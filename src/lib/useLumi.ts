@@ -88,20 +88,19 @@ function updateState(
         ? (content.culture_phrase as string)
         : prev.lumiCulturePhrase
 
-    // ── Auto-deriva session_id y resource_id desde content ──
-    // Cuando el backend manda un resource_card o cualquier nodo con
-    // content.session_id / content.id, los persistimos para que los
-    // siguientes dispatches (close_resource_viewer, feedback) puedan
-    // referirlos. result.state puede sobrescribir si el backend lo
-    // pide explícitamente (lo respeta).
-    const sessionFromContent =
-      typeof content.session_id === 'string' && content.session_id
-        ? { currentSessionId: content.session_id }
-        : {}
-    const resourceFromContent =
-      typeof content.id === 'string' && content.id && result.content_type === 'resource_card'
-        ? { currentResourceId: content.id as string }
-        : {}
+    // Session/resource: prioridad — state.override > content > prev.
+    // Strings vacíos del backend NO limpian valores ya seteados.
+    const stateOverride = (result.state as Partial<LumiState>) || {}
+    const overrideSession =
+      typeof stateOverride.currentSessionId === 'string' ? stateOverride.currentSessionId : ''
+    const overrideResource =
+      typeof stateOverride.currentResourceId === 'string' ? stateOverride.currentResourceId : ''
+    const contentSession =
+      typeof content.session_id === 'string' ? content.session_id : ''
+    const contentResource =
+      typeof content.resource_id === 'string' ? content.resource_id : ''
+    const finalSessionId = overrideSession || contentSession || prev.currentSessionId
+    const finalResourceId = overrideResource || contentResource || prev.currentResourceId
 
     return {
       ...prev,
@@ -111,13 +110,12 @@ function updateState(
       lumiContentData:   content,
       lumiCulturePhrase: culturePhrase,
       lumiCode:          (result.code as string)           ?? prev.lumiCode,
-      ...sessionFromContent,
-      ...resourceFromContent,
-      ...((result.state as Partial<LumiState>) || {}),
+      ...stateOverride,
+      currentSessionId: finalSessionId,
+      currentResourceId: finalResourceId,
     }
   })
 }
-
 // ─── useLumi hook ─────────────────────────────────────────────────
 export function useLumi() {
   const [state, setState] = useState<LumiState>(initialState)
