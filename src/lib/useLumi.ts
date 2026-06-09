@@ -3,6 +3,8 @@ import type { User } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 
 // ─── ensureAnonymousUser ──────────────────────────────────────────
+// Patrón "promesa singleton" — previene doble creación de usuario
+// bajo React 18 StrictMode (Vite dev monta dos veces).
 let userPromise: Promise<User | null> | null = null
 
 function ensureAnonymousUser(): Promise<User | null> {
@@ -72,8 +74,8 @@ function buildParams(state: LumiState): Record<string, string> {
     sanctuary_item_id: state.currentSanctuaryItemId,
     lang: state.lang,
     checkin_state: state.checkinState,
-    checkin_area:  state.checkinArea,
-    checkin_time:  state.checkinTime,
+    checkin_area: state.checkinArea,
+    checkin_time: state.checkinTime,
   }
 }
 
@@ -88,7 +90,8 @@ function updateState(
         ? (content.culture_phrase as string)
         : prev.lumiCulturePhrase
 
-    // Session/resource: prioridad — state.override > content > prev.
+    // ── Resolución de session_id y resource_id ──
+    // Prioridad: state override del backend (si no es vacío) > content > prev.
     // Strings vacíos del backend NO limpian valores ya seteados.
     const stateOverride = (result.state as Partial<LumiState>) || {}
     const overrideSession =
@@ -101,6 +104,21 @@ function updateState(
       typeof content.resource_id === 'string' ? content.resource_id : ''
     const finalSessionId = overrideSession || contentSession || prev.currentSessionId
     const finalResourceId = overrideResource || contentResource || prev.currentResourceId
+
+    // ── Diagnóstico ── (eliminar una vez verificado el flujo)
+    console.log('[updateState]', {
+      code: result.code,
+      prevSession: prev.currentSessionId,
+      prevResource: prev.currentResourceId,
+      prevCheckin: { s: prev.checkinState, a: prev.checkinArea, t: prev.checkinTime },
+      contentSession,
+      contentResource,
+      overrideSession,
+      overrideResource,
+      stateOverride,
+      finalSession: finalSessionId,
+      finalResource: finalResourceId,
+    })
 
     return {
       ...prev,
@@ -116,17 +134,26 @@ function updateState(
     }
   })
 }
+
 // ─── useLumi hook ─────────────────────────────────────────────────
 export function useLumi() {
   const [state, setState] = useState<LumiState>(initialState)
 
   const dispatch = useCallback(
     async (action: string, extra?: Record<string, string>) => {
+      const params = { ...buildParams(state), ...extra }
+
+      // ── Diagnóstico ── (eliminar una vez verificado el flujo)
+      console.log('[dispatch]', action, { params, extra })
+
       const { data, error } = await supabase.rpc('lumi_dispatch', {
         p_action: action,
-        p_params: { ...buildParams(state), ...extra },
+        p_params: params,
       })
-      if (error) { console.error('[useLumi] dispatch error:', error); return }
+      if (error) {
+        console.error('[useLumi] dispatch error:', error)
+        return
+      }
       if (data?.ok) {
         updateState(setState, data as Record<string, unknown>)
       } else {
@@ -164,8 +191,13 @@ export function useLumi() {
         },
       })
       if (cancelled) return
-      if (homeErr) { console.error('[useLumi] go_home error:', homeErr); return }
-      if (homeData?.ok) updateState(setState, homeData as Record<string, unknown>)
+      if (homeErr) {
+        console.error('[useLumi] go_home error:', homeErr)
+        return
+      }
+      if (homeData?.ok) {
+        updateState(setState, homeData as Record<string, unknown>)
+      }
     }
 
     init()
