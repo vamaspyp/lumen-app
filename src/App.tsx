@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useLumi } from './lib/useLumi'
 import { getModuleTokens, type ModuleTokens } from './lib/tokens'
@@ -499,32 +499,12 @@ function SanctuaryDetail({
 }
 
 
-const POSITIVE_ACTIONS = new Set([
-  'feedback_helpful', 'save_to_sanctuary', 'submit_name', 'save_note', 'submit_contribution',
-  'start_checkin', 'submit_checkin_state', 'submit_checkin_area', 'submit_checkin_time',
-  'next_recommendation', 'open_resource', 'resource_viewer_active',
-])
-const EXIT_ACTIONS = new Set(['go_home', 'mode_presence'])
-
-function getPillVariant(
-  action: string,
-  index: number,
-  allActions: Array<{ label: string; action: string; value?: string }>
-): 'solid' | 'outline' | 'ghost' {
-  if (EXIT_ACTIONS.has(action)) return 'ghost'
-  if (POSITIVE_ACTIONS.has(action)) {
-    const firstPositiveIdx = allActions.findIndex(a => POSITIVE_ACTIONS.has(a.action))
-    if (index === firstPositiveIdx) return 'solid'
-  }
-  return 'outline'
-}
-
 function NamePrompt({
   actions,
   dispatch,
   tokens,
 }: {
-  actions: Array<{ label: string; action: string; value?: string }>
+  actions: Array<{ label: string; action: string; value?: string; variant?: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
   tokens: ModuleTokens
 }) {
@@ -571,7 +551,7 @@ function NamePrompt({
             variant={
               action.action === 'submit_name' && !name.trim()
                 ? 'outline'
-                : getPillVariant(action.action, idx, actions)
+                : (action.variant as 'solid' | 'outline' | 'ghost') || 'outline'
             }
             onClick={() => handleAction(action.action)}
             tokens={tokens}
@@ -590,7 +570,7 @@ function NoteEditor({
   tokens,
 }: {
   content: Record<string, unknown>
-  actions: Array<{ label: string; action: string }>
+  actions: Array<{ label: string; action: string; variant?: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
   tokens: ModuleTokens
 }) {
@@ -719,7 +699,7 @@ function NoteEditor({
           <Pill
             key={`${action.action}-${idx}`}
             label={action.label}
-            variant={getPillVariant(action.action, idx, actions)}
+            variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
             onClick={() => handleAction(action.action)}
             tokens={tokens}
           />
@@ -1178,7 +1158,7 @@ function ContributionForm({
   dispatch,
   tokens,
 }: {
-  actions: Array<{ label: string; action: string }>
+  actions: Array<{ label: string; action: string; variant?: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
   tokens: ModuleTokens
 }) {
@@ -1281,7 +1261,7 @@ function ContributionForm({
             <Pill
               key={`${action.action}-${idx}`}
               label={action.label}
-              variant={getPillVariant(action.action, idx, actions)}
+              variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
               onClick={() => !disabled && handleAction(action.action)}
               tokens={tokens}
             />
@@ -1301,7 +1281,7 @@ function ShareText({
   tokens,
 }: {
   content: Record<string, unknown>
-  actions: Array<{ label: string; action: string }>
+  actions: Array<{ label: string; action: string; variant?: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
   tokens: ModuleTokens
 }) {
@@ -1370,7 +1350,7 @@ function ShareText({
           <Pill
             key={`${action.action}-${idx}`}
             label={action.label}
-            variant={getPillVariant(action.action, idx, actions)}
+            variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
             onClick={() => dispatch(action.action)}
             tokens={tokens}
           />
@@ -1389,7 +1369,7 @@ function ExternalFallback({
   tokens,
   activeUrl,
 }: {
-  actions: Array<{ label: string; action: string }>
+  actions: Array<{ label: string; action: string; variant?: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
   tokens: ModuleTokens
   activeUrl: string
@@ -1440,7 +1420,7 @@ function ExternalFallback({
           <Pill
             key={`${action.action}-${idx}`}
             label={action.label}
-            variant={getPillVariant(action.action, idx, actions)}
+            variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
             onClick={() => dispatch(action.action)}
             tokens={tokens}
           />
@@ -1640,7 +1620,7 @@ function ResourceViewer({
   sourceKind: string
   url: string
   title: string
-  actions: Array<{ label: string; action: string }>
+  actions: Array<{ label: string; action: string; variant?: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
   tokens: ModuleTokens
 }) {
@@ -1827,7 +1807,7 @@ function ContentArea({
 }: {
   contentType: string
   contentData: Record<string, unknown>
-  actions: Array<{ label: string; action: string; value?: string }>
+  actions: Array<{ label: string; action: string; value?: string; variant?: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
   tokens: ModuleTokens
 }) {
@@ -1841,7 +1821,7 @@ function ContentArea({
             <Pill
               key={`${action.action}-${idx}`}
               label={action.label}
-              variant={getPillVariant(action.action, idx, actions)}
+              variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
               onClick={() => {
                 if (action.action === 'share_resource') {
                   dispatch('share_resource', {
@@ -1975,7 +1955,7 @@ function ContentArea({
               <Pill
                 key={`${action.action}-${idx}`}
                 label={action.label}
-                variant={getPillVariant(action.action, idx, actions)}
+                variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
                 onClick={() => dispatch(action.action)}
                 tokens={tokens}
               />
@@ -1996,7 +1976,7 @@ function ContentArea({
             <Pill
               key={`${action.action}-${idx}`}
               label={action.label}
-              variant={getPillVariant(action.action, idx, actions)}
+              variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
               onClick={() => {
                 const extra: Record<string, string> = {}
                 if (action.action === 'share_resource') {
@@ -2043,7 +2023,7 @@ function ContentArea({
             <Pill
               key={`${action.action}-${idx}`}
               label={action.label}
-              variant={getPillVariant(action.action, idx, actions)}
+              variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
               onClick={() => dispatch(action.action)}
               tokens={tokens}
             />
@@ -2100,7 +2080,7 @@ function ContentArea({
         <Pill
           key={`${action.action}-${idx}`}
           label={action.label}
-          variant={getPillVariant(action.action, idx, actions)}
+          variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
           onClick={() => dispatch(action.action)}
           tokens={tokens}
         />
@@ -2121,40 +2101,7 @@ function App() {
   const { state, dispatch } = useLumi()
   const tokens = getModuleTokens(state.contentSource)
 
-  // Track del módulo actual para forzar re-render del contenido en transición
-  const moduleKey = tokens.source
   const accentGlowPeak = hexToRgba(tokens.accent, 0.5)
-
-  const [perlaVisible, setPerlaVisible] = useState(false)
-  const [msgVisible, setMsgVisible] = useState(false)
-  const [pillsVisible, setPillsVisible] = useState(false)
-  const prevMsgRef = useRef<string>('')
-
-  useEffect(() => {
-    const current = state.lumiMessage || ''
-    // Solo animar cuando el mensaje cambió a un valor no vacío.
-    // Evita el doble-disparo cuando lumiCode cambia pero el texto es el mismo.
-    if (!current || current === prevMsgRef.current) return
-    prevMsgRef.current = current
-
-    setPerlaVisible(false)
-    setMsgVisible(false)
-    setPillsVisible(false)
-
-    const perla = (state.lumiContentData?.culture_phrase as string) || ''
-    const timers: ReturnType<typeof setTimeout>[] = []
-
-    if (perla) {
-      timers.push(setTimeout(() => setPerlaVisible(true), 50))
-      timers.push(setTimeout(() => setMsgVisible(true), 550))
-      timers.push(setTimeout(() => setPillsVisible(true), 1150))
-    } else {
-      timers.push(setTimeout(() => setMsgVisible(true), 50))
-      timers.push(setTimeout(() => setPillsVisible(true), 650))
-    }
-
-    return () => timers.forEach(clearTimeout)
-  }, [state.lumiCode])
 
   return (
     <>
@@ -2163,13 +2110,9 @@ function App() {
           0%, 100% { transform: scale(1); opacity: 0.85; box-shadow: ${tokens.orbGlow}; }
           50%      { transform: scale(1.12); opacity: 1; box-shadow: 0 0 24px 24px ${accentGlowPeak}; }
         }
-        @keyframes content-enter {
-          0%   { opacity: 0; transform: translateY(8px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes message-enter {
-          0%   { opacity: 0; transform: translateY(4px); }
-          100% { opacity: 1; transform: translateY(0); }
+        @keyframes lumiAppear {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
         body { margin: 0; }
         .lumi-orb {
@@ -2177,12 +2120,6 @@ function App() {
         }
         .lumi-bg {
           transition: background-color 0.6s ease, color 0.6s ease;
-        }
-        .lumi-content {
-          animation: content-enter 0.45s ease both;
-        }
-        .lumi-message {
-          animation: message-enter 0.6s ease both;
         }
       `}</style>
 
@@ -2220,69 +2157,55 @@ function App() {
             />
           </div>
 
-{/* LUMI: una sola voz. Perla (si hay) + mensaje contextual,
-              como una misma respiración. Nunca dos voces a la vez. */}
-          {(() => {
-            const perla   = (state.lumiContentData?.culture_phrase as string) || ''
-            const mensaje = state.lumiMessage || ''
-            if (!perla && !mensaje) return null
-            return (
-              <div
-                style={{
-                  fontFamily: 'Georgia, "Times New Roman", serif',
-                  fontStyle: 'italic',
-                  textAlign: 'center',
-                  lineHeight: 1.5,
-                  margin: '0 0 1.75rem 0',
-                  maxWidth: '38ch',
-                }}
-              >
-                {perla && (
-                  <span
-                    style={{
-                      display: 'block',
-                      fontSize: '0.8rem',
-                      fontStyle: 'italic',
-                      color: tokens.textMuted,
-                      opacity: perlaVisible ? 0.75 : 0,
-                      transform: perlaVisible ? 'translateY(0)' : 'translateY(8px)',
-                      transition: 'opacity 600ms ease-out, transform 600ms ease-out',
-                      marginBottom: mensaje ? '0.65rem' : 0,
-                      letterSpacing: '0.005em',
-                    }}
-                  >
-                    "{perla}"
-                  </span>
-                )}
-                {mensaje && (
-                  <span
-                    style={{
-                      display: 'block',
-                      fontSize: '1.05rem',
-                      color: tokens.textPrimary,
-                      opacity: msgVisible ? 1 : 0,
-                      transform: msgVisible ? 'translateY(0)' : 'translateY(8px)',
-                      transition: 'opacity 600ms ease-out, transform 600ms ease-out',
-                    }}
-                  >
-                    {mensaje}
-                  </span>
-                )}
-              </div>
-            )
-          })()}
-
-          {/* Contenido: re-renderiza con fade en cambio de módulo */}
           <div
-            key={`content-${moduleKey}-${state.lumiCode}`}
-            style={{
-              width: '100%',
-              opacity: pillsVisible ? 1 : 0,
-              transform: pillsVisible ? 'translateY(0)' : 'translateY(8px)',
-              transition: 'opacity 600ms ease-out, transform 600ms ease-out',
-              pointerEvents: pillsVisible ? 'auto' : 'none',
-            }}
+            key={state.lumiMessage}
+            style={{ animation: 'lumiAppear 600ms ease-out both', width: '100%' }}
           >
+            {(() => {
+              const perla   = (state.lumiContentData?.culture_phrase as string) || ''
+              const mensaje = state.lumiMessage || ''
+              if (!perla && !mensaje) return null
+              return (
+                <div
+                  style={{
+                    fontFamily: 'Georgia, "Times New Roman", serif',
+                    fontStyle: 'italic',
+                    textAlign: 'center',
+                    lineHeight: 1.5,
+                    margin: '0 0 1.75rem 0',
+                    maxWidth: '38ch',
+                  }}
+                >
+                  {perla && (
+                    <span
+                      style={{
+                        display: 'block',
+                        fontSize: '0.8rem',
+                        fontStyle: 'italic',
+                        color: tokens.textMuted,
+                        opacity: 0.75,
+                        marginBottom: mensaje ? '0.65rem' : 0,
+                        letterSpacing: '0.005em',
+                      }}
+                    >
+                      "{perla}"
+                    </span>
+                  )}
+                  {mensaje && (
+                    <span
+                      style={{
+                        display: 'block',
+                        fontSize: '1.05rem',
+                        color: tokens.textPrimary,
+                      }}
+                    >
+                      {mensaje}
+                    </span>
+                  )}
+                </div>
+              )
+            })()}
+
             <ContentArea
               contentType={state.lumiContentType}
               contentData={state.lumiContentData}
