@@ -2159,7 +2159,7 @@ function App() {
 
           <div
             key={state.lumiMessage}
-            style={{ animation: 'lumiAppear 600ms ease-out both', width: '100%' }}
+            style={{ animation: 'lumiAppear 600ms ease-out both', width: '100%', textAlign: 'center' }}
           >
             {(() => {
               const perla   = (state.lumiContentData?.culture_phrase as string) || ''
@@ -2172,7 +2172,7 @@ function App() {
                     fontStyle: 'italic',
                     textAlign: 'center',
                     lineHeight: 1.5,
-                    margin: '0 0 1.75rem 0',
+                    margin: '0 auto 1.75rem',
                     maxWidth: '38ch',
                   }}
                 >
