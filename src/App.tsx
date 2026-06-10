@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useLumi } from './lib/useLumi'
 import { getModuleTokens, type ModuleTokens } from './lib/tokens'
@@ -41,8 +41,9 @@ function Pill({
     },
     ghost: {
       background: 'transparent',
-      border: 'none',
+      border: '1px solid transparent',
       color: tokens.textSecondary,
+      fontSize: '0.85rem',
     },
   }
 
@@ -50,7 +51,6 @@ function Pill({
     <button
       onClick={onClick}
       style={{
-        ...styles[variant],
         padding: hint ? '0.75rem 1.25rem' : '0.7rem 1.25rem',
         borderRadius: '999px',
         fontSize: '0.9rem',
@@ -62,6 +62,7 @@ function Pill({
         alignItems: 'center',
         gap: '0.125rem',
         maxWidth: '100%',
+        ...styles[variant],
       }}
     >
       <span>{label}</span>
@@ -2127,13 +2128,18 @@ function App() {
   const [perlaVisible, setPerlaVisible] = useState(false)
   const [msgVisible, setMsgVisible] = useState(false)
   const [pillsVisible, setPillsVisible] = useState(false)
+  const prevMsgRef = useRef<string>('')
 
   useEffect(() => {
+    const current = state.lumiMessage || ''
+    // Solo animar cuando el mensaje cambió a un valor no vacío.
+    // Evita el doble-disparo cuando lumiCode cambia pero el texto es el mismo.
+    if (!current || current === prevMsgRef.current) return
+    prevMsgRef.current = current
+
     setPerlaVisible(false)
     setMsgVisible(false)
     setPillsVisible(false)
-
-    if (!state.lumiMessage) return
 
     const perla = (state.lumiContentData?.culture_phrase as string) || ''
     const timers: ReturnType<typeof setTimeout>[] = []
