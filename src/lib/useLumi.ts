@@ -105,21 +105,6 @@ function updateState(
     const finalSessionId = overrideSession || contentSession || prev.currentSessionId
     const finalResourceId = overrideResource || contentResource || prev.currentResourceId
 
-    // ── Diagnóstico ── (eliminar una vez verificado el flujo)
-    console.log('[updateState]', {
-      code: result.code,
-      prevSession: prev.currentSessionId,
-      prevResource: prev.currentResourceId,
-      prevCheckin: { s: prev.checkinState, a: prev.checkinArea, t: prev.checkinTime },
-      contentSession,
-      contentResource,
-      overrideSession,
-      overrideResource,
-      stateOverride,
-      finalSession: finalSessionId,
-      finalResource: finalResourceId,
-    })
-
     return {
       ...prev,
       lumiMessage:       (result.message as string)        ?? prev.lumiMessage,
@@ -142,9 +127,6 @@ export function useLumi() {
   const dispatch = useCallback(
     async (action: string, extra?: Record<string, string>) => {
       const params = { ...buildParams(state), ...extra }
-
-      // ── Diagnóstico ── (eliminar una vez verificado el flujo)
-      console.log('[dispatch]', action, { params, extra })
 
       const { data, error } = await supabase.rpc('lumi_dispatch', {
         p_action: action,
