@@ -2099,11 +2099,11 @@ function App() {
 
     if (perla) {
       timers.push(setTimeout(() => setPerlaVisible(true), 50))
-      timers.push(setTimeout(() => setMsgVisible(true), 450))
-      timers.push(setTimeout(() => setPillsVisible(true), 750))
+      timers.push(setTimeout(() => setMsgVisible(true), 550))
+      timers.push(setTimeout(() => setPillsVisible(true), 1150))
     } else {
       timers.push(setTimeout(() => setMsgVisible(true), 50))
-      timers.push(setTimeout(() => setPillsVisible(true), 350))
+      timers.push(setTimeout(() => setPillsVisible(true), 650))
     }
 
     return () => timers.forEach(clearTimeout)
@@ -2199,7 +2199,8 @@ function App() {
                       fontStyle: 'italic',
                       color: tokens.textMuted,
                       opacity: perlaVisible ? 0.75 : 0,
-                      transition: 'opacity 300ms ease',
+                      transform: perlaVisible ? 'translateY(0)' : 'translateY(8px)',
+                      transition: 'opacity 600ms ease-out, transform 600ms ease-out',
                       marginBottom: mensaje ? '0.65rem' : 0,
                       letterSpacing: '0.005em',
                     }}
@@ -2214,7 +2215,8 @@ function App() {
                       fontSize: '1.05rem',
                       color: tokens.textPrimary,
                       opacity: msgVisible ? 1 : 0,
-                      transition: 'opacity 300ms ease',
+                      transform: msgVisible ? 'translateY(0)' : 'translateY(8px)',
+                      transition: 'opacity 600ms ease-out, transform 600ms ease-out',
                     }}
                   >
                     {mensaje}
@@ -2230,7 +2232,8 @@ function App() {
             style={{
               width: '100%',
               opacity: pillsVisible ? 1 : 0,
-              transition: 'opacity 300ms ease',
+              transform: pillsVisible ? 'translateY(0)' : 'translateY(8px)',
+              transition: 'opacity 600ms ease-out, transform 600ms ease-out',
               pointerEvents: pillsVisible ? 'auto' : 'none',
             }}
           >
