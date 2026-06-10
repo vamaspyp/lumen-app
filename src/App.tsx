@@ -2094,6 +2094,8 @@ function App() {
     setMsgVisible(false)
     setPillsVisible(false)
 
+    if (!state.lumiMessage) return
+
     const perla = (state.lumiContentData?.culture_phrase as string) || ''
     const timers: ReturnType<typeof setTimeout>[] = []
 
