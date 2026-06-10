@@ -498,6 +498,26 @@ function SanctuaryDetail({
 }
 
 
+const POSITIVE_ACTIONS = new Set([
+  'feedback_helpful', 'save_to_sanctuary', 'submit_name', 'save_note', 'submit_contribution',
+  'start_checkin', 'submit_checkin_state', 'submit_checkin_area', 'submit_checkin_time',
+  'next_recommendation', 'open_resource', 'resource_viewer_active',
+])
+const EXIT_ACTIONS = new Set(['go_home', 'mode_presence'])
+
+function getPillVariant(
+  action: string,
+  index: number,
+  allActions: Array<{ label: string; action: string; value?: string }>
+): 'solid' | 'outline' | 'ghost' {
+  if (EXIT_ACTIONS.has(action)) return 'ghost'
+  if (POSITIVE_ACTIONS.has(action)) {
+    const firstPositiveIdx = allActions.findIndex(a => POSITIVE_ACTIONS.has(a.action))
+    if (index === firstPositiveIdx) return 'solid'
+  }
+  return 'outline'
+}
+
 function NamePrompt({
   actions,
   dispatch,
@@ -547,7 +567,11 @@ function NamePrompt({
           <Pill
             key={`${action.action}-${idx}`}
             label={action.label}
-            variant={action.action === 'submit_name' && name.trim().length > 0 ? 'solid' : 'outline'}
+            variant={
+              action.action === 'submit_name' && !name.trim()
+                ? 'outline'
+                : getPillVariant(action.action, idx, actions)
+            }
             onClick={() => handleAction(action.action)}
             tokens={tokens}
           />
@@ -694,7 +718,7 @@ function NoteEditor({
           <Pill
             key={`${action.action}-${idx}`}
             label={action.label}
-            variant={action.action === 'save_note' ? 'solid' : 'outline'}
+            variant={getPillVariant(action.action, idx, actions)}
             onClick={() => handleAction(action.action)}
             tokens={tokens}
           />
@@ -1256,7 +1280,7 @@ function ContributionForm({
             <Pill
               key={`${action.action}-${idx}`}
               label={action.label}
-              variant={isSubmit ? 'solid' : 'outline'}
+              variant={getPillVariant(action.action, idx, actions)}
               onClick={() => !disabled && handleAction(action.action)}
               tokens={tokens}
             />
@@ -1345,6 +1369,7 @@ function ShareText({
           <Pill
             key={`${action.action}-${idx}`}
             label={action.label}
+            variant={getPillVariant(action.action, idx, actions)}
             onClick={() => dispatch(action.action)}
             tokens={tokens}
           />
@@ -1814,6 +1839,7 @@ function ContentArea({
             <Pill
               key={`${action.action}-${idx}`}
               label={action.label}
+              variant={getPillVariant(action.action, idx, actions)}
               onClick={() => {
                 if (action.action === 'share_resource') {
                   dispatch('share_resource', {
@@ -1947,6 +1973,7 @@ function ContentArea({
               <Pill
                 key={`${action.action}-${idx}`}
                 label={action.label}
+                variant={getPillVariant(action.action, idx, actions)}
                 onClick={() => dispatch(action.action)}
                 tokens={tokens}
               />
@@ -1967,6 +1994,7 @@ function ContentArea({
             <Pill
               key={`${action.action}-${idx}`}
               label={action.label}
+              variant={getPillVariant(action.action, idx, actions)}
               onClick={() => {
                 const extra: Record<string, string> = {}
                 if (action.action === 'share_resource') {
@@ -2013,6 +2041,7 @@ function ContentArea({
             <Pill
               key={`${action.action}-${idx}`}
               label={action.label}
+              variant={getPillVariant(action.action, idx, actions)}
               onClick={() => dispatch(action.action)}
               tokens={tokens}
             />
@@ -2069,6 +2098,7 @@ function ContentArea({
         <Pill
           key={`${action.action}-${idx}`}
           label={action.label}
+          variant={getPillVariant(action.action, idx, actions)}
           onClick={() => dispatch(action.action)}
           tokens={tokens}
         />
