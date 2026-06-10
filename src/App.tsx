@@ -31,7 +31,7 @@ function Pill({
   const styles: Record<string, React.CSSProperties> = {
     outline: {
       background: tokens.accentSoft20,
-      border: '1px solid transparent',
+      border: `1px solid ${tokens.accentSoft30}`,
       color: tokens.accentDeep,
     },
     solid: {
@@ -1439,6 +1439,7 @@ function ExternalFallback({
           <Pill
             key={`${action.action}-${idx}`}
             label={action.label}
+            variant={getPillVariant(action.action, idx, actions)}
             onClick={() => dispatch(action.action)}
             tokens={tokens}
           />
