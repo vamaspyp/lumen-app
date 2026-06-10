@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useLumi } from './lib/useLumi'
 import { getModuleTokens, type ModuleTokens } from './lib/tokens'
 import {
@@ -1656,7 +1657,7 @@ function ResourceViewer({
 
   const shareAction = actions.find(a => a.action === 'share_resource')
 
-  return (
+  return createPortal(
     <div
       style={{
         position: 'fixed',
@@ -1784,7 +1785,8 @@ function ResourceViewer({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
