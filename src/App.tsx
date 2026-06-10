@@ -1605,6 +1605,126 @@ function AudioDirect({ src, title }: {
   )
 }
 
+// ─── GuidedPractice ──────────────────────────────────────────────
+function GuidedPractice({
+  content,
+  dispatch,
+}: {
+  content: Record<string, unknown>
+  tokens: ModuleTokens
+  dispatch: (action: string, extra?: Record<string, string>) => void
+}) {
+  const steps = (content.steps as Array<{ text: string }>) || []
+  const sourceLabel = (content.source_label as string) || ''
+  const sourceDetail = (content.source_detail as string) || ''
+
+  const [stepIndex, setStepIndex] = useState(0)
+
+  if (steps.length === 0) return null
+
+  const isLast = stepIndex === steps.length - 1
+  const step = steps[stepIndex]
+
+  const advance = () => {
+    if (isLast) {
+      dispatch('close_resource_viewer')
+      return
+    }
+    setStepIndex(i => i + 1)
+  }
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '2.5rem',
+        padding: '2rem 1.5rem',
+      }}
+    >
+      {sourceLabel && (
+        <p
+          style={{
+            fontSize: '0.75rem',
+            fontStyle: 'italic',
+            color: 'rgba(244,239,230,0.5)',
+            margin: 0,
+            textAlign: 'center',
+          }}
+        >
+          {sourceLabel}
+        </p>
+      )}
+
+      <p
+        key={stepIndex}
+        style={{
+          fontSize: '1.1rem',
+          color: '#F4EFE6',
+          fontFamily: 'Georgia, "Times New Roman", serif',
+          lineHeight: 1.7,
+          maxWidth: '32ch',
+          textAlign: 'center',
+          margin: 0,
+          animation: 'lumiAppear 400ms ease-out both',
+        }}
+      >
+        {step.text}
+      </p>
+
+      {isLast && sourceDetail && (
+        <p
+          style={{
+            fontSize: '0.7rem',
+            fontStyle: 'italic',
+            color: 'rgba(244,239,230,0.4)',
+            maxWidth: '40ch',
+            textAlign: 'center',
+            margin: 0,
+          }}
+        >
+          {sourceDetail}
+        </p>
+      )}
+
+      <button
+        onClick={advance}
+        style={{
+          padding: '0.75rem 2rem',
+          borderRadius: '999px',
+          border: '1px solid rgba(255,255,255,0.2)',
+          background: 'transparent',
+          color: '#F4EFE6',
+          fontSize: '0.9rem',
+          cursor: 'pointer',
+          fontFamily: 'inherit',
+          transition: 'background 0.2s ease',
+        }}
+      >
+        {isLast ? 'Terminar' : 'Siguiente'}
+      </button>
+
+      {steps.length > 1 && (
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {steps.map((_, i) => (
+            <div
+              key={i}
+              style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: i === stepIndex ? '#F4EFE6' : 'rgba(244,239,230,0.25)',
+                transition: 'background 0.3s ease',
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── ResourceViewer (full screen overlay) ────────────────────────
 // Toma la pantalla completa. LUMI se retira durante el recurso —
 // vuelve cuando la persona cierra. Canon: "presencia que se aparta
@@ -1613,6 +1733,7 @@ function ResourceViewer({
   sourceKind,
   url,
   title,
+  content,
   actions,
   dispatch,
   tokens,
@@ -1620,6 +1741,7 @@ function ResourceViewer({
   sourceKind: string
   url: string
   title: string
+  content?: Record<string, unknown>
   actions: Array<{ label: string; action: string; variant?: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
   tokens: ModuleTokens
@@ -1642,7 +1764,9 @@ function ResourceViewer({
 
   let embedNode: React.ReactNode = null
 
-  if (sourceKind === 'youtube') {
+  if (sourceKind === 'lumen_practice') {
+    embedNode = <GuidedPractice content={content || {}} tokens={tokens} dispatch={dispatch} />
+  } else if (sourceKind === 'youtube') {
     const u = youtubeEmbedUrl(url)
     embedNode = u ? <YouTubeEmbed src={u} title={title} tokens={tokens} /> : null
   } else if (sourceKind === 'vimeo') {
@@ -2052,6 +2176,7 @@ function ContentArea({
   // external_fallback + todos los source_kinds embebibles → ResourceViewer
   if (
     contentType === 'external_fallback' ||
+    contentType === 'lumen_practice' ||
     contentType === 'youtube' ||
     contentType === 'vimeo' ||
     contentType === 'spotify' ||
@@ -2060,12 +2185,12 @@ function ContentArea({
     contentType === 'image' ||
     contentType === 'audio_direct'
   ) {
-    // Necesito acceso al state — vamos a pasarlo como prop a ContentArea
     return (
       <ResourceViewer
         sourceKind={contentType === 'external_fallback' ? 'external_fallback' : contentType}
         url={(contentData.activeUrl as string) || ''}
         title={(contentData.title as string) || ''}
+        content={contentData}
         actions={actions}
         dispatch={dispatch}
         tokens={tokens}
