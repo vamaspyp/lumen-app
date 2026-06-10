@@ -2077,6 +2077,13 @@ function ContentArea({
   )
 }
 
+function hexToRgba(hex: string, a: number): string {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r}, ${g}, ${b}, ${a})`
+}
+
 // ─── App shell ───────────────────────────────────────────────────
 function App() {
   const { state, dispatch } = useLumi()
@@ -2084,6 +2091,7 @@ function App() {
 
   // Track del módulo actual para forzar re-render del contenido en transición
   const moduleKey = tokens.source
+  const accentGlowPeak = hexToRgba(tokens.accent, 0.5)
 
   const [perlaVisible, setPerlaVisible] = useState(false)
   const [msgVisible, setMsgVisible] = useState(false)
@@ -2115,8 +2123,8 @@ function App() {
     <>
       <style>{`
         @keyframes lumi-pulse {
-          0%, 100% { transform: scale(1); opacity: 0.9; }
-          50%      { transform: scale(1.06); opacity: 1; }
+          0%, 100% { transform: scale(1); opacity: 0.85; box-shadow: ${tokens.orbGlow}; }
+          50%      { transform: scale(1.12); opacity: 1; box-shadow: 0 0 24px 24px ${accentGlowPeak}; }
         }
         @keyframes content-enter {
           0%   { opacity: 0; transform: translateY(8px); }
@@ -2170,8 +2178,7 @@ function App() {
                 height: 56,
                 borderRadius: '50%',
                 background: `radial-gradient(circle at 35% 35%, ${tokens.orbInner}, ${tokens.orbMid} 60%, ${tokens.orbOuter})`,
-                boxShadow: tokens.orbGlow,
-                animation: 'lumi-pulse 3.5s ease-in-out infinite',
+                animation: 'lumi-pulse 2.5s ease-in-out infinite',
               }}
             />
           </div>
