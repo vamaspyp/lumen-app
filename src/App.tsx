@@ -2085,6 +2085,30 @@ function App() {
   // Track del módulo actual para forzar re-render del contenido en transición
   const moduleKey = tokens.source
 
+  const [perlaVisible, setPerlaVisible] = useState(false)
+  const [msgVisible, setMsgVisible] = useState(false)
+  const [pillsVisible, setPillsVisible] = useState(false)
+
+  useEffect(() => {
+    setPerlaVisible(false)
+    setMsgVisible(false)
+    setPillsVisible(false)
+
+    const perla = (state.lumiContentData?.culture_phrase as string) || ''
+    const timers: ReturnType<typeof setTimeout>[] = []
+
+    if (perla) {
+      timers.push(setTimeout(() => setPerlaVisible(true), 50))
+      timers.push(setTimeout(() => setMsgVisible(true), 450))
+      timers.push(setTimeout(() => setPillsVisible(true), 750))
+    } else {
+      timers.push(setTimeout(() => setMsgVisible(true), 50))
+      timers.push(setTimeout(() => setPillsVisible(true), 350))
+    }
+
+    return () => timers.forEach(clearTimeout)
+  }, [state.lumiCode])
+
   return (
     <>
       <style>{`
@@ -2158,8 +2182,6 @@ function App() {
             if (!perla && !mensaje) return null
             return (
               <div
-                key={`lumi-voz-${moduleKey}-${state.lumiCode}`}
-                className="lumi-message"
                 style={{
                   fontFamily: 'Georgia, "Times New Roman", serif',
                   fontStyle: 'italic',
@@ -2173,9 +2195,11 @@ function App() {
                   <span
                     style={{
                       display: 'block',
-                      fontSize: '0.85rem',
+                      fontSize: '0.8rem',
+                      fontStyle: 'italic',
                       color: tokens.textMuted,
-                      opacity: 0.85,
+                      opacity: perlaVisible ? 0.75 : 0,
+                      transition: 'opacity 300ms ease',
                       marginBottom: mensaje ? '0.65rem' : 0,
                       letterSpacing: '0.005em',
                     }}
@@ -2189,6 +2213,8 @@ function App() {
                       display: 'block',
                       fontSize: '1.05rem',
                       color: tokens.textPrimary,
+                      opacity: msgVisible ? 1 : 0,
+                      transition: 'opacity 300ms ease',
                     }}
                   >
                     {mensaje}
@@ -2201,8 +2227,12 @@ function App() {
           {/* Contenido: re-renderiza con fade en cambio de módulo */}
           <div
             key={`content-${moduleKey}-${state.lumiCode}`}
-            className="lumi-content"
-            style={{ width: '100%' }}
+            style={{
+              width: '100%',
+              opacity: pillsVisible ? 1 : 0,
+              transition: 'opacity 300ms ease',
+              pointerEvents: pillsVisible ? 'auto' : 'none',
+            }}
           >
             <ContentArea
               contentType={state.lumiContentType}
