@@ -1611,6 +1611,8 @@ function GuidedPractice({
   tokens: ModuleTokens
   dispatch: (action: string, extra?: Record<string, string>) => void
 }) {
+  console.log('[GuidedPractice] content:', JSON.stringify(content, null, 2))
+
   const meta = (content.metadata as Record<string, unknown>) || {}
   const steps = (meta.steps as Array<{ text: string }>) || (content.steps as Array<{ text: string }>) || []
   const sourceLabel = (meta.source_label as string) || (content.source_label as string) || ''
