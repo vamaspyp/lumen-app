@@ -137,6 +137,7 @@ function ResourceCard({
   const sessionId = (content.session_id as string) || ''
   const isRepeat = !!(content.is_repeat as boolean)
   const isSaved = !!(content.is_saved as boolean)
+  const sourceKind = (content.source_kind as string) || 'external_url'
 
   const formatLabel = [
     format && format.charAt(0).toUpperCase() + format.slice(1),
@@ -149,14 +150,10 @@ function ResourceCard({
   ])
 
   const handleOpen = () => {
-    if (!url || !resourceId) return
+    if (!resourceId) return
+    // lumen_practice no tiene URL — el contenido viene en metadata
+    if (sourceKind !== 'lumen_practice' && !url) return
 
-    // Unificado: TODO recurso (embebible o externo) entra al viewer.
-    // Para externos, ResourceViewer cae a ExternalFallback que muestra
-    // "Voy a abrirlo en otra pestaña, te espero" + botón para abrir afuera.
-    // Al cerrar (pill "Listo"), arranca el feedback con el after_prompt
-    // específico del recurso. Diálogo cerrado, sin soltar al usuario.
-    const sourceKind = (content.source_kind as string) || 'external_url'
     dispatch('resource_viewer_active', {
       source_kind: sourceKind,
       resource_id: resourceId,
@@ -303,7 +300,7 @@ function ResourceCard({
       )}
 
       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-        {url && (
+        {(url || sourceKind === 'lumen_practice') && (
           <button
             onClick={handleOpen}
             style={{
@@ -1614,9 +1611,10 @@ function GuidedPractice({
   tokens: ModuleTokens
   dispatch: (action: string, extra?: Record<string, string>) => void
 }) {
-  const steps = (content.steps as Array<{ text: string }>) || []
-  const sourceLabel = (content.source_label as string) || ''
-  const sourceDetail = (content.source_detail as string) || ''
+  const meta = (content.metadata as Record<string, unknown>) || {}
+  const steps = (meta.steps as Array<{ text: string }>) || (content.steps as Array<{ text: string }>) || []
+  const sourceLabel = (meta.source_label as string) || (content.source_label as string) || ''
+  const sourceDetail = (meta.source_detail as string) || (content.source_detail as string) || ''
 
   const [stepIndex, setStepIndex] = useState(0)
 
