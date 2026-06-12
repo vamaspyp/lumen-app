@@ -2335,7 +2335,10 @@ function App() {
           backgroundColor: tokens.background,
           color: tokens.textPrimary,
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-          padding: '2rem 1.25rem 6rem',
+          paddingTop: '2rem',
+          paddingLeft: '1.25rem',
+          paddingRight: '1.25rem',
+          paddingBottom: 'calc(90px + env(safe-area-inset-bottom, 0px))',
           boxSizing: 'border-box',
         }}
       >
