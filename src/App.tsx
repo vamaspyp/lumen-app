@@ -219,7 +219,14 @@ function ResourceListCard({
   onClick: () => void
   tokens: ModuleTokens
 }) {
-  const fmt = (format || '').toLowerCase()
+  const derivedFormat = format || (() => {
+    const sub = (subtitle || '').toLowerCase()
+    if (sub.startsWith('práctica') || sub.startsWith('practica')) return 'practica'
+    if (sub.startsWith('video')) return 'video'
+    if (sub.startsWith('audio')) return 'audio'
+    return 'texto'
+  })()
+  const fmt = derivedFormat.toLowerCase()
   const badgeBg = fmt === 'practica' || fmt === 'práctica' ? '#E8F0E7'
     : fmt === 'video' ? '#EDE9E0'
     : fmt === 'audio' ? '#E8EBF0'
@@ -228,7 +235,7 @@ function ResourceListCard({
     : fmt === 'video' ? '#6E5536'
     : fmt === 'audio' ? '#4A6A8E'
     : '#6E665C'
-  const formatDisplay = format ? format.charAt(0).toUpperCase() + format.slice(1) : ''
+  const formatDisplay = derivedFormat.charAt(0).toUpperCase() + derivedFormat.slice(1)
   const badgeText = [formatDisplay, durationMin != null ? `${durationMin} min` : ''].filter(Boolean).join(' · ')
   const meta = author || subtitle
 
@@ -252,7 +259,7 @@ function ResourceListCard({
         transition: 'all 0.2s ease',
       }}
     >
-      <GenerativeThumbnail format={format || ''} title={title} />
+      <GenerativeThumbnail format={derivedFormat} title={title} />
       <div style={{ padding: '10px 14px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
         {badgeText && (
           <span style={{
