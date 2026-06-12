@@ -1069,9 +1069,11 @@ function ListFilterPanel({
 function BottomNav({
   currentSource,
   dispatch,
+  bgColor,
 }: {
   currentSource: string
   dispatch: (action: string, extra?: Record<string, string>) => void
+  bgColor: string
 }) {
   const modules: Array<{
     key: 'lumi' | 'fuente' | 'sanctuary' | 'circles'
@@ -1107,6 +1109,7 @@ function BottomNav({
         gap: '2.5rem',
         pointerEvents: 'none',
         zIndex: 10,
+        background: `linear-gradient(to bottom, transparent, ${bgColor} 40%)`,
       }}
     >
       {modules.map(m => {
@@ -2459,7 +2462,7 @@ function App() {
           </details>
         </div>
       </div>
-       <BottomNav currentSource={state.contentSource} dispatch={dispatch} />
+       <BottomNav currentSource={state.contentSource} dispatch={dispatch} bgColor={tokens.background} />
     </>
   )
 }
