@@ -114,6 +114,139 @@ function ItemRow({
   )
 }
 
+// ─── GenerativeCover ─────────────────────────────────────────────
+function titleHash(s: string): number {
+  let h = 0
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) & 0x7fffffff
+  return h
+}
+
+function GenerativeCover({ format, title }: { format: string; title: string }) {
+  const h = titleHash(title || '')
+  const v = (i: number, mod: number) => (h * (i * 7 + 3) + i * 13) % mod
+
+  const fmt = (format || '').toLowerCase()
+  let bg1: string, bg2: string
+  let pattern: React.ReactNode
+
+  if (fmt === 'practica' || fmt === 'práctica') {
+    bg1 = '#E8F0E7'; bg2 = '#C5D9C0'
+    const count = 3 + v(1, 3)
+    const cx = 20 + v(2, 60)
+    const cy = 20 + v(3, 70)
+    pattern = Array.from({ length: count }, (_, i) => (
+      <circle key={i} cx={cx} cy={cy} r={20 + i * (12 + v(i + 4, 10))} fill="#8FA38C" fillOpacity={0.04 + i * 0.04} />
+    ))
+  } else if (fmt === 'video') {
+    bg1 = '#EBE7DF'; bg2 = '#D0C7B5'
+    const count = 2 + v(1, 2)
+    pattern = Array.from({ length: count }, (_, i) => {
+      const y1 = 30 + v(i * 2 + 1, 60)
+      const cp1x = 20 + v(i * 2 + 2, 60)
+      const cp1y = y1 - 20 + v(i * 2 + 3, 40)
+      const cp2x = 80 + v(i * 2 + 4, 40)
+      const cp2y = y1 + 10 + v(i * 2 + 5, 30)
+      const y2 = 30 + v(i * 2 + 6, 70)
+      return (
+        <path key={i} d={`M 0 ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, 200 ${y2}`}
+          stroke="#9B7A52" strokeWidth={1.5} strokeOpacity={0.06 + i * 0.045} fill="none" />
+      )
+    })
+  } else if (fmt === 'audio') {
+    bg1 = '#E8EBF0'; bg2 = '#C5CDD9'
+    const count = 3 + v(1, 2)
+    const cx = 50 + v(2, 100)
+    pattern = Array.from({ length: count }, (_, i) => (
+      <circle key={i} cx={cx} cy={55} r={15 + i * (12 + v(i + 3, 8))}
+        stroke="#7090B5" strokeWidth={1.5} strokeOpacity={0.06 + i * 0.035} fill="none" />
+    ))
+  } else {
+    bg1 = '#EDE9E0'; bg2 = '#D5CFC3'
+    pattern = Array.from({ length: 12 }, (_, i) => (
+      <circle key={i} cx={10 + v(i * 2 + 1, 180)} cy={5 + v(i * 2 + 2, 100)}
+        r={1.5 + v(i + 3, 4)} fill="#8FA38C" fillOpacity={0.04 + v(i + 4, 12) / 100} />
+    ))
+  }
+
+  return (
+    <div style={{ position: 'relative', height: '110px', width: '100%', background: `linear-gradient(135deg, ${bg1}, ${bg2})`, flexShrink: 0 }}>
+      <svg width="100%" height="110" viewBox="0 0 200 110" preserveAspectRatio="xMidYMid slice"
+        style={{ position: 'absolute', inset: 0, display: 'block' }}>
+        {pattern}
+      </svg>
+      {format && (
+        <span style={{
+          position: 'absolute', left: '10px', top: '8px',
+          fontSize: '9px', letterSpacing: '0.6px', padding: '2px 7px',
+          borderRadius: '999px', background: 'rgba(255,255,255,0.55)',
+          color: '#5F7A5E', backdropFilter: 'blur(4px)',
+          textTransform: 'uppercase', fontFamily: 'inherit', fontWeight: 500, lineHeight: '1.4',
+        }}>
+          {format}
+        </span>
+      )}
+    </div>
+  )
+}
+
+// ─── ResourceGridCard ─────────────────────────────────────────────
+function ResourceGridCard({
+  title,
+  subtitle,
+  format,
+  durationMin,
+  onClick,
+  tokens,
+}: {
+  title: string
+  subtitle?: string
+  format?: string
+  durationMin?: number
+  onClick: () => void
+  tokens: ModuleTokens
+}) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background: tokens.cardBg,
+        border: `0.5px solid ${tokens.cardBorder}`,
+        borderRadius: '12px',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+        textAlign: 'left',
+        padding: 0,
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        transition: 'all 0.2s ease',
+      }}
+    >
+      <GenerativeCover format={format || ''} title={title} />
+      <div style={{ padding: '10px 12px 12px' }}>
+        {durationMin != null && (
+          <span style={{
+            display: 'inline-block', fontSize: '10px', letterSpacing: '0.4px',
+            padding: '3px 8px', borderRadius: '999px',
+            background: '#EDE9E0', color: '#6E665C', marginBottom: '6px',
+          }}>
+            {durationMin} min
+          </span>
+        )}
+        <p style={{ fontSize: '13px', fontWeight: 500, lineHeight: 1.35, color: tokens.textPrimary, margin: 0, marginBottom: subtitle ? '4px' : 0 }}>
+          {title}
+        </p>
+        {subtitle && (
+          <p style={{ fontSize: '11px', color: tokens.textSecondary, margin: 0, lineHeight: 1.3 }}>
+            {subtitle}
+          </p>
+        )}
+      </div>
+    </button>
+  )
+}
+
 // ─── ResourceCard ────────────────────────────────────────────────
 function ResourceCard({
   content,
@@ -2007,6 +2140,7 @@ function ContentArea({
         title: string
         subtitle?: string
         format?: string
+        duration_min?: number
         area?: string
         has_note?: boolean
         action: string
@@ -2050,9 +2184,9 @@ function ContentArea({
         ) : (
           <div
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.5rem',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+              gap: '12px',
               marginBottom: actions.length > 0 ? '1.5rem' : 0,
             }}
           >
@@ -2072,10 +2206,12 @@ function ContentArea({
               }
 
               return (
-                <ItemRow
+                <ResourceGridCard
                   key={item.id}
                   title={item.title}
                   subtitle={subtitle || undefined}
+                  format={item.format}
+                  durationMin={item.duration_min}
                   onClick={() => dispatch(item.action, extra)}
                   tokens={tokens}
                 />
