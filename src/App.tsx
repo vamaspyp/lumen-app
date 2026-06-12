@@ -74,45 +74,6 @@ function Pill({
   )
 }
 
-// ─── ItemRow ─────────────────────────────────────────────────────
-function ItemRow({
-  title,
-  subtitle,
-  onClick,
-  tokens,
-}: {
-  title: string
-  subtitle?: string
-  onClick: () => void
-  tokens: ModuleTokens
-}) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        background: tokens.cardBg,
-        border: `1px solid ${tokens.cardBorder}`,
-        borderRadius: '12px',
-        padding: '0.875rem 1.125rem',
-        textAlign: 'left',
-        cursor: 'pointer',
-        fontFamily: 'inherit',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '0.25rem',
-        width: '100%',
-        transition: 'all 0.2s ease',
-      }}
-    >
-      <span style={{ fontSize: '0.95rem', color: tokens.textPrimary, fontWeight: 500 }}>
-        {title}
-      </span>
-      {subtitle && (
-        <span style={{ fontSize: '0.78rem', color: tokens.textSecondary }}>{subtitle}</span>
-      )}
-    </button>
-  )
-}
 
 // ─── GenerativeThumbnail ─────────────────────────────────────────
 function titleHash(s: string): number {
@@ -315,10 +276,6 @@ function ResourceCard({
     durationMin && `${durationMin} min`,
   ].filter(Boolean).join(' · ')
 
-  // Source kinds que tienen viewer interno funcionando
-  const EMBEDDABLE_KINDS = new Set([
-    'youtube', 'vimeo', 'spotify', 'soundcloud', 'pdf', 'image', 'audio_direct'
-  ])
 
   const handleOpen = () => {
     if (!resourceId) return
@@ -1543,75 +1500,6 @@ function ShareText({
   )
 }
 
-// ─── ExternalFallback ────────────────────────────────────────────
-// Pantalla intermedia cuando se "entra" en un recurso externo.
-// LUMI no suelta al usuario sin avisar.
-function ExternalFallback({
-  actions,
-  dispatch,
-  tokens,
-  activeUrl,
-}: {
-  actions: Array<{ label: string; action: string; variant?: string }>
-  dispatch: (action: string, extra?: Record<string, string>) => void
-  tokens: ModuleTokens
-  activeUrl: string
-}) {
-  const handleOpen = () => {
-    if (!activeUrl) return
-    window.open(activeUrl, '_blank', 'noopener,noreferrer')
-  }
-
-  return (
-    <div style={{ textAlign: 'center' }}>
-      <p
-        style={{
-          fontFamily: 'Georgia, "Times New Roman", serif',
-          fontStyle: 'italic',
-          fontSize: '0.95rem',
-          color: tokens.textSecondary,
-          lineHeight: 1.6,
-          margin: '0 auto 1.75rem',
-          maxWidth: '38ch',
-        }}
-      >
-        Este recurso vive afuera de LUMEN. Voy a abrirlo en otra pestaña — vos volvés cuando quieras.
-      </p>
-
-      {activeUrl && (
-        <button
-          onClick={handleOpen}
-          style={{
-            padding: '0.75rem 2rem',
-            borderRadius: '999px',
-            background: tokens.accent,
-            border: `1px solid ${tokens.accent}`,
-            color: '#FFFFFF',
-            fontSize: '0.9rem',
-            cursor: 'pointer',
-            fontWeight: 500,
-            fontFamily: 'inherit',
-            marginBottom: '1.5rem',
-          }}
-        >
-          Lo abro
-        </button>
-      )}
-
-      <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
-        {actions.map((action, idx) => (
-          <Pill
-            key={`${action.action}-${idx}`}
-            label={action.label}
-            variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
-            onClick={() => dispatch(action.action)}
-            tokens={tokens}
-          />
-        ))}
-      </div>
-    </div>
-  )
-}
 
 
 // ─── Embed components ────────────────────────────────────────────

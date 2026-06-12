@@ -7,7 +7,6 @@ interface AreaIconProps {
 
 export function AreaIcon({ area, size = 32 }: AreaIconProps) {
   const s = size
-  const scale = s / 64
 
   const wrap = (children: React.ReactNode) => (
     <svg
