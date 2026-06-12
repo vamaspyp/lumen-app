@@ -237,7 +237,6 @@ function ResourceListCard({
     : '#6E665C'
   const formatDisplay = derivedFormat.charAt(0).toUpperCase() + derivedFormat.slice(1)
   const badgeText = [formatDisplay, durationMin != null ? `${durationMin} min` : ''].filter(Boolean).join(' · ')
-  const meta = author || subtitle
 
   return (
     <button
@@ -273,9 +272,9 @@ function ResourceListCard({
         <p style={{ fontSize: '14px', fontWeight: 500, lineHeight: 1.35, color: tokens.textPrimary, margin: 0 }}>
           {title}
         </p>
-        {meta && (
-          <p style={{ fontSize: '11px', color: tokens.textSecondary, margin: '3px 0 0' }}>
-            {meta}
+        {author && (
+          <p style={{ fontSize: '11px', color: tokens.textSecondary, margin: '2px 0 0' }}>
+            {author}
           </p>
         )}
       </div>
