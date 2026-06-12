@@ -114,14 +114,14 @@ function ItemRow({
   )
 }
 
-// ─── GenerativeCover ─────────────────────────────────────────────
+// ─── GenerativeThumbnail ─────────────────────────────────────────
 function titleHash(s: string): number {
   let h = 0
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) & 0x7fffffff
   return h
 }
 
-function GenerativeCover({ format, title }: { format: string; title: string }) {
+function GenerativeThumbnail({ format, title }: { format: string; title: string }) {
   const h = titleHash(title || '')
   const v = (i: number, mod: number) => (h * (i * 7 + 3) + i * 13) % mod
 
@@ -132,65 +132,59 @@ function GenerativeCover({ format, title }: { format: string; title: string }) {
   if (fmt === 'practica' || fmt === 'práctica') {
     bg1 = '#E8F0E7'; bg2 = '#C5D9C0'
     const count = 3 + v(1, 3)
-    const cx = 20 + v(2, 60)
-    const cy = 20 + v(3, 70)
+    const cx = 10 + v(2, 52)
+    const cy = 10 + v(3, 60)
     pattern = Array.from({ length: count }, (_, i) => (
-      <circle key={i} cx={cx} cy={cy} r={20 + i * (12 + v(i + 4, 10))} fill="#8FA38C" fillOpacity={0.04 + i * 0.04} />
+      <circle key={i} cx={cx} cy={cy} r={12 + i * (8 + v(i + 4, 7))} fill="#8FA38C" fillOpacity={0.04 + i * 0.05} />
     ))
   } else if (fmt === 'video') {
     bg1 = '#EBE7DF'; bg2 = '#D0C7B5'
     const count = 2 + v(1, 2)
     pattern = Array.from({ length: count }, (_, i) => {
-      const y1 = 30 + v(i * 2 + 1, 60)
-      const cp1x = 20 + v(i * 2 + 2, 60)
-      const cp1y = y1 - 20 + v(i * 2 + 3, 40)
-      const cp2x = 80 + v(i * 2 + 4, 40)
-      const cp2y = y1 + 10 + v(i * 2 + 5, 30)
-      const y2 = 30 + v(i * 2 + 6, 70)
+      const y1 = 15 + v(i * 2 + 1, 50)
+      const cp1x = 10 + v(i * 2 + 2, 40)
+      const cp1y = y1 - 15 + v(i * 2 + 3, 30)
+      const cp2x = 40 + v(i * 2 + 4, 25)
+      const cp2y = y1 + 8 + v(i * 2 + 5, 20)
+      const y2 = 15 + v(i * 2 + 6, 55)
       return (
-        <path key={i} d={`M 0 ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, 200 ${y2}`}
+        <path key={i} d={`M 0 ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, 72 ${y2}`}
           stroke="#9B7A52" strokeWidth={1.5} strokeOpacity={0.06 + i * 0.045} fill="none" />
       )
     })
   } else if (fmt === 'audio') {
     bg1 = '#E8EBF0'; bg2 = '#C5CDD9'
     const count = 3 + v(1, 2)
-    const cx = 50 + v(2, 100)
+    const cx = 26 + v(2, 20)
     pattern = Array.from({ length: count }, (_, i) => (
-      <circle key={i} cx={cx} cy={55} r={15 + i * (12 + v(i + 3, 8))}
-        stroke="#7090B5" strokeWidth={1.5} strokeOpacity={0.06 + i * 0.035} fill="none" />
+      <circle key={i} cx={cx} cy={40} r={8 + i * (7 + v(i + 3, 5))}
+        stroke="#7090B5" strokeWidth={1.5} strokeOpacity={0.10 + i * 0.02} fill="none" />
     ))
   } else {
     bg1 = '#EDE9E0'; bg2 = '#D5CFC3'
-    pattern = Array.from({ length: 12 }, (_, i) => (
-      <circle key={i} cx={10 + v(i * 2 + 1, 180)} cy={5 + v(i * 2 + 2, 100)}
-        r={1.5 + v(i + 3, 4)} fill="#8FA38C" fillOpacity={0.04 + v(i + 4, 12) / 100} />
+    pattern = Array.from({ length: 10 }, (_, i) => (
+      <circle key={i} cx={3 + v(i * 2 + 1, 66)} cy={3 + v(i * 2 + 2, 74)}
+        r={1.5 + v(i + 3, 3)} fill="#8FA38C" fillOpacity={0.04 + v(i + 4, 10) / 100} />
     ))
   }
 
   return (
-    <div style={{ position: 'relative', height: '110px', width: '100%', background: `linear-gradient(135deg, ${bg1}, ${bg2})`, flexShrink: 0 }}>
-      <svg width="100%" height="110" viewBox="0 0 200 110" preserveAspectRatio="xMidYMid slice"
-        style={{ position: 'absolute', inset: 0, display: 'block' }}>
+    <div style={{
+      width: '72px', minWidth: '72px', flexShrink: 0,
+      overflow: 'hidden',
+      borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: `linear-gradient(160deg, ${bg1}, ${bg2})`,
+    }}>
+      <svg width="72" height="80" viewBox="0 0 72 80" style={{ display: 'block', flexShrink: 0 }}>
         {pattern}
       </svg>
-      {format && (
-        <span style={{
-          position: 'absolute', left: '10px', top: '8px',
-          fontSize: '9px', letterSpacing: '0.6px', padding: '2px 7px',
-          borderRadius: '999px', background: 'rgba(255,255,255,0.55)',
-          color: '#5F7A5E', backdropFilter: 'blur(4px)',
-          textTransform: 'uppercase', fontFamily: 'inherit', fontWeight: 500, lineHeight: '1.4',
-        }}>
-          {format}
-        </span>
-      )}
     </div>
   )
 }
 
-// ─── ResourceGridCard ─────────────────────────────────────────────
-function ResourceGridCard({
+// ─── ResourceListCard ─────────────────────────────────────────────
+function ResourceListCard({
   title,
   subtitle,
   format,
@@ -205,6 +199,17 @@ function ResourceGridCard({
   onClick: () => void
   tokens: ModuleTokens
 }) {
+  const fmt = (format || '').toLowerCase()
+  const badgeBg = fmt === 'practica' || fmt === 'práctica' ? '#E8F0E7'
+    : fmt === 'video' ? '#EDE9E0'
+    : fmt === 'audio' ? '#E8EBF0'
+    : '#EDE9E0'
+  const badgeColor = fmt === 'practica' || fmt === 'práctica' ? '#5F7A5E'
+    : fmt === 'video' ? '#6E5536'
+    : fmt === 'audio' ? '#4A6A8E'
+    : '#6E665C'
+  const badgeText = [format, durationMin != null ? `${durationMin} min` : ''].filter(Boolean).join(' · ')
+
   return (
     <button
       onClick={onClick}
@@ -219,26 +224,28 @@ function ResourceGridCard({
         padding: 0,
         width: '100%',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
+        alignItems: 'stretch',
+        minHeight: '80px',
         transition: 'all 0.2s ease',
       }}
     >
-      <GenerativeCover format={format || ''} title={title} />
-      <div style={{ padding: '10px 12px 12px' }}>
-        {durationMin != null && (
+      <GenerativeThumbnail format={format || ''} title={title} />
+      <div style={{ padding: '10px 14px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
+        {badgeText && (
           <span style={{
-            display: 'inline-block', fontSize: '10px', letterSpacing: '0.4px',
-            padding: '3px 8px', borderRadius: '999px',
-            background: '#EDE9E0', color: '#6E665C', marginBottom: '6px',
+            fontSize: '10px', letterSpacing: '0.3px', padding: '2px 7px',
+            borderRadius: '999px', width: 'fit-content', marginBottom: '5px',
+            background: badgeBg, color: badgeColor, display: 'inline-block', lineHeight: 1.4,
           }}>
-            {durationMin} min
+            {badgeText}
           </span>
         )}
-        <p style={{ fontSize: '13px', fontWeight: 500, lineHeight: 1.35, color: tokens.textPrimary, margin: 0, marginBottom: subtitle ? '4px' : 0 }}>
+        <p style={{ fontSize: '14px', fontWeight: 500, lineHeight: 1.35, color: tokens.textPrimary, margin: 0 }}>
           {title}
         </p>
         {subtitle && (
-          <p style={{ fontSize: '11px', color: tokens.textSecondary, margin: 0, lineHeight: 1.3 }}>
+          <p style={{ fontSize: '11px', color: tokens.textSecondary, margin: '3px 0 0' }}>
             {subtitle}
           </p>
         )}
@@ -302,55 +309,60 @@ function ResourceCard({
     <div
       style={{
         background: tokens.cardBg,
-        border: `1px solid ${tokens.cardBorder}`,
-        borderRadius: '18px',
-        padding: '1.5rem',
+        border: `0.5px solid ${tokens.cardBorder}`,
+        borderRadius: '12px',
+        overflow: 'hidden',
         textAlign: 'left',
         marginBottom: '1.5rem',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'stretch',
       }}
     >
-      {formatLabel && (
+      <GenerativeThumbnail format={format} title={title} />
+      <div style={{ flex: 1, padding: '1.5rem', minWidth: 0 }}>
+        {formatLabel && (
+          <div
+            style={{
+              display: 'inline-block',
+              background: tokens.accentSoft20,
+              padding: '0.25rem 0.75rem',
+              borderRadius: '999px',
+              fontSize: '0.7rem',
+              color: tokens.accentDeep,
+              marginBottom: '1rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              fontWeight: 500,
+            }}
+          >
+            {formatLabel}
+          </div>
+        )}
+
         <div
           style={{
-            display: 'inline-block',
-            background: tokens.accentSoft20,
-            padding: '0.25rem 0.75rem',
-            borderRadius: '999px',
-            fontSize: '0.7rem',
-            color: tokens.accentDeep,
-            marginBottom: '1rem',
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
-            fontWeight: 500,
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '8px',
+            marginBottom: '1.25rem',
           }}
         >
-          {formatLabel}
+          {primaryArea && <AreaIcon area={primaryArea} size={28} />}
+          <h2
+            style={{
+              fontSize: '1.4rem',
+              fontWeight: 500,
+              color: tokens.textPrimary,
+              margin: 0,
+              lineHeight: 1.3,
+            }}
+          >
+            {title}
+          </h2>
         </div>
-      )}
 
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: '8px',
-          marginBottom: '1.25rem',
-        }}
-      >
-        {primaryArea && <AreaIcon area={primaryArea} size={28} />}
-        <h2
-          style={{
-            fontSize: '1.4rem',
-            fontWeight: 500,
-            color: tokens.textPrimary,
-            margin: 0,
-            lineHeight: 1.3,
-          }}
-        >
-          {title}
-        </h2>
-      </div>
-
-      {whyNow && (
+        {whyNow && (
         <div style={{ marginBottom: '1rem' }}>
           <div
             style={{
@@ -494,6 +506,7 @@ function ResourceCard({
           Ya lo viste antes
         </div>
       )}
+      </div>
     </div>
   )
 }
@@ -2184,9 +2197,9 @@ function ContentArea({
         ) : (
           <div
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-              gap: '12px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
               marginBottom: actions.length > 0 ? '1.5rem' : 0,
             }}
           >
@@ -2206,7 +2219,7 @@ function ContentArea({
               }
 
               return (
-                <ResourceGridCard
+                <ResourceListCard
                   key={item.id}
                   title={item.title}
                   subtitle={subtitle || undefined}
