@@ -8,6 +8,7 @@ import {
   spotifyEmbedUrl,
   soundcloudEmbedUrl,
 } from './lib/embedHelpers'
+import { AreaIcon } from './lib/areaIcons'
 
 
 // ════════════════════════════════════════════════════════════════
@@ -138,6 +139,8 @@ function ResourceCard({
   const isRepeat = !!(content.is_repeat as boolean)
   const isSaved = !!(content.is_saved as boolean)
   const sourceKind = (content.source_kind as string) || 'external_url'
+  const areas = (content.areas as string[]) || []
+  const primaryArea = areas[0] || ''
 
   const formatLabel = [
     format && format.charAt(0).toUpperCase() + format.slice(1),
@@ -192,18 +195,27 @@ function ResourceCard({
         </div>
       )}
 
-      <h2
+      <div
         style={{
-          fontSize: '1.4rem',
-          fontWeight: 500,
-          color: tokens.textPrimary,
-          marginTop: 0,
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '8px',
           marginBottom: '1.25rem',
-          lineHeight: 1.3,
         }}
       >
-        {title}
-      </h2>
+        {primaryArea && <AreaIcon area={primaryArea} size={28} />}
+        <h2
+          style={{
+            fontSize: '1.4rem',
+            fontWeight: 500,
+            color: tokens.textPrimary,
+            margin: 0,
+            lineHeight: 1.3,
+          }}
+        >
+          {title}
+        </h2>
+      </div>
 
       {whyNow && (
         <div style={{ marginBottom: '1rem' }}>
