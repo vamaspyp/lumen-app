@@ -126,46 +126,64 @@ function GenerativeThumbnail({ format, title }: { format: string; title: string 
   const v = (i: number, mod: number) => (h * (i * 7 + 3) + i * 13) % mod
 
   const fmt = (format || '').toLowerCase()
-  let bg1: string, bg2: string
+  let bg1: string, bg2: string, gradAngle = '160deg'
   let pattern: React.ReactNode
 
   if (fmt === 'practica' || fmt === 'práctica') {
     bg1 = '#E8F0E7'; bg2 = '#C5D9C0'
-    const count = 3 + v(1, 3)
     const cx = 10 + v(2, 52)
     const cy = 10 + v(3, 60)
-    pattern = Array.from({ length: count }, (_, i) => (
-      <circle key={i} cx={cx} cy={cy} r={12 + i * (8 + v(i + 4, 7))} fill="#8FA38C" fillOpacity={0.04 + i * 0.05} />
-    ))
+    pattern = (
+      <>
+        <circle cx={cx} cy={cy} r={30} fill="#8FA38C" fillOpacity={0.10} />
+        <circle cx={cx} cy={cy} r={20} fill="#8FA38C" fillOpacity={0.15} />
+        <circle cx={cx} cy={cy} r={12} fill="#8FA38C" fillOpacity={0.22} />
+        <circle cx={cx + v(10, 30) - 15} cy={cy + v(11, 30) - 15} r={6 + v(12, 5)} fill="#8FA38C" fillOpacity={0.08} />
+        <circle cx={cx - v(13, 20) + 5} cy={cy + v(14, 20)} r={5 + v(15, 4)} fill="#8FA38C" fillOpacity={0.08} />
+      </>
+    )
   } else if (fmt === 'video') {
     bg1 = '#EBE7DF'; bg2 = '#D0C7B5'
-    const count = 2 + v(1, 2)
-    pattern = Array.from({ length: count }, (_, i) => {
-      const y1 = 15 + v(i * 2 + 1, 50)
-      const cp1x = 10 + v(i * 2 + 2, 40)
-      const cp1y = y1 - 15 + v(i * 2 + 3, 30)
-      const cp2x = 40 + v(i * 2 + 4, 25)
-      const cp2y = y1 + 8 + v(i * 2 + 5, 20)
-      const y2 = 15 + v(i * 2 + 6, 55)
-      return (
-        <path key={i} d={`M 0 ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, 72 ${y2}`}
-          stroke="#9B7A52" strokeWidth={1.5} strokeOpacity={0.06 + i * 0.045} fill="none" />
-      )
-    })
+    const ya = 12 + v(1, 25)
+    const yb = 35 + v(7, 20)
+    const yc = 55 + v(13, 18)
+    pattern = (
+      <>
+        <path
+          d={`M 0 ${ya} C ${18 + v(2, 20)} ${ya - 12 + v(3, 24)}, ${42 + v(4, 22)} ${ya + 14 + v(5, 18)}, 72 ${ya + 5 + v(6, 22)}`}
+          stroke="#9B7A52" strokeWidth={1.8} strokeOpacity={0.18} fill="none"
+        />
+        <path
+          d={`M 0 ${yb} C ${14 + v(8, 24)} ${yb + 10 + v(9, 22)}, ${48 + v(10, 18)} ${yb - 8 + v(11, 20)}, 72 ${yb + 6 + v(12, 18)}`}
+          stroke="#9B7A52" strokeWidth={1.2} strokeOpacity={0.12} fill="none"
+        />
+        <path
+          d={`M 0 ${yc} C ${25 + v(14, 22)} ${yc - 10 + v(15, 20)}, ${44 + v(16, 20)} ${yc + 8 + v(17, 16)}, 72 ${yc + 3 + v(18, 14)}`}
+          stroke="#9B7A52" strokeWidth={2} strokeOpacity={0.08} fill="none"
+        />
+      </>
+    )
   } else if (fmt === 'audio') {
-    bg1 = '#E8EBF0'; bg2 = '#C5CDD9'
-    const count = 3 + v(1, 2)
+    bg1 = '#E8EBF0'; bg2 = '#C5CDD9'; gradAngle = '145deg'
     const cx = 26 + v(2, 20)
-    pattern = Array.from({ length: count }, (_, i) => (
-      <circle key={i} cx={cx} cy={40} r={8 + i * (7 + v(i + 3, 5))}
-        stroke="#7090B5" strokeWidth={1.5} strokeOpacity={0.10 + i * 0.02} fill="none" />
-    ))
+    pattern = (
+      <>
+        <circle cx={cx} cy={40} r={28} stroke="#7090B5" strokeWidth={1} strokeOpacity={0.12} fill="none" />
+        <circle cx={cx} cy={40} r={18} stroke="#7090B5" strokeWidth={0.8} strokeOpacity={0.16} fill="none" />
+        <circle cx={cx} cy={40} r={10} stroke="#7090B5" strokeWidth={0.6} strokeOpacity={0.20} fill="none" />
+        <circle cx={cx} cy={40} r={4} fill="#7090B5" fillOpacity={0.18} />
+      </>
+    )
   } else {
     bg1 = '#EDE9E0'; bg2 = '#D5CFC3'
-    pattern = Array.from({ length: 10 }, (_, i) => (
-      <circle key={i} cx={3 + v(i * 2 + 1, 66)} cy={3 + v(i * 2 + 2, 74)}
-        r={1.5 + v(i + 3, 3)} fill="#8FA38C" fillOpacity={0.04 + v(i + 4, 10) / 100} />
-    ))
+    pattern = (
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <circle key={i} cx={3 + v(i * 2 + 1, 66)} cy={3 + v(i * 2 + 2, 74)}
+            r={2 + v(i + 3, 3)} fill="#8FA38C" fillOpacity={0.08 + v(i + 4, 8) / 100} />
+        ))}
+      </>
+    )
   }
 
   return (
@@ -174,7 +192,7 @@ function GenerativeThumbnail({ format, title }: { format: string; title: string 
       overflow: 'hidden',
       borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: `linear-gradient(160deg, ${bg1}, ${bg2})`,
+      background: `linear-gradient(${gradAngle}, ${bg1}, ${bg2})`,
     }}>
       <svg width="72" height="80" viewBox="0 0 72 80" style={{ display: 'block', flexShrink: 0 }}>
         {pattern}
@@ -187,6 +205,7 @@ function GenerativeThumbnail({ format, title }: { format: string; title: string 
 function ResourceListCard({
   title,
   subtitle,
+  author,
   format,
   durationMin,
   onClick,
@@ -194,6 +213,7 @@ function ResourceListCard({
 }: {
   title: string
   subtitle?: string
+  author?: string
   format?: string
   durationMin?: number
   onClick: () => void
@@ -208,7 +228,9 @@ function ResourceListCard({
     : fmt === 'video' ? '#6E5536'
     : fmt === 'audio' ? '#4A6A8E'
     : '#6E665C'
-  const badgeText = [format, durationMin != null ? `${durationMin} min` : ''].filter(Boolean).join(' · ')
+  const formatDisplay = format ? format.charAt(0).toUpperCase() + format.slice(1) : ''
+  const badgeText = [formatDisplay, durationMin != null ? `${durationMin} min` : ''].filter(Boolean).join(' · ')
+  const meta = author || subtitle
 
   return (
     <button
@@ -244,9 +266,9 @@ function ResourceListCard({
         <p style={{ fontSize: '14px', fontWeight: 500, lineHeight: 1.35, color: tokens.textPrimary, margin: 0 }}>
           {title}
         </p>
-        {subtitle && (
+        {meta && (
           <p style={{ fontSize: '11px', color: tokens.textSecondary, margin: '3px 0 0' }}>
-            {subtitle}
+            {meta}
           </p>
         )}
       </div>
@@ -2155,6 +2177,7 @@ function ContentArea({
         format?: string
         duration_min?: number
         area?: string
+        author?: string
         has_note?: boolean
         action: string
         value?: string
@@ -2223,6 +2246,7 @@ function ContentArea({
                   key={item.id}
                   title={item.title}
                   subtitle={subtitle || undefined}
+                  author={item.author}
                   format={item.format}
                   durationMin={item.duration_min}
                   onClick={() => dispatch(item.action, extra)}
