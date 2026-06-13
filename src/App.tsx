@@ -2463,7 +2463,7 @@ function App() {
           </details>
         </div>
       </div>
-      <div style={{ height: 'calc(80px + env(safe-area-inset-bottom, 0px))', flexShrink: 0 }} />
+      <div style={{ height: '80px', flexShrink: 0 }} />
        <BottomNav currentSource={state.contentSource} dispatch={dispatch} bgColor={tokens.background} />
     </>
   )
