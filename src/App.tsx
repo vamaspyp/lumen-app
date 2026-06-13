@@ -9,6 +9,7 @@ import {
   soundcloudEmbedUrl,
 } from './lib/embedHelpers'
 import { AreaIcon } from './lib/areaIcons'
+import { supabase } from './lib/supabase'
 
 
 // ════════════════════════════════════════════════════════════════
@@ -1070,10 +1071,12 @@ function BottomNav({
   currentSource,
   dispatch,
   bgColor,
+  dimmed = false,
 }: {
   currentSource: string
   dispatch: (action: string, extra?: Record<string, string>) => void
   bgColor: string
+  dimmed?: boolean
 }) {
   const modules: Array<{
     key: 'lumi' | 'fuente' | 'sanctuary' | 'circles'
@@ -1107,9 +1110,11 @@ function BottomNav({
         display: 'flex',
         justifyContent: 'center',
         gap: '2.5rem',
-        pointerEvents: 'none',
+        pointerEvents: dimmed ? 'none' : 'none',
         zIndex: 10,
         background: `linear-gradient(to bottom, transparent, ${bgColor} 40%)`,
+        opacity: dimmed ? 0.15 : 1,
+        transition: 'opacity 0.4s ease',
       }}
     >
       {modules.map(m => {
@@ -2294,6 +2299,161 @@ function ContentArea({
   )
 }
 
+// ─── LandingScan ─────────────────────────────────────────────────
+function LandingScan({
+  scanData,
+  tokens,
+  onComplete,
+  onContinue,
+}: {
+  scanData: Record<string, unknown>
+  tokens: ModuleTokens
+  onComplete: () => void
+  onContinue: () => void
+}) {
+  const [phase, setPhase] = useState<'invite' | 'scanning' | 'done'>('invite')
+  const [stepIndex, setStepIndex] = useState(0)
+
+  const message = (scanData.message as string) || ''
+  const actions = (scanData.actions as Array<{ label: string; action: string; variant?: string }>) || []
+  const content = (scanData.content as Record<string, unknown>) || {}
+  const steps = (content.steps as Array<{ text: string; pause_ms: number }>) || []
+  const sourceLabel = (content.source_label as string) || ''
+
+  useEffect(() => {
+    if (phase !== 'scanning' || steps.length === 0) return
+    const step = steps[stepIndex]
+    const timer = setTimeout(() => {
+      if (stepIndex < steps.length - 1) {
+        setStepIndex(i => i + 1)
+      } else {
+        setPhase('done')
+      }
+    }, step.pause_ms)
+    return () => clearTimeout(timer)
+  }, [phase, stepIndex, steps])
+
+  const orbAnimation = phase === 'scanning'
+    ? 'orbBreathe 10s ease-in-out infinite'
+    : 'lumi-pulse 2.5s ease-in-out infinite'
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 'calc(100vh - 80px)',
+        padding: '2rem 1.25rem',
+        textAlign: 'center',
+        boxSizing: 'border-box',
+      }}
+    >
+      <div
+        className="lumi-orb"
+        style={{
+          width: 100,
+          height: 100,
+          borderRadius: '50%',
+          background: `radial-gradient(circle at 35% 35%, ${tokens.orbInner}, ${tokens.orbMid} 60%, ${tokens.orbOuter})`,
+          animation: orbAnimation,
+          marginBottom: '2rem',
+          flexShrink: 0,
+        }}
+      />
+
+      {phase === 'invite' && (
+        <>
+          <p
+            style={{
+              fontFamily: 'Georgia, "Times New Roman", serif',
+              fontStyle: 'italic',
+              fontSize: '1.05rem',
+              lineHeight: 1.6,
+              color: tokens.textPrimary,
+              maxWidth: '32ch',
+              margin: '0 auto 2rem',
+            }}
+          >
+            {message}
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', width: '100%', maxWidth: 320 }}>
+            {actions.map((action, idx) => (
+              <Pill
+                key={idx}
+                label={action.label}
+                variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
+                onClick={() => {
+                  if (action.action === 'skip_scan') onComplete()
+                  else if (action.action === 'start_scan') setPhase('scanning')
+                }}
+                tokens={tokens}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      {phase === 'scanning' && steps.length > 0 && (
+        <div style={{ maxWidth: 360 }}>
+          {sourceLabel && (
+            <p
+              style={{
+                fontSize: '0.72rem',
+                fontStyle: 'italic',
+                color: tokens.textMuted,
+                opacity: 0.6,
+                margin: '0 0 1.25rem',
+              }}
+            >
+              {sourceLabel}
+            </p>
+          )}
+          <p
+            key={stepIndex}
+            style={{
+              fontFamily: 'Georgia, "Times New Roman", serif',
+              fontSize: '1.1rem',
+              lineHeight: 1.7,
+              color: tokens.textPrimary,
+              maxWidth: '28ch',
+              margin: '0 auto',
+              animation: 'lumiAppear 600ms ease-out both',
+            }}
+          >
+            {steps[stepIndex].text}
+          </p>
+        </div>
+      )}
+
+      {phase === 'done' && (
+        <>
+          {steps.length > 0 && (
+            <p
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontStyle: 'italic',
+                fontSize: '1.05rem',
+                lineHeight: 1.6,
+                color: tokens.textPrimary,
+                maxWidth: '32ch',
+                margin: '0 auto 2rem',
+              }}
+            >
+              {steps[steps.length - 1].text}
+            </p>
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', width: '100%', maxWidth: 320 }}>
+            <Pill label="¿Cómo estoy?" variant="solid" onClick={onComplete} tokens={tokens} />
+            <Pill label="Seguir respirando" variant="outline" onClick={onContinue} tokens={tokens} />
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 function hexToRgba(hex: string, a: number): string {
   const r = parseInt(hex.slice(1, 3), 16)
   const g = parseInt(hex.slice(3, 5), 16)
@@ -2305,6 +2465,18 @@ function hexToRgba(hex: string, a: number): string {
 function App() {
   const { state, dispatch } = useLumi()
   const tokens = getModuleTokens(state.contentSource)
+
+  const [scanData, setScanData] = useState<Record<string, unknown> | null>(null)
+  const [hasScannedThisSession, setHasScannedThisSession] = useState(false)
+  const [scanKey, setScanKey] = useState(0)
+
+  useEffect(() => {
+    supabase.rpc('lumi_get_scan').then(({ data }) => {
+      if (data?.ok) setScanData(data as Record<string, unknown>)
+    })
+  }, [])
+
+  const showScan = !hasScannedThisSession && scanData !== null
 
   const accentGlowPeak = hexToRgba(tokens.accent, 0.5)
 
@@ -2318,6 +2490,11 @@ function App() {
         @keyframes lumiAppear {
           from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes orbBreathe {
+          0%   { transform: scale(1); }
+          40%  { transform: scale(1.15); }
+          100% { transform: scale(1); }
         }
         body { margin: 0; }
         .lumi-orb {
@@ -2340,6 +2517,21 @@ function App() {
           boxSizing: 'border-box',
         }}
       >
+        {showScan ? (
+          <LandingScan
+            key={scanKey}
+            scanData={scanData!}
+            tokens={tokens}
+            onComplete={() => setHasScannedThisSession(true)}
+            onContinue={async () => {
+              const { data } = await supabase.rpc('lumi_get_scan')
+              if (data?.ok) {
+                setScanData(data as Record<string, unknown>)
+                setScanKey(k => k + 1)
+              }
+            }}
+          />
+        ) : (
         <div
           style={{
             maxWidth: 560,
@@ -2462,9 +2654,10 @@ function App() {
             </pre>
           </details>
         </div>
+        )}
       </div>
       <div style={{ height: '80px', flexShrink: 0 }} />
-       <BottomNav currentSource={state.contentSource} dispatch={dispatch} bgColor={tokens.background} />
+       <BottomNav currentSource={state.contentSource} dispatch={dispatch} bgColor={tokens.background} dimmed={showScan} />
     </>
   )
 }
