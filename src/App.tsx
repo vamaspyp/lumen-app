@@ -2331,14 +2331,12 @@ function App() {
       <div
         className="lumi-bg"
         style={{
-          minHeight: '100vh',
           backgroundColor: tokens.background,
           color: tokens.textPrimary,
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
           paddingTop: '2rem',
           paddingLeft: '1.25rem',
           paddingRight: '1.25rem',
-          paddingBottom: 'calc(90px + env(safe-area-inset-bottom, 0px))',
           boxSizing: 'border-box',
         }}
       >
@@ -2465,6 +2463,7 @@ function App() {
           </details>
         </div>
       </div>
+      <div style={{ height: 'calc(80px + env(safe-area-inset-bottom, 0px))', flexShrink: 0 }} />
        <BottomNav currentSource={state.contentSource} dispatch={dispatch} bgColor={tokens.background} />
     </>
   )
