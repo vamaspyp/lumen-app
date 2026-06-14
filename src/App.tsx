@@ -2331,19 +2331,6 @@ function LandingScan({
     return () => clearTimeout(timer)
   }, [phase, stepIndex, steps])
 
-  const currentStep = steps[stepIndex]
-  let orbAnimation: string
-  if (phase !== 'scanning') {
-    orbAnimation = 'orbBreathe 10s ease-in-out infinite'
-  } else {
-    const breathe = currentStep?.breathe ?? 'cycle'
-    const ms = currentStep?.pause_ms ?? 4000
-    if (breathe === 'inhale')      orbAnimation = `orbInhale ${ms}ms ease-in forwards`
-    else if (breathe === 'exhale') orbAnimation = `orbExhale ${ms}ms ease-out forwards`
-    else if (breathe === 'rest')   orbAnimation = 'orbBreathe 10s ease-in-out infinite'
-    else                           orbAnimation = 'orbBreathe 10s ease-in-out infinite'
-  }
-
   return (
     <div
       style={{
@@ -2365,8 +2352,8 @@ function LandingScan({
           width: '80px',
           height: '80px',
           borderRadius: '50%',
-          background: `radial-gradient(circle at center, ${tokens.orbInner} 0%, ${tokens.orbMid} 30%, ${tokens.accent}33 60%, transparent 100%)`,
-          animation: orbAnimation,
+          background: `radial-gradient(circle at center, ${tokens.orbInner} 0%, ${tokens.orbMid} 25%, rgba(143,163,140,0.3) 60%, transparent 100%)`,
+          animation: 'orbBreathe 10s ease-in-out infinite',
           flexShrink: 0,
         }}
       />
@@ -2518,22 +2505,16 @@ function App() {
         @keyframes orbBreathe {
           0%, 100% {
             transform: scale(1);
-            box-shadow: 0 0 10px 2px rgba(143, 163, 140, 0.3);
             filter: blur(0px);
+            box-shadow: 0 0 5px 0px rgba(143,163,140,0.2);
+            opacity: 1;
           }
           40% {
-            transform: scale(1.2);
-            box-shadow: 0 0 40px 15px rgba(143, 163, 140, 0.4);
-            filter: blur(2px);
+            transform: scale(1.4);
+            filter: blur(12px);
+            box-shadow: 0 0 60px 30px rgba(143,163,140,0.3);
+            opacity: 0.75;
           }
-        }
-        @keyframes orbInhale {
-          from { transform: scale(1);   box-shadow: 0 0 10px 2px rgba(143, 163, 140, 0.3); filter: blur(0px); }
-          to   { transform: scale(1.2); box-shadow: 0 0 40px 15px rgba(143, 163, 140, 0.4); filter: blur(2px); }
-        }
-        @keyframes orbExhale {
-          from { transform: scale(1.2); box-shadow: 0 0 40px 15px rgba(143, 163, 140, 0.4); filter: blur(2px); }
-          to   { transform: scale(1);   box-shadow: 0 0 10px 2px rgba(143, 163, 140, 0.3); filter: blur(0px); }
         }
         body { margin: 0; }
         .lumi-bg {
@@ -2591,7 +2572,7 @@ function App() {
                 width: '80px',
                 height: '80px',
                 borderRadius: '50%',
-                background: `radial-gradient(circle at center, ${tokens.orbInner} 0%, ${tokens.orbMid} 30%, ${tokens.accent}33 60%, transparent 100%)`,
+                background: `radial-gradient(circle at center, ${tokens.orbInner} 0%, ${tokens.orbMid} 25%, rgba(143,163,140,0.3) 60%, transparent 100%)`,
                 animation: 'orbBreathe 10s ease-in-out infinite',
               }}
             />
