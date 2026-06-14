@@ -2317,7 +2317,7 @@ function LandingScan({
   const message = (scanData.message as string) || ''
   const actions = (scanData.actions as Array<{ label: string; action: string; variant?: string }>) || []
   const content = (scanData.content as Record<string, unknown>) || {}
-  const steps = (content.steps as Array<{ text: string; pause_ms: number }>) || []
+  const steps = (content.steps as Array<{ text: string; pause_ms: number; breathe?: string }>) || []
   const sourceLabel = (content.source_label as string) || ''
 
   useEffect(() => {
@@ -2333,9 +2333,18 @@ function LandingScan({
     return () => clearTimeout(timer)
   }, [phase, stepIndex, steps])
 
-  const orbAnimation = phase === 'scanning'
-    ? 'orbBreathe 10s ease-in-out infinite'
-    : 'lumi-pulse 2.5s ease-in-out infinite'
+  const currentStep = steps[stepIndex]
+  let orbAnimation: string
+  if (phase !== 'scanning') {
+    orbAnimation = 'lumi-pulse 2.5s ease-in-out infinite'
+  } else {
+    const breathe = currentStep?.breathe ?? 'cycle'
+    const ms = currentStep?.pause_ms ?? 4000
+    if (breathe === 'inhale')      orbAnimation = `orbInhale ${ms}ms ease-in forwards`
+    else if (breathe === 'exhale') orbAnimation = `orbExhale ${ms}ms ease-out forwards`
+    else if (breathe === 'rest')   orbAnimation = 'lumi-pulse 2.5s ease-in-out infinite'
+    else                           orbAnimation = 'orbBreathe 10s ease-in-out infinite'
+  }
 
   return (
     <div
@@ -2356,7 +2365,7 @@ function LandingScan({
           width: 100,
           height: 100,
           borderRadius: '50%',
-          background: `radial-gradient(circle at 35% 35%, ${tokens.orbInner}, ${tokens.orbMid} 60%, ${tokens.orbOuter})`,
+          background: `radial-gradient(circle, ${tokens.orbInner} 0%, ${tokens.orbMid} 45%, transparent 72%)`,
           animation: orbAnimation,
           marginBottom: '2rem',
           flexShrink: 0,
@@ -2478,23 +2487,39 @@ function App() {
 
   const showScan = !hasScannedThisSession && scanData !== null
 
+  // Al navegar durante el scan, lo descartamos y navegamos normalmente
+  const navDispatch = (action: string, extra?: Record<string, string>) => {
+    if (showScan) setHasScannedThisSession(true)
+    dispatch(action, extra)
+  }
+
+  const isSimpleView = ['empty_presence', 'landing_scan', 'landing_scan_invite'].includes(state.lumiContentType)
+
   const accentGlowPeak = hexToRgba(tokens.accent, 0.5)
 
   return (
     <>
       <style>{`
         @keyframes lumi-pulse {
-          0%, 100% { transform: scale(1); opacity: 0.85; box-shadow: ${tokens.orbGlow}; }
-          50%      { transform: scale(1.12); opacity: 1; box-shadow: 0 0 24px 24px ${accentGlowPeak}; }
+          0%, 100% { transform: scale(1);    opacity: 0.90; box-shadow: 0 0 10px 2px ${hexToRgba(tokens.accent, 0.20)}; }
+          50%      { transform: scale(1.12); opacity: 1;    box-shadow: 0 0 28px 12px ${accentGlowPeak}; }
         }
         @keyframes lumiAppear {
           from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
         }
         @keyframes orbBreathe {
-          0%   { transform: scale(1); }
-          40%  { transform: scale(1.15); }
-          100% { transform: scale(1); }
+          0%   { transform: scale(1);    box-shadow: 0 0 8px 2px ${hexToRgba(tokens.accent, 0.15)}; }
+          40%  { transform: scale(1.15); box-shadow: 0 0 32px 14px ${accentGlowPeak}; }
+          100% { transform: scale(1);    box-shadow: 0 0 8px 2px ${hexToRgba(tokens.accent, 0.15)}; }
+        }
+        @keyframes orbInhale {
+          from { transform: scale(1);    box-shadow: 0 0 8px 2px ${hexToRgba(tokens.accent, 0.15)}; }
+          to   { transform: scale(1.15); box-shadow: 0 0 32px 14px ${accentGlowPeak}; }
+        }
+        @keyframes orbExhale {
+          from { transform: scale(1.15); box-shadow: 0 0 32px 14px ${accentGlowPeak}; }
+          to   { transform: scale(1);    box-shadow: 0 0 8px 2px ${hexToRgba(tokens.accent, 0.15)}; }
         }
         body { margin: 0; }
         .lumi-orb {
@@ -2539,6 +2564,7 @@ function App() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            ...(isSimpleView ? { justifyContent: 'center', minHeight: '70vh' } : {}),
           }}
         >
           {/* LUMI: orb permanente en el centro, solo cambia de color */}
@@ -2549,7 +2575,7 @@ function App() {
                 width: 56,
                 height: 56,
                 borderRadius: '50%',
-                background: `radial-gradient(circle at 35% 35%, ${tokens.orbInner}, ${tokens.orbMid} 60%, ${tokens.orbOuter})`,
+                background: `radial-gradient(circle, ${tokens.orbInner} 0%, ${tokens.orbMid} 45%, transparent 72%)`,
                 animation: 'lumi-pulse 2.5s ease-in-out infinite',
               }}
             />
@@ -2657,7 +2683,7 @@ function App() {
         )}
       </div>
       <div style={{ height: '80px', flexShrink: 0 }} />
-       <BottomNav currentSource={state.contentSource} dispatch={dispatch} bgColor={tokens.background} dimmed={showScan} />
+       <BottomNav currentSource={state.contentSource} dispatch={navDispatch} bgColor={tokens.background} dimmed={showScan} />
     </>
   )
 }
