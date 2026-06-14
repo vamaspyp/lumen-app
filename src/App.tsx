@@ -1110,11 +1110,8 @@ function BottomNav({
         display: 'flex',
         justifyContent: 'center',
         gap: '2.5rem',
-        pointerEvents: dimmed ? 'none' : 'none',
         zIndex: 10,
         background: 'transparent',
-        opacity: dimmed ? 0.4 : 1,
-        transition: 'opacity 0.4s ease',
       }}
     >
       {modules.map(m => {
@@ -1130,7 +1127,7 @@ function BottomNav({
             aria-label={m.label}
             title={disabled ? `${m.label} · próximamente` : m.label}
             style={{
-              pointerEvents: dimmed ? 'none' : 'auto',
+              pointerEvents: 'auto',
               background: 'transparent',
               border: 'none',
               cursor: disabled ? 'not-allowed' : active ? 'default' : 'pointer',
@@ -2319,6 +2316,7 @@ function LandingScan({
   const content = (scanData.content as Record<string, unknown>) || {}
   const steps = (content.steps as Array<{ text: string; pause_ms: number; breathe?: string }>) || []
   const sourceLabel = (content.source_label as string) || ''
+  const postActions = (content.post_actions as Array<{ label: string; action: string; variant?: string }>) || []
 
   useEffect(() => {
     if (phase !== 'scanning' || steps.length === 0) return
@@ -2455,8 +2453,20 @@ function LandingScan({
             </p>
           )}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', width: '100%', maxWidth: 320, marginTop: '3rem' }}>
-            <Pill label="¿Cómo estoy?" variant="solid" onClick={onComplete} tokens={tokens} />
-            <Pill label="Seguir respirando" variant="outline" onClick={onContinue} tokens={tokens} />
+            {postActions.length > 0 ? postActions.map((pa, idx) => (
+              <Pill
+                key={`${pa.action}-${idx}`}
+                label={pa.label}
+                variant={(pa.variant as 'solid' | 'outline' | 'ghost') || (idx === 0 ? 'solid' : 'outline')}
+                onClick={pa.action === 'continue_breathing' ? onContinue : onComplete}
+                tokens={tokens}
+              />
+            )) : (
+              <>
+                <Pill label="¿Cómo estoy?" variant="solid" onClick={onComplete} tokens={tokens} />
+                <Pill label="Seguir respirando" variant="outline" onClick={onContinue} tokens={tokens} />
+              </>
+            )}
           </div>
         </>
       )}
