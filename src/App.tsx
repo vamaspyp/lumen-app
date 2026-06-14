@@ -1113,7 +1113,7 @@ function BottomNav({
         pointerEvents: dimmed ? 'none' : 'none',
         zIndex: 10,
         background: `linear-gradient(to bottom, transparent, ${bgColor} 40%)`,
-        opacity: dimmed ? 0.15 : 1,
+        opacity: dimmed ? 0.4 : 1,
         transition: 'opacity 0.4s ease',
       }}
     >
@@ -1130,7 +1130,7 @@ function BottomNav({
             aria-label={m.label}
             title={disabled ? `${m.label} · próximamente` : m.label}
             style={{
-              pointerEvents: 'auto',
+              pointerEvents: dimmed ? 'none' : 'auto',
               background: 'transparent',
               border: 'none',
               cursor: disabled ? 'not-allowed' : active ? 'default' : 'pointer',
@@ -2336,13 +2336,13 @@ function LandingScan({
   const currentStep = steps[stepIndex]
   let orbAnimation: string
   if (phase !== 'scanning') {
-    orbAnimation = 'lumi-pulse 2.5s ease-in-out infinite'
+    orbAnimation = 'orbBreathe 10s ease-in-out infinite'
   } else {
     const breathe = currentStep?.breathe ?? 'cycle'
     const ms = currentStep?.pause_ms ?? 4000
     if (breathe === 'inhale')      orbAnimation = `orbInhale ${ms}ms ease-in forwards`
     else if (breathe === 'exhale') orbAnimation = `orbExhale ${ms}ms ease-out forwards`
-    else if (breathe === 'rest')   orbAnimation = 'lumi-pulse 2.5s ease-in-out infinite'
+    else if (breathe === 'rest')   orbAnimation = 'orbBreathe 10s ease-in-out infinite'
     else                           orbAnimation = 'orbBreathe 10s ease-in-out infinite'
   }
 
@@ -2352,9 +2352,10 @@ function LandingScan({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: 'calc(100vh - 80px)',
-        padding: '2rem 1.25rem',
+        paddingTop: '15vh',
+        paddingLeft: '1.25rem',
+        paddingRight: '1.25rem',
+        paddingBottom: '2rem',
         textAlign: 'center',
         boxSizing: 'border-box',
       }}
@@ -2367,7 +2368,6 @@ function LandingScan({
           borderRadius: '50%',
           background: `radial-gradient(circle, ${tokens.orbInner} 0%, ${tokens.orbMid} 45%, transparent 72%)`,
           animation: orbAnimation,
-          marginBottom: '2rem',
           flexShrink: 0,
         }}
       />
@@ -2382,12 +2382,12 @@ function LandingScan({
               lineHeight: 1.6,
               color: tokens.textPrimary,
               maxWidth: '32ch',
-              margin: '0 auto 2rem',
+              margin: '3rem auto 0',
             }}
           >
             {message}
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', width: '100%', maxWidth: 320 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', width: '100%', maxWidth: 320, marginTop: '2.5rem' }}>
             {actions.map((action, idx) => (
               <Pill
                 key={idx}
@@ -2413,7 +2413,7 @@ function LandingScan({
                 fontStyle: 'italic',
                 color: tokens.textMuted,
                 opacity: 0.6,
-                margin: '0 0 1.25rem',
+                margin: '3rem 0 1rem',
               }}
             >
               {sourceLabel}
@@ -2447,13 +2447,13 @@ function LandingScan({
                 lineHeight: 1.6,
                 color: tokens.textPrimary,
                 maxWidth: '32ch',
-                margin: '0 auto 2rem',
+                margin: '3rem auto 0',
               }}
             >
               {steps[steps.length - 1].text}
             </p>
           )}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', width: '100%', maxWidth: 320 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', width: '100%', maxWidth: 320, marginTop: '2.5rem' }}>
             <Pill label="¿Cómo estoy?" variant="solid" onClick={onComplete} tokens={tokens} />
             <Pill label="Seguir respirando" variant="outline" onClick={onContinue} tokens={tokens} />
           </div>
@@ -2500,26 +2500,22 @@ function App() {
   return (
     <>
       <style>{`
-        @keyframes lumi-pulse {
-          0%, 100% { transform: scale(1);    opacity: 0.90; box-shadow: 0 0 10px 2px ${hexToRgba(tokens.accent, 0.20)}; }
-          50%      { transform: scale(1.12); opacity: 1;    box-shadow: 0 0 28px 12px ${accentGlowPeak}; }
-        }
         @keyframes lumiAppear {
           from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
         }
         @keyframes orbBreathe {
-          0%   { transform: scale(1);    box-shadow: 0 0 8px 2px ${hexToRgba(tokens.accent, 0.15)}; }
-          40%  { transform: scale(1.15); box-shadow: 0 0 32px 14px ${accentGlowPeak}; }
-          100% { transform: scale(1);    box-shadow: 0 0 8px 2px ${hexToRgba(tokens.accent, 0.15)}; }
+          0%   { transform: scale(1);    box-shadow: 0 0 8px 0px ${hexToRgba(tokens.accent, 0.20)}; }
+          40%  { transform: scale(1.15); box-shadow: 0 0 30px 8px ${hexToRgba(tokens.accent, 0.40)}; }
+          100% { transform: scale(1);    box-shadow: 0 0 8px 0px ${hexToRgba(tokens.accent, 0.20)}; }
         }
         @keyframes orbInhale {
-          from { transform: scale(1);    box-shadow: 0 0 8px 2px ${hexToRgba(tokens.accent, 0.15)}; }
-          to   { transform: scale(1.15); box-shadow: 0 0 32px 14px ${accentGlowPeak}; }
+          from { transform: scale(1);    box-shadow: 0 0 8px 0px ${hexToRgba(tokens.accent, 0.20)}; }
+          to   { transform: scale(1.15); box-shadow: 0 0 30px 8px ${hexToRgba(tokens.accent, 0.40)}; }
         }
         @keyframes orbExhale {
-          from { transform: scale(1.15); box-shadow: 0 0 32px 14px ${accentGlowPeak}; }
-          to   { transform: scale(1);    box-shadow: 0 0 8px 2px ${hexToRgba(tokens.accent, 0.15)}; }
+          from { transform: scale(1.15); box-shadow: 0 0 30px 8px ${hexToRgba(tokens.accent, 0.40)}; }
+          to   { transform: scale(1);    box-shadow: 0 0 8px 0px ${hexToRgba(tokens.accent, 0.20)}; }
         }
         body { margin: 0; }
         .lumi-orb {
@@ -2564,7 +2560,7 @@ function App() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            ...(isSimpleView ? { justifyContent: 'center', minHeight: '70vh' } : {}),
+            ...(isSimpleView ? { paddingTop: '15vh' } : {}),
           }}
         >
           {/* LUMI: orb permanente en el centro, solo cambia de color */}
@@ -2576,7 +2572,7 @@ function App() {
                 height: 56,
                 borderRadius: '50%',
                 background: `radial-gradient(circle, ${tokens.orbInner} 0%, ${tokens.orbMid} 45%, transparent 72%)`,
-                animation: 'lumi-pulse 2.5s ease-in-out infinite',
+                animation: 'orbBreathe 10s ease-in-out infinite',
               }}
             />
           </div>
