@@ -1111,7 +1111,10 @@ function BottomNav({
         justifyContent: 'center',
         gap: '2.5rem',
         zIndex: 10,
-        background: 'transparent',
+        background: 'none',
+        backgroundColor: 'transparent',
+        boxShadow: 'none',
+        borderTop: 'none',
       }}
     >
       {modules.map(m => {
