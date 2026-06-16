@@ -2,9 +2,11 @@ import type { ModuleTokens } from '../lib/tokens'
 
 export function SanctuaryDetail({
   content,
+  dispatch,
   tokens,
 }: {
   content: Record<string, unknown>
+  dispatch: (action: string, extra?: Record<string, string>) => void
   tokens: ModuleTokens
 }) {
   const title = (content.title as string) || ''
@@ -121,7 +123,11 @@ export function SanctuaryDetail({
 
       {url && (
         <button
-          onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
+          onClick={() => dispatch('resource_viewer_active', {
+            source_kind: (content.source_kind as string) || 'external_url',
+            resource_id: (content.resource_id as string) || (content.id as string) || '',
+            source: 'sanctuary',
+          })}
           style={{
             padding: '0.625rem 1.5rem',
             borderRadius: '999px',
@@ -134,7 +140,7 @@ export function SanctuaryDetail({
             fontFamily: 'inherit',
           }}
         >
-          Abrir
+          Quiero probarlo
         </button>
       )}
     </div>

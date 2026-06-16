@@ -504,7 +504,7 @@ export function ContentArea({
   if (contentType === 'sanctuary_detail') {
     return (
       <>
-        <SanctuaryDetail content={contentData} tokens={tokens} />
+        <SanctuaryDetail content={contentData} dispatch={dispatch} tokens={tokens} />
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
           {actions.map((action, idx) => (
             <Pill
