@@ -2533,7 +2533,8 @@ function App() {
       <div
         className="lumi-bg"
         style={{
-          backgroundColor: tokens.background,
+          background: tokens.background,
+          minHeight: '100vh',
           color: tokens.textPrimary,
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
           paddingTop: (showScan || isSimpleView) ? 0 : '2rem',
