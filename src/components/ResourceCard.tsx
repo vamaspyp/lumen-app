@@ -175,6 +175,7 @@ export function ResourceListCard({
 
 export function ResourceCard({
   content,
+  dispatch,
   tokens,
 }: {
   content: Record<string, unknown>
@@ -189,6 +190,11 @@ export function ResourceCard({
   const whatItIsNot = (content.what_it_is_not as string) || ''
   const sourceName = (content.source_name as string) || ''
   const sourceBasis = (content.source_basis as string) || ''
+  const url = (content.url as string) || ''
+  const resourceId = (content.resource_id as string) || ''
+  const isFrom = (content.is_from as string) || 'lumi'
+  const sessionId = (content.session_id as string) || ''
+  const sourceKind = (content.source_kind as string) || 'external_url'
   const areas = (content.areas as string[]) || []
   const primaryArea = areas[0] || ''
 
@@ -196,6 +202,17 @@ export function ResourceCard({
     format && format.charAt(0).toUpperCase() + format.slice(1),
     durationMin && `${durationMin} min`,
   ].filter(Boolean).join(' · ')
+
+  const handleOpen = () => {
+    if (!resourceId) return
+    if (sourceKind !== 'lumen_practice' && !url) return
+    dispatch('resource_viewer_active', {
+      source_kind: sourceKind,
+      resource_id: resourceId,
+      source:      isFrom,
+      session_id:  sessionId,
+    })
+  }
 
   return (
     <div
@@ -347,6 +364,25 @@ export function ResourceCard({
         </div>
       )}
 
+      {(url || sourceKind === 'lumen_practice') && (
+        <button
+          onClick={handleOpen}
+          style={{
+            marginTop: '1.25rem',
+            padding: '0.625rem 1.5rem',
+            borderRadius: '999px',
+            background: tokens.accent,
+            border: `1px solid ${tokens.accent}`,
+            color: '#FFFFFF',
+            fontSize: '0.875rem',
+            cursor: 'pointer',
+            fontWeight: 500,
+            fontFamily: 'inherit',
+          }}
+        >
+          Quiero probarlo
+        </button>
+      )}
       </div>
     </div>
   )
