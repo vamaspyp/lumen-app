@@ -2337,29 +2337,38 @@ function LandingScan({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        paddingTop: '12vh',
-        paddingLeft: '1.25rem',
-        paddingRight: '1.25rem',
-        paddingBottom: '100px',
-        minHeight: '100vh',
+        height: '100vh',
         boxSizing: 'border-box',
-        textAlign: 'center',
+        paddingBottom: '70px',
       }}
     >
+      {/* DIV 1: orb — mitad superior */}
+      <div style={{ flex: '1 1 50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div
+          style={{
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            background: `radial-gradient(circle at center, ${tokens.orbInner} 0%, ${tokens.orbMid} 25%, rgba(143,163,140,0.3) 60%, transparent 100%)`,
+            animation: 'orbBreathe 10s ease-in-out infinite',
+            flexShrink: 0,
+          }}
+        />
+      </div>
+
+      {/* DIV 2: mensaje */}
       <div
         style={{
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          background: `radial-gradient(circle at center, ${tokens.orbInner} 0%, ${tokens.orbMid} 25%, rgba(143,163,140,0.3) 60%, transparent 100%)`,
-          animation: 'orbBreathe 10s ease-in-out infinite',
-          flexShrink: 0,
+          flex: '1 1 25%',
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          paddingTop: '1rem',
+          width: '100%',
+          textAlign: 'center',
         }}
-      />
-
-      {phase === 'invite' && (
-        <>
+      >
+        {phase === 'invite' && (
           <p
             style={{
               fontFamily: 'Georgia, "Times New Roman", serif',
@@ -2368,12 +2377,72 @@ function LandingScan({
               lineHeight: 1.6,
               color: tokens.textPrimary,
               maxWidth: '32ch',
-              marginTop: '4rem',
+              margin: 0,
             }}
           >
             {message}
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', width: '100%', maxWidth: 320, marginTop: '3rem' }}>
+        )}
+        {phase === 'scanning' && steps.length > 0 && (
+          <div style={{ maxWidth: 360 }}>
+            {sourceLabel && (
+              <p
+                style={{
+                  fontSize: '0.72rem',
+                  fontStyle: 'italic',
+                  color: tokens.textMuted,
+                  opacity: 0.6,
+                  margin: '0 0 1rem',
+                }}
+              >
+                {sourceLabel}
+              </p>
+            )}
+            <p
+              key={stepIndex}
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontSize: '1.1rem',
+                lineHeight: 1.7,
+                color: tokens.textPrimary,
+                maxWidth: '28ch',
+                margin: '0 auto',
+                animation: 'lumiAppear 600ms ease-out both',
+              }}
+            >
+              {steps[stepIndex].text}
+            </p>
+          </div>
+        )}
+        {phase === 'done' && steps.length > 0 && (
+          <p
+            style={{
+              fontFamily: 'Georgia, "Times New Roman", serif',
+              fontStyle: 'italic',
+              fontSize: '1.05rem',
+              lineHeight: 1.6,
+              color: tokens.textPrimary,
+              maxWidth: '32ch',
+              margin: 0,
+            }}
+          >
+            {steps[steps.length - 1].text}
+          </p>
+        )}
+      </div>
+
+      {/* DIV 3: pills */}
+      <div
+        style={{
+          flex: '1 1 25%',
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          paddingTop: '1rem',
+        }}
+      >
+        {phase === 'invite' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', width: '100%', maxWidth: 320 }}>
             {actions.map((action, idx) => (
               <Pill
                 key={idx}
@@ -2387,59 +2456,9 @@ function LandingScan({
               />
             ))}
           </div>
-        </>
-      )}
-
-      {phase === 'scanning' && steps.length > 0 && (
-        <div style={{ maxWidth: 360 }}>
-          {sourceLabel && (
-            <p
-              style={{
-                fontSize: '0.72rem',
-                fontStyle: 'italic',
-                color: tokens.textMuted,
-                opacity: 0.6,
-                margin: '4rem 0 1rem',
-              }}
-            >
-              {sourceLabel}
-            </p>
-          )}
-          <p
-            key={stepIndex}
-            style={{
-              fontFamily: 'Georgia, "Times New Roman", serif',
-              fontSize: '1.1rem',
-              lineHeight: 1.7,
-              color: tokens.textPrimary,
-              maxWidth: '28ch',
-              margin: '0 auto',
-              animation: 'lumiAppear 600ms ease-out both',
-            }}
-          >
-            {steps[stepIndex].text}
-          </p>
-        </div>
-      )}
-
-      {phase === 'done' && (
-        <>
-          {steps.length > 0 && (
-            <p
-              style={{
-                fontFamily: 'Georgia, "Times New Roman", serif',
-                fontStyle: 'italic',
-                fontSize: '1.05rem',
-                lineHeight: 1.6,
-                color: tokens.textPrimary,
-                maxWidth: '32ch',
-                marginTop: '4rem',
-              }}
-            >
-              {steps[steps.length - 1].text}
-            </p>
-          )}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', width: '100%', maxWidth: 320, marginTop: '3rem' }}>
+        )}
+        {phase === 'done' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', width: '100%', maxWidth: 320 }}>
             {postActions.length > 0 ? postActions.map((pa, idx) => (
               <Pill
                 key={`${pa.action}-${idx}`}
@@ -2455,8 +2474,8 @@ function LandingScan({
               </>
             )}
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   )
 }
@@ -2528,7 +2547,7 @@ function App() {
           backgroundColor: tokens.background,
           color: tokens.textPrimary,
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-          paddingTop: '2rem',
+          paddingTop: (showScan || isSimpleView) ? 0 : '2rem',
           paddingLeft: '1.25rem',
           paddingRight: '1.25rem',
           boxSizing: 'border-box',
@@ -2548,86 +2567,103 @@ function App() {
               }
             }}
           />
-        ) : (
-        <div
-          style={{
-            maxWidth: 560,
-            margin: '0 auto',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            ...(isSimpleView ? {
-              justifyContent: 'flex-start',
-              paddingTop: '12vh',
-              paddingBottom: '100px',
-              minHeight: '100vh',
-              boxSizing: 'border-box' as const,
-            } : {}),
-          }}
-        >
-          {/* LUMI: orb permanente en el centro, solo cambia de color */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: isSimpleView ? 0 : '1.25rem' }}>
+        ) : isSimpleView ? (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              height: '100vh',
+              boxSizing: 'border-box',
+              paddingBottom: '70px',
+            }}
+          >
+            {/* DIV 1: orb — mitad superior */}
+            <div style={{ flex: '1 1 50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  background: `radial-gradient(circle at center, ${tokens.orbInner} 0%, ${tokens.orbMid} 25%, rgba(143,163,140,0.3) 60%, transparent 100%)`,
+                  animation: 'orbBreathe 10s ease-in-out infinite',
+                }}
+              />
+            </div>
+
+            {/* DIV 2: mensaje */}
             <div
               style={{
-                width: '80px',
-                height: '80px',
-                borderRadius: '50%',
-                background: `radial-gradient(circle at center, ${tokens.orbInner} 0%, ${tokens.orbMid} 25%, rgba(143,163,140,0.3) 60%, transparent 100%)`,
-                animation: 'orbBreathe 10s ease-in-out infinite',
+                flex: '1 1 25%',
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
+                paddingTop: '1rem',
+                width: '100%',
+                textAlign: 'center',
               }}
-            />
-          </div>
-
-          <div
-            key={state.lumiMessage}
-            style={{ animation: 'lumiAppear 600ms ease-out both', width: '100%', textAlign: 'center', marginTop: isSimpleView ? '4rem' : 0 }}
-          >
-            {(() => {
-              const perla   = (state.lumiContentData?.culture_phrase as string) || ''
-              const mensaje = state.lumiMessage || ''
-              if (!perla && !mensaje) return null
-              return (
-                <div
-                  style={{
-                    fontFamily: 'Georgia, "Times New Roman", serif',
-                    fontStyle: 'italic',
-                    textAlign: 'center',
-                    lineHeight: 1.5,
-                    margin: '0 auto 1.75rem',
-                    maxWidth: '38ch',
-                  }}
-                >
-                  {perla && (
-                    <span
+            >
+              <div
+                key={state.lumiMessage}
+                style={{ animation: 'lumiAppear 600ms ease-out both', width: '100%', textAlign: 'center' }}
+              >
+                {(() => {
+                  const perla   = (state.lumiContentData?.culture_phrase as string) || ''
+                  const mensaje = state.lumiMessage || ''
+                  if (!perla && !mensaje) return null
+                  return (
+                    <div
                       style={{
-                        display: 'block',
-                        fontSize: '0.8rem',
+                        fontFamily: 'Georgia, "Times New Roman", serif',
                         fontStyle: 'italic',
-                        color: tokens.textMuted,
-                        opacity: 0.75,
-                        marginBottom: mensaje ? '0.65rem' : 0,
-                        letterSpacing: '0.005em',
+                        textAlign: 'center',
+                        lineHeight: 1.5,
+                        margin: '0 auto',
+                        maxWidth: '38ch',
                       }}
                     >
-                      "{perla}"
-                    </span>
-                  )}
-                  {mensaje && (
-                    <span
-                      style={{
-                        display: 'block',
-                        fontSize: '1.05rem',
-                        color: tokens.textPrimary,
-                      }}
-                    >
-                      {mensaje}
-                    </span>
-                  )}
-                </div>
-              )
-            })()}
+                      {perla && (
+                        <span
+                          style={{
+                            display: 'block',
+                            fontSize: '0.8rem',
+                            fontStyle: 'italic',
+                            color: tokens.textMuted,
+                            opacity: 0.75,
+                            marginBottom: mensaje ? '0.65rem' : 0,
+                            letterSpacing: '0.005em',
+                          }}
+                        >
+                          "{perla}"
+                        </span>
+                      )}
+                      {mensaje && (
+                        <span
+                          style={{
+                            display: 'block',
+                            fontSize: '1.05rem',
+                            color: tokens.textPrimary,
+                          }}
+                        >
+                          {mensaje}
+                        </span>
+                      )}
+                    </div>
+                  )
+                })()}
+              </div>
+            </div>
 
-            <div style={isSimpleView ? { marginTop: '3rem', width: '100%' } : {}}>
+            {/* DIV 3: pills */}
+            <div
+              style={{
+                flex: '1 1 25%',
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
+                paddingTop: '1rem',
+              }}
+            >
               <ContentArea
                 contentType={state.lumiContentType}
                 contentData={state.lumiContentData}
@@ -2637,48 +2673,128 @@ function App() {
               />
             </div>
           </div>
-
-          <details
+        ) : (
+          <div
             style={{
-              marginTop: '3rem',
-              width: '100%',
-              fontSize: '0.7rem',
-              color: tokens.textMuted,
-              opacity: 0.6,
+              maxWidth: 560,
+              margin: '0 auto',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
             }}
           >
-            <summary style={{ cursor: 'pointer' }}>debug</summary>
-            <pre
+            {/* LUMI: orb permanente en el centro, solo cambia de color */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
+              <div
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  background: `radial-gradient(circle at center, ${tokens.orbInner} 0%, ${tokens.orbMid} 25%, rgba(143,163,140,0.3) 60%, transparent 100%)`,
+                  animation: 'orbBreathe 10s ease-in-out infinite',
+                }}
+              />
+            </div>
+
+            <div
+              key={state.lumiMessage}
+              style={{ animation: 'lumiAppear 600ms ease-out both', width: '100%', textAlign: 'center' }}
+            >
+              {(() => {
+                const perla   = (state.lumiContentData?.culture_phrase as string) || ''
+                const mensaje = state.lumiMessage || ''
+                if (!perla && !mensaje) return null
+                return (
+                  <div
+                    style={{
+                      fontFamily: 'Georgia, "Times New Roman", serif',
+                      fontStyle: 'italic',
+                      textAlign: 'center',
+                      lineHeight: 1.5,
+                      margin: '0 auto 1.75rem',
+                      maxWidth: '38ch',
+                    }}
+                  >
+                    {perla && (
+                      <span
+                        style={{
+                          display: 'block',
+                          fontSize: '0.8rem',
+                          fontStyle: 'italic',
+                          color: tokens.textMuted,
+                          opacity: 0.75,
+                          marginBottom: mensaje ? '0.65rem' : 0,
+                          letterSpacing: '0.005em',
+                        }}
+                      >
+                        "{perla}"
+                      </span>
+                    )}
+                    {mensaje && (
+                      <span
+                        style={{
+                          display: 'block',
+                          fontSize: '1.05rem',
+                          color: tokens.textPrimary,
+                        }}
+                      >
+                        {mensaje}
+                      </span>
+                    )}
+                  </div>
+                )
+              })()}
+
+              <ContentArea
+                contentType={state.lumiContentType}
+                contentData={state.lumiContentData}
+                actions={state.lumiActions}
+                dispatch={dispatch}
+                tokens={tokens}
+              />
+            </div>
+
+            <details
               style={{
-                background: 'rgba(0,0,0,0.04)',
-                padding: '0.75rem',
-                borderRadius: '8px',
-                overflow: 'auto',
-                fontSize: '0.65rem',
+                marginTop: '3rem',
+                width: '100%',
+                fontSize: '0.7rem',
+                color: tokens.textMuted,
+                opacity: 0.6,
               }}
             >
-              {JSON.stringify(
-                {
-                  code: state.lumiCode,
-                  content_type: state.lumiContentType,
-                  source: state.contentSource,
-                  module: tokens.source,
-                  session: state.currentSessionId,
-                  resource: state.currentResourceId,
-                  sanctuary_item: state.currentSanctuaryItemId,
-                  checkin: {
-                    state: state.checkinState,
-                    area: state.checkinArea,
-                    time: state.checkinTime,
+              <summary style={{ cursor: 'pointer' }}>debug</summary>
+              <pre
+                style={{
+                  background: 'rgba(0,0,0,0.04)',
+                  padding: '0.75rem',
+                  borderRadius: '8px',
+                  overflow: 'auto',
+                  fontSize: '0.65rem',
+                }}
+              >
+                {JSON.stringify(
+                  {
+                    code: state.lumiCode,
+                    content_type: state.lumiContentType,
+                    source: state.contentSource,
+                    module: tokens.source,
+                    session: state.currentSessionId,
+                    resource: state.currentResourceId,
+                    sanctuary_item: state.currentSanctuaryItemId,
+                    checkin: {
+                      state: state.checkinState,
+                      area: state.checkinArea,
+                      time: state.checkinTime,
+                    },
+                    actions: state.lumiActions.map(a => `${a.label} → ${a.action}`),
                   },
-                  actions: state.lumiActions.map(a => `${a.label} → ${a.action}`),
-                },
-                null,
-                2
-              )}
-            </pre>
-          </details>
-        </div>
+                  null,
+                  2
+                )}
+              </pre>
+            </details>
+          </div>
         )}
       </div>
       <div style={{ height: '80px', flexShrink: 0 }} />
