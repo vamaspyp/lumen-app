@@ -128,7 +128,7 @@ export function useLumi() {
     async (action: string, extra?: Record<string, string>) => {
       const params = { ...buildParams(state), ...extra }
 
-      const { data, error } = await supabase.rpc('lumi_dispatch', {
+const { data, error } = await supabase.rpc('lumi_dispatch', {
         p_action: action,
         p_params: params,
       })
