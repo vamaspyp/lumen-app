@@ -2344,13 +2344,13 @@ function LandingScan({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        height: '100vh',
-        boxSizing: 'border-box',
-        paddingBottom: '70px',
+        minHeight: 'calc(100vh - 70px)',
+        paddingTop: '0',
+        paddingBottom: '0',
       }}
     >
-      {/* DIV 1: orb — mitad superior */}
-      <div style={{ flex: '1 1 50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {/* SECCIÓN 1: orb */}
+      <div style={{ flex: '1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div
           style={{
             width: '80px',
@@ -2363,14 +2363,12 @@ function LandingScan({
         />
       </div>
 
-      {/* DIV 2: mensaje */}
+      {/* SECCIÓN 2: mensaje */}
       <div
         style={{
-          flex: '1 1 25%',
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'center',
-          paddingTop: '1rem',
+          flex: '0 0 auto',
+          padding: '0 2rem',
+          marginBottom: '2rem',
           width: '100%',
           textAlign: 'center',
         }}
@@ -2438,14 +2436,11 @@ function LandingScan({
         )}
       </div>
 
-      {/* DIV 3: pills */}
+      {/* SECCIÓN 3: pills */}
       <div
         style={{
-          flex: '1 1 25%',
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'center',
-          paddingTop: '1rem',
+          flex: '0 0 auto',
+          marginBottom: '4rem',
         }}
       >
         {phase === 'invite' && (
@@ -2499,7 +2494,7 @@ function App() {
     dispatch(action, extra)
   }
 
-  const isSimpleView = ['empty_presence', 'landing_scan', 'landing_scan_invite'].includes(state.lumiContentType)
+  const isSimpleView = ['empty_presence', 'landing_scan', 'landing_scan_invite', 'scan_complete'].includes(state.lumiContentType)
 
   const accentGlowPeak = hexToRgba(tokens.accent, 0.5)
 
@@ -2560,13 +2555,13 @@ function App() {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              height: '100vh',
-              boxSizing: 'border-box',
-              paddingBottom: '70px',
+              minHeight: 'calc(100vh - 70px)',
+              paddingTop: '0',
+              paddingBottom: '0',
             }}
           >
-            {/* DIV 1: orb — mitad superior */}
-            <div style={{ flex: '1 1 50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {/* SECCIÓN 1: orb */}
+            <div style={{ flex: '1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div
                 style={{
                   width: '80px',
@@ -2578,14 +2573,12 @@ function App() {
               />
             </div>
 
-            {/* DIV 2: mensaje */}
+            {/* SECCIÓN 2: mensaje */}
             <div
               style={{
-                flex: '1 1 25%',
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                paddingTop: '1rem',
+                flex: '0 0 auto',
+                padding: '0 2rem',
+                marginBottom: '2rem',
                 width: '100%',
                 textAlign: 'center',
               }}
@@ -2641,14 +2634,11 @@ function App() {
               </div>
             </div>
 
-            {/* DIV 3: pills */}
+            {/* SECCIÓN 3: pills */}
             <div
               style={{
-                flex: '1 1 25%',
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                paddingTop: '1rem',
+                flex: '0 0 auto',
+                marginBottom: '4rem',
               }}
             >
               <ContentArea
