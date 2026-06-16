@@ -1070,13 +1070,9 @@ function ListFilterPanel({
 function BottomNav({
   currentSource,
   dispatch,
-  bgColor,
-  dimmed = false,
 }: {
   currentSource: string
   dispatch: (action: string, extra?: Record<string, string>) => void
-  bgColor: string
-  dimmed?: boolean
 }) {
   const modules: Array<{
     key: 'lumi' | 'fuente' | 'sanctuary' | 'circles'
@@ -2464,13 +2460,6 @@ function LandingScan({
   )
 }
 
-function hexToRgba(hex: string, a: number): string {
-  const r = parseInt(hex.slice(1, 3), 16)
-  const g = parseInt(hex.slice(3, 5), 16)
-  const b = parseInt(hex.slice(5, 7), 16)
-  return `rgba(${r}, ${g}, ${b}, ${a})`
-}
-
 // ─── App shell ───────────────────────────────────────────────────
 function App() {
   const { state, dispatch } = useLumi()
@@ -2496,8 +2485,6 @@ function App() {
 
   const isSimpleView = ['empty_presence', 'landing_scan', 'landing_scan_invite', 'scan_complete'].includes(state.lumiContentType)
 
-  const accentGlowPeak = hexToRgba(tokens.accent, 0.5)
-
   return (
     <>
       <style>{`
@@ -2519,7 +2506,6 @@ function App() {
             opacity: 0.75;
           }
         }
-        body { margin: 0; }
         .lumi-bg {
           transition: background-color 0.6s ease, color 0.6s ease;
         }
@@ -2775,7 +2761,7 @@ function App() {
         )}
       </div>
       <div style={{ height: '80px', flexShrink: 0 }} />
-       <BottomNav currentSource={state.contentSource} dispatch={navDispatch} bgColor={tokens.background} dimmed={showScan} />
+      <BottomNav currentSource={state.contentSource} dispatch={navDispatch} />
     </>
   )
 }
