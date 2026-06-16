@@ -2301,12 +2301,12 @@ function LandingScan({
   scanData,
   tokens,
   onComplete,
-  onContinue,
+  onScanComplete,
 }: {
   scanData: Record<string, unknown>
   tokens: ModuleTokens
   onComplete: () => void
-  onContinue: () => void
+  onScanComplete: () => void
 }) {
   const [phase, setPhase] = useState<'invite' | 'scanning' | 'done'>('invite')
   const [stepIndex, setStepIndex] = useState(0)
@@ -2316,7 +2316,11 @@ function LandingScan({
   const content = (scanData.content as Record<string, unknown>) || {}
   const steps = (content.steps as Array<{ text: string; pause_ms: number; breathe?: string }>) || []
   const sourceLabel = (content.source_label as string) || ''
-  const postActions = (content.post_actions as Array<{ label: string; action: string; variant?: string }>) || []
+
+  // Al completar el escaneo, delega al dispatcher canónico para obtener el nodo de cierre
+  useEffect(() => {
+    if (phase === 'done') onScanComplete()
+  }, [phase, onScanComplete])
 
   useEffect(() => {
     if (phase !== 'scanning' || steps.length === 0) return
@@ -2457,24 +2461,6 @@ function LandingScan({
             ))}
           </div>
         )}
-        {phase === 'done' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', width: '100%', maxWidth: 320 }}>
-            {postActions.length > 0 ? postActions.map((pa, idx) => (
-              <Pill
-                key={`${pa.action}-${idx}`}
-                label={pa.label}
-                variant={(pa.variant as 'solid' | 'outline' | 'ghost') || (idx === 0 ? 'solid' : 'outline')}
-                onClick={pa.action === 'continue_breathing' ? onContinue : onComplete}
-                tokens={tokens}
-              />
-            )) : (
-              <>
-                <Pill label="¿Cómo estoy?" variant="solid" onClick={onComplete} tokens={tokens} />
-                <Pill label="Seguir respirando" variant="outline" onClick={onContinue} tokens={tokens} />
-              </>
-            )}
-          </div>
-        )}
       </div>
     </div>
   )
@@ -2559,12 +2545,9 @@ function App() {
             scanData={scanData!}
             tokens={tokens}
             onComplete={() => setHasScannedThisSession(true)}
-            onContinue={async () => {
-              const { data } = await supabase.rpc('lumi_get_scan')
-              if (data?.ok) {
-                setScanData(data as Record<string, unknown>)
-                setScanKey(k => k + 1)
-              }
+            onScanComplete={async () => {
+              await dispatch('complete_scan')
+              setHasScannedThisSession(true)
             }}
           />
         ) : isSimpleView ? (
