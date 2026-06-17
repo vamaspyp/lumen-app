@@ -73,6 +73,7 @@ function buildParams(state: LumiState): Record<string, string> {
     resource_id: state.currentResourceId,
     sanctuary_item_id: state.currentSanctuaryItemId,
     lang: state.lang,
+    source: state.contentSource,
     checkin_state: state.checkinState,
     checkin_area: state.checkinArea,
     checkin_time: state.checkinTime,
