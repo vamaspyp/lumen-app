@@ -1,76 +1,118 @@
-# LUMEN — Briefing para Claude Code
+# LUMEN — Briefing para Claude Code (actualizado junio 2026)
 
 ## Qué es LUMEN
-Plataforma de bienestar en español con un compañero de IA **determinístico** llamado LUMI (cero LLM). La misión: ayudar a cada persona a sentirse un poco mejor ahora y vivir progresivamente mejor con el tiempo.
+Plataforma de bienestar en español con un compañero de IA **determinístico** llamado LUMI (cero LLM). Misión: ayudar a cada persona a sentirse un poco mejor ahora y vivir progresivamente mejor con el tiempo.
+
+## Principio rector
+LUMEN no gestiona contenidos. LUMEN gestiona **capacidad de ayuda**.
+La unidad estratégica principal no es el recurso — es la ayuda ofrecida.
 
 ## Stack técnico
-- **Frontend:** React 18 + TypeScript + Vite (este repo)
-- **Backend:** Supabase/PostgreSQL (proyecto `xezolunw`)
-- **Estado actual:** MVP en desarrollo local (`npm run dev` → localhost:5173)
-- **Deploy futuro:** Vercel + PWA (no está implementado todavía)
+- **Frontend:** React 18 + TypeScript + Vite
+- **Backend:** Supabase/PostgreSQL (proyecto xezolunw)
+- **Deploy:** Vercel → lumen-vamas.vercel.app
+- **Repo:** github.com/vamaspyp/lumen-app
+- **Dev:** VS Code + Claude Code extension
 
-## Estructura del proyecto
+## Estructura del proyecto (post-refactor)
 ```
 src/
-  App.tsx          ← componente principal, toda la UI
-  main.tsx         ← entry point
+  App.tsx              — shell principal (~284 líneas)
+  main.tsx             — entry point
   lib/
-    useLumi.ts     ← hook principal: auth, state, dispatch al backend
-    supabase.ts    ← cliente Supabase
-    tokens.ts      ← sistema de tokens cromáticos por módulo (paleta nordic/zen)
-    embedHelpers.ts ← helpers para URLs embebibles (YouTube, Spotify, etc.)
+    useLumi.ts         — hook principal: auth, state, dispatch
+    supabase.ts        — cliente Supabase
+    tokens.ts          — tokens cromáticos por módulo (paleta nordic/zen)
+    embedHelpers.ts    — helpers para URLs embebibles
+  components/
+    Pill.tsx            — pills (voz de la persona)
+    LumiOrb.tsx         — orb con animación sólido-energético
+    BottomNav.tsx       — navegación inferior
+    ResourceCard.tsx    — ficha de recurso
+    SanctuaryDetail.tsx — detalle de ítem del santuario
+    NamePrompt.tsx      — captura de nombre
+    NoteEditor.tsx      — editor de notas
+    ListFilterPanel.tsx — filtros de listas
+    GuidedPractice.tsx  — práctica guiada paso a paso (Capa 1)
+    ResourceViewer.tsx  — viewer full-screen (createPortal)
+    LandingScan.tsx     — escaneo de llegada (momento de aterrizaje)
+    ContentArea.tsx     — router de contenido
 docs/
-  backend/
-    DB - rpcs-dump.csv      ← dump de todas las funciones RPC del backend
-    DB - schema con data.csv ← DDL completo con datos
+  backend/             — dumps de DB y SQLs aplicados
 ```
 
-## Arquitectura (canon inamovible)
-- **Supabase decide → dispatcher ejecuta → React renderiza.** Separación de capas pura.
-- `lumi_dispatch(p_action, p_params)` es el dispatcher universal. Recibe una acción como string, llama dinámicamente a `lumi_{action}(p_params)`.
-- `gaia_submit_session_action` es el único punto de registro de señales. No dispersar.
-- Los componentes son **pasivos**: leen de `content`, nunca de `state` del backend.
-- El front usa `useLumi()` hook que expone `{ state, dispatch }`.
+## Arquitectura canónica (inamovible)
+- **Supabase decide - dispatcher ejecuta - React renderiza pasivamente**
+- lumi_dispatch(p_action, p_params) es el dispatcher universal
+- gaia_submit_session_action es el único punto de registro de señales
+- Componentes son **pasivos**: leen content, no state del backend
+- **Una sola voz a la vez** — nunca dos mensajes simultáneos de LUMI
+- **Pills son la voz de la persona** — primera persona, no comandos
+- Node-chaining canónico: nunca dos conjuntos de acciones en un nodo
+- Pill variants (solid/outline/ghost) vienen del backend en actions_json
 
-## Reglas de LUMI (voz y comportamiento)
-- **Una sola voz a la vez.** Nunca dos mensajes simultáneos.
-- **Pills son la voz de la persona** en el diálogo — primera persona, no comandos ("Quiero probarlo", no "ABRIR RECURSO").
-- **LUMEN no genera ni reinterpreta sabiduría.** Toda fuente debe ser verificable externamente.
-- **Recursos viven DENTRO de LUMEN** (embebidos). Salir afuera es excepción forzada.
-- **El motor es honesto:** si no hay match, dice "no tengo algo claro" — no inventa.
-- **Voz:** amable, gentil, serena, no intrusiva, no coach. Primera persona humilde.
+## Modelo de ayuda canónico MVP
+Estado - Prevalencia - Intervention Key - Patrón - Instancia (Recurso) - Feedback - Santuario
 
-## Módulos y tokens
-Cuatro módulos con identidad visual propia (definidos en `tokens.ts`):
-- **lumi** (home) — salvia `#8FA38C`
-- **fuente** (biblioteca) — bronce `#9B7A52`
-- **sanctuary** (espacio personal) — dorado tierra `#A88860`
-- **circles** (comunidad) — azul niebla `#7090B5`
+## 12 Intervention Keys canónicas
+abrir_sentido, bajar_la_velocidad, cerrar_el_dia, cultivar_gratitud,
+dar_un_paso_minimo, descansar_sin_exigirte, nombrar_lo_que_pasa,
+ordenar_lo_que_importa, recordar_un_vinculo, suavizar_la_friccion,
+volver_a_lo_que_ayudo, volver_al_cuerpo
 
-Paleta general: fondo tiza arena, textos marrón cálido (no negro), bordes casi imperceptibles.
+## 9 Estados MVP
+abierto, ansioso, bajo, bien, cansado, cargado, confundido, irritado, solo
 
-## Flujo principal (check-in)
-1. Usuario llega → `go_home` → LUMI saluda (con nombre si lo tiene)
-2. Check-in: estado → área → tiempo (3 pasos, cada uno un dispatch)
-3. Motor propone recurso → `resource_card` aparece
-4. Usuario abre → viewer (embebido o externo)
-5. Cierra viewer → feedback ("Me dejó un poco mejor" / "No era para mí")
-6. Puede guardar en Santuario
+## Contenido actual
+- 12 prácticas Capa 1 (LUMEN nativas, español, GuidedPractice)
+- 33 recursos Capa 2 (YouTube español embebido)
+- 3 escaneos de llegada (SCAN_BREATHE, SCAN_BODY, SCAN_COMPASSION)
 
-## Campos clave del state en useLumi
-- `currentSessionId` y `currentResourceId` se preservan entre dispatches (no se limpian con strings vacíos del backend)
-- `checkinState`, `checkinArea`, `checkinTime` acumulan las selecciones del check-in
-- `contentSource` determina qué módulo de tokens aplicar
+## Paleta Nordic/zen
+- LUMI: salvia #8FA38C / deep #5F7A5E
+- Fuente: bronce #9B7A52 / deep #6E5536
+- Santuario: dorado tierra #A88860 / deep #7A6240
+- Círculos: azul niebla #7090B5 / deep #4A6A8E
+- Fondo: tiza arena #F4EFE6
+- Texto: marrón cálido #3A332A
 
-## Comunicación
-- Idioma: español rioplatense, directo
-- Entregar archivos completos o bloques completos, no fragmentos quirúrgicos
-- Contradecir si algo viola el canon
-- Pensar siempre en modo LUMEN desde la visión completa del sistema
+## Reglas de LUMI
+- Amable, gentil, serena, no intrusiva, no coach
+- Primera persona humilde
+- NO genera ni reinterpreta sabiduría — toda Fuente verificable
+- Si no hay match, dice "no tengo algo claro" — no inventa
+- Recursos viven DENTRO de LUMEN (embebidos). Salir afuera es excepción
+- Santuario: no dispara feedback post-viewer
 
 ## Errores conocidos (no repetir)
-- `ResourceCard` NUNCA debe referenciar `state.currentSessionId` directamente (causa ReferenceError silencioso)
-- `coalesce(active, true)=true` necesario para nodos con `active=NULL`
-- `content.resource_id` es el campo correcto (no `content.id`) para extraer el ID del recurso
-- Strings vacíos en `result.state` NO deben limpiar IDs ya seteados en el state del hook
-- React 18 StrictMode en dev monta dos veces — usar patrón singleton para auth
+- ResourceCard NUNCA referencia state.currentSessionId directamente
+- Strings vacíos en result.state NO limpian IDs del hook
+- React 18 StrictMode monta dos veces — patrón singleton para auth
+- content.resource_id (no content.id) para extraer ID del recurso
+- buildParams incluye source: state.contentSource para routing post-viewer
+- Verificar funciones existentes antes de CREATE OR REPLACE
+- Un nodo = un estado. Node-chaining para múltiples fases
+
+## Pendientes inmediatos
+### Backend (prioridad alta)
+- Crear tabla patterns (pattern_key, intervention_key, name, description)
+- Crear tabla state_intervention_prevalence (state, IK, priority, weight)
+- Agregar pattern_id a resources, sessions, session_events, sanctuary_items
+- Agregar selected_intervention_key y selected_pattern_id a sessions
+- Poblar patrones (~36-60) y prevalencia (9x12)
+- Evolucionar motor para usar prevalencia + patrones
+
+### Frontend (mejoras)
+- Layout LUMI/mensaje/pills en pantalla completa
+- Colores Fuente vs Santuario más diferenciados
+- LUMI sticky al scrollear
+- Respaldo/Fuente visible en resource cards
+- Íconos por área de vida (esperando decisión de Pauli)
+- PWA (manifest + service worker + íconos)
+
+### Post-MVP
+- Audio Capa 1 (ElevenLabs)
+- Factor sonoro (Suno AI)
+- HCI complejo
+- Comunidad + autopoiesis
+- Modo proactivo
