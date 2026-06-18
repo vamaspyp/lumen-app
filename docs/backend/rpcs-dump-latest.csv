@@ -1,0 +1,3179 @@
+routine_name,routine_definition
+gaia_candidate_interventions,"
+  SELECT coalesce(array_agg(
+           ik.key
+           ORDER BY (p_area IS NOT NULL AND p_area = ANY(ik.allowed_areas)) DESC,
+                    ik.key
+         ), '{}')
+  FROM public.intervention_keys ik
+  WHERE ik.is_active
+    AND p_state = ANY(ik.allowed_states);
+"
+gaia_create_session_and_recommendations,"
+declare
+  v_lang          text;
+  v_avoid_tags    text[];
+  v_pref_formats  resource_format[];
+  v_session_id    uuid;
+  v_max_mins      int;
+  v_copy          text := null;
+  v_fmt_w         jsonb;
+  v_ik_w          jsonb;            -- ◀ B1: pesos por intervention_key (sanctuary)
+  v_cand_int      text[];          -- ◀ B1: intervenciones candidatas (estado+área)
+  v_target_hi     text[];          -- ◀ B1: intents objetivo del estado
+  v_recs          jsonb := '[]'::jsonb;
+  v_fallback      int  := 0;
+  v_rec_count     int  := 0;
+  v_had_no_match  boolean := false;
+begin
+  if p_mode = 'propose' then
+    if p_state is null or p_area is null or p_time_bucket is null then
+      raise exception 'Propose requiere state, area y time_bucket';
+    end if;
+  end if;
+
+  select u.lang, u.avoid_tags, u.preferred_formats
+    into v_lang, v_avoid_tags, v_pref_formats
+  from public.users u where u.id = p_user_id;
+
+  if v_lang is null then
+    raise exception 'User profile missing in public.users for id %', p_user_id;
+  end if;
+
+  insert into public.user_weights(user_id) values (p_user_id)
+  on conflict (user_id) do nothing;
+
+  select format_weights, intervention_key_weights
+    into v_fmt_w, v_ik_w
+  from public.user_weights where user_id = p_user_id;
+
+  insert into public.sessions(user_id, mode, state, area, time_bucket, fallback_level, gaia_copy)
+  values (p_user_id, p_mode, p_state, p_area, p_time_bucket, 0, null)
+  returning id into v_session_id;
+
+  if p_mode = 'presence' then
+    v_copy := 'Estoy acá. Si querés, hoy podemos simplemente estar.';
+    update public.sessions set gaia_copy = v_copy where id = v_session_id;
+    return jsonb_build_object('session_id', v_session_id, 'mode', p_mode,
+      'gaia_copy', v_copy, 'fallback_level', 0, 'recommendations', jsonb_build_array());
+  end if;
+
+  if p_mode = 'no_intervention' then
+    v_copy := 'No tengo nada mejor que agregar ahora. Si querés, quedémonos un momento.';
+    update public.sessions set gaia_copy = v_copy where id = v_session_id;
+    return jsonb_build_object('session_id', v_session_id, 'mode', p_mode,
+      'gaia_copy', v_copy, 'fallback_level', 0, 'recommendations', jsonb_build_array());
+  end if;
+
+  v_max_mins  := public.gaia_max_minutes(p_time_bucket);
+  -- ◀ B1: resolvers data-driven (Patch A)
+  v_cand_int  := public.gaia_candidate_interventions(p_state, p_area);
+  v_target_hi := public.gaia_target_help_intents(p_state);
+
+  with
+  last_session as (
+    select s.id as sid from public.sessions s
+    where s.user_id = p_user_id and s.id <> v_session_id and s.mode = 'propose'
+    order by s.created_at desc limit 1
+  ),
+  last_shown as (
+    select sr.resource_id from public.session_recommendations sr
+    join last_session ls on ls.sid = sr.session_id
+  ),
+  neg_feedback as (
+    select distinct e.resource_id from public.session_events e
+    where e.user_id = p_user_id and e.action_type = 'reject' and e.resource_id is not null
+  ),
+  saved as (select distinct si.resource_id from public.sanctuary_items si where si.user_id = p_user_id),
+  seen_before as (
+    select distinct sr.resource_id from public.session_recommendations sr
+    join public.sessions s on s.id = sr.session_id where s.user_id = p_user_id
+  ),
+  base as (
+    select r.*,
+      -- layer (se preserva: alimenta filtro layer<4, exploración y fallback_level)
+      case
+        when (p_state = any(r.states) and p_area = any(r.areas)) then 0
+        when (p_state = any(r.states) and p_area = any(public.gaia_neighbor_areas(p_area))) then 1
+        when (public.gaia_neighbor_states(p_state) && r.states and p_area = any(r.areas)) then 2
+        when (r.is_core = true and r.tier = 'A'::resource_tier) then 4
+        else 99
+      end::smallint as layer,
+
+      -- ◀ B1 · COMPONENTES DE SCORING ACOTADOS ───────────────────
+      -- state_area (0-4)
+      case
+        when (p_state = any(r.states) and p_area = any(r.areas)) then 4
+        when (p_state = any(r.states) and p_area = any(public.gaia_neighbor_areas(p_area))) then 3
+        when (public.gaia_neighbor_states(p_state) && r.states and p_area = any(r.areas)) then 2
+        else 0
+      end::numeric as sc_state_area,
+
+      -- help_intent (0-2): dirección preferible del estado (curada)
+      case when r.help_intent is not null and r.help_intent::text = any(v_target_hi)
+           then 2 else 0 end::numeric as sc_help_intent,
+
+      -- intervention_key (0-3): candidata; 3 si además matchea área, 1.5 si solo estado
+      case
+        when p_area = any(ik.allowed_areas) then 3
+        else 1.5
+      end::numeric as sc_intervention,
+
+      -- duration_fit (0-2)
+      greatest(0, least(public.gaia_duration_bonus(r.duration_min), 2))::numeric as sc_duration,
+
+      -- format_preference (-1..1.5)
+      greatest(-1, least(coalesce((v_fmt_w ->> (r.format::text))::numeric, 0) / 10.0, 1.5))::numeric as sc_format,
+
+      -- resource_quality (0-2): agregado de resource_stats
+      least(coalesce(rs.helpful_count,0)*0.5 + coalesce(rs.saved_count,0)*0.5, 2)::numeric as sc_quality,
+
+      -- sanctuary (0-2): peso aprendido por intervention_key (cold-start = 0)
+      least(coalesce((v_ik_w ->> r.intervention_key)::numeric, 0) / 5.0, 2)::numeric as sc_sanctuary,
+
+      -- flags
+      (r.id = any(select resource_id from last_shown)) as shown_last_session,
+      (r.id = any(select resource_id from neg_feedback)) as had_neg_feedback,
+      (r.id = any(select resource_id from saved)) as is_saved,
+      (r.id = any(select resource_id from seen_before)) as is_repeat
+    from public.resources r
+    left join public.intervention_keys ik on ik.key = r.intervention_key
+    left join public.resource_stats   rs on rs.resource_id = r.id
+    where r.is_active = true and r.lang = v_lang and r.duration_min <= v_max_mins
+      and (v_avoid_tags is null or not (r.tags && v_avoid_tags))
+      and (v_pref_formats is null or r.format = any(v_pref_formats))
+      -- ◀ B1 · GATE GOLDEN PATH (columnas) + candidatura de intervención
+      and r.depth_level = 'immediate'::public.depth_level
+      and r.is_direct_action = true
+      and r.risk_level = 'low'::public.risk_level
+      and r.source_trust_level is not null
+      and r.source_trust_level <> 'lumen_origin'::public.source_trust_level
+      and r.minimum_step is not null
+      and r.show_in_first_session = true
+      and r.intervention_key = any(v_cand_int)
+  ),
+  candidates as (
+    select b.*,
+      b.sc_state_area as score_match,
+      b.sc_format     as score_weights,
+      (b.sc_help_intent + b.sc_intervention + b.sc_quality + b.sc_sanctuary) as score_preferences,
+      (b.sc_state_area + b.sc_help_intent + b.sc_intervention + b.sc_duration
+       + b.sc_format + b.sc_quality + b.sc_sanctuary
+       + case when b.is_repeat then -1 else 0 end) as score_total
+    from base b
+    where b.layer < 4
+      and b.shown_last_session = false
+      and b.had_neg_feedback = false
+      and b.is_saved = false
+  ),
+  ranked as (
+    select c.*, row_number() over (order by (case when c.is_repeat then 0 else 1 end) desc, c.score_total desc) as rn
+    from candidates c
+  ),
+  safe as (select * from ranked where rn <= 2),
+  safe_pos as (select row_number() over (order by rn)::smallint as position, * from safe),
+  remaining as (select r.* from ranked r where r.id not in (select id from safe)),
+  exploration as (
+    select rem.* from remaining rem where rem.format <> all(select format from safe)
+    order by rem.rn limit 1
+  ),
+  third_pool as (
+    select * from exploration
+    union all
+    select * from remaining where not exists (select 1 from exploration)
+  ),
+  third_pick as (select * from third_pool order by rn limit 1),
+  final_picks as (
+    select sp.position, sp.id as resource_id, sp.layer,
+      sp.score_total, sp.score_match, sp.score_weights, sp.score_preferences,
+      false as is_exploration, sp.is_repeat, sp.format
+    from safe_pos sp
+    union all
+    select 3::smallint, tp.id, tp.layer,
+      tp.score_total, tp.score_match, tp.score_weights, tp.score_preferences,
+      (tp.format <> all(select format from safe)), tp.is_repeat, tp.format
+    from third_pick tp
+  )
+  insert into public.session_recommendations(
+    session_id, position, resource_id, layer,
+    score_total, score_match, score_weights, score_preferences,
+    is_exploration, is_repeat, repeat_reason
+  )
+  select v_session_id, fp.position, fp.resource_id, fp.layer,
+    fp.score_total, fp.score_match, fp.score_weights, fp.score_preferences,
+    fp.is_exploration, fp.is_repeat,
+    case when fp.is_repeat then 'seen_before' else null end
+  from final_picks fp;
+
+  -- shown_count (Patch V2, preservado)
+  insert into public.resource_stats(resource_id, shown_count, updated_at)
+  select sr.resource_id, 1, now()
+  from public.session_recommendations sr where sr.session_id = v_session_id
+  on conflict (resource_id) do update
+    set shown_count = resource_stats.shown_count + 1, updated_at = now();
+
+  select coalesce(max(sr.layer), 0) into v_fallback
+  from public.session_recommendations sr where sr.session_id = v_session_id;
+
+  select count(*) into v_rec_count
+  from public.session_recommendations where session_id = v_session_id;
+
+  v_had_no_match := (v_rec_count = 0);
+
+  if v_had_no_match then
+    insert into public.session_events(user_id, session_id, action_type, resource_id, created_at)
+    values (p_user_id, v_session_id, 'no_match'::gaia_action_type, null, now());
+  end if;
+
+  v_copy := case
+    when v_had_no_match
+      then 'Hoy no tengo algo suficientemente claro y respaldado para esto. Prefiero no forzarlo.'
+    when v_fallback >= 3
+      then 'No tengo algo exacto. Te propongo lo más cercano que tengo.'
+    when v_fallback >= 1
+      then 'No es exactamente para esto, pero puede ayudarte ahora.'
+    else 'Podrías empezar por esto. Es pequeño y suficiente por ahora.'
+  end;
+
+  update public.sessions
+    set fallback_level = v_fallback, gaia_copy = v_copy, had_no_match = v_had_no_match
+  where id = v_session_id;
+
+  select jsonb_agg(jsonb_build_object('position', sr.position, 'resource_id', sr.resource_id) order by sr.position)
+    into v_recs
+  from public.session_recommendations sr where sr.session_id = v_session_id;
+
+  return jsonb_build_object(
+    'session_id', v_session_id, 'mode', p_mode, 'gaia_copy', v_copy,
+    'fallback_level', v_fallback, 'had_no_match', v_had_no_match,
+    'recommendations', coalesce(v_recs, '[]'::jsonb)
+  );
+end;
+"
+gaia_decay_weights_monthly,"begin
+  update public.user_weights uw
+  set
+    format_weights = (
+      select coalesce(
+        jsonb_object_agg(k, to_jsonb(round((v::numeric)*p_factor)::int)),
+        '{}'::jsonb
+      )
+      from jsonb_each_text(uw.format_weights) e(k,v)
+    ),
+    updated_at = now();
+end;"
+gaia_dismiss_session,"declare
+  v_user_id uuid;
+begin
+  select user_id into v_user_id
+  from public.sessions
+  where id = p_session_id;
+
+  if v_user_id is null then
+    raise exception 'Session not found: %', p_session_id;
+  end if;
+
+  -- insertar un evento dismissed por cada recomendación de esa sesión
+  insert into public.session_events(session_id, user_id, action_type, resource_id, metadata)
+  select
+    sr.session_id,
+    v_user_id,
+    'dismissed'::gaia_action_type,
+    sr.resource_id,
+    jsonb_build_object('reason', p_reason)
+  from public.session_recommendations sr
+  where sr.session_id = p_session_id;
+
+  -- (opcional, suave) subir streak 1 para habilitar ""presence/no_intervention"" si insiste
+  update public.user_weights
+  set recent_reject_streak = recent_reject_streak + 1,
+      updated_at = now()
+  where user_id = v_user_id;
+
+  return jsonb_build_object('ok', true, 'session_id', p_session_id);
+end;"
+gaia_duration_bonus,"
+  -- bonus suave por ser corto (MVP: sesiones breves)
+  select case
+    when mins <= 3 then 1.2
+    when mins <= 7 then 0.8
+    when mins <= 12 then 0.3
+    else 0.0
+  end;
+"
+gaia_get_next_recommendation,"
+declare
+  v_next record;
+  v_max_position smallint;
+  v_user_id uuid;
+begin
+  select s.user_id into v_user_id
+  from public.sessions s
+  where s.id = p_session_id;
+
+  if v_user_id is null then
+    raise exception 'Session not found: %', p_session_id;
+  end if;
+
+  select coalesce(max(sr.position), 0)
+    into v_max_position
+  from public.session_recommendations sr
+  where sr.session_id = p_session_id;
+
+  if p_last_shown_position >= v_max_position then
+    return jsonb_build_object(
+      'ok', false,
+      'pool_exhausted', true,
+      'gaia_copy', 'Ya te mostré todo lo que tengo para este momento.',
+      'suggestions', jsonb_build_array('sanctuary', 'fuente')
+    );
+  end if;
+
+  select sr.resource_id, sr.position, sr.layer
+    into v_next
+  from public.session_recommendations sr
+  where sr.session_id = p_session_id
+    and sr.position = p_last_shown_position + 1
+  limit 1;
+
+  if v_next.resource_id is null then
+    return jsonb_build_object(
+      'ok', false,
+      'pool_exhausted', true,
+      'gaia_copy', 'No tengo más opciones para este momento.',
+      'suggestions', jsonb_build_array('sanctuary', 'fuente')
+    );
+  end if;
+
+  return jsonb_build_object(
+    'ok', true,
+    'pool_exhausted', false,
+    'position', v_next.position,
+    'resource_id', v_next.resource_id,
+    'gaia_copy', case
+      when v_next.layer = 0 then 'Esta también puede ayudarte ahora.'
+      when v_next.layer <= 2 then 'No es exactamente para esto, pero puede servir.'
+      else 'Esto es lo que me queda. No es lo más específico, pero puede ayudar algo.'
+    end
+  );
+end;
+"
+gaia_get_resource_card,"
+declare
+  v_r record;
+  v_is_saved boolean := false;
+  v_is_repeat boolean := false;
+  v_was_negative boolean := false;
+  v_was_shown_last boolean := false;
+  v_last_session_id uuid;
+  v_session_state gaia_state;
+  v_help_intent help_intent;
+  v_why_now text;
+  v_minimum_step text;
+  v_after_prompt text;
+begin
+  -- 1) Recurso base (+ intervention_key y source_trust_level)
+  select
+    r.id, r.title, r.author, r.provider, r.url, r.lang,
+    r.tier, r.is_core, r.format, r.duration_min,
+    r.states, r.areas, r.tags,
+    r.when_it_helps, r.what_it_is_not,
+    r.metadata, r.source_kind,
+    r.why_now, r.minimum_step, r.after_prompt, r.help_intent,
+    r.intervention_key, r.source_trust_level                    -- ◀ NUEVO
+  into v_r
+  from public.resources r
+  where r.id = p_resource_id;
+
+  if v_r.id is null then
+    raise exception 'Resource not found: %', p_resource_id;
+  end if;
+
+  select exists(
+    select 1 from public.sanctuary_items si
+    where si.user_id = p_user_id and si.resource_id = p_resource_id
+  ) into v_is_saved;
+
+  select exists(
+    select 1 from public.session_recommendations sr
+    join public.sessions s on s.id = sr.session_id
+    where s.user_id = p_user_id and sr.resource_id = p_resource_id
+  ) into v_is_repeat;
+
+  select exists(
+    select 1 from public.session_events e
+    where e.user_id = p_user_id and e.resource_id = p_resource_id
+      and e.feedback = 'no_me_sirvio'::feedback_type
+  ) into v_was_negative;
+
+  select s.id into v_last_session_id
+  from public.sessions s
+  where s.user_id = p_user_id and s.mode = 'propose'
+    and (p_session_id is null or s.id <> p_session_id)
+  order by s.created_at desc limit 1;
+
+  if v_last_session_id is not null then
+    select exists(
+      select 1 from public.session_recommendations sr
+      where sr.session_id = v_last_session_id and sr.resource_id = p_resource_id
+    ) into v_was_shown_last;
+  end if;
+
+  -- 6) Resolución de los 4 campos de acción (fallback al vuelo) — preservada
+  if p_session_id is not null then
+    select s.state into v_session_state
+    from public.sessions s where s.id = p_session_id;
+  end if;
+
+  v_help_intent := v_r.help_intent;
+
+  if v_help_intent is null then
+    begin
+      v_help_intent := (v_r.metadata ->> 'suggested_help_type')::help_intent;
+    exception when others then
+      v_help_intent := null;
+    end;
+  end if;
+
+  if v_help_intent is null and v_session_state is not null then
+    v_help_intent := case v_session_state
+      when 'cargado'    then 'calmar'
+      when 'ansioso'    then 'calmar'
+      when 'irritado'   then 'calmar'
+      when 'confundido' then 'ordenar'
+      when 'cansado'    then 'energizar'
+      when 'bajo'       then 'energizar'
+      when 'solo'       then 'conectar'
+      when 'bien'       then 'expandir'
+      when 'abierto'    then 'expandir'
+      else null
+    end::help_intent;
+  end if;
+
+  v_why_now := coalesce(nullif(trim(v_r.why_now), ''), nullif(trim(v_r.when_it_helps), ''));
+
+  v_minimum_step := coalesce(
+    nullif(trim(v_r.minimum_step), ''),
+    case v_r.format::text
+      when 'audio'     then 'Escuchá los primeros minutos. Si no conecta, lo dejás.'
+      when 'video'     then 'Mirá el comienzo. No hace falta terminarlo.'
+      when 'texto'     then 'Leé el primer párrafo. Con eso alcanza para empezar.'
+      when 'article'   then 'Leé el primer párrafo. Con eso alcanza para empezar.'
+      when 'practica'  then 'Probá la primera parte. Un ratito basta.'
+      else 'Empezá por un pedacito. No tenés que hacer todo.'
+    end
+  );
+
+  v_after_prompt := coalesce(
+    nullif(trim(v_r.after_prompt), ''),
+    case v_help_intent
+      when 'calmar'    then '¿Te dejó un poco más en calma?'
+      when 'ordenar'   then '¿Quedaste con un poco más de claridad?'
+      when 'energizar' then '¿Sentís un poco más de energía?'
+      when 'conectar'  then '¿Te sentís un poco más acompañado?'
+      when 'orientar'  then '¿Ves un poco más el camino?'
+      when 'expandir'  then '¿Te abrió algo nuevo?'
+      else '¿Te dejó un poco mejor?'
+    end
+  );
+
+  -- 7) Output (+ Fuente + intervention_key)
+  return jsonb_build_object(
+    'id', v_r.id,
+    'title', v_r.title,
+    'author', v_r.author,
+    'provider', v_r.provider,
+    'url', v_r.url,
+    'lang', v_r.lang,
+    'tier', v_r.tier::text,
+    'is_core', v_r.is_core,
+    'format', v_r.format::text,
+    'duration_min', v_r.duration_min,
+    'states', v_r.states,
+    'areas', v_r.areas,
+    'tags', v_r.tags,
+    'when_it_helps', v_r.when_it_helps,
+    'what_it_is_not', v_r.what_it_is_not,
+    'metadata', v_r.metadata,
+    'source_kind', v_r.source_kind,
+    'why_now',      v_why_now,
+    'minimum_step', v_minimum_step,
+    'after_prompt', v_after_prompt,
+    'help_intent',  v_help_intent::text,
+    'intervention_key', v_r.intervention_key,                  -- ◀ NUEVO
+    'source', jsonb_strip_nulls(jsonb_build_object(            -- ◀ NUEVO
+      'name',        v_r.metadata #>> '{source,name}',
+      'reference',   v_r.metadata #>> '{source,reference}',
+      'basis',       v_r.metadata #>> '{source,basis}',
+      'trust_level', v_r.source_trust_level::text
+    )),
+    'flags', jsonb_build_object(
+      'is_saved', v_is_saved,
+      'is_repeat', v_is_repeat,
+      'was_negative', v_was_negative,
+      'was_shown_last', v_was_shown_last
+    )
+  );
+end;
+"
+gaia_get_session_history,"
+declare
+  v_data jsonb;
+  v_user_id uuid;
+begin
+  select s.user_id into v_user_id
+  from public.sessions s
+  where s.id = p_session_id;
+
+  if v_user_id is null then
+    raise exception 'Session not found: %', p_session_id;
+  end if;
+
+  select coalesce(
+    jsonb_agg(
+      jsonb_build_object(
+        'position', sr.position,
+        'resource_id', sr.resource_id,
+        'resource', public.gaia_get_resource_min(sr.resource_id),
+        'layer', sr.layer,
+        'is_exploration', sr.is_exploration
+      )
+      order by sr.position
+    ),
+    '[]'::jsonb
+  )
+  into v_data
+  from public.session_recommendations sr
+  where sr.session_id = p_session_id;
+
+  return jsonb_build_object(
+    'ok', true,
+    'session_id', p_session_id,
+    'total', coalesce(jsonb_array_length(v_data), 0),
+    'data', v_data
+  );
+end;
+"
+gaia_help_intent_score,"
+  SELECT CASE
+    WHEN p_targets IS NULL OR cardinality(p_targets) = 0 THEN 0
+    WHEN coalesce(p_resource_meta->>'suggested_help_type', '') = ANY(p_targets) THEN 1.0
+    ELSE 0
+  END
+"
+gaia_inc_jsonb_weight,"declare
+  cur int;
+begin
+  cur := coalesce((weights ->> k)::int, 0);
+  return jsonb_set(
+    weights,
+    array[k],
+    to_jsonb(cur + delta),
+    true
+  );
+end;"
+gaia_max_minutes,"
+  SELECT CASE tb
+    WHEN 't2_5'::public.time_bucket    THEN 5
+    WHEN 't5_15'::public.time_bucket   THEN 15
+    WHEN 't15_plus'::public.time_bucket THEN 999  -- sin límite efectivo
+    ELSE 15
+  END;
+"
+gaia_neighbor_areas,"select case a
+    when 'trabajo_obra'   then array['sentido_valores'::life_area,'cuerpo_energia'::life_area]
+    when 'vinculos'       then array['mente_emocion'::life_area,'gozo_vida'::life_area]
+    when 'cuerpo_energia' then array['mente_emocion'::life_area, 'gozo_vida'::life_area]
+    when 'mente_emocion'  then array['cuerpo_energia'::life_area,'sentido_valores'::life_area]
+    when 'sentido_valores'then array['trabajo_obra'::life_area,'gozo_vida'::life_area]
+    when 'gozo_vida'      then array['sentido_valores'::life_area,'vinculos'::life_area]
+    else array[]::life_area[]
+  end;"
+gaia_neighbor_states,"
+  select case s
+    when 'cargado'    then array['ansioso'::gaia_state,'cansado'::gaia_state,'confundido'::gaia_state]
+    when 'ansioso'    then array['cargado'::gaia_state,'irritado'::gaia_state,'confundido'::gaia_state]
+    when 'cansado'    then array['bajo'::gaia_state,'cargado'::gaia_state]
+    when 'irritado'   then array['ansioso'::gaia_state,'cargado'::gaia_state]
+    when 'bajo'       then array['cansado'::gaia_state,'solo'::gaia_state]
+    when 'solo'       then array['bajo'::gaia_state,'ansioso'::gaia_state]
+    when 'confundido' then array['cargado'::gaia_state,'ansioso'::gaia_state,'bien'::gaia_state]
+    when 'bien'       then array['abierto'::gaia_state,'confundido'::gaia_state]
+    when 'abierto'    then array['bien'::gaia_state]
+    else array[]::gaia_state[]
+  end;
+"
+gaia_submit_session_action,"
+declare
+  v_user_id         uuid;
+  v_state           gaia_state;
+  v_area            life_area;
+  v_time_bucket     time_bucket;
+  v_format          resource_format;
+  v_intervention    text;
+  v_help_intent     text;
+  v_min_step        text;
+  v_source_name     text;
+  v_fmt_w           jsonb;
+  v_hi_w            jsonb;
+  v_ik_w            jsonb;
+  v_dur_w           jsonb;
+  v_new_streak      int;
+  v_delta_total     int := 0;
+  v_action_feedback gaia_action_type;
+  v_evt_meta        jsonb := jsonb_build_object('src', 'gaia_submit_session_action_v6');
+begin
+  -- Contexto de la sesión (sirve a ambas ramas)
+  select s.user_id, s.state, s.area, s.time_bucket
+    into v_user_id, v_state, v_area, v_time_bucket
+  from public.sessions s
+  where s.id = p_session_id;
+
+  if v_user_id is null then
+    raise exception 'Session not found: %', p_session_id;
+  end if;
+
+  -- ═══════════════════════════════════════════════════════════
+  -- RAMA LIVIANA · señales de interacción (opened y afines)
+  -- Captura con intervention_key en COLUMNA. Sin tocar pesos.
+  -- ═══════════════════════════════════════════════════════════
+  if p_action is not null then
+    if p_chosen_resource_id is null then
+      raise exception '% requiere un resource_id', p_action;
+    end if;
+
+    select r.intervention_key into v_intervention
+    from public.resources r where r.id = p_chosen_resource_id;
+
+    insert into public.session_events(session_id, user_id, action_type, resource_id, intervention_key, feedback, metadata)
+    values (p_session_id, v_user_id, p_action, p_chosen_resource_id, v_intervention, null,
+            jsonb_build_object('src', 'gaia_submit_session_action_light'));
+
+    if p_action = 'opened'::gaia_action_type then
+      insert into public.resource_stats(resource_id, opened_count, updated_at)
+      values (p_chosen_resource_id, 1, now())
+      on conflict (resource_id) do update
+        set opened_count = coalesce(resource_stats.opened_count, 0) + 1,
+            updated_at   = now();
+    end if;
+
+    return jsonb_build_object(
+      'ok', true, 'action', p_action::text,
+      'resource_id', p_chosen_resource_id, 'intervention_key', v_intervention
+    );
+  end if;
+
+  -- ═══════════════════════════════════════════════════════════
+  -- RAMA COMPLETA · chosen / feedback / saved (aprendizaje)
+  -- ═══════════════════════════════════════════════════════════
+
+  -- Datos del recurso elegido (early: intervention_key va a la COLUMNA)
+  if p_chosen_resource_id is not null then
+    select r.format, r.intervention_key, r.help_intent::text,
+           r.minimum_step, (r.metadata #>> '{source,name}')
+      into v_format, v_intervention, v_help_intent, v_min_step, v_source_name
+    from public.resources r
+    where r.id = p_chosen_resource_id;
+
+    if v_format is null then
+      raise exception 'Resource not found: %', p_chosen_resource_id;
+    end if;
+  end if;
+
+  if p_feedback = 'me_sirvio' then
+    v_action_feedback := 'helpful'::gaia_action_type;
+  elsif p_feedback = 'no_me_sirvio' then
+    v_action_feedback := 'reject'::gaia_action_type;
+  else
+    v_action_feedback := null;
+  end if;
+
+  -- Eventos (append-only). intervention_key en COLUMNA; metadata solo provenance.
+  if p_chosen_resource_id is not null then
+    insert into public.session_events(session_id, user_id, action_type, resource_id, intervention_key, feedback, metadata)
+    values (p_session_id, v_user_id, 'chosen'::gaia_action_type, p_chosen_resource_id, v_intervention, null, v_evt_meta);
+  else
+    insert into public.session_events(session_id, user_id, action_type, resource_id, intervention_key, feedback, metadata)
+    values (p_session_id, v_user_id, 'dismissed'::gaia_action_type, null, null, p_feedback, v_evt_meta);
+  end if;
+
+  if v_action_feedback is not null then
+    insert into public.session_events(session_id, user_id, action_type, resource_id, intervention_key, feedback, metadata)
+    values (p_session_id, v_user_id, v_action_feedback, p_chosen_resource_id, v_intervention, p_feedback, v_evt_meta);
+  end if;
+
+  if p_saved = true and p_chosen_resource_id is not null then
+    insert into public.session_events(session_id, user_id, action_type, resource_id, intervention_key, feedback, metadata)
+    values (p_session_id, v_user_id, 'saved'::gaia_action_type, p_chosen_resource_id, v_intervention, null,
+            v_evt_meta || jsonb_strip_nulls(jsonb_build_object('minimum_step_snapshot', v_min_step)));
+  end if;
+
+  -- Santuario: guarda el PASO. intervention_key + area en COLUMNAS; snapshot en metadata.
+  if p_saved = true and p_chosen_resource_id is not null then
+    insert into public.sanctuary_items(user_id, resource_id, intervention_key, area, metadata)
+    select v_user_id, p_chosen_resource_id, v_intervention, v_area,
+      jsonb_strip_nulls(jsonb_build_object(
+        'minimum_step_snapshot', v_min_step,
+        'source_name',           v_source_name,
+        'help_intent',           v_help_intent,
+        'state_when_saved',      v_state
+      ))
+    where not exists (
+      select 1 from public.sanctuary_items si
+      where si.user_id = v_user_id and si.resource_id = p_chosen_resource_id
+    );
+  end if;
+
+  -- Weights
+  insert into public.user_weights(user_id) values (v_user_id)
+  on conflict (user_id) do nothing;
+
+  select format_weights, help_intent_weights, intervention_key_weights,
+         duration_weights, recent_reject_streak
+    into v_fmt_w, v_hi_w, v_ik_w, v_dur_w, v_new_streak
+  from public.user_weights where user_id = v_user_id;
+
+  -- Streak
+  if p_chosen_resource_id is null then
+    v_new_streak := v_new_streak + 1;
+  elsif p_feedback = 'no_me_sirvio' then
+    v_new_streak := v_new_streak + 1;
+  elsif p_feedback = 'me_sirvio' then
+    v_new_streak := 0;
+  end if;
+
+  -- Pesos personales (solo si eligió). Mismo delta para los cuatro.
+  if p_chosen_resource_id is not null then
+    v_delta_total :=
+        1
+      + case when p_feedback = 'me_sirvio' then 2
+             when p_feedback = 'no_me_sirvio' then -2 else 0 end
+      + case when p_saved then 2 else 0 end;
+
+    v_fmt_w := public.gaia_inc_jsonb_weight(v_fmt_w, v_format::text, v_delta_total);
+    if v_help_intent is not null then
+      v_hi_w := public.gaia_inc_jsonb_weight(v_hi_w, v_help_intent, v_delta_total);
+    end if;
+    if v_intervention is not null then
+      v_ik_w := public.gaia_inc_jsonb_weight(v_ik_w, v_intervention, v_delta_total);
+    end if;
+    v_dur_w := public.gaia_inc_jsonb_weight(v_dur_w, v_time_bucket::text, v_delta_total);
+  end if;
+
+  update public.user_weights
+    set format_weights           = v_fmt_w,
+        help_intent_weights      = v_hi_w,
+        intervention_key_weights = v_ik_w,
+        duration_weights         = v_dur_w,
+        recent_reject_streak     = v_new_streak,
+        updated_at               = now()
+  where user_id = v_user_id;
+
+  -- resource_stats
+  if p_chosen_resource_id is not null then
+    insert into public.resource_stats(resource_id, chosen_count, helpful_count, saved_count, updated_at)
+    values (
+      p_chosen_resource_id, 1,
+      case when p_feedback = 'me_sirvio' then 1 else 0 end,
+      case when p_saved then 1 else 0 end,
+      now()
+    )
+    on conflict (resource_id) do update
+      set chosen_count  = resource_stats.chosen_count + 1,
+          helpful_count = resource_stats.helpful_count + case when p_feedback = 'me_sirvio' then 1 else 0 end,
+          saved_count   = resource_stats.saved_count   + case when p_saved then 1 else 0 end,
+          updated_at    = now();
+  end if;
+
+  return jsonb_build_object(
+    'ok', true, 'user_id', v_user_id, 'recent_reject_streak', v_new_streak,
+    'updated_weights', jsonb_build_object(
+      'format_weights', v_fmt_w, 'help_intent_weights', v_hi_w,
+      'intervention_key_weights', v_ik_w, 'duration_weights', v_dur_w
+    )
+  );
+end;
+"
+gaia_target_help_intents,"
+  SELECT coalesce(target_help_intents::text[], '{}')
+  FROM public.gaia_state_help_intents
+  WHERE state = p_state;
+"
+lumi_area_label,"
+  SELECT coalesce(
+    (SELECT long_label
+     FROM   public.ui_copy
+     WHERE  domain = 'life_area'
+       AND  key    = p_area
+       AND  lang   = 'es'
+     LIMIT 1),
+    p_area
+  );
+"
+lumi_close_resource_viewer,"
+begin
+  if p_source = 'lumi' then
+    return public.lumi_get_node('POST_VIEWER_LUMI');
+  end if;
+
+  if p_source = 'fuente' then
+    if coalesce(p_resource_id_text, '') <> '' then
+      return public.lumi_open_resource(
+        p_user_id_text,
+        p_resource_id_text,
+        'fuente',
+        coalesce(p_session_id_text, '')
+      );
+    end if;
+
+    return public.lumi_get_fuente_items('', '', '');
+  end if;
+
+  if p_source = 'sanctuary' then
+    if coalesce(p_sanctuary_item_id_text, '') <> '' then
+      return public.lumi_open_sanctuary_item(
+        p_user_id_text,
+        p_sanctuary_item_id_text
+      );
+    end if;
+
+    if coalesce(p_resource_id_text, '') <> '' then
+      return public.lumi_open_resource(
+        p_user_id_text,
+        p_resource_id_text,
+        'sanctuary',
+        coalesce(p_session_id_text, '')
+      );
+    end if;
+
+    return public.lumi_get_sanctuary(p_user_id_text);
+  end if;
+
+  return public.lumi_get_node('HOME_DEFAULT');
+end;
+"
+lumi_close_resource_viewer,"
+DECLARE
+  v_source       text;
+  v_user_id      uuid;
+  v_resource_id  uuid;
+  v_session_id   uuid;
+  v_node_code    text;
+  v_node         jsonb;
+  v_module_color text;
+  v_message      text;
+  v_card         jsonb;
+  v_after_prompt text;
+BEGIN
+  v_source      := coalesce(nullif(trim(p_params->>'source'), ''), 'lumi');
+  v_user_id     := nullif(trim(p_params->>'user_id'), '')::uuid;
+  v_resource_id := nullif(trim(p_params->>'resource_id'), '')::uuid;
+  v_session_id  := nullif(trim(p_params->>'session_id'), '')::uuid;
+
+  v_node_code := CASE v_source
+    WHEN 'fuente'    THEN 'POST_VIEWER_FUENTE'
+    WHEN 'sanctuary' THEN 'POST_VIEWER_SANCTUARY'
+    ELSE 'POST_VIEWER_LUMI'
+  END;
+
+  v_module_color := CASE v_source
+    WHEN 'fuente'    THEN '#2A9068'
+    WHEN 'sanctuary' THEN '#B88820'
+    ELSE '#7860E0'
+  END;
+
+  v_node := public.lumi_get_node(v_node_code);
+
+  IF v_node IS NULL THEN
+    RETURN public.lumi_get_node('HOME_DEFAULT')
+      || jsonb_build_object(
+        'ok', false,
+        'error', 'node_not_found',
+        'state', jsonb_build_object('contentSource', '', 'moduleColor', '#7860E0')
+      );
+  END IF;
+
+  -- Mensaje base del nodo
+  v_message := coalesce(v_node->>'message', 'Listo.');
+
+  -- ◀ NUEVO: solo desde LUMI y con recurso, usar el after_prompt del recurso
+  IF v_source = 'lumi' AND v_resource_id IS NOT NULL THEN
+    BEGIN
+      v_card := public.gaia_get_resource_card(v_user_id, v_resource_id, v_session_id);
+      v_after_prompt := nullif(trim(v_card->>'after_prompt'), '');
+      IF v_after_prompt IS NOT NULL THEN
+        v_message := v_after_prompt;   -- la pregunta específica del recurso
+      END IF;
+    EXCEPTION WHEN OTHERS THEN
+      -- Si falla el lookup, queda el mensaje base del nodo. Nunca rompe el cierre.
+      NULL;
+    END;
+  END IF;
+
+  RETURN jsonb_build_object(
+    'ok',           true,
+    'code',         v_node_code,
+    'message',      v_message,
+    'actions',      coalesce(v_node->'actions', '[]'::jsonb),
+    'content_type', 'empty_presence',
+    'content',      jsonb_build_object('type', 'empty_presence'),
+    'state',        jsonb_build_object(
+                      'contentSource',     v_source,
+                      'moduleColor',       v_module_color,
+                      'currentResourceId', coalesce(v_resource_id::text, ''),
+                      'currentSessionId',  coalesce(v_session_id::text, '')
+                    )
+  );
+END;
+"
+lumi_complete_scan,"
+DECLARE
+  v_node jsonb;
+BEGIN
+  v_node := public.lumi_get_node('SCAN_COMPLETE');
+  
+  RETURN jsonb_build_object(
+    'ok',           true,
+    'code',         'SCAN_COMPLETE',
+    'message',      coalesce(v_node->>'message', 'Ahora sí.'),
+    'actions',      coalesce(v_node->'actions', '[]'::jsonb),
+    'content_type', 'scan_complete',
+    'content',      jsonb_build_object('type', 'scan_complete'),
+    'state',        jsonb_build_object(
+      'contentSource', '',
+      'moduleColor', '#8FA38C'
+    )
+  );
+END;
+"
+lumi_confirm_remove_from_sanctuary,"
+DECLARE
+  v_user_id           uuid;
+  v_sanctuary_item_id uuid;
+  v_detail            jsonb;
+  v_node              jsonb;
+BEGIN
+  v_user_id := nullif(trim(p_user_id_text), '')::uuid;
+  v_sanctuary_item_id := nullif(
+    trim(both '''' from trim(coalesce(p_sanctuary_item_id_text, ''))),
+    ''
+  )::uuid;
+
+  v_detail := public.lumi_open_sanctuary_item(p_user_id_text, p_sanctuary_item_id_text);
+  v_node   := public.lumi_get_node('SANCTUARY_REMOVE_CONFIRM');
+
+  RETURN jsonb_build_object(
+    'ok', true,
+    'code', 'SANCTUARY_REMOVE_CONFIRM',
+    'message', coalesce(v_node->>'message', '¿Querés quitar esto de tu Santuario?'),
+    'actions', jsonb_build_array(
+      jsonb_build_object(
+        'label',  'Sí, quitar',
+        'action', 'remove_from_sanctuary',  -- ◀ FIX: era confirm_remove (loop)
+        'value',  v_sanctuary_item_id::text
+      ),
+      jsonb_build_object(
+        'label',  'No, volver',
+        'action', 'open_sanctuary',
+        'value',  ''
+      )
+    ),
+    'content_type', 'sanctuary_detail',
+    'content', coalesce(v_detail->'content', '{}'::jsonb),
+    'state',   coalesce(v_detail->'state', '{}'::jsonb) ||
+               jsonb_build_object(
+                 'contentSource',   'sanctuary',
+                 'moduleColor',     '#C8A46E',
+                 'spacesMenuOpen',  false,
+                 'filterPanelOpen', false
+               )
+  );
+END;
+"
+lumi_confirm_remove_from_sanctuary,"
+BEGIN
+  RETURN public.lumi_confirm_remove_from_sanctuary(
+    p_params->>'user_id',
+    p_params->>'sanctuary_item_id'
+  );
+END;
+"
+lumi_dispatch,"
+DECLARE
+  v_fn     text;
+  v_result jsonb;
+BEGIN
+  -- Sanitizar y construir el nombre de función
+  -- 'go_home'     → 'lumi_go_home'
+  -- 'open_faros'  → 'lumi_open_faros'
+  v_fn := 'lumi_' || regexp_replace(
+    lower(trim(p_action)),
+    '[^a-z0-9_]', '_', 'g'
+  );
+
+  -- Ejecutar dinámicamente — cero knowledge del dispatcher
+  BEGIN
+    EXECUTE format('SELECT public.%I($1)', v_fn)
+    INTO   v_result
+    USING  p_params;
+
+  EXCEPTION
+    -- Función no existe: mensaje claro
+    WHEN undefined_function THEN
+      RETURN public.lumi_get_node('HOME_DEFAULT')
+        || jsonb_build_object(
+             'ok',    false,
+             'error', 'action_not_found: ' || v_fn,
+             'state', '{}'::jsonb
+           );
+
+    -- Cualquier otro error: revelar la causa real
+    WHEN OTHERS THEN
+      RETURN public.lumi_get_node('HOME_DEFAULT')
+        || jsonb_build_object(
+             'ok',    false,
+             'error', 'dispatch_error: ' || v_fn || ' / ' || SQLSTATE || ' / ' || SQLERRM,
+             'state', '{}'::jsonb
+           );
+  END;
+
+  RETURN coalesce(v_result, public.lumi_get_node('HOME_DEFAULT'));
+END;
+"
+lumi_express_interest,"
+BEGIN
+  INSERT INTO public.resource_rsvps (user_id, resource_id, status)
+  VALUES ((p_params->>'user_id')::uuid, (p_params->>'resource_id')::uuid, 'interested')
+  ON CONFLICT (user_id, resource_id) DO UPDATE SET status = 'interested';
+
+  RETURN public.lumi_get_node('INTEREST_EXPRESSED')
+    || jsonb_build_object('state', '{}'::jsonb);
+END;
+"
+lumi_feedback_helpful,"
+DECLARE
+  v_user_id     uuid;
+  v_session_id  uuid;
+  v_resource_id uuid;
+  v_node        jsonb;
+  v_card        jsonb;
+BEGIN
+  v_user_id     := nullif(trim(p_params->>'user_id'), '')::uuid;
+  v_session_id  := nullif(trim(p_params->>'session_id'), '')::uuid;
+  v_resource_id := nullif(trim(p_params->>'resource_id'), '')::uuid;
+
+  -- Resource obligatorio, session opcional
+  IF v_resource_id IS NULL THEN
+    RETURN public.lumi_get_node('HOME_DEFAULT')
+      || jsonb_build_object(
+           'ok',    false,
+           'error', 'missing_resource_for_feedback',
+           'state', '{}'::jsonb
+         );
+  END IF;
+
+  -- Registrar feedback en gaia solo si hay sesión
+  IF v_session_id IS NOT NULL THEN
+    PERFORM public.gaia_submit_session_action(
+      p_session_id         := v_session_id,
+      p_chosen_resource_id := v_resource_id,
+      p_feedback           := 'me_sirvio'::feedback_type,
+      p_saved              := false
+    );
+  END IF;
+
+  v_card := public.gaia_get_resource_card(v_user_id, v_resource_id, v_session_id);
+  v_node := public.lumi_get_node('RESOURCE_FEEDBACK_HELPFUL');
+
+  RETURN jsonb_build_object(
+    'ok',           true,
+    'code',         'RESOURCE_FEEDBACK_HELPFUL',
+    'message',      coalesce(v_node->>'message', 'Me alegra que haya servido.'),
+    'actions',      coalesce(v_node->'actions', '[]'::jsonb),
+    'content_type', 'resource_card',
+    'content',      coalesce(v_card, '{}'::jsonb) || jsonb_build_object(
+                      'type',        'resource_card',
+                      'resource_id', v_resource_id::text,
+                      'session_id',  coalesce(v_session_id::text, ''),
+                      'is_from',     'lumi'
+                    ),
+    'state',        jsonb_build_object(
+                      'currentResourceId',  v_resource_id::text,
+                      'contentSource',      'lumi'
+                    )
+  );
+END;
+"
+lumi_feedback_reject,"
+DECLARE
+  v_session_id  uuid;
+  v_resource_id uuid;
+  v_node        jsonb;
+  v_reflection  text;
+BEGIN
+  v_session_id  := nullif(trim(p_params->>'session_id'), '')::uuid;
+  v_resource_id := nullif(trim(p_params->>'resource_id'), '')::uuid;
+
+  -- Resource obligatorio, session opcional
+  IF v_resource_id IS NULL THEN
+    RETURN public.lumi_get_node('HOME_DEFAULT')
+      || jsonb_build_object('ok', false,
+                            'error', 'missing_resource_for_feedback',
+                            'state', '{}'::jsonb);
+  END IF;
+
+  -- Registrar feedback en gaia solo si hay sesión
+  IF v_session_id IS NOT NULL THEN
+    PERFORM public.gaia_submit_session_action(
+      p_session_id         := v_session_id,
+      p_chosen_resource_id := v_resource_id,
+      p_feedback           := 'no_me_sirvio'::feedback_type,
+      p_saved              := false
+    );
+  END IF;
+
+  v_node       := public.lumi_get_node('RESOURCE_FEEDBACK_REJECT');
+  v_reflection := public.lumi_get_message('reflection', 'after_action');
+
+  RETURN jsonb_build_object(
+    'ok',           true,
+    'code',         'RESOURCE_FEEDBACK_REJECT',
+    'message',      coalesce(v_reflection, v_node->>'message', 'Entendido.'),
+    'actions',      coalesce(v_node->'actions', '[]'::jsonb),
+    'content_type', 'empty_presence',
+    'content',      jsonb_build_object('type', 'empty_presence'),
+    'state',        '{}'::jsonb
+  );
+END;
+"
+lumi_get_circulos_activities,"
+DECLARE
+  v_items jsonb;
+BEGIN
+  SELECT coalesce(
+    jsonb_agg(
+      jsonb_build_object(
+        'id',               r.id::text,
+        'title',            r.title,
+        'description_short', coalesce(r.description_short, ''),
+        'modalidad_label',
+          CASE rc.delivery_mode
+            WHEN 'online'    THEN 'Virtual'
+            WHEN 'in_person' THEN 'Presencial'
+            WHEN 'hybrid'    THEN 'Híbrido'
+            ELSE 'Presencial'
+          END,
+        'fecha_label',
+          CASE
+            WHEN rc.start_at IS NOT NULL
+            THEN to_char(rc.start_at AT TIME ZONE 'America/Argentina/Buenos_Aires',
+                         'DD/MM · HH24:MI hs')
+            ELSE 'Próximamente'
+          END,
+        'join_url',         coalesce(rc.online_url, rc.booking_url, rc.contact, ''),
+        'city',             coalesce(rc.city, ''),
+        'action',           'open_activity'
+      )
+      ORDER BY rc.start_at ASC NULLS LAST
+    ),
+    '[]'::jsonb
+  )
+  INTO v_items
+  FROM  public.resources r
+  JOIN  public.resource_coordinables rc ON rc.resource_id = r.id
+  WHERE r.is_active = true
+    AND r.tier = 'A'
+    AND (
+      rc.start_at IS NULL
+      OR rc.start_at > now()
+    )
+    AND CASE
+          WHEN p_area != '' THEN p_area::life_area = ANY(r.areas)
+          ELSE TRUE
+        END;
+
+  RETURN jsonb_build_object(
+    'type',   'activity_list',
+    'source', 'circulos',
+    'items',  v_items
+  );
+END;
+"
+lumi_get_faros,"
+DECLARE
+  v_faros jsonb;
+BEGIN
+  -- Genera las 6 áreas siempre, con texto del faro si existe
+  -- Usa ui_copy para los labels — fuente de verdad
+  SELECT jsonb_agg(
+    jsonb_build_object(
+      'area',      uc.key,
+      'label',     coalesce(uc.long_label, uc.short_label, uc.key),
+      'faro_text', coalesce(f.faro_text, ''),
+      'has_faro',  (f.faro_text IS NOT NULL AND f.faro_text != '')
+    )
+    ORDER BY uc.sort_order
+  )
+  INTO v_faros
+  FROM public.ui_copy uc
+  LEFT JOIN public.user_area_faros f
+         ON f.area::text = uc.key
+        AND f.user_id = p_user_id
+  WHERE uc.domain = 'life_area'
+    AND uc.lang   = 'es'
+    AND uc.key    != ''; -- excluir 'Sin área'
+
+  RETURN jsonb_build_object(
+    'type',  'faros_panel',
+    'faros', coalesce(v_faros, '[]'::jsonb)
+  );
+END;
+"
+lumi_get_fuente_items,"
+DECLARE
+  v_items              jsonb;
+  v_count              integer := 0;
+  v_has_filters        boolean;
+  v_filter_parts       text[]  := ARRAY[]::text[];
+  v_filter_label       text    := '';
+  v_node_code          text;
+  v_node               jsonb;
+  v_message            text;
+  v_empty              text;
+  v_area_options       jsonb;
+  v_format_options     jsonb;
+  v_duration_options   jsonb;
+BEGIN
+  v_has_filters :=
+    coalesce(nullif(trim(p_area), ''), '')    <> ''
+    OR coalesce(nullif(trim(p_formato), ''), '')  <> ''
+    OR coalesce(nullif(trim(p_duracion), ''), '') <> '';
+
+  IF coalesce(nullif(trim(p_area), ''), '') <> '' THEN
+    v_filter_parts := array_append(v_filter_parts, public.lumi_area_label(p_area));
+  END IF;
+  IF coalesce(nullif(trim(p_formato), ''), '') <> '' THEN
+    v_filter_parts := array_append(v_filter_parts, coalesce(
+      (SELECT short_label FROM public.ui_copy
+        WHERE domain = 'resource_format' AND key = p_formato AND lang = 'es' LIMIT 1),
+      p_formato
+    ));
+  END IF;
+  IF coalesce(nullif(trim(p_duracion), ''), '') <> '' THEN
+    v_filter_parts := array_append(v_filter_parts,
+      CASE p_duracion
+        WHEN 't2_5'    THEN 'hasta 5 min'
+        WHEN 't5_15'   THEN '5 a 15 min'
+        WHEN 't15_plus' THEN 'más de 15 min'
+        ELSE p_duracion
+      END);
+  END IF;
+  v_filter_label := array_to_string(v_filter_parts, ' · ');
+
+  SELECT jsonb_agg(jsonb_build_object('value', uc.key, 'label', uc.short_label)
+                   ORDER BY uc.sort_order)
+    INTO v_area_options
+    FROM public.ui_copy uc WHERE uc.domain = 'area' AND uc.lang = 'es';
+
+  SELECT jsonb_agg(jsonb_build_object('value', uc.key, 'label', uc.short_label)
+                   ORDER BY uc.sort_order)
+    INTO v_format_options
+    FROM public.ui_copy uc WHERE uc.domain = 'resource_format' AND uc.lang = 'es';
+
+  SELECT jsonb_agg(jsonb_build_object('value', uc.key, 'label', uc.short_label)
+                   ORDER BY uc.sort_order)
+    INTO v_duration_options
+    FROM public.ui_copy uc WHERE uc.domain = 'time_bucket' AND uc.lang = 'es';
+
+  SELECT
+    coalesce(jsonb_agg(
+      jsonb_build_object(
+        'id',          r.id::text,
+        'title',       coalesce(r.title, 'Recurso'),
+        'subtitle',
+          coalesce(
+            (SELECT short_label FROM public.ui_copy
+              WHERE domain = 'resource_format' AND key = r.format::text AND lang = 'es' LIMIT 1),
+            r.format::text
+          ) || ' · ' || r.duration_min::text || ' min',
+        'action',      'open_resource',
+        'value',       'fuente',
+        'source_kind', coalesce(r.source_kind, 'external_url'),
+        'url',         coalesce(r.url, '')
+      )
+      ORDER BY r.title
+    ), '[]'::jsonb),
+    count(*)
+  INTO v_items, v_count
+  FROM public.resources r
+  WHERE r.is_active = true
+    AND r.tier = 'A'
+    AND CASE WHEN coalesce(nullif(trim(p_area), ''), '') <> ''
+          THEN p_area = ANY(r.areas::text[]) ELSE true END
+    AND CASE WHEN coalesce(nullif(trim(p_formato), ''), '') <> ''
+          THEN r.format::text = p_formato ELSE true END
+    AND CASE
+          WHEN p_duracion = 't2_5'    THEN r.duration_min <= 5
+          WHEN p_duracion = 't5_15'   THEN r.duration_min > 5  AND r.duration_min <= 15
+          WHEN p_duracion = 't15_plus' THEN r.duration_min > 15
+          ELSE true
+        END;
+
+  -- Fuente totalmente vacía (caso raro: 0 recursos sin filtros) → catálogo
+  IF v_count = 0 AND NOT v_has_filters THEN
+    v_empty := public.lumi_get_message('empty', 'empty_state');
+    v_node  := public.lumi_get_node('FUENTE_EMPTY');
+    RETURN jsonb_build_object(
+      'ok',           true,
+      'code',         'FUENTE_EMPTY',
+      'message',      coalesce(v_empty, v_node->>'message', 'No encontré recursos.'),
+      'actions',      coalesce(v_node->'actions', '[]'::jsonb),
+      'content_type', 'empty_presence',
+      'content',      jsonb_build_object('type', 'empty_presence', 'source', 'fuente'),
+      'state',        jsonb_build_object('contentSource', 'fuente',
+                                         'moduleColor', '#2A9068')
+    );
+  END IF;
+
+  v_message := CASE
+    WHEN v_count = 0 AND v_has_filters THEN 'Sin recursos con estos filtros. Probá ajustar.'
+    WHEN v_has_filters THEN v_filter_label || ' · ' || v_count::text || ' recursos.'
+    ELSE 'Explorá libremente. ' || v_count::text || ' recursos disponibles.'
+  END;
+
+  v_node_code := 'FUENTE_DEFAULT';
+  v_node      := public.lumi_get_node(v_node_code);
+
+  RETURN jsonb_build_object(
+    'ok',           true,
+    'code',         v_node_code,
+    'message',      v_message,
+    'actions',      coalesce(v_node->'actions', '[]'::jsonb),
+    'content_type', 'item_list',
+    'content', jsonb_build_object(
+      'type',   'item_list',
+      'source', 'fuente',
+      'items',  v_items,
+      'current_filters', jsonb_build_object(
+        'area',     coalesce(nullif(trim(p_area), ''), ''),
+        'format',   coalesce(nullif(trim(p_formato), ''), ''),
+        'duration', coalesce(nullif(trim(p_duracion), ''), '')
+      ),
+      'filter_options', jsonb_build_object(
+        'area',     coalesce(v_area_options, '[]'::jsonb),
+        'format',   coalesce(v_format_options, '[]'::jsonb),
+        'duration', coalesce(v_duration_options, '[]'::jsonb)
+      )
+    ),
+    'state', jsonb_build_object(
+      'contentSource', 'fuente',
+      'moduleColor',   '#2A9068'
+    )
+  );
+END;
+"
+lumi_get_init_data,"
+DECLARE
+  v_has_visited     boolean;
+  v_sanctuary_count integer;
+  v_days_since      integer;
+BEGIN
+  SELECT coalesce(u.has_visited, false) INTO v_has_visited
+  FROM public.users u WHERE u.id = p_user_id;
+
+  SELECT count(*) INTO v_sanctuary_count
+  FROM public.sanctuary_items si WHERE si.user_id = p_user_id;
+
+  -- Días desde la última sesión (0 si nunca tuvo sesión)
+  SELECT coalesce(
+    extract(day FROM (now() - max(s.created_at)))::integer, 0
+  ) INTO v_days_since
+  FROM public.sessions s WHERE s.user_id = p_user_id;
+
+  RETURN jsonb_build_object(
+    'has_visited',            v_has_visited,
+    'sanctuary_count',        v_sanctuary_count,
+    'days_since_last_session', v_days_since
+  );
+END;
+"
+lumi_get_message,"
+DECLARE
+  v_text text;
+BEGIN
+  -- Random ponderado: -ln(random())/weight es el algoritmo estándar
+  -- para weighted reservoir sampling. random_weight DEFAULT 1.
+  SELECT message_text INTO v_text
+  FROM public.lumen_messages
+  WHERE message_type = p_message_type
+    AND moment_type  = p_moment_type
+    AND active = true
+    AND (starts_at IS NULL OR starts_at <= now())
+    AND (ends_at   IS NULL OR ends_at   >= now())
+  ORDER BY -ln(greatest(random(), 0.0000001)) /
+           greatest(coalesce(random_weight, 1), 1)
+  LIMIT 1;
+
+  RETURN v_text;
+END;
+"
+lumi_get_node,"
+DECLARE
+  v_node         public.lumen_nodes%rowtype;
+  v_message      text;
+  v_content_type text;
+BEGIN
+  SELECT *
+  INTO v_node
+  FROM public.lumen_nodes
+  WHERE code = p_code
+    AND coalesce(active, true) = true   -- ◀️ defensivo: NULL = activo
+  ORDER BY priority ASC
+  LIMIT 1;
+
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object(
+      'ok', false,
+      'error', 'NODE_NOT_FOUND',
+      'code', p_code,
+      'message', 'Estoy acá.',
+      'actions', '[]'::jsonb,
+      'content_type', 'empty_presence',
+      'content', jsonb_build_object('type', 'empty_presence')
+    );
+  END IF;
+
+  v_message := coalesce(v_node.message_text, '');
+  v_content_type := coalesce(v_node.content_json ->> 'type', 'empty_presence');
+
+  RETURN jsonb_build_object(
+    'ok', true,
+    'code', v_node.code,
+    'title', v_node.title,
+    'module', v_node.module,
+    'node_type', v_node.node_type,
+    'moment_type', v_node.moment_type,
+    'message', v_message,
+    'actions', coalesce(v_node.actions_json, '[]'::jsonb),
+    'content_type', v_content_type,
+    'content', coalesce(v_node.content_json, jsonb_build_object('type', 'empty_presence')),
+    'metadata', coalesce(v_node.metadata, '{}'::jsonb)
+  );
+END;
+"
+lumi_get_note_editor,"
+DECLARE
+  v_note text := '';
+  v_area text := '';
+  v_title text;
+BEGIN
+  -- Leer nota y área actuales del item
+  SELECT coalesce(si.note, ''), coalesce(si.area::text, '')
+  INTO   v_note, v_area
+  FROM   public.sanctuary_items si
+  WHERE  si.resource_id = p_resource_id AND si.user_id = p_user_id
+  LIMIT  1;
+
+  -- Título del recurso para contexto
+  SELECT coalesce(r.title, 'Recurso')
+  INTO   v_title
+  FROM   public.resources r
+  WHERE  r.id = p_resource_id;
+
+  RETURN jsonb_build_object(
+    'type',         'note_editor',
+    'resource_id',  p_resource_id::text,
+    'title',        coalesce(v_title, 'Recurso'),
+    'current_note', v_note,
+    'current_area', v_area
+  );
+END;
+"
+lumi_get_resource_card,"
+DECLARE
+  v_base jsonb;
+  v_desc text;
+  v_sk   text;
+BEGIN
+  v_base := public.gaia_get_resource_card(p_user_id, p_resource_id, p_session_id);
+
+  SELECT coalesce(r.description_short, ''), coalesce(r.source_kind, 'external_url')
+  INTO   v_desc, v_sk
+  FROM   public.resources r
+  WHERE  r.id = p_resource_id;
+
+  RETURN jsonb_build_object(
+    'type',              'resource_card',
+    'resource_id',       (v_base->>'id'),
+    'title',             coalesce(v_base->>'title', 'Recurso'),
+    'description_short', v_desc,
+    'when_it_helps',     coalesce(v_base->>'when_it_helps', ''),
+    'what_it_is_not',    coalesce(v_base->>'what_it_is_not', ''),
+    'format',            coalesce(v_base->>'format', '—'),
+    'duration_min',      coalesce(v_base->>'duration_min', '—'),
+    'source_kind',       v_sk,
+    'url',               coalesce(v_base->>'url', ''),
+    'areas',             coalesce(v_base->'areas', '[]'::jsonb),
+    'is_from',           p_is_from,
+
+    -- ◀ NUEVO · Capa de acción (antes se descartaba)
+    'intervention_key',  v_base->>'intervention_key',
+    'why_now',           coalesce(v_base->>'why_now', ''),
+    'minimum_step',      coalesce(v_base->>'minimum_step', ''),
+    'after_prompt',      coalesce(v_base->>'after_prompt', ''),
+    'help_intent',       v_base->>'help_intent',
+
+    -- ◀ NUEVO · Fuente (paso respaldado)
+    'source_name',        v_base#>>'{source,name}',
+    'source_reference',   v_base#>>'{source,reference}',   -- URL o cita canónica
+    'source_basis',       v_base#>>'{source,basis}',
+    'source_trust_level', v_base#>>'{source,trust_level}',
+
+    -- ◀ NUEVO · CTAs (§15)
+    'cta_label',           'Empezar ahora',
+    'secondary_cta_label', 'Probemos otra cosa',
+
+    -- Flags (preservados)
+    'is_saved',         coalesce((v_base->'flags'->>'is_saved')::boolean, false),
+    'is_repeat',        coalesce((v_base->'flags'->>'is_repeat')::boolean, false),
+    'was_negative',     coalesce((v_base->'flags'->>'was_negative')::boolean, false),
+    'was_shown_last',   coalesce((v_base->'flags'->>'was_shown_last')::boolean, false),
+    'session_id',       coalesce(p_session_id::text, '')
+  );
+END;
+"
+lumi_get_sanctuary,"
+BEGIN
+  RETURN public.lumi_open_sanctuary(jsonb_build_object(
+    'user_id',          p_user_id::text,
+    'filter_area',      CASE WHEN p_area = 'sin_area' THEN '' ELSE coalesce(p_area, '') END,
+    'filter_format',    '',
+    'filter_has_note',  CASE
+                          WHEN p_nota = 'con_nota' THEN 'yes'
+                          WHEN p_nota = 'sin_nota' THEN 'no'
+                          ELSE ''
+                        END
+  ));
+END;
+"
+lumi_get_sanctuary_item,"
+DECLARE
+  v_item record;
+  v_r    record;
+  v_note text;
+  v_area text;
+BEGIN
+  SELECT si.id, si.note, si.area::text, si.resource_id
+  INTO  v_item
+  FROM  public.sanctuary_items si
+  WHERE si.id = p_item_id AND si.user_id = p_user_id;
+
+  IF NOT FOUND THEN RETURN NULL; END IF;
+
+  SELECT r.id, r.title, r.description_short, r.format::text,
+         r.duration_min, r.source_kind, r.url, r.when_it_helps
+  INTO  v_r
+  FROM  public.resources r
+  WHERE r.id = v_item.resource_id;
+
+  v_note := coalesce(v_item.note, '');
+  v_area := coalesce(v_item.area, '');
+
+  RETURN jsonb_build_object(
+    'type',             'sanctuary_detail',
+    'sanctuary_item_id', v_item.id::text,
+    'resource_id',       v_r.id::text,
+    'title',            coalesce(v_r.title, 'Recurso guardado'),
+    'description_short', coalesce(v_r.description_short, ''),
+    'format',           coalesce(v_r.format, '—'),
+    'duration_min',     coalesce(v_r.duration_min::text, '—'),
+    'source_kind',      coalesce(v_r.source_kind, 'external_url'),
+    'url',              coalesce(v_r.url, ''),
+    'when_it_helps',    coalesce(v_r.when_it_helps, ''),
+    'note',             v_note,
+    'has_note',         (v_note != ''),
+    'area',             v_area,
+    'area_label',       CASE WHEN v_area != '' THEN public.lumi_area_label(v_area) ELSE '' END,
+    'has_area',         (v_area != '')
+  );
+END;
+"
+lumi_get_scan,"
+DECLARE
+  v_node record;
+BEGIN
+  SELECT code, message_text, actions_json, content_json
+  INTO v_node
+  FROM public.lumen_nodes
+  WHERE moment_type = 'landing_scan'
+    AND active = true
+  ORDER BY random()
+  LIMIT 1;
+
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'no_scan_available');
+  END IF;
+
+  RETURN jsonb_build_object(
+    'ok', true,
+    'code', v_node.code,
+    'message', v_node.message_text,
+    'actions', v_node.actions_json,
+    'content', v_node.content_json
+  );
+END;
+"
+lumi_get_session_history,"
+declare
+  v_user_id uuid;
+  v_session_id uuid;
+  v_node jsonb;
+  v_items jsonb;
+begin
+  v_user_id := nullif(trim(p_user_id_text), '')::uuid;
+  v_session_id := nullif(trim(both '''' from trim(coalesce(p_session_id_text, ''))), '')::uuid;
+
+  if v_session_id is null then
+    select s.id
+    into v_session_id
+    from public.sessions s
+    where s.user_id = v_user_id
+      and s.mode = 'propose'
+    order by s.created_at desc
+    limit 1;
+  end if;
+
+  v_node := public.lumi_get_node('REC_HISTORY');
+
+  select coalesce(
+    jsonb_agg(
+      jsonb_build_object(
+        'id', r.id::text,
+        'title', r.title,
+        'subtitle', concat(r.format::text, ' · ', r.duration_min::text, ' min'),
+        'format', r.format::text,
+        'duration_min', r.duration_min,
+        'source_kind', coalesce(r.source_kind, 'external_url'),
+        'url', coalesce(r.url, ''),
+        'action', 'open_resource',
+        'value', 'lumi'
+      )
+      order by sr.position asc
+    ),
+    '[]'::jsonb
+  )
+  into v_items
+  from public.session_recommendations sr
+  join public.resources r on r.id = sr.resource_id
+  where sr.session_id = v_session_id;
+
+  return jsonb_build_object(
+    'ok', true,
+    'code', 'REC_HISTORY',
+    'message', coalesce(v_node->>'message', 'Todo lo que te propuse en esta sesión.'),
+    'actions', coalesce(v_node->'actions', '[]'::jsonb),
+    'content_type', 'item_list',
+    'content', jsonb_build_object(
+      'type', 'item_list',
+      'source', 'session_history',
+      'items', v_items
+    ),
+    'state', jsonb_build_object(
+      'currentSessionId', coalesce(v_session_id::text, ''),
+      'contentSource', 'lumi'
+    )
+  );
+end;
+"
+lumi_go_home,"
+DECLARE
+  v_user_id         uuid;
+  v_has_visited     boolean := true;
+  v_first_name      text;
+  v_days_since      integer := 0;
+  v_sanctuary_count integer := 0;
+  v_greeting        text;
+  v_culture_phrase  text;
+  v_node            jsonb;
+  v_si_resource_id  uuid;
+  v_si_title        text;
+  v_si_format       text;
+  v_si_duration     int;
+  v_subtitle        text;
+  v_offer_item      jsonb;
+  v_name_suffix     text;
+BEGIN
+  v_user_id    := nullif(trim(p_params->>'user_id'), '')::uuid;
+  v_days_since := coalesce(nullif(trim(p_params->>'days_since_last_session'), ''), '0')::integer;
+
+  IF v_user_id IS NOT NULL THEN
+    SELECT coalesce(u.has_visited, false), u.first_name 
+      INTO v_has_visited, v_first_name
+    FROM public.users u WHERE u.id = v_user_id;
+    SELECT count(*) INTO v_sanctuary_count
+    FROM public.sanctuary_items si WHERE si.user_id = v_user_id;
+  END IF;
+
+  v_culture_phrase := public.lumi_get_message('culture_phrase', 'first_contact');
+  v_name_suffix := CASE 
+    WHEN v_first_name IS NOT NULL AND length(trim(v_first_name)) > 0 
+    THEN ', ' || trim(v_first_name) ELSE '' END;
+
+  -- Primera visita → prompt de nombre
+  IF NOT v_has_visited THEN
+    v_node := public.lumi_get_node('HOME_FIRST_VISIT_NAME');
+    RETURN jsonb_build_object(
+      'ok',           true,
+      'code',         'HOME_FIRST_VISIT_NAME',
+      'message',      coalesce(v_node->>'message', 
+        'Hola. Antes de empezar — si querés, decime cómo te llamo.'),
+      'actions',      coalesce(v_node->'actions', '[]'::jsonb),
+      'content_type', 'name_prompt',
+      'content',      jsonb_build_object(
+                        'type', 'name_prompt',
+                        'culture_phrase', coalesce(v_culture_phrase, '')
+                      ),
+      'state', jsonb_build_object(
+        'contentSource', '', 'moduleColor', '#7860E0',
+        'currentSessionId', '', 'currentResourceId', '', 'currentSanctuaryItemId', ''
+      )
+    );
+  END IF;
+
+  -- Returning con Santuario → mensaje cálido con nombre
+  IF v_has_visited AND v_sanctuary_count > 0 THEN
+    SELECT si.resource_id, r.title, r.format::text, r.duration_min
+      INTO v_si_resource_id, v_si_title, v_si_format, v_si_duration
+    FROM public.sanctuary_items si
+    JOIN public.resources r ON r.id = si.resource_id
+    WHERE si.user_id = v_user_id
+    ORDER BY si.created_at DESC LIMIT 1;
+
+    v_node := public.lumi_get_node('HOME_RETURNING');
+    v_greeting := 'Qué bueno tenerte de vuelta' || v_name_suffix || '. '
+                  || 'Dejé cerca algo que ya te hizo bien, por si querés retomarlo — '
+                  || 'o empezamos por donde estés hoy.';
+    v_subtitle := initcap(coalesce(v_si_format, ''))
+                  || coalesce(' · ' || v_si_duration || ' min', '');
+    v_offer_item := jsonb_build_object(
+      'id', v_si_resource_id::text, 'title', v_si_title,
+      'subtitle', nullif(v_subtitle, ''), 'format', v_si_format,
+      'action', 'open_resource', 'value', 'sanctuary'
+    );
+
+    RETURN jsonb_build_object(
+      'ok',           true,
+      'code',         'HOME_RETURNING',
+      'message',      v_greeting,
+      'actions',      coalesce(v_node->'actions', '[]'::jsonb),
+      'content_type', 'item_list',
+      'content',      jsonb_build_object(
+                        'type', 'item_list',
+                        'culture_phrase', coalesce(v_culture_phrase, ''),
+                        'items', jsonb_build_array(v_offer_item)
+                      ),
+      'state', jsonb_build_object(
+        'contentSource', '', 'moduleColor', '#7860E0',
+        'currentSessionId', '', 'currentResourceId', '', 'currentSanctuaryItemId', ''
+      )
+    );
+  END IF;
+
+  -- Returning sin Santuario
+  IF v_days_since > 7 THEN
+    v_greeting := 'Qué bueno volver' || v_name_suffix || '. Podemos empezar suave.';
+  ELSE
+    v_greeting := 'Estoy acá' || v_name_suffix || '.';
+  END IF;
+
+  v_node := public.lumi_get_node('HOME_DEFAULT');
+
+  RETURN jsonb_build_object(
+    'ok',           true,
+    'code',         'HOME_DEFAULT',
+    'message',      coalesce(v_greeting, v_node->>'message', 'Estoy acá.'),
+    'actions',      coalesce(v_node->'actions', '[]'::jsonb),
+    'content_type', 'empty_presence',
+    'content',      jsonb_build_object(
+                      'type', 'empty_presence',
+                      'culture_phrase', coalesce(v_culture_phrase, '')
+                    ),
+    'state', jsonb_build_object(
+      'contentSource', '', 'moduleColor', '#7860E0',
+      'currentSessionId', '', 'currentResourceId', '', 'currentSanctuaryItemId', ''
+    )
+  );
+END;
+"
+lumi_mode_presence,"
+DECLARE
+  v_node    jsonb;
+  v_message text;
+BEGIN
+  v_node := public.lumi_get_node('HOME_PRESENCE');
+
+  -- Asimetría enriquecedora: a veces LUMI te abraza, a veces te
+  -- ofrece una pausa de sabiduría.
+  IF random() < 0.5 THEN
+    v_message := public.lumi_get_message('support', 'companion');
+  ELSE
+    v_message := public.lumi_get_message('quote', 'wisdom');
+  END IF;
+
+  RETURN jsonb_build_object(
+    'ok',           true,
+    'code',         'HOME_PRESENCE',
+    'message',      coalesce(v_message, v_node->>'message', 'Acá estoy.'),
+    'actions',      coalesce(v_node->'actions',
+                             jsonb_build_array(
+                               jsonb_build_object('label', 'Volver al inicio',
+                                                  'action', 'go_home')
+                             )),
+    'content_type', 'empty_presence',
+    'content',      jsonb_build_object('type', 'empty_presence'),
+    'state',        jsonb_build_object(
+                      'contentSource', '',
+                      'moduleColor',   '#7860E0'
+                    )
+  );
+END;
+"
+lumi_mode_presence,"
+declare
+  v_user_id uuid;
+  v_session jsonb;
+  v_session_id text := '';
+  v_node jsonb;
+begin
+  v_user_id := nullif(trim(p_user_id_text), '')::uuid;
+
+  begin
+    v_session := public.gaia_create_session_and_recommendations(
+      v_user_id,
+      'presence'::gaia_mode,
+      null,
+      null,
+      null
+    );
+
+    v_session_id := coalesce(v_session->>'session_id', '');
+  exception when others then
+    v_session_id := '';
+  end;
+
+  v_node := public.lumi_get_node('HOME_PRESENCE');
+
+  return v_node || jsonb_build_object(
+    'state', jsonb_build_object(
+      'currentSessionId', v_session_id,
+      'contentSource', '',
+      'spacesMenuOpen', false,
+      'filterPanelOpen', false
+    )
+  );
+end;
+"
+lumi_next_recommendation,"
+BEGIN
+  RETURN public.lumi_next_recommendation(
+    p_params->>'user_id',
+    p_params->>'session_id',
+    coalesce(p_params->>'resource_id', ''),
+    coalesce((p_params->>'last_position')::int, 1)
+  );
+END;
+"
+lumi_next_recommendation,"
+declare
+  v_user_id uuid;
+  v_session_id uuid;
+  v_current_resource_id uuid;
+  v_last_position int;
+  v_next jsonb;
+  v_resource_id uuid;
+  v_card jsonb;
+  v_node jsonb;
+begin
+  v_user_id := nullif(trim(p_user_id_text), '')::uuid;
+  v_session_id := nullif(trim(both '''' from trim(coalesce(p_session_id_text, ''))), '')::uuid;
+  v_current_resource_id := nullif(trim(both '''' from trim(coalesce(p_current_resource_id_text, ''))), '')::uuid;
+
+  if v_session_id is null then
+    select s.id
+    into v_session_id
+    from public.sessions s
+    where s.user_id = v_user_id
+      and s.mode = 'propose'
+    order by s.created_at desc
+    limit 1;
+  end if;
+
+  if v_session_id is null then
+    return public.lumi_get_node('REC_POOL_EXHAUSTED');
+  end if;
+
+  select sr.position
+  into v_last_position
+  from public.session_recommendations sr
+  where sr.session_id = v_session_id
+    and sr.resource_id = v_current_resource_id
+  limit 1;
+
+  v_last_position := coalesce(v_last_position, p_last_position, 1);
+
+  v_next := public.gaia_get_next_recommendation(
+    v_session_id,
+    v_last_position::smallint
+  );
+
+  if v_next is null
+     or coalesce((v_next->>'pool_exhausted')::boolean, false)
+     or nullif(v_next->>'resource_id', '') is null then
+    return public.lumi_get_node('REC_POOL_EXHAUSTED');
+  end if;
+
+  v_resource_id := (v_next->>'resource_id')::uuid;
+  v_card := public.gaia_get_resource_card(v_user_id, v_resource_id, v_session_id);
+  v_node := public.lumi_get_node('REC_NEXT');
+
+  return jsonb_build_object(
+    'ok', true,
+    'code', 'REC_NEXT',
+    'message', coalesce(v_next->>'gaia_copy', v_node->>'message'),
+    'actions', coalesce(v_node->'actions', '[]'::jsonb),
+    'content_type', 'resource_card',
+    'content', coalesce(v_card, '{}'::jsonb) ||
+      jsonb_build_object(
+        'type', 'resource_card',
+        'resource_id', v_resource_id::text,
+        'session_id', v_session_id::text,
+        'is_from', 'lumi'
+      ),
+    'state', jsonb_build_object(
+      'currentSessionId', v_session_id::text,
+      'currentResourceId', v_resource_id::text,
+      'lastRecommendationPosition', (v_next->>'position')::int,
+      'resourceSourceKind', coalesce(v_card->>'source_kind', 'external_url'),
+      'activeUrl', coalesce(v_card->>'url', ''),
+      'contentSource', 'lumi'
+    )
+  );
+end;
+"
+lumi_open_circulos,"
+DECLARE
+  v_activities jsonb;
+BEGIN
+  v_activities := public.lumi_get_circulos_activities(
+    coalesce(p_params->>'filter_area', '')
+  );
+
+  RETURN public.lumi_get_node(
+    CASE WHEN jsonb_array_length(v_activities->'items') = 0
+      THEN 'CIRCULOS_EMPTY'
+      ELSE 'CIRCULOS_ENTRY'
+    END)
+    || jsonb_build_object(
+        'content', v_activities,
+        'state',   jsonb_build_object(
+          'moduleColor',   '#7AAAC4',
+          'contentSource', 'circulos'
+        ));
+END;
+"
+lumi_open_contribution_form,"
+DECLARE
+  v_node jsonb;
+BEGIN
+  v_node := public.lumi_get_node('CONTRIBUTION_FORM');
+
+  RETURN jsonb_build_object(
+    'ok',           true,
+    'code',         'CONTRIBUTION_FORM',
+    'message',      coalesce(v_node->>'message',
+                             '¿Conocés un recurso que valga la pena compartir con la comunidad?'),
+    'actions',      coalesce(v_node->'actions', '[]'::jsonb),
+    'content_type', 'contribution_form',
+    'content',      jsonb_build_object('type', 'contribution_form'),
+    'state',        jsonb_build_object('contentSource', 'fuente',
+                                       'moduleColor',   '#2A9068')
+  );
+END;
+"
+lumi_open_faros,"
+DECLARE
+  v_user_id uuid;
+  v_faros   jsonb;
+  v_node    jsonb;
+BEGIN
+  v_user_id := nullif(trim(p_params->>'user_id'), '')::uuid;
+
+  IF v_user_id IS NULL THEN
+    RETURN public.lumi_get_node('HOME_DEFAULT')
+      || jsonb_build_object('ok', false, 'error', 'missing_user_id', 'state', '{}'::jsonb);
+  END IF;
+
+  -- Para cada área canónica de ui_copy, traer el faro_text si existe
+  SELECT jsonb_agg(
+    jsonb_build_object(
+      'area',      uc.key,
+      'label',     uc.short_label,
+      'hint',      uc.subtitle,
+      'faro_text', coalesce(uaf.faro_text, ''),
+      'has_faro',  uaf.faro_text IS NOT NULL AND uaf.faro_text <> ''
+    ) ORDER BY uc.sort_order
+  ) INTO v_faros
+  FROM public.ui_copy uc
+  LEFT JOIN public.user_area_faros uaf
+    ON uaf.user_id = v_user_id
+   AND uaf.area::text = uc.key
+  WHERE uc.domain = 'area' AND uc.lang = 'es';
+
+  v_node := public.lumi_get_node('FAROS_VIEW');
+
+  RETURN jsonb_build_object(
+    'ok',           true,
+    'code',         'FAROS_VIEW',
+    'message',      coalesce(v_node->>'message',
+                             'Tus orientaciones íntimas. Solo vos las ves.'),
+    'actions',      coalesce(v_node->'actions',
+                             jsonb_build_array(
+                               jsonb_build_object(
+                                 'label',  'Volver al Santuario',
+                                 'action', 'open_sanctuary'
+                               )
+                             )),
+    'content_type', 'faros_panel',
+    'content',      jsonb_build_object(
+                      'type',  'faros_panel',
+                      'faros', coalesce(v_faros, '[]'::jsonb),
+                      'privacy_hint', 'Solo vos podés leer estos textos. LUMI no los usa.'
+                    ),
+    'state',        jsonb_build_object(
+                      'contentSource', 'sanctuary',
+                      'moduleColor',   '#B88820'
+                    )
+  );
+END;
+"
+lumi_open_fuente,"
+BEGIN
+  RETURN public.lumi_get_fuente_items(
+    coalesce(p_params->>'filter_area', ''),
+    coalesce(p_params->>'filter_format', ''),
+    coalesce(p_params->>'filter_duration', '')
+  );
+END;
+"
+lumi_open_note_editor,"
+declare
+  v_user_id uuid;
+  v_resource_id uuid;
+  v_node jsonb;
+  v_item record;
+begin
+  if nullif(trim(coalesce(p_user_id_text, '')), '') is null then
+    return public.lumi_get_node('SANCTUARY_WITH_ITEMS');
+  end if;
+
+  if nullif(trim(both '''' from trim(coalesce(p_resource_id_text, ''))), '') is null then
+    return public.lumi_get_node('SANCTUARY_WITH_ITEMS');
+  end if;
+
+  v_user_id := nullif(trim(p_user_id_text), '')::uuid;
+  v_resource_id := nullif(
+    trim(both '''' from trim(coalesce(p_resource_id_text, ''))),
+    ''
+  )::uuid;
+
+  select
+    si.id as sanctuary_item_id,
+    si.note,
+    si.area,
+    r.title
+  into v_item
+  from public.sanctuary_items si
+  join public.resources r on r.id = si.resource_id
+  where si.user_id = v_user_id
+    and si.resource_id = v_resource_id
+  limit 1;
+
+  if not found then
+    return public.lumi_get_node('SANCTUARY_WITH_ITEMS');
+  end if;
+
+  v_node := public.lumi_get_node('SANCTUARY_NOTE');
+
+  return jsonb_build_object(
+    'ok', true,
+    'code', 'SANCTUARY_NOTE',
+    'message', coalesce(v_node->>'message', 'Podés dejar una nota para vos.'),
+    'actions', coalesce(v_node->'actions', '[]'::jsonb),
+    'content_type', 'note_editor',
+    'content', jsonb_build_object(
+      'type', 'note_editor',
+      'resource_id', v_resource_id::text,
+      'sanctuary_item_id', coalesce(v_item.sanctuary_item_id::text, ''),
+      'title', coalesce(v_item.title, 'Recurso'),
+      'current_note', coalesce(v_item.note, ''),
+      'current_area', coalesce(v_item.area::text, '')
+    ),
+    'state', jsonb_build_object(
+      'contentSource', 'sanctuary',
+      'moduleColor', '#C8A46E',
+      'spacesMenuOpen', false,
+      'filterPanelOpen', false
+    )
+  );
+end;
+"
+lumi_open_note_editor,"
+DECLARE
+  v_result  jsonb;
+  v_options jsonb;
+BEGIN
+  v_result := public.lumi_open_note_editor(
+    p_params->>'user_id',
+    p_params->>'resource_id'
+  );
+
+  -- Hidratar las 6 áreas desde ui_copy
+  SELECT jsonb_agg(
+    jsonb_build_object(
+      'value', uc.key,
+      'label', uc.short_label,
+      'hint',  uc.subtitle
+    ) ORDER BY uc.sort_order
+  ) INTO v_options
+  FROM public.ui_copy uc
+  WHERE uc.domain = 'area' AND uc.lang = 'es';
+
+  -- Inyectar en content.area_options
+  v_result := jsonb_set(
+    v_result,
+    '{content,area_options}',
+    coalesce(v_options, '[]'::jsonb)
+  );
+
+  RETURN v_result;
+END;
+"
+lumi_open_resource,"
+declare
+  v_user_id uuid;
+  v_resource_id uuid;
+  v_session_id uuid;
+  v_session_text text;
+  v_card jsonb;
+  v_node_code text;
+  v_node jsonb;
+begin
+  v_user_id := nullif(trim(p_user_id_text), '')::uuid;
+  v_resource_id := nullif(trim(p_resource_id_text), '')::uuid;
+  v_session_text := trim(both '''' from trim(coalesce(p_session_id_text, '')));
+  v_session_id := case when v_session_text = '' then null else v_session_text::uuid end;
+
+  -- Registrar apertura (solo si hay sesión). reopened diferido: siempre 'opened'.
+  IF v_session_id IS NOT NULL AND v_resource_id IS NOT NULL THEN
+    PERFORM public.gaia_submit_session_action(
+      p_session_id         := v_session_id,
+      p_chosen_resource_id := v_resource_id,
+      p_feedback           := NULL,
+      p_saved              := false,
+      p_action             := 'opened'::gaia_action_type
+    );
+  END IF;
+
+  v_card := public.gaia_get_resource_card(v_user_id, v_resource_id, v_session_id);
+
+  v_node_code := case
+    when p_source = 'lumi' then 'RESOURCE_FROM_LUMI'
+    when p_source = 'sanctuary' then 'RESOURCE_FROM_SANCTUARY'
+    else 'RESOURCE_FROM_FUENTE'
+  end;
+  v_node := public.lumi_get_node(v_node_code);
+
+  return jsonb_build_object(
+    'ok', true,
+    'code', v_node_code,
+    'message', coalesce(v_card->>'lumi_context', v_node->>'message'),
+    'actions', coalesce(v_node->'actions', '[]'::jsonb),
+    'content_type', 'resource_card',
+    'content', coalesce(v_card, '{}'::jsonb) ||
+      jsonb_build_object('type', 'resource_card', 'resource_id', v_resource_id::text,
+        'session_id', coalesce(v_session_id::text, ''), 'is_from', p_source),
+    'state', jsonb_build_object(
+      'currentResourceId', v_resource_id::text,
+      'resourceSourceKind', coalesce(v_card->>'source_kind', 'external_url'),
+      'activeUrl', coalesce(v_card->>'url', ''),
+      'contentSource', p_source)
+  );
+end;
+"
+lumi_open_resource,"
+BEGIN
+  RETURN public.lumi_open_resource(
+    p_params->>'user_id',
+    p_params->>'resource_id',
+    coalesce(p_params->>'source', 'fuente'),
+    coalesce(p_params->>'session_id', '')
+  );
+END;
+"
+lumi_open_sanctuary,"
+DECLARE
+  v_user_id          uuid := (p_params->>'user_id')::uuid;
+  v_area             text := coalesce(nullif(trim(p_params->>'filter_area'), ''), '');
+  v_format           text := coalesce(nullif(trim(p_params->>'filter_format'), ''), '');
+  v_has_note         text := coalesce(nullif(trim(p_params->>'filter_has_note'), ''), '');
+  v_items            jsonb;
+  v_count            integer := 0;
+  v_total            integer := 0;
+  v_has_filters      boolean;
+  v_node_code        text;
+  v_node             jsonb;
+  v_message          text;
+  v_empty            text;
+  v_area_options     jsonb;
+  v_format_options   jsonb;
+  v_has_note_options jsonb;
+BEGIN
+  v_has_filters := v_area <> '' OR v_format <> '' OR v_has_note <> '';
+
+  SELECT count(*) INTO v_total
+  FROM public.sanctuary_items
+  WHERE user_id = v_user_id;
+
+  -- Santuario completamente vacío → mensaje del catálogo
+  IF v_total = 0 THEN
+    v_node  := public.lumi_get_node('SANCTUARY_EMPTY');
+    v_empty := public.lumi_get_message('empty', 'empty_state');
+    RETURN jsonb_build_object(
+      'ok',           true,
+      'code',         'SANCTUARY_EMPTY',
+      'message',      coalesce(v_empty, v_node->>'message', 'Todavía no guardaste nada.'),
+      'actions',      coalesce(v_node->'actions', '[]'::jsonb),
+      'content_type', 'empty_presence',
+      'content',      jsonb_build_object('type', 'empty_presence', 'source', 'sanctuary'),
+      'state',        jsonb_build_object('contentSource', 'sanctuary',
+                                         'moduleColor', '#B88820')
+    );
+  END IF;
+
+  -- Items con filtros aplicados
+  SELECT
+    coalesce(jsonb_agg(jsonb_build_object(
+      'id',       si.id::text,
+      'title',    r.title,
+      'subtitle',
+        coalesce(
+          (SELECT short_label FROM public.ui_copy
+            WHERE domain = 'resource_format' AND key = r.format::text AND lang = 'es' LIMIT 1),
+          r.format::text
+        )
+        || CASE WHEN si.area IS NOT NULL THEN ' · ' || public.lumi_area_label(si.area::text) ELSE '' END
+        || CASE WHEN si.note IS NOT NULL AND si.note <> '' THEN ' · con nota' ELSE '' END,
+      'format',   r.format::text,
+      'area',     coalesce(si.area::text, ''),
+      'has_note', (si.note IS NOT NULL AND si.note <> ''),
+      'action',   'open_sanctuary_item'
+    ) ORDER BY si.created_at DESC), '[]'::jsonb),
+    count(*)
+  INTO v_items, v_count
+  FROM public.sanctuary_items si
+  JOIN public.resources r ON r.id = si.resource_id
+  WHERE si.user_id = v_user_id
+    AND CASE WHEN v_area <> '' THEN si.area::text = v_area ELSE true END
+    AND CASE WHEN v_format <> '' THEN r.format::text = v_format ELSE true END
+    AND CASE
+          WHEN v_has_note = 'yes' THEN si.note IS NOT NULL AND si.note <> ''
+          WHEN v_has_note = 'no'  THEN si.note IS NULL OR si.note = ''
+          ELSE true
+        END;
+
+  SELECT jsonb_agg(jsonb_build_object('value', uc.key, 'label', uc.short_label) ORDER BY uc.sort_order)
+    INTO v_area_options
+    FROM public.ui_copy uc
+   WHERE uc.domain = 'area' AND uc.lang = 'es';
+
+  SELECT jsonb_agg(jsonb_build_object('value', uc.key, 'label', uc.short_label) ORDER BY uc.sort_order)
+    INTO v_format_options
+    FROM public.ui_copy uc
+   WHERE uc.domain = 'resource_format' AND uc.lang = 'es';
+
+  v_has_note_options := jsonb_build_array(
+    jsonb_build_object('value', 'yes', 'label', 'Con nota'),
+    jsonb_build_object('value', 'no',  'label', 'Sin nota')
+  );
+
+  v_message := CASE
+    WHEN v_count = 0 AND v_has_filters THEN 'Nada con estos filtros. Probá ajustar.'
+    WHEN v_has_filters THEN v_count::text || ' de ' || v_total::text || ' guardados.'
+    ELSE 'Acá está lo que fuiste guardando.'
+  END;
+
+  v_node_code := 'SANTUARIO_ENTRY';
+  v_node      := public.lumi_get_node(v_node_code);
+
+  RETURN jsonb_build_object(
+    'ok',           true,
+    'code',         v_node_code,
+    'message',      v_message,
+    'actions',      coalesce(v_node->'actions', '[]'::jsonb),
+    'content_type', 'item_list',
+    'content', jsonb_build_object(
+      'type',   'item_list',
+      'source', 'sanctuary',
+      'items',  v_items,
+      'current_filters', jsonb_build_object(
+        'area', v_area, 'format', v_format, 'has_note', v_has_note
+      ),
+      'filter_options', jsonb_build_object(
+        'area',     coalesce(v_area_options, '[]'::jsonb),
+        'format',   coalesce(v_format_options, '[]'::jsonb),
+        'has_note', v_has_note_options
+      )
+    ),
+    'state', jsonb_build_object(
+      'contentSource', 'sanctuary',
+      'moduleColor',   '#B88820'
+    )
+  );
+END;
+"
+lumi_open_sanctuary_item,"
+DECLARE
+  v_user_id           uuid;
+  v_sanctuary_item_id uuid;
+  v_item              record;
+  v_note              text;
+  v_area              text;
+  v_node_code         text;
+  v_node              jsonb;
+  v_actions_raw       jsonb;
+  v_actions_final     jsonb := '[]'::jsonb;
+  v_action            jsonb;
+BEGIN
+  v_user_id := nullif(trim(p_user_id_text), '')::uuid;
+  v_sanctuary_item_id := nullif(
+    trim(both '''' from trim(coalesce(p_sanctuary_item_id_text, ''))),
+    ''
+  )::uuid;
+
+  SELECT
+    si.id AS sanctuary_item_id,
+    si.resource_id,
+    si.note,
+    si.area,
+    r.title,
+    r.description_short,
+    r.format,
+    r.duration_min,
+    r.source_kind,
+    r.url
+  INTO v_item
+  FROM public.sanctuary_items si
+  JOIN public.resources r ON r.id = si.resource_id
+  WHERE si.id = v_sanctuary_item_id
+    AND si.user_id = v_user_id
+  LIMIT 1;
+
+  IF NOT FOUND THEN
+    RETURN public.lumi_get_node('SANCTUARY_EMPTY');
+  END IF;
+
+  v_note := coalesce(v_item.note, '');
+  v_area := coalesce(v_item.area::text, '');
+
+  -- Decidir el código del nodo según haya nota o no
+  v_node_code := CASE
+    WHEN v_note <> '' THEN 'SANCTUARY_ITEM_WITH_NOTE'
+    ELSE 'SANCTUARY_ITEM_WITHOUT_NOTE'
+  END;
+  v_node := public.lumi_get_node(v_node_code);
+
+  -- Hidratar los `value` contextuales en las actions que vienen del nodo
+  v_actions_raw := coalesce(v_node->'actions', '[]'::jsonb);
+  FOR v_action IN SELECT * FROM jsonb_array_elements(v_actions_raw)
+  LOOP
+    -- Inyectar value según la acción
+    IF v_action->>'action' = 'open_note_editor' THEN
+      v_action := v_action || jsonb_build_object('value', v_item.resource_id::text);
+    ELSIF v_action->>'action' = 'confirm_remove_from_sanctuary' THEN
+      v_action := v_action || jsonb_build_object('value', v_item.sanctuary_item_id::text);
+    END IF;
+    v_actions_final := v_actions_final || jsonb_build_array(v_action);
+  END LOOP;
+
+  RETURN jsonb_build_object(
+    'ok', true,
+    'code', v_node_code,
+    'message', coalesce(v_node->>'message',
+      CASE WHEN v_note = '' THEN
+        'Aquí está. Todavía no escribiste una nota — podés hacerlo cuando quieras.'
+      ELSE
+        'Aquí está. Solo vos podés leer esto.'
+      END),
+    'actions', v_actions_final,
+    'content_type', 'sanctuary_detail',
+    'content', jsonb_build_object(
+      'type',               'sanctuary_detail',
+      'sanctuary_item_id',  v_item.sanctuary_item_id::text,
+      'resource_id',        v_item.resource_id::text,
+      'title',              v_item.title,
+      'description_short',  coalesce(v_item.description_short, ''),
+      'format',             coalesce(v_item.format::text, '—'),
+      'duration_min',       coalesce(v_item.duration_min::text, '—'),
+      'source_kind',        coalesce(v_item.source_kind, 'external_url'),
+      'url',                coalesce(v_item.url, ''),
+      'note',               v_note,
+      'area',               v_area,
+      'has_note',           v_note <> '',
+      'has_area',           v_area <> ''
+    ),
+    'state', jsonb_build_object(
+      'currentResourceId',       v_item.resource_id::text,
+      'currentSanctuaryItemId',  v_item.sanctuary_item_id::text,
+      'resourceSourceKind',      coalesce(v_item.source_kind, 'external_url'),
+      'activeUrl',               coalesce(v_item.url, ''),
+      'contentSource',           'sanctuary',
+      'moduleColor',             '#B88820',
+      'spacesMenuOpen',          false,
+      'filterPanelOpen',         false
+    )
+  );
+END;
+"
+lumi_open_sanctuary_item,"
+DECLARE
+  v_result jsonb;
+  v_has_note boolean;
+BEGIN
+  v_result := public.lumi_open_sanctuary_item(
+    p_params->>'user_id',
+    p_params->>'sanctuary_item_id'
+  );
+  -- La función existente ya devuelve el item completo
+  -- Solo necesitamos elegir el nodo correcto según has_note
+  v_has_note := coalesce((v_result->'content'->>'has_note')::boolean, false);
+  RETURN public.lumi_get_node(
+    CASE WHEN v_has_note
+      THEN 'SANCTUARY_ITEM_WITH_NOTE'
+      ELSE 'SANCTUARY_ITEM_WITHOUT_NOTE'
+    END)
+    || jsonb_build_object(
+        'content', v_result->'content',
+        'state',   v_result->'state');
+END;
+"
+lumi_remove_from_sanctuary,"
+BEGIN
+  RETURN public.lumi_remove_from_sanctuary(
+    p_params->>'user_id',
+    p_params->>'sanctuary_item_id'
+  );
+END;
+"
+lumi_remove_from_sanctuary,"
+declare
+  v_user_id uuid;
+  v_sanctuary_item_id uuid;
+begin
+  v_user_id := nullif(trim(p_user_id_text), '')::uuid;
+
+  v_sanctuary_item_id := nullif(
+    trim(both '''' from trim(coalesce(p_sanctuary_item_id_text, ''))),
+    ''
+  )::uuid;
+
+  delete from public.sanctuary_items
+  where id = v_sanctuary_item_id
+    and user_id = v_user_id;
+
+  return public.lumi_get_sanctuary(v_user_id);
+end;
+"
+lumi_resource_viewer_active,"
+declare
+  v_node jsonb;
+  v_type text;
+begin
+  v_type := coalesce(nullif(trim(p_content_type), ''), 'external_fallback');
+  v_node := public.lumi_get_node('RESOURCE_VIEWER_ACTIVE');
+
+  return v_node
+    || jsonb_build_object(
+      'content_type', v_type,
+      'content', jsonb_build_object('type', v_type)
+    );
+end;
+"
+lumi_resource_viewer_active,"
+DECLARE
+  v_source_kind text;
+  v_resource_id uuid;
+  v_user_id     uuid;
+  v_source      text;
+  v_session_id  uuid;
+  v_result      jsonb;
+  v_resource    record;
+BEGIN
+  v_source_kind := coalesce(nullif(trim(p_params->>'source_kind'), ''), 'external_fallback');
+  v_resource_id := nullif(trim(p_params->>'resource_id'), '')::uuid;
+  v_user_id     := nullif(trim(p_params->>'user_id'), '')::uuid;
+  v_source      := coalesce(nullif(trim(p_params->>'source'), ''), 'lumi');
+  v_session_id  := nullif(trim(p_params->>'session_id'), '')::uuid;
+
+  -- Registrar apertura
+  IF v_session_id IS NOT NULL AND v_resource_id IS NOT NULL THEN
+    PERFORM public.gaia_submit_session_action(
+      p_session_id         := v_session_id,
+      p_chosen_resource_id := v_resource_id,
+      p_feedback           := NULL,
+      p_saved              := false,
+      p_action             := 'opened'::gaia_action_type
+    );
+  END IF;
+
+  -- Resolver envelope base
+  v_result := public.lumi_resource_viewer_active(v_source_kind);
+
+  -- Enriquecer content con datos del recurso
+  IF v_resource_id IS NOT NULL THEN
+    SELECT r.title, r.url, r.source_kind, r.format, r.duration_min, r.metadata
+    INTO v_resource
+    FROM public.resources r
+    WHERE r.id = v_resource_id;
+
+    IF FOUND THEN
+      v_result := jsonb_set(v_result, '{content}',
+        (v_result->'content') || jsonb_build_object(
+          'title',        coalesce(v_resource.title, ''),
+          'activeUrl',    coalesce(v_resource.url, ''),
+          'source_kind',  coalesce(v_resource.source_kind, 'external_url'),
+          'resource_id',  v_resource_id::text,
+          'metadata',     coalesce(v_resource.metadata, '{}'::jsonb)
+        )
+      );
+      v_result := jsonb_set(v_result, '{state}',
+        coalesce(v_result->'state', '{}'::jsonb) || jsonb_build_object(
+          'currentResourceId',  v_resource_id::text,
+          'activeUrl',          coalesce(v_resource.url, ''),
+          'resourceSourceKind', coalesce(v_resource.source_kind, 'external_url'),
+          'contentSource',      v_source
+        )
+      );
+    END IF;
+  END IF;
+
+  RETURN v_result;
+END;
+"
+lumi_restore_node,"
+declare
+  v_source text := coalesce(p_context->>'source', '');
+  v_resource_id text := coalesce(p_context->>'resource_id', '');
+  v_session_id text := coalesce(p_context->>'session_id', '');
+  v_sanctuary_item_id text := coalesce(p_context->>'sanctuary_item_id', '');
+begin
+  if p_code = 'SANCTUARY_DETAIL' and v_sanctuary_item_id <> '' then
+    return public.lumi_open_sanctuary_item(
+      p_user_id_text,
+      v_sanctuary_item_id
+    );
+  end if;
+
+  if p_code in (
+    'RESOURCE_FROM_LUMI',
+    'RESOURCE_FROM_FUENTE',
+    'RESOURCE_FROM_SANCTUARY'
+  ) and v_resource_id <> '' then
+    return public.lumi_open_resource(
+      p_user_id_text,
+      v_resource_id,
+      v_source,
+      v_session_id
+    );
+  end if;
+
+  return public.lumi_get_node(p_code);
+end;
+"
+lumi_save_faro,"
+BEGIN
+  INSERT INTO public.user_area_faros (user_id, area, faro_text, updated_at)
+  VALUES (p_user_id, p_area::life_area, p_faro_text, now())
+  ON CONFLICT (user_id, area)
+  DO UPDATE SET
+    faro_text  = EXCLUDED.faro_text,
+    updated_at = now();
+END;
+"
+lumi_save_faro,"
+DECLARE
+  v_user_id   uuid;
+  v_area_text text;
+  v_area      life_area;
+  v_faro_text text;
+BEGIN
+  v_user_id   := nullif(trim(p_params->>'user_id'), '')::uuid;
+  v_area_text := nullif(trim(coalesce(p_params->>'area', '')), '');
+  v_faro_text := coalesce(p_params->>'faro_text', '');
+
+  IF v_user_id IS NULL OR v_area_text IS NULL THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'missing_user_id_or_area');
+  END IF;
+
+  -- Cast seguro del enum
+  BEGIN
+    v_area := v_area_text::life_area;
+  EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'invalid_area');
+  END;
+
+  -- Si el texto viene vacío → eliminar el faro (limpieza canónica)
+  IF trim(v_faro_text) = '' THEN
+    DELETE FROM public.user_area_faros
+    WHERE user_id = v_user_id AND area = v_area;
+  ELSE
+    INSERT INTO public.user_area_faros(user_id, area, faro_text, updated_at)
+    VALUES (v_user_id, v_area, trim(v_faro_text), now())
+    ON CONFLICT (user_id, area)
+    DO UPDATE SET faro_text  = excluded.faro_text,
+                  updated_at = now();
+  END IF;
+
+  -- Silencio canónico: solo ok, sin envelope
+  RETURN jsonb_build_object('ok', true, 'state', '{}'::jsonb);
+END;
+"
+lumi_save_note,"
+DECLARE
+  v_user_id           uuid;
+  v_resource_id       uuid;
+  v_note              text;
+  v_area_text         text;
+  v_area              life_area;
+  v_sanctuary_item_id uuid;
+BEGIN
+  v_user_id     := nullif(trim(p_params->>'user_id'), '')::uuid;
+  v_resource_id := nullif(trim(p_params->>'resource_id'), '')::uuid;
+  v_note        := coalesce(p_params->>'note', '');
+  v_area_text   := nullif(trim(coalesce(p_params->>'area', '')), '');
+
+  IF v_user_id IS NULL OR v_resource_id IS NULL THEN
+    RETURN public.lumi_open_sanctuary(p_params);
+  END IF;
+
+  -- Cast seguro del enum life_area
+  IF v_area_text IS NOT NULL THEN
+    BEGIN
+      v_area := v_area_text::life_area;
+    EXCEPTION WHEN OTHERS THEN
+      v_area := NULL;  -- valor inválido → área vacía (no rompe)
+    END;
+  END IF;
+
+  -- UPDATE: guardar nota + área (vacíos → NULL)
+  UPDATE public.sanctuary_items
+  SET note       = nullif(v_note, ''),
+      area       = v_area,
+      updated_at = now()
+  WHERE user_id = v_user_id AND resource_id = v_resource_id
+  RETURNING id INTO v_sanctuary_item_id;
+
+  IF v_sanctuary_item_id IS NULL THEN
+    -- El item no existe en sanctuary → volver al listado
+    RETURN public.lumi_open_sanctuary(p_params);
+  END IF;
+
+  -- Devolver el detalle actualizado vía la cadena canónica
+  RETURN public.lumi_open_sanctuary_item(jsonb_build_object(
+    'user_id',            v_user_id::text,
+    'sanctuary_item_id',  v_sanctuary_item_id::text
+  ));
+END;
+"
+lumi_save_to_sanctuary,"
+BEGIN
+  RETURN public.lumi_save_to_sanctuary(
+    p_params->>'user_id',
+    p_params->>'resource_id',
+    coalesce(p_params->>'session_id', '')
+  );
+END;
+"
+lumi_save_to_sanctuary,"
+DECLARE
+  v_user_id     uuid;
+  v_resource_id uuid;
+  v_session_id  uuid;
+  v_item_id     uuid;
+  v_node        jsonb;
+  v_r           record;
+BEGIN
+  v_user_id     := nullif(trim(p_user_id_text), '')::uuid;
+  v_resource_id := nullif(trim(both '''' from trim(coalesce(p_resource_id_text, ''))), '')::uuid;
+  v_session_id  := nullif(trim(both '''' from trim(coalesce(p_session_id_text, ''))), '')::uuid;
+
+  INSERT INTO public.sanctuary_items(user_id, resource_id)
+  VALUES (v_user_id, v_resource_id)
+  ON CONFLICT (user_id, resource_id)
+  DO UPDATE SET updated_at = now()
+  RETURNING id INTO v_item_id;
+
+  IF v_session_id IS NOT NULL THEN
+    PERFORM public.lumi_submit_session_action(
+      p_session_id_text   := v_session_id::text,
+      p_resource_id_text  := v_resource_id::text,
+      p_feedback          := 'me_sirvio',
+      p_saved             := true
+    );
+  END IF;
+
+  SELECT r.id, r.title, r.description_short, r.format, r.duration_min, r.source_kind, r.url
+  INTO   v_r
+  FROM   public.resources r
+  WHERE  r.id = v_resource_id;
+
+  v_node := public.lumi_get_node('SANCTUARY_SAVED');
+
+  RETURN jsonb_build_object(
+    'ok', true,
+    'code', 'SANCTUARY_SAVED',
+    'message', coalesce(v_node->>'message', 'Lo guardé en tu Santuario.'),
+    'actions', coalesce(v_node->'actions', '[]'::jsonb),  -- ◀ FIX: leer del nodo
+    'content_type', 'sanctuary_detail',
+    'content', jsonb_build_object(
+      'type',               'sanctuary_detail',
+      'sanctuary_item_id',  v_item_id::text,
+      'resource_id',        v_resource_id::text,
+      'title',              coalesce(v_r.title, 'Recurso guardado'),
+      'description_short',  coalesce(v_r.description_short, ''),
+      'format',             coalesce(v_r.format::text, '—'),
+      'duration_min',       coalesce(v_r.duration_min::text, '—'),
+      'source_kind',        coalesce(v_r.source_kind, 'external_url'),
+      'url',                coalesce(v_r.url, ''),
+      'note',               '',
+      'area',               '',
+      'area_label',         '',
+      'has_note',           false,
+      'has_area',           false
+    ),
+    'state', jsonb_build_object(
+      'contentSource',          'sanctuary',
+      'currentResourceId',      v_resource_id::text,
+      'currentSanctuaryItemId', v_item_id::text,
+      'resourceSourceKind',     coalesce(v_r.source_kind, 'external_url'),
+      'activeUrl',              coalesce(v_r.url, ''),
+      'moduleColor',            '#C8A46E',
+      'spacesMenuOpen',         false,
+      'filterPanelOpen',        false
+    )
+  );
+END;
+"
+lumi_share_resource,"
+BEGIN
+  RETURN public.lumi_share_resource_text(
+    coalesce(p_params->>'title', ''),
+    coalesce(p_params->>'format', ''),
+    coalesce(p_params->>'duration', ''),
+    coalesce(p_params->>'url', '')
+  );
+END;
+"
+lumi_share_resource_text,"
+declare
+  v_node jsonb;
+  v_content jsonb;
+  v_title text := trim(coalesce(p_title, ''));
+  v_format text := trim(coalesce(p_format, ''));
+  v_duration text := trim(coalesce(p_duration, ''));
+  v_url text := trim(coalesce(p_url, ''));
+  v_meta text := '';
+  v_text text;
+begin
+  v_node := public.lumi_get_node('SHARE_RESOURCE_TEXT');
+
+  if v_format <> '' then
+    v_meta := v_format;
+  end if;
+
+  if v_duration <> '' then
+    v_meta := case
+      when v_meta = '' then v_duration || ' min'
+      else v_meta || ' · ' || v_duration || ' min'
+    end;
+  end if;
+
+  v_text :=
+    'Te comparto algo que me pareció valioso. Quizás también te sirva:' ||
+    E'\n\n' ||
+    case when v_title <> '' then v_title || E'\n' else '' end ||
+    case when v_meta <> '' then v_meta || E'\n' else '' end ||
+    case when v_url <> '' then E'\n' || v_url else '' end;
+
+  v_content := jsonb_build_object(
+    'type', 'share_text',
+    'title', v_title,
+    'format', v_format,
+    'duration', v_duration,
+    'url', v_url,
+    'text', v_text
+  );
+
+  return jsonb_set(v_node, '{content}', v_content);
+end;
+"
+lumi_share_text_copied,"
+declare
+  v_node jsonb;
+  v_content jsonb;
+begin
+  v_node := public.lumi_get_node('SHARE_RESOURCE_TEXT');
+
+  v_content := jsonb_build_object(
+    'type', 'share_text',
+    'title', '',
+    'format', '',
+    'duration', '',
+    'url', '',
+    'text', coalesce(p_text, ''),
+    'copied', true
+  );
+
+  v_node := jsonb_set(v_node, '{message}', to_jsonb('Listo. Ya tenés el texto disponible para pegarlo y compartirlo donde quieras.'::text));
+  v_node := jsonb_set(v_node, '{content}', v_content);
+
+  return v_node;
+end;
+"
+lumi_show_history,"
+BEGIN
+  RETURN public.lumi_get_session_history(
+    p_params->>'user_id',
+    p_params->>'session_id'
+  );
+END;
+"
+lumi_skip_name,"
+BEGIN
+  RETURN public.lumi_submit_name(p_params || jsonb_build_object('first_name', ''));
+END;
+"
+lumi_skip_scan,"
+BEGIN
+  -- Saltear scan = ir directo a home
+  RETURN public.lumi_go_home(p_params);
+END;
+"
+lumi_start_checkin,"
+DECLARE
+  v_node    jsonb;
+  v_options jsonb;
+  v_intro   text;
+BEGIN
+  v_node := public.lumi_get_node('CHECKIN_STATE');
+
+  SELECT jsonb_agg(
+    jsonb_build_object('value', uc.key, 'label', uc.short_label, 'hint', uc.subtitle)
+    ORDER BY uc.sort_order, uc.key
+  ) INTO v_options
+  FROM public.ui_copy uc
+  WHERE uc.domain = 'state' AND uc.lang = 'es';
+
+  v_node := jsonb_set(v_node, '{content,options}', coalesce(v_options, '[]'::jsonb));
+
+  v_intro := public.lumi_get_message('intro', 'checkin_intro');
+
+  RETURN v_node || jsonb_build_object(
+    'message', coalesce(v_intro, v_node->>'message', '¿Cómo estás hoy?'),
+    'state',   jsonb_build_object('checkinState', '', 'checkinArea', '', 'checkinTime', '')
+  );
+END;
+"
+lumi_start_recommendation,"
+DECLARE
+  v_session     jsonb;
+  v_session_id  uuid;
+  v_fallback    int;
+  v_had_no_match boolean;
+  v_recs        jsonb;
+  v_resource_id uuid;
+  v_card        jsonb;
+  v_node_code   text;
+  v_node        jsonb;
+BEGIN
+  v_session := public.gaia_create_session_and_recommendations(
+    p_user_id, 'propose', p_state, p_area, p_time_bucket
+  );
+  v_session_id   := (v_session->>'session_id')::uuid;
+  v_fallback     := coalesce((v_session->>'fallback_level')::int, 99);
+  v_had_no_match := coalesce((v_session->>'had_no_match')::boolean, false);
+  v_recs         := coalesce(v_session->'recommendations', '[]'::jsonb);
+
+  -- ─── No-match canónico: rutear a NO_MATCH_OFFER ──────────────
+  -- Si el motor explícitamente marcó no-match O no hay recs,
+  -- presentar las 3 opciones de salida noble.
+  IF v_had_no_match OR jsonb_array_length(v_recs) = 0 THEN
+    v_node := public.lumi_get_node('NO_MATCH_OFFER');
+    RETURN jsonb_build_object(
+      'ok',           true,
+      'code',         'NO_MATCH_OFFER',
+      'message',      coalesce(v_session->>'gaia_copy', v_node->>'message',
+                               'Hoy no tengo algo perfecto para esto.'),
+      'actions',      coalesce(v_node->'actions', '[]'::jsonb),
+      'content_type', 'empty_presence',
+      'content',      jsonb_build_object('type', 'empty_presence'),
+      'state',        jsonb_build_object(
+                        'currentSessionId',  v_session_id::text,
+                        'currentResourceId', '',
+                        'contentSource',     '',
+                        'moduleColor',       '#7860E0'
+                      )
+    );
+  END IF;
+
+  -- ─── Camino feliz: hay recomendación ──────────────────────────
+  v_resource_id := (v_recs->0->>'resource_id')::uuid;
+  v_card := public.gaia_get_resource_card(p_user_id, v_resource_id, v_session_id);
+
+  v_node_code := CASE
+    WHEN v_fallback = 0 THEN 'REC_PROPOSAL_HIGH'
+    WHEN v_fallback <= 2 THEN 'REC_PROPOSAL_MED'
+    ELSE 'REC_PROPOSAL_LOW'
+  END;
+  v_node := public.lumi_get_node(v_node_code);
+
+  RETURN jsonb_build_object(
+    'ok',           true,
+    'code',         v_node->>'code',
+    'message',      coalesce(v_session->>'gaia_copy', v_node->>'message'),
+    'actions',      coalesce(v_node->'actions', '[]'::jsonb),
+    'content_type', 'resource_card',
+    'content', coalesce(v_card, '{}'::jsonb) ||
+      jsonb_build_object(
+        'type',        'resource_card',
+        'resource_id', v_resource_id::text,
+        'session_id',  v_session_id::text,
+        'is_from',     'lumi'
+      ),
+    'state', jsonb_build_object(
+      'currentSessionId',          v_session_id::text,
+      'currentResourceId',         v_resource_id::text,
+      'resourceSourceKind',        coalesce(v_card->>'source_kind', 'external_url'),
+      'activeUrl',                 coalesce(v_card->>'url', ''),
+      'lastRecommendationPosition', 1,
+      'contentSource',             'lumi'
+    )
+  );
+END;
+"
+lumi_start_recommendation,"
+BEGIN
+  RETURN public.lumi_start_recommendation(
+    (p_params->>'user_id')::uuid,
+    (p_params->>'checkin_state')::gaia_state,
+    (p_params->>'checkin_area')::life_area,
+    (p_params->>'checkin_time')::time_bucket
+  );
+END;
+"
+lumi_submit_checkin_area,"
+DECLARE
+  v_value   text := coalesce(p_params->>'checkin_area', '');
+  v_node    jsonb;
+  v_options jsonb;
+BEGIN
+  IF v_value = '' THEN
+    RETURN public.lumi_submit_checkin_state(p_params);
+  END IF;
+
+  v_node := public.lumi_get_node('CHECKIN_TIME');
+
+  SELECT jsonb_agg(
+           jsonb_build_object(
+             'value', uc.key,
+             'label', uc.short_label,
+             'hint',  uc.subtitle
+           ) ORDER BY uc.sort_order, uc.key
+         )
+    INTO v_options
+    FROM public.ui_copy uc
+   WHERE uc.domain = 'time_bucket' AND uc.lang = 'es';
+
+  v_node := jsonb_set(v_node, '{content,options}', coalesce(v_options, '[]'::jsonb));
+
+  RETURN v_node || jsonb_build_object(
+    'state', jsonb_build_object('checkinArea', v_value)
+  );
+END;
+"
+lumi_submit_checkin_state,"
+DECLARE
+  v_value   text := coalesce(p_params->>'checkin_state', '');
+  v_node    jsonb;
+  v_options jsonb;
+BEGIN
+  IF v_value = '' THEN
+    RETURN public.lumi_start_checkin(p_params);
+  END IF;
+
+  v_node := public.lumi_get_node('CHECKIN_AREA');
+
+  SELECT jsonb_agg(
+           jsonb_build_object(
+             'value', uc.key,
+             'label', uc.short_label,
+             'hint',  uc.subtitle
+           ) ORDER BY uc.sort_order, uc.key
+         )
+    INTO v_options
+    FROM public.ui_copy uc
+   WHERE uc.domain = 'area' AND uc.lang = 'es';
+
+  v_node := jsonb_set(v_node, '{content,options}', coalesce(v_options, '[]'::jsonb));
+
+  RETURN v_node || jsonb_build_object(
+    'state', jsonb_build_object('checkinState', v_value)
+  );
+END;
+"
+lumi_submit_checkin_time,"
+DECLARE
+  v_value    text := coalesce(p_params->>'checkin_time', '');
+  v_params   jsonb;
+  v_result   jsonb;
+  v_guidance text;
+BEGIN
+  IF v_value = '' THEN
+    RETURN public.lumi_submit_checkin_area(p_params);
+  END IF;
+
+  v_params := p_params || jsonb_build_object('checkin_time', v_value);
+  v_result := public.lumi_start_recommendation(v_params);
+
+  v_guidance := public.lumi_get_message('guidance', 'before_suggestions');
+
+  RETURN v_result || jsonb_build_object(
+    'message', coalesce(v_guidance, v_result->>'message', 'Tengo algunas ideas para este momento.'),
+    'state',   coalesce(v_result->'state', '{}'::jsonb)
+                 || jsonb_build_object('checkinTime', v_value)
+  );
+END;
+"
+lumi_submit_contribution,"
+DECLARE
+  v_id uuid;
+BEGIN
+  IF trim(p_title) = '' THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'title_required');
+  END IF;
+
+  INSERT INTO public.resource_proposals (
+    user_id, url, title, rationale, lang
+  ) VALUES (
+    p_user_id,
+    CASE WHEN trim(p_url) = '' THEN 'sin_url' ELSE trim(p_url) END,
+    trim(p_title),
+    CASE WHEN trim(p_why) = '' THEN NULL ELSE trim(p_why) END,
+    'es'
+  )
+  RETURNING id INTO v_id;
+
+  RETURN jsonb_build_object('ok', true, 'proposal_id', v_id::text);
+END;
+"
+lumi_submit_contribution,"
+DECLARE
+  v_result jsonb;
+BEGIN
+  v_result := public.lumi_submit_contribution(
+    (p_params->>'user_id')::uuid,
+    coalesce(p_params->>'contribution_title', ''),
+    coalesce(p_params->>'contribution_url', ''),
+    coalesce(p_params->>'contribution_why', '')
+  );
+  RETURN public.lumi_get_node(
+    CASE WHEN (v_result->>'ok')::boolean
+      THEN 'CONTRIBUTION_SUBMITTED'
+      ELSE 'ERROR_SUBMIT_FAILED'
+    END)
+    || jsonb_build_object('state', '{}'::jsonb);
+END;
+"
+lumi_submit_name,"
+DECLARE
+  v_user_id    uuid;
+  v_first_name text;
+  v_node       jsonb;
+  v_message    text;
+BEGIN
+  v_user_id    := nullif(trim(p_params->>'user_id'), '')::uuid;
+  v_first_name := nullif(trim(p_params->>'first_name'), '');
+  
+  IF v_user_id IS NULL THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'missing_user_id');
+  END IF;
+  
+  IF v_first_name IS NOT NULL AND length(v_first_name) > 0 THEN
+    UPDATE public.users 
+    SET first_name = substring(v_first_name from 1 for 40), has_visited = true 
+    WHERE id = v_user_id;
+    v_message := 'Hola, ' || substring(v_first_name from 1 for 40) 
+              || '. No hace falta que sepas qué necesitás. Podemos empezar por algo pequeño.';
+  ELSE
+    UPDATE public.users SET has_visited = true WHERE id = v_user_id;
+    v_message := 'No hace falta que sepas qué necesitás. Podemos empezar por algo pequeño.';
+  END IF;
+  
+  v_node := public.lumi_get_node('HOME_DEFAULT');
+  
+  RETURN jsonb_build_object(
+    'ok',           true,
+    'code',         'HOME_DEFAULT',
+    'message',      v_message,
+    'actions',      coalesce(v_node->'actions', '[]'::jsonb),
+    'content_type', 'empty_presence',
+    'content',      jsonb_build_object(
+                      'type', 'empty_presence',
+                      'culture_phrase', coalesce(public.lumi_get_message('culture_phrase', 'first_contact'), '')
+                    ),
+    'state', jsonb_build_object(
+      'contentSource', '', 'moduleColor', '#7860E0',
+      'currentSessionId', '', 'currentResourceId', '', 'currentSanctuaryItemId', ''
+    )
+  );
+END;
+"
+lumi_submit_session_action,"
+BEGIN
+  RETURN public.lumi_submit_session_action(
+    coalesce(p_params->>'session_id', ''),
+    coalesce(p_params->>'resource_id', ''),
+    coalesce(p_params->>'feedback', ''),
+    coalesce((p_params->>'saved')::boolean, false)
+  );
+END;
+"
+lumi_submit_session_action,"
+declare
+  v_session_id uuid;
+  v_resource_id uuid;
+begin
+  v_session_id := nullif(trim(both '''' from trim(coalesce(p_session_id_text, ''))), '')::uuid;
+  v_resource_id := nullif(trim(both '''' from trim(coalesce(p_resource_id_text, ''))), '')::uuid;
+
+  if v_session_id is null or v_resource_id is null then
+    return jsonb_build_object('ok', false, 'reason', 'missing_session_or_resource');
+  end if;
+
+  return public.gaia_submit_session_action(
+    p_session_id := v_session_id,
+    p_chosen_resource_id := v_resource_id,
+    p_feedback := nullif(trim(p_feedback), '')::feedback_type,
+    p_saved := coalesce(p_saved, false)
+  );
+end;
+"
