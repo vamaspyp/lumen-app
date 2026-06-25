@@ -71,7 +71,8 @@ function App() {
             onComplete={() => setHasScannedThisSession(true)}
 onScanComplete={async () => {
   setHasScannedThisSession(true)
-  await dispatch('complete_scan')
+  const result = await dispatch('complete_scan')
+  console.log('[CULTURE_PHRASE] dispatch result:', result)
             }}
           />
         ) : isSimpleView ? (
