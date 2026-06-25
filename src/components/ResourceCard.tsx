@@ -1,5 +1,4 @@
 import type { ModuleTokens } from '../lib/tokens'
-import { AreaIcon } from '../lib/areaIcons'
 
 // ─── helpers ─────────────────────────────────────────────────────
 
@@ -195,8 +194,6 @@ export function ResourceCard({
   const isFrom = (content.is_from as string) || 'lumi'
   const sessionId = (content.session_id as string) || ''
   const sourceKind = (content.source_kind as string) || 'external_url'
-  const areas = (content.areas as string[]) || []
-  const primaryArea = areas[0] || ''
 
   const formatLabel = [
     format && format.charAt(0).toUpperCase() + format.slice(1),
@@ -207,10 +204,11 @@ export function ResourceCard({
     if (!resourceId) return
     if (sourceKind !== 'lumen_practice' && !url) return
     dispatch('resource_viewer_active', {
-      source_kind: sourceKind,
-      resource_id: resourceId,
-      source:      isFrom,
-      session_id:  sessionId,
+      source_kind:       sourceKind,
+      resource_id:       resourceId,
+      source:            isFrom,
+      session_id:        sessionId,
+      experience_run_id: (content.run_id as string) || '',
     })
   }
 
@@ -249,27 +247,17 @@ export function ResourceCard({
           </div>
         )}
 
-        <div
+        <h2
           style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '8px',
-            marginBottom: '1.25rem',
+            fontSize: '1.4rem',
+            fontWeight: 500,
+            color: tokens.textPrimary,
+            margin: '0 0 1.25rem 0',
+            lineHeight: 1.3,
           }}
         >
-          {primaryArea && <AreaIcon area={primaryArea} size={28} />}
-          <h2
-            style={{
-              fontSize: '1.4rem',
-              fontWeight: 500,
-              color: tokens.textPrimary,
-              margin: 0,
-              lineHeight: 1.3,
-            }}
-          >
-            {title}
-          </h2>
-        </div>
+          {title}
+        </h2>
 
         {whyNow && (
         <div style={{ marginBottom: '1rem' }}>

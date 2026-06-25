@@ -15,7 +15,7 @@ export function SanctuaryDetail({
   const durationMin = (content.duration_min as string) || ''
   const url = (content.url as string) || ''
   const note = (content.note as string) || ''
-  const area = (content.area as string) || ''
+  const area = (content.life_area_key as string) || (content.area as string) || ''
   const hasNote = !!(content.has_note as boolean)
 
   const formatLabel = [

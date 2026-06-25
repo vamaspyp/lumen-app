@@ -337,13 +337,16 @@ export function ContentArea({
   actions,
   dispatch,
   tokens,
+  experienceRunId = '',
 }: {
   contentType: string
   contentData: Record<string, unknown>
   actions: Array<{ label: string; action: string; value?: string; variant?: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
   tokens: ModuleTokens
+  experienceRunId?: string
 }) {
+
   if (contentType === 'resource_card') {
     return (
       <>
@@ -361,6 +364,11 @@ export function ContentArea({
                     format:   (contentData.format as string) || '',
                     duration: (contentData.duration_min as string | number)?.toString() || '',
                     url:      (contentData.url as string) || '',
+                  })
+                } else if (action.action === 'save_to_sanctuary') {
+                  dispatch('save_to_sanctuary', {
+                    resource_id:       (contentData.resource_id as string) || '',
+                    experience_run_id: experienceRunId,
                   })
                 } else {
                   dispatch(action.action)
@@ -388,7 +396,7 @@ export function ContentArea({
             key={opt.value}
             label={opt.label}
             hint={opt.hint}
-            onClick={() => dispatch(actionName, { [paramKey]: opt.value })}
+            onClick={() => dispatch(actionName, { [paramKey]: opt.value, value: opt.value })}
             tokens={tokens}
           />
         ))}
@@ -404,20 +412,24 @@ export function ContentArea({
         subtitle?: string
         format?: string
         duration_min?: number
-        area?: string
         author?: string
         has_note?: boolean
         action: string
         value?: string
+        experience_id?: string
       }>) || []
 
     const filterOptions = contentData.filter_options as
-      | { area?: Array<{ value: string; label: string }>
+      | {
+          area?: Array<{ value: string; label: string }>
           format?: Array<{ value: string; label: string }>
-          duration?: Array<{ value: string; label: string }> }
+          duration?: Array<{ value: string; label: string }>
+          has_note?: Array<{ value: string; label: string }>
+          necesito?: Array<{ value: string; label: string }>
+        }
       | undefined
     const currentFilters = (contentData.current_filters as
-      | { area?: string; format?: string; duration?: string }
+      | { area?: string; format?: string; duration?: string; has_note?: string }
       | undefined) || {}
     const source = contentData.source as string | undefined
 
@@ -455,15 +467,16 @@ export function ContentArea({
             }}
           >
             {items.map(item => {
-              const subtitle =
-                item.subtitle ??
-                [item.format, item.area && item.area.replace(/_/g, ' ')]
-                  .filter(Boolean)
-                  .join(' · ')
+              // subtitle: preferir el que viene del backend, sino derivar del format
+              const subtitle = item.subtitle ?? [item.format].filter(Boolean).join(' · ')
 
               const extra: Record<string, string> = {}
               if (item.action === 'open_sanctuary_item') {
                 extra.sanctuary_item_id = item.id
+              } else if (item.experience_id) {
+                // Item de La Fuente (modelo nuevo — experience como unidad)
+                extra.experience_id = item.experience_id
+                extra.resource_id = item.id
               } else {
                 extra.resource_id = item.id
                 if (item.value) extra.source = item.value
@@ -577,6 +590,22 @@ export function ContentArea({
     return <ShareText content={contentData} actions={actions} dispatch={dispatch} tokens={tokens} />
   }
 
+  // ── Viewer activo en flujo de experiencia ──────────────────────
+  if (contentType === 'resource_viewer') {
+    return (
+      <ResourceViewer
+        sourceKind={(contentData.source_kind as string) || 'external_url'}
+        url={(contentData.url as string) || ''}
+        title={(contentData.title as string) || ''}
+        content={contentData}
+        actions={actions}
+        dispatch={dispatch}
+        tokens={tokens}
+      />
+    )
+  }
+
+  // ── Viewers embebibles (Fuente, apertura directa) ──────────────
   if (
     contentType === 'external_fallback' ||
     contentType === 'lumen_practice' ||
@@ -601,6 +630,7 @@ export function ContentArea({
     )
   }
 
+  // ── Default: pills de acción ───────────────────────────────────
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
       {actions.map((action, idx) => (
