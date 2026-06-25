@@ -68,7 +68,10 @@ function App() {
             key={scanKey}
             scanData={scanData!}
             tokens={tokens}
-            onComplete={() => setHasScannedThisSession(true)}
+            onComplete={async () => {
+  setHasScannedThisSession(true)
+  await dispatch('complete_scan')
+}}
 onScanComplete={async () => {
   setHasScannedThisSession(true)
   const result = await dispatch('complete_scan')
