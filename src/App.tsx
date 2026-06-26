@@ -123,22 +123,36 @@ onScanComplete={async () => {
                         maxWidth: '38ch',
                       }}
                     >
-                      {perla && (
-                        <span
-                          style={{
-                            display: 'block',
-                            fontSize: '0.8rem',
-                            fontStyle: 'italic',
-                            color: tokens.textMuted,
-                            opacity: 0.75,
-                            marginBottom: mensaje ? '0.65rem' : 0,
-                            letterSpacing: '0.005em',
-                          }}
-                        >
-                          "{perla}"
-                        </span>
-                      )}
-                      {mensaje && (
+                     {perla && (
+                      <span
+                        style={{
+                          display: 'block',
+                          fontSize: '0.8rem',
+                          fontStyle: 'italic',
+                          color: tokens.textMuted,
+                          opacity: 0.75,
+                          marginBottom: (state.reflectionHint || mensaje) ? '0.65rem' : 0,
+                          letterSpacing: '0.005em',
+                        }}
+                      >
+                        "{perla}"
+                      </span>
+                    )}
+                    {state.reflectionHint && (
+                      <span
+                        style={{
+                          display: 'block',
+                          fontSize: '0.9rem',
+                          fontStyle: 'italic',
+                          color: tokens.textSecondary,
+                          opacity: 0.9,
+                          marginBottom: mensaje ? '0.65rem' : 0,
+                        }}
+                      >
+                        {state.reflectionHint}
+                      </span>
+                    )}
+                    {mensaje && (
                         <span
                           style={{
                             display: 'block',
@@ -214,11 +228,25 @@ onScanComplete={async () => {
                           fontStyle: 'italic',
                           color: tokens.textMuted,
                           opacity: 0.75,
-                          marginBottom: mensaje ? '0.65rem' : 0,
+                          marginBottom: (state.reflectionHint || mensaje) ? '0.65rem' : 0,
                           letterSpacing: '0.005em',
                         }}
                       >
                         "{perla}"
+                      </span>
+                    )}
+                    {state.reflectionHint && (
+                      <span
+                        style={{
+                          display: 'block',
+                          fontSize: '0.9rem',
+                          fontStyle: 'italic',
+                          color: tokens.textSecondary,
+                          opacity: 0.9,
+                          marginBottom: mensaje ? '0.65rem' : 0,
+                        }}
+                      >
+                        {state.reflectionHint}
                       </span>
                     )}
                     {mensaje && (
