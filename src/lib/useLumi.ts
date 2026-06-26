@@ -25,6 +25,7 @@ export interface LumiState {
   currentItemId: string
   currentSanctuaryItemId: string
   daysSinceLastSession: number
+  reflectionHint: string
 
   // Navegación
   moduleColor: string
@@ -54,6 +55,7 @@ const initialState: LumiState = {
   currentItemId: '',
   currentSanctuaryItemId: '',
   daysSinceLastSession: 0,
+  reflectionHint: '',
 
   moduleColor: '#9B8EC4',
   contentSource: '',
@@ -143,8 +145,9 @@ export function useLumi() {
       if (cancelled) return
 
       const days = (initData?.days_since_last_session as number) ?? 0
+      const reflection = (initData?.reflection_hint as string) || ''
 
-      setState(prev => ({ ...prev, daysSinceLastSession: days }))
+      setState(prev => ({ ...prev, daysSinceLastSession: days, reflectionHint: reflection }))
 
       await dispatch('go_home', {
         days_since_last_session: String(days),
