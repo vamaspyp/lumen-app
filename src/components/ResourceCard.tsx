@@ -368,7 +368,15 @@ export function ResourceCard({
             fontFamily: 'inherit',
           }}
         >
-          Quiero probarlo
+          {(() => {
+            const fmt = (format || '').toLowerCase()
+            if (fmt === 'práctica' || fmt === 'practica') return 'Empezar la práctica'
+            if (fmt === 'video') return 'Ver el video'
+            if (fmt === 'audio') return 'Escuchar ahora'
+            if (fmt === 'texto' || fmt === 'lectura') return 'Leer ahora'
+            if (fmt === 'podcast') return 'Escuchar el episodio'
+            return 'Quiero probarlo'
+          })()}
         </button>
       )}
       </div>
