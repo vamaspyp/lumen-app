@@ -27,8 +27,7 @@ function FarosPanel({
     has_faro: boolean
   }>) || []
 
-  const privacyHint = (content.privacy_hint as string) ||
-    'Solo vos podés leer estos textos. LUMI no los usa.'
+  const privacyHint = (content.privacy_hint as string) || ''
 
   const [texts, setTexts] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {}
@@ -107,18 +106,20 @@ function FarosPanel({
         ))}
       </div>
 
-      <p
-        style={{
-          fontSize: '0.72rem',
-          color: tokens.textMuted,
-          fontStyle: 'italic',
-          textAlign: 'center',
-          marginTop: '1.5rem',
-          marginBottom: '1.5rem',
-        }}
-      >
-        {privacyHint}
-      </p>
+      {privacyHint && (
+        <p
+          style={{
+            fontSize: '0.72rem',
+            color: tokens.textMuted,
+            fontStyle: 'italic',
+            textAlign: 'center',
+            marginTop: '1.5rem',
+            marginBottom: '1.5rem',
+          }}
+        >
+          {privacyHint}
+        </p>
+      )}
     </div>
   )
 }
