@@ -31,12 +31,13 @@ export function ListFilterPanel({
     (currentFilters.area     ? 1 : 0) +
     (currentFilters.format   ? 1 : 0) +
     (currentFilters.duration ? 1 : 0) +
-    (currentFilters.has_note ? 1 : 0)
+    (currentFilters.has_note ? 1 : 0) +
+    (currentFilters.necesito ? 1 : 0)
 
   const [expanded, setExpanded] = useState(activeCount > 0)
 
   const handleToggle = (
-    group: 'area' | 'format' | 'duration' | 'has_note',
+    group: 'area' | 'format' | 'duration' | 'has_note' | 'necesito',
     value: string
   ) => {
     const current = currentFilters[group] || ''
@@ -46,6 +47,7 @@ export function ListFilterPanel({
       filter_format:   group === 'format'   ? next : (currentFilters.format || ''),
       filter_duration: group === 'duration' ? next : (currentFilters.duration || ''),
       filter_has_note: group === 'has_note' ? next : (currentFilters.has_note || ''),
+      filter_necesito: group === 'necesito' ? next : (currentFilters.necesito || ''),
     }
     dispatch(action, extras)
   }
@@ -56,6 +58,7 @@ export function ListFilterPanel({
       filter_format: '',
       filter_duration: '',
       filter_has_note: '',
+      filter_necesito: '',
     })
   }
 
@@ -114,8 +117,8 @@ export function ListFilterPanel({
   const hasFormat   = filterOptions.format && filterOptions.format.length > 0
   const hasDuration = filterOptions.duration && filterOptions.duration.length > 0
   const hasNote     = filterOptions.has_note && filterOptions.has_note.length > 0
-  if (!hasArea && !hasFormat && !hasDuration && !hasNote) return null
-
+  const hasNecesito = filterOptions.necesito && filterOptions.necesito.length > 0
+  if (!hasArea && !hasFormat && !hasDuration && !hasNote && !hasNecesito) return null
   const summary = [
     currentFilters.area && (filterOptions.area?.find(o => o.value === currentFilters.area)?.label),
     currentFilters.format && (filterOptions.format?.find(o => o.value === currentFilters.format)?.label),
@@ -203,6 +206,7 @@ export function ListFilterPanel({
 
       {expanded && (
         <div style={{ padding: '0 0.875rem 0.75rem' }}>
+         {hasNecesito && <Row label="Necesito" options={filterOptions.necesito!} group="necesito" selected={currentFilters.necesito || ''} />}
           {hasArea     && <Row label="Área"     options={filterOptions.area!}     group="area"     selected={currentFilters.area || ''} />}
           {hasFormat   && <Row label="Formato"  options={filterOptions.format!}   group="format"   selected={currentFilters.format || ''} />}
           {hasDuration && <Row label="Duración" options={filterOptions.duration!} group="duration" selected={currentFilters.duration || ''} />}
