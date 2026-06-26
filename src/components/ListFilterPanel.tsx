@@ -13,13 +13,16 @@ export function ListFilterPanel({
     format?: Array<{ value: string; label: string }>
     duration?: Array<{ value: string; label: string }>
     has_note?: Array<{ value: string; label: string }>
+    necesito?: Array<{ value: string; label: string }>
   }
   currentFilters: {
     area?: string
     format?: string
     duration?: string
     has_note?: string
+    necesito?: string
   }
+  
   dispatch: (action: string, extra?: Record<string, string>) => void
   action: string
   tokens: ModuleTokens
