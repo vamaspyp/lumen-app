@@ -1,4 +1,4 @@
-# LUMEN — Briefing para Claude Code (actualizado junio 2026)
+# LUMEN — Briefing para Claude Code (actualizado 26 jun 2026)
 
 ## Qué es LUMEN
 Plataforma de bienestar en español con un compañero de IA **determinístico** llamado LUMI (cero LLM). Misión: ayudar a cada persona a sentirse un poco mejor ahora y vivir progresivamente mejor con el tiempo.
@@ -65,8 +65,17 @@ abierto, ansioso, bajo, bien, cansado, cargado, confundido, irritado, solo
 
 ## Contenido actual
 - 12 prácticas Capa 1 (LUMEN nativas, español, GuidedPractice)
-- 33 recursos Capa 2 (YouTube español embebido)
+- 33 recursos Capa 2 (YouTube español embebido) — con depth_level para filtro de redescubrimiento
 - 3 escaneos de llegada (SCAN_BREATHE, SCAN_BODY, SCAN_COMPASSION)
+
+## Tablas y funciones backend activas (post 26 jun 2026)
+- `user_life_model` — modelo de vida del usuario (creada hoy)
+- `help_capacity_index` — índice de capacidad de ayuda (creada hoy)
+- `lumi_dispatch` — dispatcher universal
+- `lumi_select_experience` — con filtro depth_level; versión legacy eliminada
+- `lumi_open_sanctuary` — con depth condicional (redescubrimiento)
+- `lumi_get_init_data` — incluye momentos de reflejo sobrio
+- `gaia_submit_session_action` — único punto de registro de señales
 
 ## Paleta Nordic/zen
 - LUMI: salvia #8FA38C / deep #5F7A5E
@@ -93,8 +102,25 @@ abierto, ansioso, bajo, bien, cansado, cargado, confundido, irritado, solo
 - Verificar funciones existentes antes de CREATE OR REPLACE
 - Un nodo = un estado. Node-chaining para múltiples fases
 
-## Pendientes inmediatos
-### Backend (prioridad alta)
+## Deployado hoy (26 jun 2026)
+- CTA dinámico en ResourceCard (varía por contexto)
+- Filtro "Necesito" en ListFilterPanel
+- Redescubrimiento en Santuario: lumi_open_sanctuary con depth condicional
+- No-match copy actualizado (LUMI no inventa)
+- Nortes copy unificado y redundancia eliminada
+- depth_level agregado a resources + filtro en lumi_select_experience
+- Versión legacy de lumi_select_experience eliminada
+- user_life_model y help_capacity_index creadas
+- Momentos de reflejo sobrio: lumi_get_init_data + render en App.tsx
+
+## Pendientes próxima sesión (prioridad)
+- SanctuaryDetail como experiencia completa (no solo detalle)
+- La Fuente: ficha extendida (respaldo, descripción, autor)
+- Anonymous Auth (acceso sin registro)
+- Auditoría de fuentes (verificar que todos los recursos son válidos/embebibles)
+- QA 90 segundos pre-beta (flujo completo end-to-end)
+
+### Backend (medio plazo)
 - Crear tabla patterns (pattern_key, intervention_key, name, description)
 - Crear tabla state_intervention_prevalence (state, IK, priority, weight)
 - Agregar pattern_id a resources, sessions, session_events, sanctuary_items
@@ -106,7 +132,6 @@ abierto, ansioso, bajo, bien, cansado, cargado, confundido, irritado, solo
 - Layout LUMI/mensaje/pills en pantalla completa
 - Colores Fuente vs Santuario más diferenciados
 - LUMI sticky al scrollear
-- Respaldo/Fuente visible en resource cards
 - Íconos por área de vida (esperando decisión de Pauli)
 - PWA (manifest + service worker + íconos)
 
