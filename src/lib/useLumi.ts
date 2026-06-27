@@ -20,12 +20,12 @@ export interface LumiState {
 
   // Sesión
   userId: string
+  isAnonymous: boolean
   currentSessionId: string
   currentResourceId: string
   currentItemId: string
   currentSanctuaryItemId: string
   daysSinceLastSession: number
-  reflectionHint: string
 
   // Navegación
   moduleColor: string
@@ -40,6 +40,9 @@ export interface LumiState {
   // Experiencia (modelo nuevo)
   currentExperienceRunId: string
   selectedIkKey: string
+
+  // Reflejo
+  reflectionHint: string
 }
 
 const initialState: LumiState = {
@@ -49,13 +52,13 @@ const initialState: LumiState = {
   lumiContentData: {},
   lumiCode: '',
 
-  userId: import.meta.env.VITE_DEV_USER_ID || '',
+  userId: '',
+  isAnonymous: false,
   currentSessionId: '',
   currentResourceId: '',
   currentItemId: '',
   currentSanctuaryItemId: '',
   daysSinceLastSession: 0,
-  reflectionHint: '',
 
   moduleColor: '#9B8EC4',
   contentSource: '',
@@ -67,6 +70,8 @@ const initialState: LumiState = {
 
   currentExperienceRunId: '',
   selectedIkKey: '',
+
+  reflectionHint: '',
 }
 
 // ───────── Helpers ─────────
@@ -105,6 +110,36 @@ function updateState(
   }))
 }
 
+// ───────── Auth ─────────
+
+async function ensureUser(): Promise<{ userId: string; isAnonymous: boolean }> {
+  // Dev override: si hay VITE_DEV_USER_ID, usarlo directamente
+  const devUserId = import.meta.env.VITE_DEV_USER_ID
+  if (devUserId) {
+    return { userId: devUserId, isAnonymous: false }
+  }
+
+  // Buscar sesión existente
+  const { data: { session } } = await supabase.auth.getSession()
+  if (session?.user) {
+    return {
+      userId: session.user.id,
+      isAnonymous: session.user.is_anonymous ?? false,
+    }
+  }
+
+  // No hay sesión → sign in anónimo
+  const { data, error } = await supabase.auth.signInAnonymously()
+  if (error || !data.user) {
+    throw new Error('No se pudo crear sesión anónima: ' + (error?.message || 'unknown'))
+  }
+
+  return {
+    userId: data.user.id,
+    isAnonymous: true,
+  }
+}
+
 // ───────── Hook ─────────
 
 export function useLumi() {
@@ -131,15 +166,19 @@ export function useLumi() {
     [state]
   )
 
-  // Bootstrap: al montar, init_data + go_home
+  // Bootstrap: auth → init_data → go_home
   useEffect(() => {
-    if (!state.userId) return
-
     let cancelled = false
 
     async function bootstrap() {
+      const { userId, isAnonymous } = await ensureUser()
+
+      if (cancelled) return
+
+      setState(prev => ({ ...prev, userId, isAnonymous }))
+
       const { data: initData } = await supabase.rpc('lumi_get_init_data', {
-        p_user_id: state.userId,
+        p_user_id: userId,
       })
 
       if (cancelled) return
@@ -147,9 +186,14 @@ export function useLumi() {
       const days = (initData?.days_since_last_session as number) ?? 0
       const reflection = (initData?.reflection_hint as string) || ''
 
-      setState(prev => ({ ...prev, daysSinceLastSession: days, reflectionHint: reflection }))
+      setState(prev => ({
+        ...prev,
+        daysSinceLastSession: days,
+        reflectionHint: reflection,
+      }))
 
       await dispatch('go_home', {
+        user_id: userId,
         days_since_last_session: String(days),
       })
     }
@@ -160,5 +204,22 @@ export function useLumi() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return { state, dispatch }
+  // Función para vincular cuenta anónima a cuenta real
+  const linkAccount = useCallback(
+    async (email: string, password: string) => {
+      const { data, error } = await supabase.auth.updateUser({
+        email,
+        password,
+      })
+      if (error) {
+        console.error('[useLumi] linkAccount error:', error)
+        return { ok: false, error: error.message }
+      }
+      setState(prev => ({ ...prev, isAnonymous: false }))
+      return { ok: true, user: data.user }
+    },
+    []
+  )
+
+  return { state, dispatch, linkAccount }
 }
