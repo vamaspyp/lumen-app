@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { supabase } from './supabase'
 
 // ───────── Types ─────────
@@ -144,12 +144,14 @@ async function ensureUser(): Promise<{ userId: string; isAnonymous: boolean }> {
 
 export function useLumi() {
   const [state, setState] = useState<LumiState>(initialState)
+  const stateRef = useRef(state)
+  stateRef.current = state
 
   const dispatch = useCallback(
     async (action: string, extra?: Record<string, string>) => {
       const { data, error } = await supabase.rpc('lumi_dispatch', {
         p_action: action,
-        p_params: { ...buildParams(state), ...extra },
+        p_params: { ...buildParams(stateRef.current), ...extra },
       })
 
       if (error) {
@@ -163,7 +165,7 @@ export function useLumi() {
         console.warn('[useLumi] dispatch returned not-ok:', data)
       }
     },
-    [state]
+    []
   )
 
   // Bootstrap: auth → init_data → go_home
