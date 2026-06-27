@@ -37,7 +37,7 @@ export function ListFilterPanel({
   const [expanded, setExpanded] = useState(activeCount > 0)
 
   const handleToggle = (
-    group: 'area' | 'format' | 'duration' | 'has_note' | 'necesito'
+    group: 'area' | 'format' | 'duration' | 'has_note' | 'necesito',
     value: string
   ) => {
     const current = currentFilters[group] || ''
