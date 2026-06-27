@@ -70,7 +70,7 @@ export function ListFilterPanel({
   }: {
     label: string
     options: Array<{ value: string; label: string }>
-    group: 'area' | 'format' | 'duration' | 'has_note'
+    group: 'area' | 'format' | 'duration' | 'has_note' | 'necesito'
     selected: string
   }) => (
     <div style={{ marginBottom: '0.625rem' }}>
