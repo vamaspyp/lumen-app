@@ -7,7 +7,7 @@ import { NoteEditor } from './NoteEditor'
 import { NamePrompt } from './NamePrompt'
 import { ListFilterPanel } from './ListFilterPanel'
 import { ResourceViewer } from './ResourceViewer'
-
+import { ExperiencePreview } from './ExperiencePreview'
 // ─── FarosPanel ───────────────────────────────────────────────────
 
 function FarosPanel({
@@ -511,6 +511,33 @@ export function ContentArea({
             ))}
           </div>
         )}
+      </>
+    )
+  }
+
+if (contentType === 'experience_preview') {
+    return (
+      <>
+        <ExperiencePreview content={contentData} tokens={tokens} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+          {actions.map((action, idx) => (
+            <Pill
+              key={`${action.action}-${idx}`}
+              label={action.label}
+              variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
+              onClick={() => {
+                if (action.action === 'open_experience') {
+                  dispatch('open_experience', {
+                    experience_id: (contentData.experience_id as string) || '',
+                  })
+                } else {
+                  dispatch(action.action)
+                }
+              }}
+              tokens={tokens}
+            />
+          ))}
+        </div>
       </>
     )
   }
