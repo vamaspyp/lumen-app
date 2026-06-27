@@ -8,7 +8,7 @@ import { ContentArea } from './components/ContentArea'
 import { LandingScan } from './components/LandingScan'
 
 function App() {
-  const { state, dispatch } = useLumi()
+  const { state, dispatch, linkAccount } = useLumi()
   const tokens = getModuleTokens(state.contentSource)
 
   const [scanData, setScanData] = useState<Record<string, unknown> | null>(null)
@@ -183,6 +183,7 @@ onScanComplete={async () => {
                 dispatch={dispatch}
                 tokens={tokens}
                 experienceRunId={activeRunId}
+                onRegister={linkAccount}
               />
             </div>
           </div>
@@ -271,6 +272,7 @@ onScanComplete={async () => {
                 dispatch={dispatch}
                 tokens={tokens}
                 experienceRunId={activeRunId}
+                onRegister={linkAccount}
               />
             </div>
 

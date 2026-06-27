@@ -8,6 +8,7 @@ import { NamePrompt } from './NamePrompt'
 import { ListFilterPanel } from './ListFilterPanel'
 import { ResourceViewer } from './ResourceViewer'
 import { ExperiencePreview } from './ExperiencePreview'
+import { RegisterForm } from './RegisterForm.tsx'
 // ─── FarosPanel ───────────────────────────────────────────────────
 
 function FarosPanel({
@@ -339,6 +340,7 @@ export function ContentArea({
   dispatch,
   tokens,
   experienceRunId = '',
+  onRegister,
 }: {
   contentType: string
   contentData: Record<string, unknown>
@@ -346,6 +348,7 @@ export function ContentArea({
   dispatch: (action: string, extra?: Record<string, string>) => void
   tokens: ModuleTokens
   experienceRunId?: string
+  onRegister?: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>
 }) {
 
   if (contentType === 'resource_card') {
@@ -514,7 +517,15 @@ export function ContentArea({
       </>
     )
   }
-
+if (contentType === 'register_form') {
+    return (
+      <RegisterForm
+        onRegister={onRegister || (async () => ({ ok: false, error: 'No disponible' }))}
+        dispatch={dispatch}
+        tokens={tokens}
+      />
+    )
+  }
 if (contentType === 'experience_preview') {
     return (
       <>
