@@ -1,4 +1,4 @@
-# LUMEN — Briefing para Claude Code (actualizado 26 jun 2026)
+# LUMEN — Briefing para Claude Code (actualizado 27 jun 2026)
 
 ## Qué es LUMEN
 Plataforma de bienestar en español con un compañero de IA **determinístico** llamado LUMI (cero LLM). Misión: ayudar a cada persona a sentirse un poco mejor ahora y vivir progresivamente mejor con el tiempo.
@@ -25,18 +25,20 @@ src/
     tokens.ts          — tokens cromáticos por módulo (paleta nordic/zen)
     embedHelpers.ts    — helpers para URLs embebibles
   components/
-    Pill.tsx            — pills (voz de la persona)
-    LumiOrb.tsx         — orb con animación sólido-energético
-    BottomNav.tsx       — navegación inferior
-    ResourceCard.tsx    — ficha de recurso
-    SanctuaryDetail.tsx — detalle de ítem del santuario
-    NamePrompt.tsx      — captura de nombre
-    NoteEditor.tsx      — editor de notas
-    ListFilterPanel.tsx — filtros de listas
-    GuidedPractice.tsx  — práctica guiada paso a paso (Capa 1)
-    ResourceViewer.tsx  — viewer full-screen (createPortal)
-    LandingScan.tsx     — escaneo de llegada (momento de aterrizaje)
-    ContentArea.tsx     — router de contenido
+    Pill.tsx              — pills (voz de la persona)
+    LumiOrb.tsx           — orb con animación sólido-energético
+    BottomNav.tsx         — navegación inferior
+    ResourceCard.tsx      — ficha de recurso con CTA dinámico
+    SanctuaryDetail.tsx   — detalle de ítem del santuario (experiencia completa)
+    ExperiencePreview.tsx — ficha extendida de La Fuente (nueva)
+    RegisterForm.tsx      — registro LUMI-céntrico (nuevo)
+    NamePrompt.tsx        — captura de nombre
+    NoteEditor.tsx        — editor de notas
+    ListFilterPanel.tsx   — filtros de listas (incl. filtro Necesito)
+    GuidedPractice.tsx    — práctica guiada paso a paso (Capa 1)
+    ResourceViewer.tsx    — viewer full-screen (createPortal)
+    LandingScan.tsx       — escaneo de llegada (momento de aterrizaje)
+    ContentArea.tsx       — router de contenido (incl. handler experience_preview)
 docs/
   backend/             — dumps de DB y SQLs aplicados
 ```
@@ -102,21 +104,24 @@ abierto, ansioso, bajo, bien, cansado, cargado, confundido, irritado, solo
 - Verificar funciones existentes antes de CREATE OR REPLACE
 - Un nodo = un estado. Node-chaining para múltiples fases
 
-## Deployado hoy (26 jun 2026)
-- CTA dinámico en ResourceCard (varía por contexto)
+## Deployado 26 jun 2026
+- CTA dinámico en ResourceCard
 - Filtro "Necesito" en ListFilterPanel
 - Redescubrimiento en Santuario: lumi_open_sanctuary con depth condicional
-- No-match copy actualizado (LUMI no inventa)
-- Nortes copy unificado y redundancia eliminada
-- depth_level agregado a resources + filtro en lumi_select_experience
-- Versión legacy de lumi_select_experience eliminada
+- No-match copy actualizado; Nortes copy unificado y redundancia eliminada
+- depth_level en resources + filtro en lumi_select_experience; legacy eliminada
 - user_life_model y help_capacity_index creadas
 - Momentos de reflejo sobrio: lumi_get_init_data + render en App.tsx
 
+## Deployado hoy (27 jun 2026)
+- Anonymous Auth: ensureUser + linkAccount en useLumi (acceso sin registro)
+- ExperiencePreview.tsx: ficha extendida de La Fuente (nuevo componente)
+- ContentArea: handler experience_preview conectado al nuevo componente
+- RegisterForm.tsx: componente de registro LUMI-céntrico (nuevo componente)
+- Conexión RegisterForm en ContentArea y App.tsx
+- SanctuaryDetail: ajustes hacia experiencia completa (+121 líneas)
+
 ## Pendientes próxima sesión (prioridad)
-- SanctuaryDetail como experiencia completa (no solo detalle)
-- La Fuente: ficha extendida (respaldo, descripción, autor)
-- Anonymous Auth (acceso sin registro)
 - Auditoría de fuentes (verificar que todos los recursos son válidos/embebibles)
 - QA 90 segundos pre-beta (flujo completo end-to-end)
 
