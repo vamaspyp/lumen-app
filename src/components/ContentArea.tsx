@@ -677,7 +677,29 @@ if (contentType === 'experience_preview') {
           key={`${action.action}-${idx}`}
           label={action.label}
           variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
-          onClick={() => dispatch(action.action)}
+          onClick={() => {
+            // Feedback canónico → complete_experience_run
+            if (action.action === 'feedback_helpful') {
+              dispatch('complete_experience_run', {
+                experience_run_id: experienceRunId,
+                help_signal: 'me_dejo_un_poco_mejor',
+              })
+              return
+            }
+            if (action.action === 'feedback_reject') {
+              dispatch('complete_experience_run', {
+                experience_run_id: experienceRunId,
+                help_signal: 'no_era_para_mi',
+              })
+              return
+            }
+            // Pills con value (check-in H1/H2, capabilities, faros, etc.)
+            if (action.value) {
+              dispatch(action.action, { value: action.value })
+            } else {
+              dispatch(action.action)
+            }
+          }}
           tokens={tokens}
         />
       ))}
