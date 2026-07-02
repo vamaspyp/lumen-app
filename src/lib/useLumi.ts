@@ -32,10 +32,13 @@ export interface LumiState {
   contentSource: string
 
   // Check-in
-  checkinState: string
+   checkinState: string
   checkinArea: string
   checkinHelpIntent: string
   checkinTime: string
+  checkinHemisphere: string
+  checkinFaro: string
+  checkinCapability: string
 
   // Experiencia (modelo nuevo)
   currentExperienceRunId: string
@@ -63,11 +66,13 @@ const initialState: LumiState = {
   moduleColor: '#9B8EC4',
   contentSource: '',
 
-  checkinState: '',
+checkinState: '',
   checkinArea: '',
   checkinHelpIntent: '',
   checkinTime: '',
-
+  checkinHemisphere: '',
+  checkinFaro: '',
+  checkinCapability: '',
   currentExperienceRunId: '',
   selectedIkKey: '',
 
@@ -84,11 +89,14 @@ function buildParams(state: LumiState): Record<string, string> {
     sanctuary_item_id: state.currentSanctuaryItemId,
     source: state.contentSource,
     days_since_last_session: String(state.daysSinceLastSession),
-    // Check-in (4 pasos canónicos)
+    // Check-in canónico H1/H2
     checkin_state:       state.checkinState,
     checkin_area:        state.checkinArea,
     checkin_help_intent: state.checkinHelpIntent,
     checkin_time:        state.checkinTime,
+    checkin_hemisphere:  state.checkinHemisphere,
+    checkin_faro:        state.checkinFaro,
+    checkin_capability:  state.checkinCapability,
     // Experiencia activa (modelo nuevo)
     experience_run_id: state.currentExperienceRunId,
   }
