@@ -7,6 +7,7 @@ export interface Action {
   label: string
   action: string
   value?: string
+  variant?: string
   target_node?: string
 }
 

@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react'
 import { useLumi } from './lib/useLumi'
 import { getModuleTokens } from './lib/tokens'
-import { supabase } from './lib/supabase'
 import { LumiOrb } from './components/LumiOrb'
 import { BottomNav } from './components/BottomNav'
 import { ContentArea } from './components/ContentArea'
@@ -11,32 +9,71 @@ function App() {
   const { state, dispatch, linkAccount } = useLumi()
   const tokens = getModuleTokens(state.contentSource)
 
-  const [scanData, setScanData] = useState<Record<string, unknown> | null>(null)
-  const [hasScannedThisSession, setHasScannedThisSession] = useState(false)
-  const [scanKey] = useState(0)
-
-  useEffect(() => {
-    supabase.rpc('lumi_get_scan').then(({ data }) => {
-      if (data?.ok) setScanData(data as Record<string, unknown>)
-    })
-  }, [])
-
-  const showScan = !hasScannedThisSession && scanData !== null
-
-  const navDispatch = (action: string, extra?: Record<string, string>) => {
-    if (showScan) setHasScannedThisSession(true)
-    dispatch(action, extra)
-  }
-
+  const isScan = state.lumiContentType === 'lumi_scan'
   const isSimpleView = ['empty_presence', 'landing_scan', 'landing_scan_invite', 'scan_complete'].includes(state.lumiContentType)
 
-  // ── Helpers para el modelo nuevo ──────────────────────────────
-  // experience_run_id se pasa automáticamente via buildParams en useLumi.
-  // Solo necesitamos leerlo del content cuando el backend lo devuelve
-  // (EXPERIENCE_PRE lo trae en content.run_id).
   const activeRunId = (state.lumiContentData?.run_id as string)
     || state.currentExperienceRunId
     || ''
+
+  const renderPerlaBlock = (marginBottom: string) => {
+    const perla = (state.lumiContentData?.culture_phrase as string) || ''
+    const mensaje = state.lumiMessage || ''
+    if (!perla && !mensaje) return null
+    return (
+      <div
+        style={{
+          fontFamily: 'Georgia, "Times New Roman", serif',
+          fontStyle: 'italic',
+          textAlign: 'center',
+          lineHeight: 1.5,
+          margin: `0 auto ${marginBottom}`,
+          maxWidth: '38ch',
+        }}
+      >
+        {perla && (
+          <span
+            style={{
+              display: 'block',
+              fontSize: '0.8rem',
+              fontStyle: 'italic',
+              color: tokens.textMuted,
+              opacity: 0.75,
+              marginBottom: (state.reflectionHint || mensaje) ? '0.65rem' : 0,
+              letterSpacing: '0.005em',
+            }}
+          >
+            "{perla}"
+          </span>
+        )}
+        {state.reflectionHint && (
+          <span
+            style={{
+              display: 'block',
+              fontSize: '0.9rem',
+              fontStyle: 'italic',
+              color: tokens.textSecondary,
+              opacity: 0.9,
+              marginBottom: mensaje ? '0.65rem' : 0,
+            }}
+          >
+            {state.reflectionHint}
+          </span>
+        )}
+        {mensaje && (
+          <span
+            style={{
+              display: 'block',
+              fontSize: '1.05rem',
+              color: tokens.textPrimary,
+            }}
+          >
+            {mensaje}
+          </span>
+        )}
+      </div>
+    )
+  }
 
   return (
     <>
@@ -57,26 +94,19 @@ function App() {
           minHeight: '100vh',
           color: tokens.textPrimary,
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-          paddingTop: (showScan || isSimpleView) ? 0 : '2rem',
+          paddingTop: (isScan || isSimpleView) ? 0 : '2rem',
           paddingLeft: '1.25rem',
           paddingRight: '1.25rem',
           boxSizing: 'border-box',
         }}
       >
-        {showScan ? (
+        {isScan ? (
           <LandingScan
-            key={scanKey}
-            scanData={scanData!}
+            message={state.lumiMessage}
+            actions={state.lumiActions}
+            contentData={state.lumiContentData}
             tokens={tokens}
-            onComplete={async () => {
-  setHasScannedThisSession(true)
-  await dispatch('complete_scan')
-}}
-onScanComplete={async () => {
-  setHasScannedThisSession(true)
-  const result = await dispatch('complete_scan')
-  console.log('[CULTURE_PHRASE] dispatch result:', result)
-            }}
+            onComplete={() => dispatch('complete_scan')}
           />
         ) : isSimpleView ? (
           <div
@@ -108,74 +138,12 @@ onScanComplete={async () => {
                 key={state.lumiMessage}
                 style={{ animation: 'lumiAppear 600ms ease-out both', width: '100%', textAlign: 'center' }}
               >
-                {(() => {
-                  const perla   = (state.lumiContentData?.culture_phrase as string) || ''
-                  const mensaje = state.lumiMessage || ''
-                  if (!perla && !mensaje) return null
-                  return (
-                    <div
-                      style={{
-                        fontFamily: 'Georgia, "Times New Roman", serif',
-                        fontStyle: 'italic',
-                        textAlign: 'center',
-                        lineHeight: 1.5,
-                        margin: '0 auto',
-                        maxWidth: '38ch',
-                      }}
-                    >
-                     {perla && (
-                      <span
-                        style={{
-                          display: 'block',
-                          fontSize: '0.8rem',
-                          fontStyle: 'italic',
-                          color: tokens.textMuted,
-                          opacity: 0.75,
-                          marginBottom: (state.reflectionHint || mensaje) ? '0.65rem' : 0,
-                          letterSpacing: '0.005em',
-                        }}
-                      >
-                        "{perla}"
-                      </span>
-                    )}
-                    {state.reflectionHint && (
-                      <span
-                        style={{
-                          display: 'block',
-                          fontSize: '0.9rem',
-                          fontStyle: 'italic',
-                          color: tokens.textSecondary,
-                          opacity: 0.9,
-                          marginBottom: mensaje ? '0.65rem' : 0,
-                        }}
-                      >
-                        {state.reflectionHint}
-                      </span>
-                    )}
-                    {mensaje && (
-                        <span
-                          style={{
-                            display: 'block',
-                            fontSize: '1.05rem',
-                            color: tokens.textPrimary,
-                          }}
-                        >
-                          {mensaje}
-                        </span>
-                      )}
-                    </div>
-                  )
-                })()}
+                {renderPerlaBlock('0')}
               </div>
             </div>
 
             {/* SECCIÓN 3: pills */}
-            <div
-              style={{
-                flex: '0 0 auto',
-                marginBottom: '4rem',
-              }}
-            >
+            <div style={{ flex: '0 0 auto', marginBottom: '4rem' }}>
               <ContentArea
                 contentType={state.lumiContentType}
                 contentData={state.lumiContentData}
@@ -206,64 +174,7 @@ onScanComplete={async () => {
               key={state.lumiMessage}
               style={{ animation: 'lumiAppear 600ms ease-out both', width: '100%', textAlign: 'center' }}
             >
-              {(() => {
-                const perla   = (state.lumiContentData?.culture_phrase as string) || ''
-                const mensaje = state.lumiMessage || ''
-                if (!perla && !mensaje) return null
-                return (
-                  <div
-                    style={{
-                      fontFamily: 'Georgia, "Times New Roman", serif',
-                      fontStyle: 'italic',
-                      textAlign: 'center',
-                      lineHeight: 1.5,
-                      margin: '0 auto 1.75rem',
-                      maxWidth: '38ch',
-                    }}
-                  >
-                    {perla && (
-                      <span
-                        style={{
-                          display: 'block',
-                          fontSize: '0.8rem',
-                          fontStyle: 'italic',
-                          color: tokens.textMuted,
-                          opacity: 0.75,
-                          marginBottom: (state.reflectionHint || mensaje) ? '0.65rem' : 0,
-                          letterSpacing: '0.005em',
-                        }}
-                      >
-                        "{perla}"
-                      </span>
-                    )}
-                    {state.reflectionHint && (
-                      <span
-                        style={{
-                          display: 'block',
-                          fontSize: '0.9rem',
-                          fontStyle: 'italic',
-                          color: tokens.textSecondary,
-                          opacity: 0.9,
-                          marginBottom: mensaje ? '0.65rem' : 0,
-                        }}
-                      >
-                        {state.reflectionHint}
-                      </span>
-                    )}
-                    {mensaje && (
-                      <span
-                        style={{
-                          display: 'block',
-                          fontSize: '1.05rem',
-                          color: tokens.textPrimary,
-                        }}
-                      >
-                        {mensaje}
-                      </span>
-                    )}
-                  </div>
-                )
-              })()}
+              {renderPerlaBlock('1.75rem')}
 
               <ContentArea
                 contentType={state.lumiContentType}
@@ -323,7 +234,7 @@ onScanComplete={async () => {
         )}
       </div>
       <div style={{ height: '80px', flexShrink: 0 }} />
-      <BottomNav currentSource={state.contentSource} dispatch={navDispatch} />
+      <BottomNav currentSource={state.contentSource} dispatch={dispatch} />
     </>
   )
 }

@@ -1,31 +1,31 @@
 import { useState, useEffect } from 'react'
 import type { ModuleTokens } from '../lib/tokens'
+import type { Action } from '../lib/useLumi'
 import { Pill } from './Pill'
 import { LumiOrb } from './LumiOrb'
 
 export function LandingScan({
-  scanData,
+  message,
+  actions,
+  contentData,
   tokens,
   onComplete,
-  onScanComplete,
 }: {
-  scanData: Record<string, unknown>
+  message: string
+  actions: Action[]
+  contentData: Record<string, unknown>
   tokens: ModuleTokens
   onComplete: () => void
-  onScanComplete: () => void
 }) {
   const [phase, setPhase] = useState<'invite' | 'scanning' | 'done'>('invite')
   const [stepIndex, setStepIndex] = useState(0)
 
-  const message = (scanData.message as string) || ''
-  const actions = (scanData.actions as Array<{ label: string; action: string; variant?: string }>) || []
-  const content = (scanData.content as Record<string, unknown>) || {}
-  const steps = (content.steps as Array<{ text: string; pause_ms: number; breathe?: string }>) || []
-  const sourceLabel = (content.source_label as string) || ''
+  const steps = (contentData.steps as Array<{ text: string; pause_ms: number }>) || []
+  const sourceLabel = (contentData.source_label as string) || ''
 
   useEffect(() => {
-    if (phase === 'done') onScanComplete()
-  }, [phase, onScanComplete])
+    if (phase === 'done') onComplete()
+  }, [phase, onComplete])
 
   useEffect(() => {
     if (phase !== 'scanning' || steps.length === 0) return
@@ -130,12 +130,7 @@ export function LandingScan({
       </div>
 
       {/* SECCIÓN 3: pills */}
-      <div
-        style={{
-          flex: '0 0 auto',
-          marginBottom: '4rem',
-        }}
-      >
+      <div style={{ flex: '0 0 auto', marginBottom: '4rem' }}>
         {phase === 'invite' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', width: '100%', maxWidth: 320 }}>
             {actions.map((action, idx) => (
