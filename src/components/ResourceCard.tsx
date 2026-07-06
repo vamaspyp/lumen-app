@@ -203,13 +203,17 @@ export function ResourceCard({
   const handleOpen = () => {
     if (!resourceId) return
     if (sourceKind !== 'lumen_practice' && !url) return
-    dispatch('resource_viewer_active', {
-      source_kind:       sourceKind,
-      resource_id:       resourceId,
-      source:            isFrom,
-      session_id:        sessionId,
-      experience_run_id: (content.run_id as string) || '',
-    })
+
+    const extra: Record<string, string> = {
+      source_kind: sourceKind,
+      resource_id: resourceId,
+      source:      isFrom,
+      session_id:  sessionId,
+    }
+    const runId = (content.run_id as string) || ''
+    if (runId) extra.experience_run_id = runId
+
+    dispatch('resource_viewer_active', extra)
   }
 
   return (

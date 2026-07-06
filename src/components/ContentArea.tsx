@@ -361,23 +361,16 @@ export function ContentArea({
               key={`${action.action}-${idx}`}
               label={action.label}
               variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
-              onClick={() => {
-                if (action.action === 'share_resource') {
-                  dispatch('share_resource', {
-                    title:    (contentData.title as string) || '',
-                    format:   (contentData.format as string) || '',
-                    duration: (contentData.duration_min as string | number)?.toString() || '',
-                    url:      (contentData.url as string) || '',
-                  })
-                } else if (action.action === 'save_to_sanctuary') {
-                  dispatch('save_to_sanctuary', {
-                    resource_id:       (contentData.resource_id as string) || '',
-                    experience_run_id: experienceRunId,
-                  })
-                } else {
-                  dispatch(action.action)
-                }
-              }}
+              onClick={() => dispatch(action.action, {
+                ...(action.value ? { value: action.value } : {}),
+                resource_id:       (contentData.resource_id as string) || '',
+                session_id:        (contentData.session_id as string) || '',
+                title:             (contentData.title as string) || '',
+                format:            (contentData.format as string) || '',
+                duration:          String(contentData.duration_min || ''),
+                url:               (contentData.url as string) || '',
+                ...(experienceRunId ? { experience_run_id: experienceRunId } : {}),
+              })}
               tokens={tokens}
             />
           ))}
@@ -390,8 +383,8 @@ export function ContentArea({
     const step = (contentData.step as string) || ''
     const options =
       (contentData.options as Array<{ value: string; label: string; hint?: string }>) || []
-    const actionName = `submit_checkin_${step}`
-    const paramKey = `checkin_${step}`
+    const actionName = step === 'effect' ? 'submit_feedback_effect' : `submit_checkin_${step}`
+    const paramKey   = step === 'effect' ? 'perceived_capability_key' : `checkin_${step}`
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
@@ -471,20 +464,7 @@ export function ContentArea({
             }}
           >
             {items.map(item => {
-              // subtitle: preferir el que viene del backend, sino derivar del format
               const subtitle = item.subtitle ?? [item.format].filter(Boolean).join(' · ')
-
-              const extra: Record<string, string> = {}
-              if (item.action === 'open_sanctuary_item') {
-                extra.sanctuary_item_id = item.id
-              } else if (item.experience_id) {
-                // Item de La Fuente (modelo nuevo — experience como unidad)
-                extra.experience_id = item.experience_id
-                extra.resource_id = item.id
-              } else {
-                extra.resource_id = item.id
-                if (item.value) extra.source = item.value
-              }
 
               return (
                 <ResourceListCard
@@ -494,7 +474,13 @@ export function ContentArea({
                   author={item.author}
                   format={item.format}
                   durationMin={item.duration_min}
-                  onClick={() => dispatch(item.action, extra)}
+                  onClick={() => dispatch(item.action, {
+                    resource_id:       item.id,
+                    sanctuary_item_id: item.id,
+                    ...(item.experience_id ? { experience_id: item.experience_id } : {}),
+                    source:            item.value || '',
+                    value:             item.value || '',
+                  })}
                   tokens={tokens}
                 />
               )
@@ -536,15 +522,10 @@ if (contentType === 'experience_preview') {
               key={`${action.action}-${idx}`}
               label={action.label}
               variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
-              onClick={() => {
-                if (action.action === 'open_experience') {
-                  dispatch('open_experience', {
-                    experience_id: (contentData.experience_id as string) || '',
-                  })
-                } else {
-                  dispatch(action.action)
-                }
-              }}
+              onClick={() => dispatch(action.action, {
+                ...(action.value ? { value: action.value } : {}),
+                ...(contentData.experience_id ? { experience_id: contentData.experience_id as string } : {}),
+              })}
               tokens={tokens}
             />
           ))}
@@ -563,29 +544,15 @@ if (contentType === 'experience_preview') {
               key={`${action.action}-${idx}`}
               label={action.label}
               variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
-              onClick={() => {
-                const extra: Record<string, string> = {}
-                if (action.action === 'share_resource') {
-                  dispatch('share_resource', {
-                    title:    (contentData.title as string) || '',
-                    format:   (contentData.format as string) || '',
-                    duration: (contentData.duration_min as string) || '',
-                    url:      (contentData.url as string) || '',
-                  })
-                  return
-                }
-                if (action.value) {
-                  if (action.action === 'open_note_editor') {
-                    extra.resource_id = action.value
-                  } else if (
-                    action.action === 'confirm_remove_from_sanctuary' ||
-                    action.action === 'remove_from_sanctuary'
-                  ) {
-                    extra.sanctuary_item_id = action.value
-                  }
-                }
-                dispatch(action.action, Object.keys(extra).length ? extra : undefined)
-              }}
+              onClick={() => dispatch(action.action, {
+                ...(action.value ? { value: action.value } : {}),
+                resource_id:       (contentData.resource_id as string) || '',
+                sanctuary_item_id: (contentData.sanctuary_item_id as string) || '',
+                title:             (contentData.title as string) || '',
+                format:            (contentData.format as string) || '',
+                duration:          String(contentData.duration_min || ''),
+                url:               (contentData.url as string) || '',
+              })}
               tokens={tokens}
             />
           ))}
@@ -677,29 +644,10 @@ if (contentType === 'experience_preview') {
           key={`${action.action}-${idx}`}
           label={action.label}
           variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
-          onClick={() => {
-            // Feedback canónico → complete_experience_run
-            if (action.action === 'feedback_helpful') {
-              dispatch('complete_experience_run', {
-                experience_run_id: experienceRunId,
-                help_signal: 'me_dejo_un_poco_mejor',
-              })
-              return
-            }
-            if (action.action === 'feedback_reject') {
-              dispatch('complete_experience_run', {
-                experience_run_id: experienceRunId,
-                help_signal: 'no_era_para_mi',
-              })
-              return
-            }
-            // Pills con value (check-in H1/H2, capabilities, faros, etc.)
-            if (action.value) {
-              dispatch(action.action, { value: action.value })
-            } else {
-              dispatch(action.action)
-            }
-          }}
+          onClick={() => dispatch(action.action, {
+            ...(action.value ? { value: action.value } : {}),
+            ...(experienceRunId ? { experience_run_id: experienceRunId } : {}),
+          })}
           tokens={tokens}
         />
       ))}
