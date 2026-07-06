@@ -28,10 +28,11 @@ export function SanctuaryDetail({
   ].filter(Boolean).join(' · ')
 
   const helpSignalLabel: Record<string, string> = {
-    'me_sirvio':      'Te sirvió',
-    'no_era_para_mi': 'No era para vos',
-    'guardado':       'Lo guardaste',
-  }
+  'me_sirvio':                'Te sirvió',
+  'me_dejo_un_poco_mejor':    'Te dejó un poco mejor',
+  'no_era_para_mi':           'No era para vos',
+  'guardado':                 'Lo guardaste',
+}
 
   return (
     <div
