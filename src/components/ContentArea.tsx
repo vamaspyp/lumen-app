@@ -512,52 +512,77 @@ if (contentType === 'register_form') {
       />
     )
   }
-if (contentType === 'experience_preview') {
-    return (
-      <>
-        <ExperiencePreview content={contentData} tokens={tokens} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-          {actions.map((action, idx) => (
-            <Pill
-              key={`${action.action}-${idx}`}
-              label={action.label}
-              variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
-              onClick={() => dispatch(action.action, {
-                ...(action.value ? { value: action.value } : {}),
-                ...(contentData.experience_id ? { experience_id: contentData.experience_id as string } : {}),
-              })}
-              tokens={tokens}
-            />
-          ))}
-        </div>
-      </>
-    )
-  }
+if (contentType === 'activity_detail') {
+    const detailKind =
+      (contentData.detail_kind as string) ||
+      (contentData.source as string) ||
+      ''
 
-  if (contentType === 'sanctuary_detail') {
+    if (detailKind === 'sanctuary') {
+      return (
+        <>
+          <SanctuaryDetail content={contentData} dispatch={dispatch} tokens={tokens} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+            {actions.map((action, idx) => (
+              <Pill
+                key={`${action.action}-${idx}`}
+                label={action.label}
+                variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
+                onClick={() => dispatch(action.action, {
+                  ...(action.value ? { value: action.value } : {}),
+                  resource_id:       (contentData.resource_id as string) || '',
+                  sanctuary_item_id: (contentData.sanctuary_item_id as string) || '',
+                  experience_id:     (contentData.experience_id as string) || '',
+                  experience_run_id: (contentData.experience_run_id as string) || '',
+                  title:             (contentData.title as string) || '',
+                  format:            (contentData.format as string) || '',
+                  duration:          String(contentData.duration_min || ''),
+                  url:               (contentData.url as string) || '',
+                })}
+                tokens={tokens}
+              />
+            ))}
+          </div>
+        </>
+      )
+    }
+
+    if (detailKind === 'experience_preview') {
+      return (
+        <>
+          <ExperiencePreview content={contentData} tokens={tokens} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+            {actions.map((action, idx) => (
+              <Pill
+                key={`${action.action}-${idx}`}
+                label={action.label}
+                variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
+                onClick={() => dispatch(action.action, {
+                  ...(action.value ? { value: action.value } : {}),
+                  ...(contentData.experience_id ? { experience_id: contentData.experience_id as string } : {}),
+                })}
+                tokens={tokens}
+              />
+            ))}
+          </div>
+        </>
+      )
+    }
+
     return (
-      <>
-        <SanctuaryDetail content={contentData} dispatch={dispatch} tokens={tokens} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-          {actions.map((action, idx) => (
-            <Pill
-              key={`${action.action}-${idx}`}
-              label={action.label}
-              variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
-              onClick={() => dispatch(action.action, {
-                ...(action.value ? { value: action.value } : {}),
-                resource_id:       (contentData.resource_id as string) || '',
-                sanctuary_item_id: (contentData.sanctuary_item_id as string) || '',
-                title:             (contentData.title as string) || '',
-                format:            (contentData.format as string) || '',
-                duration:          String(contentData.duration_min || ''),
-                url:               (contentData.url as string) || '',
-              })}
-              tokens={tokens}
-            />
-          ))}
-        </div>
-      </>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+        {actions.map((action, idx) => (
+          <Pill
+            key={`${action.action}-${idx}`}
+            label={action.label}
+            variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
+            onClick={() => dispatch(action.action, {
+              ...(action.value ? { value: action.value } : {}),
+            })}
+            tokens={tokens}
+          />
+        ))}
+      </div>
     )
   }
 
