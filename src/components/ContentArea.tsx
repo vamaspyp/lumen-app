@@ -636,31 +636,6 @@ if (contentType === 'activity_detail') {
     )
   }
 
-  // ── Viewers embebibles (Fuente, apertura directa) ──────────────
-  if (
-    contentType === 'external_fallback' ||
-    contentType === 'lumen_practice' ||
-    contentType === 'youtube' ||
-    contentType === 'vimeo' ||
-    contentType === 'spotify' ||
-    contentType === 'soundcloud' ||
-    contentType === 'pdf' ||
-    contentType === 'image' ||
-    contentType === 'audio_direct'
-  ) {
-    return (
-      <ResourceViewer
-        sourceKind={contentType === 'external_fallback' ? 'external_fallback' : contentType}
-        url={(contentData.activeUrl as string) || ''}
-        title={(contentData.title as string) || ''}
-        content={contentData}
-        actions={actions}
-        dispatch={dispatch}
-        tokens={tokens}
-      />
-    )
-  }
-
   // ── Default: pills de acción ───────────────────────────────────
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
