@@ -4,6 +4,7 @@ import type { ModuleTokens } from '../lib/tokens'
 export function GuidedPractice({
   content,
   dispatch,
+  tokens,
 }: {
   content: Record<string, unknown>
   tokens: ModuleTokens
@@ -32,11 +33,17 @@ export function GuidedPractice({
   return (
     <div
       style={{
+        background: tokens.cardBg,
+        border: `1px solid ${tokens.cardBorder}`,
+        borderRadius: '22px',
+        boxShadow: tokens.shadow,
+        padding: '2rem 1.5rem',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '2.5rem',
-        padding: '2rem 1.5rem',
+        gap: '2rem',
+        maxWidth: '36rem',
+        margin: '0 auto',
       }}
     >
       {sourceLabel && (
@@ -44,7 +51,7 @@ export function GuidedPractice({
           style={{
             fontSize: '0.75rem',
             fontStyle: 'italic',
-            color: 'rgba(244,239,230,0.5)',
+            color: tokens.textMuted,
             margin: 0,
             textAlign: 'center',
           }}
@@ -57,7 +64,7 @@ export function GuidedPractice({
         key={stepIndex}
         style={{
           fontSize: '1.1rem',
-          color: '#F4EFE6',
+          color: tokens.textPrimary,
           fontFamily: 'Georgia, "Times New Roman", serif',
           lineHeight: 1.7,
           maxWidth: '32ch',
@@ -72,12 +79,13 @@ export function GuidedPractice({
       {isLast && sourceDetail && (
         <p
           style={{
-            fontSize: '0.7rem',
+            fontSize: '0.78rem',
             fontStyle: 'italic',
-            color: 'rgba(244,239,230,0.4)',
+            color: tokens.textMuted,
             maxWidth: '40ch',
             textAlign: 'center',
             margin: 0,
+            lineHeight: 1.5,
           }}
         >
           {sourceDetail}
@@ -89,34 +97,19 @@ export function GuidedPractice({
         style={{
           padding: '0.75rem 2rem',
           borderRadius: '999px',
-          border: '1px solid rgba(255,255,255,0.2)',
-          background: 'transparent',
-          color: '#F4EFE6',
+          border: `1px solid ${tokens.cardBorder}`,
+          background: isLast ? tokens.accent : tokens.cardBg,
+          color: isLast ? '#FFFFFF' : tokens.accentDeep,
           fontSize: '0.9rem',
           cursor: 'pointer',
           fontFamily: 'inherit',
-          transition: 'background 0.2s ease',
+          fontWeight: 500,
+          boxShadow: isLast ? tokens.shadow : 'none',
+          transition: 'background 0.2s ease, transform 0.2s ease',
         }}
       >
         {isLast ? 'Terminar' : 'Siguiente'}
       </button>
-
-      {steps.length > 1 && (
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          {steps.map((_, i) => (
-            <div
-              key={i}
-              style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                background: i === stepIndex ? '#F4EFE6' : 'rgba(244,239,230,0.25)',
-                transition: 'background 0.3s ease',
-              }}
-            />
-          ))}
-        </div>
-      )}
     </div>
   )
 }

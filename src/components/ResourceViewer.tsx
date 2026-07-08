@@ -152,21 +152,34 @@ function ImageEmbed({ src, title }: {
   )
 }
 
-function AudioDirect({ src, title }: {
+function AudioDirect({ src, title, tokens }: {
   src: string
   title: string
   tokens: ModuleTokens
 }) {
   return (
-    <div style={{ textAlign: 'center' }}>
-      <h3 style={{
-        fontFamily: 'Georgia, "Times New Roman", serif',
-        fontStyle: 'italic',
-        fontSize: '1.1rem',
-        color: '#F4EFE6',
-        marginBottom: '1.5rem',
-        fontWeight: 400,
-      }}>
+    <div
+      style={{
+        textAlign: 'center',
+        background: tokens.cardBg,
+        border: `1px solid ${tokens.cardBorder}`,
+        borderRadius: '22px',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+        padding: '2rem 1.5rem',
+        maxWidth: '36rem',
+        margin: '0 auto',
+      }}
+    >
+      <h3
+        style={{
+          fontFamily: 'Georgia, "Times New Roman", serif',
+          fontStyle: 'italic',
+          fontSize: '1.1rem',
+          color: tokens.textPrimary,
+          marginBottom: '1.5rem',
+          fontWeight: 400,
+        }}
+      >
         {title}
       </h3>
       <audio
@@ -177,6 +190,211 @@ function AudioDirect({ src, title }: {
           maxWidth: '30rem',
         }}
       />
+    </div>
+  )
+}
+
+function LumenOwnResource({
+  title,
+  content,
+  tokens,
+}: {
+  title: string
+  content?: Record<string, unknown>
+  tokens: ModuleTokens
+}) {
+  const meta = (content?.metadata as Record<string, unknown>) || {}
+
+  const description =
+    (content?.description_short as string) ||
+    (content?.description as string) ||
+    (meta.description_short as string) ||
+    (meta.description as string) ||
+    ''
+
+  const body =
+    (content?.body as string) ||
+    (content?.text as string) ||
+    (content?.content as string) ||
+    (meta.body as string) ||
+    (meta.text as string) ||
+    (meta.content as string) ||
+    ''
+
+  const sourceLabel =
+    (meta.source_label as string) ||
+    (content?.provider as string) ||
+    (content?.author as string) ||
+    'LUMEN'
+
+  return (
+    <div
+      style={{
+        background: tokens.cardBg,
+        border: `1px solid ${tokens.cardBorder}`,
+        borderRadius: '22px',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+        padding: '1.75rem 1.5rem',
+        maxWidth: '42rem',
+        margin: '0 auto',
+        textAlign: 'left',
+      }}
+    >
+      <div
+        style={{
+          display: 'inline-block',
+          background: tokens.accentSoft20,
+          color: tokens.accentDeep,
+          borderRadius: '999px',
+          padding: '0.25rem 0.75rem',
+          fontSize: '0.7rem',
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
+          fontWeight: 500,
+          marginBottom: '1rem',
+        }}
+      >
+        Recurso LUMEN
+      </div>
+
+      {title && (
+        <h2
+          style={{
+            margin: '0 0 1rem',
+            color: tokens.textPrimary,
+            fontSize: '1.35rem',
+            lineHeight: 1.3,
+            fontWeight: 500,
+          }}
+        >
+          {title}
+        </h2>
+      )}
+
+      {description && (
+        <p
+          style={{
+            margin: '0 0 1.25rem',
+            color: tokens.textSecondary,
+            fontSize: '0.98rem',
+            lineHeight: 1.55,
+          }}
+        >
+          {description}
+        </p>
+      )}
+
+      {body ? (
+        <div
+          style={{
+            whiteSpace: 'pre-wrap',
+            color: tokens.textPrimary,
+            fontSize: '1rem',
+            lineHeight: 1.7,
+            fontFamily: 'Georgia, "Times New Roman", serif',
+          }}
+        >
+          {body}
+        </div>
+      ) : (
+        <p
+          style={{
+            margin: 0,
+            color: tokens.textMuted,
+            fontSize: '0.95rem',
+            lineHeight: 1.55,
+            fontStyle: 'italic',
+          }}
+        >
+          Este recurso propio todavía no trae contenido visible. La experiencia puede continuar cuando estés listo.
+        </p>
+      )}
+
+      {sourceLabel && (
+        <div
+          style={{
+            marginTop: '1.5rem',
+            paddingTop: '1rem',
+            borderTop: `1px solid ${tokens.cardBorder}`,
+            color: tokens.textMuted,
+            fontSize: '0.78rem',
+            fontStyle: 'italic',
+          }}
+        >
+          Fuente: {sourceLabel}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ExternalResourceCard({
+  url,
+  dispatch,
+  tokens,
+}: {
+  url: string
+  dispatch: (action: string, extra?: Record<string, string>) => void
+  tokens: ModuleTokens
+}) {
+  return (
+    <div
+      style={{
+        textAlign: 'center',
+        padding: '2rem',
+        background: tokens.cardBg,
+        border: `1px solid ${tokens.cardBorder}`,
+        borderRadius: '22px',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+        maxWidth: '36rem',
+        margin: '0 auto',
+      }}
+    >
+      <p
+        style={{
+          fontFamily: 'Georgia, "Times New Roman", serif',
+          fontStyle: 'italic',
+          fontSize: '1.05rem',
+          lineHeight: 1.6,
+          margin: '0 auto 2rem',
+          maxWidth: '38ch',
+          color: tokens.textSecondary,
+        }}
+      >
+        Este recurso vive fuera de LUMEN. Abrilo cuando estés listo; volvés cuando quieras.
+      </p>
+
+      {url ? (
+        <button
+          onClick={() => {
+            window.open(url, '_blank', 'noopener,noreferrer')
+            dispatch('external_open', { url })
+          }}
+          style={{
+            padding: '0.875rem 2.25rem',
+            borderRadius: '999px',
+            background: tokens.accent,
+            border: 'none',
+            color: '#FFFFFF',
+            fontSize: '0.95rem',
+            cursor: 'pointer',
+            fontWeight: 500,
+            fontFamily: 'inherit',
+          }}
+        >
+          Abrir recurso externo
+        </button>
+      ) : (
+        <p
+          style={{
+            margin: 0,
+            color: tokens.textMuted,
+            fontSize: '0.95rem',
+          }}
+        >
+          No encontré un enlace disponible para este recurso.
+        </p>
+      )}
     </div>
   )
 }
@@ -214,10 +432,23 @@ export function ResourceViewer({
     return () => window.removeEventListener('keydown', handleKey)
   }, [dispatch])
 
+  const meta = (content?.metadata as Record<string, unknown>) || {}
+  const practiceSteps = (meta.steps as Array<{ text: string }>) || []
+
+  const isOwnLumenResource =
+    sourceKind === 'lumen_practice' ||
+    sourceKind === 'lumen_origin' ||
+    sourceKind === 'lumen_text' ||
+    sourceKind === 'text' ||
+    sourceKind === 'practica' ||
+    sourceKind === 'práctica'
+
   let embedNode: React.ReactNode = null
 
-  if (sourceKind === 'lumen_practice') {
+  if (sourceKind === 'lumen_practice' && practiceSteps.length > 0) {
     embedNode = <GuidedPractice content={content || {}} tokens={tokens} dispatch={dispatch} />
+  } else if (isOwnLumenResource) {
+    embedNode = <LumenOwnResource title={title} content={content} tokens={tokens} />
   } else if (sourceKind === 'youtube') {
     const u = youtubeEmbedUrl(url)
     embedNode = u ? <YouTubeEmbed src={u} title={title} tokens={tokens} /> : null
@@ -325,64 +556,11 @@ export function ResourceViewer({
       >
         <div style={{ width: '100%', maxWidth: '64rem', margin: '0 auto' }}>
           {embedNode ?? (
-            <div
-              style={{
-                textAlign: 'center',
-                padding: '2rem',
-                background: tokens.cardBg,
-                border: `1px solid ${tokens.cardBorder}`,
-                borderRadius: '20px',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
-                maxWidth: '36rem',
-                margin: '0 auto',
-              }}
-            >
-              <p
-                style={{
-                  fontFamily: 'Georgia, "Times New Roman", serif',
-                  fontStyle: 'italic',
-                  fontSize: '1.05rem',
-                  lineHeight: 1.6,
-                  margin: '0 auto 2rem',
-                  maxWidth: '38ch',
-                  color: tokens.textMuted,
-                }}
-              >
-                Este recurso vive fuera de LUMEN. Abrilo cuando estés listo; volvés cuando quieras.
-              </p>
-
-              {url ? (
-                <button
-                  onClick={() => {
-                    window.open(url, '_blank', 'noopener,noreferrer')
-                    dispatch('external_open', { url })
-                  }}
-                  style={{
-                    padding: '0.875rem 2.25rem',
-                    borderRadius: '999px',
-                    background: tokens.accent,
-                    border: 'none',
-                    color: '#FFFFFF',
-                    fontSize: '0.95rem',
-                    cursor: 'pointer',
-                    fontWeight: 500,
-                    fontFamily: 'inherit',
-                  }}
-                >
-                  Abrir recurso externo
-                </button>
-              ) : (
-                <p
-                  style={{
-                    margin: 0,
-                    color: tokens.textMuted,
-                    fontSize: '0.95rem',
-                  }}
-                >
-                  No encontré un enlace disponible para este recurso.
-                </p>
-              )}
-            </div>
+            <ExternalResourceCard
+              url={url}
+              dispatch={dispatch}
+              tokens={tokens}
+            />
           )}
         </div>
       </div>
