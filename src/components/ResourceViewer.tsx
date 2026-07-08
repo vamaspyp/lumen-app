@@ -325,7 +325,18 @@ export function ResourceViewer({
       >
         <div style={{ width: '100%', maxWidth: '64rem', margin: '0 auto' }}>
           {embedNode ?? (
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '2rem',
+                background: tokens.cardBg,
+                border: `1px solid ${tokens.cardBorder}`,
+                borderRadius: '20px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+                maxWidth: '36rem',
+                margin: '0 auto',
+              }}
+            >
               <p
                 style={{
                   fontFamily: 'Georgia, "Times New Roman", serif',
@@ -334,12 +345,13 @@ export function ResourceViewer({
                   lineHeight: 1.6,
                   margin: '0 auto 2rem',
                   maxWidth: '38ch',
-                  color: 'rgba(244, 239, 230, 0.8)',
+                  color: tokens.textMuted,
                 }}
               >
-                Este recurso vive afuera de LUMEN. Lo abro en otra pestaña — volvés cuando quieras.
+                Este recurso vive fuera de LUMEN. Abrilo cuando estés listo; volvés cuando quieras.
               </p>
-              {url && (
+
+              {url ? (
                 <button
                   onClick={() => {
                     window.open(url, '_blank', 'noopener,noreferrer')
@@ -357,8 +369,18 @@ export function ResourceViewer({
                     fontFamily: 'inherit',
                   }}
                 >
-                  Lo abro en otra pestaña
+                  Abrir recurso externo
                 </button>
+              ) : (
+                <p
+                  style={{
+                    margin: 0,
+                    color: tokens.textMuted,
+                    fontSize: '0.95rem',
+                  }}
+                >
+                  No encontré un enlace disponible para este recurso.
+                </p>
               )}
             </div>
           )}
