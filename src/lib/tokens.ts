@@ -62,6 +62,8 @@ export interface ModuleTokens {
   orbOuter:      string
   orbGlow:       string
 
+  shadow:        string
+
   energy:        string
   source:        ModuleKey
 }
@@ -95,6 +97,8 @@ export function getModuleTokens(contentSource: string | undefined | null): Modul
     orbMid:        accent,
     orbOuter:      accentDeep,
     orbGlow:       `0 0 32px ${withAlpha(accent, 0.40)}`,
+
+    shadow:        '0 8px 24px rgba(0,0,0,0.08)',
 
     energy,
     source:        key,
