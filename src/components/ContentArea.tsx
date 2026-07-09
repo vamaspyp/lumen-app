@@ -609,11 +609,16 @@ if (contentType === 'activity_detail') {
     )
   }
 
-  if (contentType === 'name_prompt') {
-    return <NamePrompt actions={actions} dispatch={dispatch} tokens={tokens} />
-  }
-
   if (contentType === 'contribution_form') {
+    const formKind =
+      (contentData.form_kind as string) ||
+      (contentData.source as string) ||
+      ''
+
+    if (formKind === 'name_prompt') {
+      return <NamePrompt actions={actions} dispatch={dispatch} tokens={tokens} />
+    }
+
     return <ContributionForm actions={actions} dispatch={dispatch} tokens={tokens} />
   }
 
