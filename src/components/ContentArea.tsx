@@ -245,92 +245,6 @@ function ContributionForm({
   )
 }
 
-// ─── ShareText ────────────────────────────────────────────────────
-
-function ShareText({
-  content,
-  actions,
-  dispatch,
-  tokens,
-}: {
-  content: Record<string, unknown>
-  actions: Array<{ label: string; action: string; variant?: string }>
-  dispatch: (action: string, extra?: Record<string, string>) => void
-  tokens: ModuleTokens
-}) {
-  const initialText = (content.text as string) || ''
-  const [text, setText] = useState(initialText)
-  const [copied, setCopied] = useState(false)
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(text)
-      setCopied(true)
-      dispatch('share_text_copied')
-      setTimeout(() => setCopied(false), 2500)
-    } catch {
-      setCopied(false)
-    }
-  }
-
-  return (
-    <div style={{ textAlign: 'left' }}>
-      <textarea
-        value={text}
-        onChange={e => setText(e.target.value)}
-        rows={6}
-        style={{
-          width: '100%',
-          padding: '1rem 1.125rem',
-          borderRadius: '14px',
-          background: tokens.cardBg,
-          border: `1px solid ${tokens.cardBorder}`,
-          color: tokens.textPrimary,
-          fontSize: '0.95rem',
-          fontFamily: 'inherit',
-          resize: 'vertical',
-          outline: 'none',
-          lineHeight: 1.55,
-          boxSizing: 'border-box',
-          marginBottom: '1rem',
-        }}
-      />
-
-      <button
-        onClick={handleCopy}
-        style={{
-          width: '100%',
-          padding: '0.75rem 1.25rem',
-          borderRadius: '999px',
-          background: copied ? tokens.accentSoft20 : tokens.accent,
-          border: `1px solid ${tokens.accent}`,
-          color: copied ? tokens.accentDeep : '#FFFFFF',
-          fontSize: '0.9rem',
-          cursor: 'pointer',
-          fontWeight: 500,
-          fontFamily: 'inherit',
-          transition: 'all 0.25s ease',
-          marginBottom: '1rem',
-        }}
-      >
-        {copied ? '✓ Copiado al portapapeles' : 'Copiar texto'}
-      </button>
-
-      <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
-        {actions.map((action, idx) => (
-          <Pill
-            key={`${action.action}-${idx}`}
-            label={action.label}
-            variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
-            onClick={() => dispatch(action.action)}
-            tokens={tokens}
-          />
-        ))}
-      </div>
-    </div>
-  )
-}
-
 // ─── ContentArea ──────────────────────────────────────────────────
 
 export function ContentArea({
@@ -620,10 +534,6 @@ if (contentType === 'activity_detail') {
     }
 
     return <ContributionForm actions={actions} dispatch={dispatch} tokens={tokens} />
-  }
-
-  if (contentType === 'share_text') {
-    return <ShareText content={contentData} actions={actions} dispatch={dispatch} tokens={tokens} />
   }
 
   // ── Viewer activo en flujo de experiencia ──────────────────────
