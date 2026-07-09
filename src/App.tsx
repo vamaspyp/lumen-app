@@ -9,8 +9,11 @@ function App() {
   const { state, dispatch, linkAccount } = useLumi()
   const tokens = getModuleTokens(state.contentSource)
 
-  const isScan = state.lumiContentType === 'lumi_scan'
-  const isSimpleView = ['empty_presence', 'landing_scan', 'landing_scan_invite', 'scan_complete'].includes(state.lumiContentType)
+  const isLandingScan =
+    state.lumiContentType === 'activity_detail' &&
+    state.lumiContentData?.detail_kind === 'landing_scan'
+
+  const isSimpleView = state.lumiContentType === 'empty_presence'
 
   const activeRunId = (state.lumiContentData?.run_id as string)
     || state.currentExperienceRunId
@@ -94,13 +97,13 @@ function App() {
           minHeight: '100vh',
           color: tokens.textPrimary,
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-          paddingTop: (isScan || isSimpleView) ? 0 : '2rem',
+          paddingTop: (isLandingScan || isSimpleView) ? 0 : '2rem',
           paddingLeft: '1.25rem',
           paddingRight: '1.25rem',
           boxSizing: 'border-box',
         }}
       >
-        {isScan ? (
+        {isLandingScan ? (
           <LandingScan
             message={state.lumiMessage}
             actions={state.lumiActions}
