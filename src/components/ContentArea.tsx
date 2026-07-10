@@ -264,6 +264,14 @@ export function ContentArea({
   experienceRunId?: string
   onRegister?: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>
 }) {
+  console.log('[ContentArea]', {
+    contentType,
+    detailKind: contentData?.detail_kind,
+    codeLike: contentData?.code,
+    title: contentData?.title,
+    action0: actions?.[0]?.action,
+    contentData,
+  })
 
   if (contentType === 'resource_card') {
     return (
@@ -414,6 +422,14 @@ export function ContentArea({
                     if (item.action === 'open_sanctuary_item') {
                       extra.sanctuary_item_id = item.id
                     }
+
+                    console.log('[ItemList click]', {
+                      itemAction: item.action,
+                      itemId: item.id,
+                      experienceId: item.experience_id,
+                      resourceId: item.resource_id,
+                      extra,
+                    })
 
                     dispatch(item.action, extra)
                   }}
