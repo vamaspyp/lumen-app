@@ -96,6 +96,8 @@ export function ResourceListCard({
   author,
   format,
   durationMin,
+  whyNow,
+  minimumStep,
   onClick,
   tokens,
 }: {
@@ -104,6 +106,8 @@ export function ResourceListCard({
   author?: string
   format?: string
   durationMin?: number
+  whyNow?: string
+  minimumStep?: string
   onClick: () => void
   tokens: ModuleTokens
 }) {
@@ -163,6 +167,32 @@ export function ResourceListCard({
         {author && (
           <p style={{ fontSize: '11px', color: tokens.textSecondary, margin: '2px 0 0' }}>
             {author}
+          </p>
+        )}
+        {whyNow && (
+          <p
+            style={{
+              fontSize: '11px',
+              color: tokens.textMuted,
+              margin: '4px 0 0',
+              lineHeight: 1.35,
+              fontStyle: 'italic',
+            }}
+          >
+            {whyNow}
+          </p>
+        )}
+        {minimumStep && !whyNow && (
+          <p
+            style={{
+              fontSize: '11px',
+              color: tokens.textMuted,
+              margin: '4px 0 0',
+              lineHeight: 1.35,
+              fontStyle: 'italic',
+            }}
+          >
+            {minimumStep}
           </p>
         )}
       </div>

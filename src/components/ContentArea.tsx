@@ -327,7 +327,14 @@ export function ContentArea({
         has_note?: boolean
         action: string
         value?: string
+        source?: string
         experience_id?: string
+        resource_id?: string
+        why_now?: string
+        minimum_step?: string
+        capability_key?: string
+        editorial_status?: string
+        source_control?: string
       }>) || []
 
     const filterOptions = contentData.filter_options as
@@ -388,13 +395,28 @@ export function ContentArea({
                   author={item.author}
                   format={item.format}
                   durationMin={item.duration_min}
-                  onClick={() => dispatch(item.action, {
-                    resource_id:       item.id,
-                    sanctuary_item_id: item.id,
-                    ...(item.experience_id ? { experience_id: item.experience_id } : {}),
-                    source:            item.value || '',
-                    value:             item.value || '',
-                  })}
+                  whyNow={item.why_now}
+                  minimumStep={item.minimum_step}
+                  onClick={() => {
+                    const extra: Record<string, string> = {
+                      source: item.value || item.source || source || '',
+                      value:  item.value || item.source || source || '',
+                    }
+
+                    if (item.experience_id) {
+                      extra.experience_id = item.experience_id
+                    }
+
+                    if (item.resource_id) {
+                      extra.resource_id = item.resource_id
+                    }
+
+                    if (item.action === 'open_sanctuary_item') {
+                      extra.sanctuary_item_id = item.id
+                    }
+
+                    dispatch(item.action, extra)
+                  }}
                   tokens={tokens}
                 />
               )
