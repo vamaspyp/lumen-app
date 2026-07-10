@@ -22,7 +22,13 @@ function App() {
   const renderPerlaBlock = (marginBottom: string) => {
     const perla = (state.lumiContentData?.culture_phrase as string) || ''
     const mensaje = state.lumiMessage || ''
-    if (!perla && !mensaje) return null
+
+    const showReflectionHint =
+      !!state.reflectionHint &&
+      (state.contentSource === '' || state.contentSource === 'lumi') &&
+      state.lumiContentType === 'empty_presence'
+
+    if (!perla && !mensaje && !showReflectionHint) return null
     return (
       <div
         style={{
@@ -49,7 +55,7 @@ function App() {
             "{perla}"
           </span>
         )}
-        {state.reflectionHint && (
+        {showReflectionHint && (
           <span
             style={{
               display: 'block',
