@@ -337,18 +337,45 @@ export function ContentArea({
         source_control?: string
       }>) || []
 
-    const filterOptions = contentData.filter_options as
+    const rawFilterOptions = contentData.filter_options as
       | {
           area?: Array<{ value: string; label: string }>
           format?: Array<{ value: string; label: string }>
+          formato?: Array<{ value: string; label: string }>
           duration?: Array<{ value: string; label: string }>
+          duracion?: Array<{ value: string; label: string }>
           has_note?: Array<{ value: string; label: string }>
           necesito?: Array<{ value: string; label: string }>
         }
       | undefined
-    const currentFilters = (contentData.current_filters as
-      | { area?: string; format?: string; duration?: string; has_note?: string }
+
+    // Compat: backend puede devolver format/duration en español (formato/duracion)
+    const filterOptions = rawFilterOptions
+      ? {
+          ...rawFilterOptions,
+          format: rawFilterOptions.format || rawFilterOptions.formato,
+          duration: rawFilterOptions.duration || rawFilterOptions.duracion,
+        }
+      : undefined
+
+    const rawCurrentFilters = (contentData.current_filters as
+      | {
+          area?: string
+          format?: string
+          formato?: string
+          duration?: string
+          duracion?: string
+          has_note?: string
+          necesito?: string
+        }
       | undefined) || {}
+
+    const currentFilters = {
+      ...rawCurrentFilters,
+      format: rawCurrentFilters.format || rawCurrentFilters.formato,
+      duration: rawCurrentFilters.duration || rawCurrentFilters.duracion,
+    }
+
     const source = contentData.source as string | undefined
 
     return (
