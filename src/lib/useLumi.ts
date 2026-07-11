@@ -109,11 +109,11 @@ function updateState(
 ) {
   setState(prev => ({
     ...prev,
-    lumiMessage: (result.message as string) ?? prev.lumiMessage,
-    lumiActions: (result.actions as Action[]) ?? prev.lumiActions,
-    lumiContentType: (result.content_type as string) ?? prev.lumiContentType,
-    lumiContentData: (result.content as Record<string, unknown>) ?? prev.lumiContentData,
-    lumiCode: (result.code as string) ?? prev.lumiCode,
+    lumiMessage: 'message' in result ? (result.message as string) : prev.lumiMessage,
+    lumiActions: 'actions' in result ? (result.actions as Action[]) : [],
+    lumiContentType: 'content_type' in result ? (result.content_type as string) : 'empty_presence',
+    lumiContentData: ('content' in result && result.content != null) ? (result.content as Record<string, unknown>) : {},
+    lumiCode: 'code' in result ? (result.code as string) : prev.lumiCode,
     // Supabase decide qué App State actualizar
     ...((result.state as Partial<LumiState>) || {}),
   }))

@@ -20,13 +20,18 @@ function App() {
     || ''
 
   const renderPerlaBlock = (marginBottom: string) => {
-    const perla = (state.lumiContentData?.culture_phrase as string) || ''
+    const rawPerla = (state.lumiContentData?.culture_phrase as string) || ''
     const mensaje = state.lumiMessage || ''
+
+    const showLumiHomeContext =
+      (state.contentSource === '' || state.contentSource === 'lumi') &&
+      state.lumiContentType === 'empty_presence'
+
+    const perla = showLumiHomeContext ? rawPerla : ''
 
     const showReflectionHint =
       !!state.reflectionHint &&
-      (state.contentSource === '' || state.contentSource === 'lumi') &&
-      state.lumiContentType === 'empty_presence'
+      showLumiHomeContext
 
     if (!perla && !mensaje && !showReflectionHint) return null
     return (
