@@ -325,6 +325,7 @@ export function ContentArea({
         duration_min?: number
         author?: string
         has_note?: boolean
+        note_preview?: string
         action: string
         value?: string
         source?: string
@@ -424,6 +425,8 @@ export function ContentArea({
                   durationMin={item.duration_min}
                   whyNow={item.why_now}
                   minimumStep={item.minimum_step}
+                  hasNote={item.has_note}
+                  notePreview={item.note_preview}
                   onClick={() => {
                     const extra: Record<string, string> = {
                       source: item.value || item.source || source || '',

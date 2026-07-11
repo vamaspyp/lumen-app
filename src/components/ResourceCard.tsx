@@ -98,6 +98,8 @@ export function ResourceListCard({
   durationMin,
   whyNow,
   minimumStep,
+  hasNote,
+  notePreview,
   onClick,
   tokens,
 }: {
@@ -108,6 +110,8 @@ export function ResourceListCard({
   durationMin?: number
   whyNow?: string
   minimumStep?: string
+  hasNote?: boolean
+  notePreview?: string
   onClick: () => void
   tokens: ModuleTokens
 }) {
@@ -152,14 +156,27 @@ export function ResourceListCard({
     >
       <GenerativeThumbnail format={derivedFormat} title={title} />
       <div style={{ padding: '10px 14px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
-        {badgeText && (
-          <span style={{
-            fontSize: '10px', letterSpacing: '0.3px', padding: '2px 7px',
-            borderRadius: '999px', width: 'fit-content', marginBottom: '5px',
-            background: badgeBg, color: badgeColor, display: 'inline-block', lineHeight: 1.4,
-          }}>
-            {badgeText}
-          </span>
+        {(badgeText || hasNote) && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '5px' }}>
+            {badgeText && (
+              <span style={{
+                fontSize: '10px', letterSpacing: '0.3px', padding: '2px 7px',
+                borderRadius: '999px', width: 'fit-content',
+                background: badgeBg, color: badgeColor, display: 'inline-block', lineHeight: 1.4,
+              }}>
+                {badgeText}
+              </span>
+            )}
+            {hasNote && (
+              <span style={{
+                fontSize: '10px', letterSpacing: '0.3px', padding: '2px 7px',
+                borderRadius: '999px', width: 'fit-content',
+                background: tokens.accentSoft10, color: tokens.textMuted, display: 'inline-block', lineHeight: 1.4,
+              }}>
+                Nota
+              </span>
+            )}
+          </div>
         )}
         <p style={{ fontSize: '14px', fontWeight: 500, lineHeight: 1.35, color: tokens.textPrimary, margin: 0 }}>
           {title}
@@ -193,6 +210,19 @@ export function ResourceListCard({
             }}
           >
             {minimumStep}
+          </p>
+        )}
+        {notePreview && !whyNow && !minimumStep && (
+          <p
+            style={{
+              fontSize: '11px',
+              color: tokens.textMuted,
+              margin: '4px 0 0',
+              lineHeight: 1.35,
+              fontStyle: 'italic',
+            }}
+          >
+            {notePreview}
           </p>
         )}
       </div>
