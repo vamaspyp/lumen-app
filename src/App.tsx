@@ -48,7 +48,7 @@ function App() {
               fontStyle: 'italic',
               color: tokens.textMuted,
               opacity: 0.75,
-              marginBottom: (state.reflectionHint || mensaje) ? '0.65rem' : 0,
+              marginBottom: (showReflectionHint || mensaje) ? '0.65rem' : 0,
               letterSpacing: '0.005em',
             }}
           >
@@ -196,49 +196,6 @@ function App() {
               />
             </div>
 
-            <details
-              style={{
-                marginTop: '3rem',
-                width: '100%',
-                fontSize: '0.7rem',
-                color: tokens.textMuted,
-                opacity: 0.6,
-              }}
-            >
-              <summary style={{ cursor: 'pointer' }}>debug</summary>
-              <pre
-                style={{
-                  background: 'rgba(0,0,0,0.04)',
-                  padding: '0.75rem',
-                  borderRadius: '8px',
-                  overflow: 'auto',
-                  fontSize: '0.65rem',
-                }}
-              >
-                {JSON.stringify(
-                  {
-                    code: state.lumiCode,
-                    content_type: state.lumiContentType,
-                    source: state.contentSource,
-                    module: tokens.source,
-                    session: state.currentSessionId,
-                    resource: state.currentResourceId,
-                    sanctuary_item: state.currentSanctuaryItemId,
-                    experience_run: state.currentExperienceRunId,
-                    ik: state.selectedIkKey,
-                    checkin: {
-                      state: state.checkinState,
-                      area: state.checkinArea,
-                      intent: state.checkinHelpIntent,
-                      time: state.checkinTime,
-                    },
-                    actions: state.lumiActions.map(a => `${a.label} → ${a.action}`),
-                  },
-                  null,
-                  2
-                )}
-              </pre>
-            </details>
           </div>
         )}
       </div>
