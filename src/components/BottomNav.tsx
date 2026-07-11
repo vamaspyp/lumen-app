@@ -8,7 +8,7 @@ export function BottomNav({
   dispatch: (action: string, extra?: Record<string, string>) => void
 }) {
   const modules: Array<{
-    key: 'lumi' | 'fuente' | 'sanctuary' | 'circles'
+    key: 'lumi' | 'fuente' | 'sanctuary'
     label: string
     action: string
     disabled?: boolean
@@ -16,13 +16,11 @@ export function BottomNav({
     { key: 'lumi',      label: 'LUMI',      action: 'go_home' },
     { key: 'fuente',    label: 'Fuente',    action: 'open_fuente' },
     { key: 'sanctuary', label: 'Santuario', action: 'open_sanctuary' },
-    { key: 'circles',   label: 'Círculos',  action: 'open_circulos', disabled: true },
   ]
 
   const activeKey: typeof modules[number]['key'] =
     currentSource === 'fuente'    ? 'fuente'    :
     currentSource === 'sanctuary' ? 'sanctuary' :
-    currentSource === 'circles'   ? 'circles'   :
     'lumi'
 
   return (
