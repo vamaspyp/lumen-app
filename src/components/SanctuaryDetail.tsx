@@ -1,4 +1,5 @@
 import type { ModuleTokens } from '../lib/tokens'
+import { ExperienceDetailCard } from './ExperienceDetailCard'
 
 export function SanctuaryDetail({
   content,
@@ -19,7 +20,7 @@ export function SanctuaryDetail({
   const hasNote      = !!(content.has_note as boolean)
   const preText      = (content.pre_text as string) || ''
   const postText     = (content.post_text as string) || ''
-  
+
   const helpSignal   = (content.help_signal as string) || ''
 
   const formatLabel = [
@@ -28,136 +29,23 @@ export function SanctuaryDetail({
   ].filter(Boolean).join(' · ')
 
   const helpSignalLabel: Record<string, string> = {
-  'me_sirvio':                'Te sirvió',
-  'me_dejo_un_poco_mejor':    'Te dejó un poco mejor',
-  'no_era_para_mi':           'No era para vos',
-  'guardado':                 'Lo guardaste',
-}
+    'me_sirvio':                'Te sirvió',
+    'me_dejo_un_poco_mejor':    'Te dejó un poco mejor',
+    'no_era_para_mi':           'No era para vos',
+    'guardado':                 'Lo guardaste',
+  }
 
   return (
-    <div
-      style={{
-        background: tokens.cardBg,
-        border: `1px solid ${tokens.cardBorder}`,
-        borderRadius: '18px',
-        padding: '1.5rem',
-        textAlign: 'left',
-        marginBottom: '1.5rem',
-      }}
+    <ExperienceDetailCard
+      tokens={tokens}
+      formatLabel={formatLabel || undefined}
+      secondaryBadgeLabel={helpSignal && helpSignalLabel[helpSignal] ? helpSignalLabel[helpSignal] : undefined}
+      title={title}
+      preText={preText || undefined}
+      preTextLabel="Lo que LUMI te propuso"
+      descriptionShort={description || undefined}
+      postText={postText || undefined}
     >
-      {/* Badge formato + señal de ayuda */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-        {formatLabel && (
-          <div
-            style={{
-              display: 'inline-block',
-              background: tokens.accentSoft20,
-              padding: '0.25rem 0.75rem',
-              borderRadius: '999px',
-              fontSize: '0.7rem',
-              color: tokens.accentDeep,
-              textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              fontWeight: 500,
-            }}
-          >
-            {formatLabel}
-          </div>
-        )}
-        {helpSignal && helpSignalLabel[helpSignal] && (
-          <div
-            style={{
-              display: 'inline-block',
-              background: tokens.accentSoft10,
-              padding: '0.25rem 0.75rem',
-              borderRadius: '999px',
-              fontSize: '0.7rem',
-              color: tokens.textMuted,
-              letterSpacing: '0.04em',
-            }}
-          >
-            {helpSignalLabel[helpSignal]}
-          </div>
-        )}
-      </div>
-
-      {/* Título */}
-      <h2
-        style={{
-          fontSize: '1.4rem',
-          fontWeight: 500,
-          color: tokens.textPrimary,
-          marginTop: 0,
-          marginBottom: '1rem',
-          lineHeight: 1.3,
-        }}
-      >
-        {title}
-      </h2>
-
-      {/* Pre-text de la experiencia */}
-      {preText && (
-        <div
-          style={{
-            background: tokens.accentSoft10,
-            borderRadius: '12px',
-            padding: '0.875rem 1rem',
-            marginBottom: '1.25rem',
-          }}
-        >
-          <div
-            style={{
-              fontSize: '0.7rem',
-              color: tokens.accentDeep,
-              textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              marginBottom: '0.375rem',
-              fontWeight: 600,
-            }}
-          >
-            Lo que LUMI te propuso
-          </div>
-          <p style={{ fontSize: '0.95rem', color: tokens.textPrimary, margin: 0, lineHeight: 1.5 }}>
-            {preText}
-          </p>
-        </div>
-      )}
-
-      {/* Descripción del recurso */}
-      {description && !preText && (
-        <p
-          style={{
-            fontSize: '0.95rem',
-            color: tokens.textSecondary,
-            lineHeight: 1.5,
-            margin: '0 0 1.25rem 0',
-          }}
-        >
-          {description}
-        </p>
-      )}
-
-      {/* Post-text */}
-      {postText && (
-        <div style={{ marginBottom: '1.25rem' }}>
-          <div
-            style={{
-              fontSize: '0.7rem',
-              color: tokens.textMuted,
-              textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              marginBottom: '0.375rem',
-              fontWeight: 500,
-            }}
-          >
-            Para después
-          </div>
-          <p style={{ fontSize: '0.9rem', color: tokens.textSecondary, margin: 0, lineHeight: 1.5 }}>
-            {postText}
-          </p>
-        </div>
-      )}
-
       {/* Nota personal */}
       {hasNote && note && (
         <div
@@ -232,6 +120,6 @@ export function SanctuaryDetail({
           })()}
         </button>
       )}
-    </div>
+    </ExperienceDetailCard>
   )
 }
