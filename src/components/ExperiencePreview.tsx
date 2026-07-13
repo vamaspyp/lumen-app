@@ -18,7 +18,7 @@ export function ExperiencePreview({
   const minimumStep    = (content.minimum_step as string) || ''
   const whatItIsNot    = (content.what_it_is_not as string) || ''
   const whenItHelps    = (content.when_it_helps as string) || ''
-  const ikLabel        = (content.ik_label as string) || ''
+  const expectedCapabilityLabel = (content.expected_capability_label as string) || ''
   const preText        = (content.pre_text as string) || ''
   const descriptionShort = (content.description_short as string) || ''
 
@@ -33,7 +33,7 @@ export function ExperiencePreview({
     <ExperienceDetailCard
       tokens={tokens}
       formatLabel={formatLabel || undefined}
-      secondaryBadgeLabel={ikLabel || undefined}
+      secondaryBadgeLabel={expectedCapabilityLabel || undefined}
       title={title}
       objective={objective || undefined}
       descriptionShort={descriptionShort || undefined}
