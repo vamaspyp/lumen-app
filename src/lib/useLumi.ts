@@ -36,7 +36,6 @@ export interface LumiState {
   // Check-in
    checkinState: string
   checkinArea: string
-  checkinHelpIntent: string
   checkinTime: string
   checkinHemisphere: string
   checkinFaro: string
@@ -70,7 +69,6 @@ const initialState: LumiState = {
 
 checkinState: '',
   checkinArea: '',
-  checkinHelpIntent: '',
   checkinTime: '',
   checkinHemisphere: '',
   checkinFaro: '',
@@ -94,7 +92,6 @@ function buildParams(state: LumiState): Record<string, string> {
     // Check-in canónico H1/H2
     checkin_state:       state.checkinState,
     checkin_area:        state.checkinArea,
-    checkin_help_intent: state.checkinHelpIntent,
     checkin_time:        state.checkinTime,
     checkin_hemisphere:  state.checkinHemisphere,
     checkin_faro:        state.checkinFaro,
