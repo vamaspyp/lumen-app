@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { supabase } from './supabase'
+import { shareLight } from './shareLight'
 
 // ───────── Types ─────────
 
@@ -158,6 +159,13 @@ export function useLumi() {
 
   const dispatch = useCallback(
     async (action: string, extra?: Record<string, string>) => {
+      // share_light es una acción técnica local: nunca llama a Supabase,
+      // nunca cambia de nodo ni limpia estado.
+      if (action === 'share_light') {
+        await shareLight({ ...stateRef.current.lumiContentData, ...extra })
+        return
+      }
+
       const { data, error } = await supabase.rpc('lumi_dispatch', {
         p_action: action,
         p_params: { ...buildParams(stateRef.current), ...extra },

@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import type { ModuleTokens } from '../lib/tokens'
 import { ExperienceDetailCard } from './ExperienceDetailCard'
+import { Pill } from './Pill'
+import { shareLight } from '../lib/shareLight'
 
 export function SanctuaryDetail({
   content,
@@ -33,6 +36,13 @@ export function SanctuaryDetail({
     'me_dejo_un_poco_mejor':    'Te dejó un poco mejor',
     'no_era_para_mi':           'No era para vos',
     'guardado':                 'Lo guardaste',
+  }
+
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'failed'>('idle')
+
+  const handleShareLight = async () => {
+    const result = await shareLight(content)
+    setShareStatus(result === 'shared' ? 'idle' : result)
   }
 
   return (
@@ -119,6 +129,23 @@ export function SanctuaryDetail({
             return 'Abrir'
           })()}
         </button>
+      )}
+
+      {/* Compartir luz */}
+      {title && (
+        <div style={{ marginTop: '1.25rem', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem' }}>
+          <Pill label="Compartir luz" variant="ghost" onClick={handleShareLight} tokens={tokens} />
+          {shareStatus === 'copied' && (
+            <span style={{ fontSize: '0.75rem', color: tokens.textMuted, fontStyle: 'italic' }}>
+              Copiado para compartir
+            </span>
+          )}
+          {shareStatus === 'failed' && (
+            <span style={{ fontSize: '0.75rem', color: tokens.textMuted, fontStyle: 'italic' }}>
+              No pude copiarlo ahora
+            </span>
+          )}
+        </div>
       )}
     </ExperienceDetailCard>
   )
