@@ -1,8 +1,6 @@
-import { useState } from 'react'
 import type { ModuleTokens } from '../lib/tokens'
 import { ExperienceDetailCard } from './ExperienceDetailCard'
 import { Pill } from './Pill'
-import { shareLight } from '../lib/shareLight'
 
 export function SanctuaryDetail({
   content,
@@ -26,6 +24,11 @@ export function SanctuaryDetail({
 
   const helpSignal   = (content.help_signal as string) || ''
 
+  const resourceId       = (content.resource_id as string) || ''
+  const experienceId     = (content.experience_id as string) || ''
+  const experienceRunId  = (content.experience_run_id as string) || ''
+  const sanctuaryItemId  = (content.sanctuary_item_id as string) || ''
+
   const formatLabel = [
     format && format !== '—' && format.charAt(0).toUpperCase() + format.slice(1),
     durationMin && durationMin !== '—' && `${durationMin} min`,
@@ -38,11 +41,18 @@ export function SanctuaryDetail({
     'guardado':                 'Lo guardaste',
   }
 
-  const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'failed'>('idle')
-
-  const handleShareLight = async () => {
-    const result = await shareLight(content)
-    setShareStatus(result === 'shared' ? 'idle' : result)
+  const handleShareLight = () => {
+    dispatch('share_light', {
+      surface: 'sanctuary_detail',
+      title,
+      description_short: description,
+      url,
+      source: 'sanctuary',
+      ...(resourceId ? { resource_id: resourceId } : {}),
+      ...(experienceId ? { experience_id: experienceId } : {}),
+      ...(experienceRunId ? { experience_run_id: experienceRunId } : {}),
+      ...(sanctuaryItemId ? { sanctuary_item_id: sanctuaryItemId } : {}),
+    })
   }
 
   return (
@@ -135,16 +145,6 @@ export function SanctuaryDetail({
       {title && (
         <div style={{ marginTop: '1.25rem', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem' }}>
           <Pill label="Compartir luz" variant="ghost" onClick={handleShareLight} tokens={tokens} />
-          {shareStatus === 'copied' && (
-            <span style={{ fontSize: '0.75rem', color: tokens.textMuted, fontStyle: 'italic' }}>
-              Copiado para compartir
-            </span>
-          )}
-          {shareStatus === 'failed' && (
-            <span style={{ fontSize: '0.75rem', color: tokens.textMuted, fontStyle: 'italic' }}>
-              No pude copiarlo ahora
-            </span>
-          )}
         </div>
       )}
     </ExperienceDetailCard>

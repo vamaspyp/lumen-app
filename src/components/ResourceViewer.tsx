@@ -469,7 +469,7 @@ export function ResourceViewer({
     embedNode = url ? <AudioDirect src={url} title={title} tokens={tokens} /> : null
   }
 
-  const shareAction = actions.find(a => a.action === 'share_resource')
+  const shareAction = actions.find(a => a.action === 'share_light')
 
   return createPortal(
     <div
@@ -497,7 +497,13 @@ export function ResourceViewer({
       >
         {shareAction && (
           <button
-            onClick={() => dispatch('share_resource', { title, url })}
+            onClick={() => dispatch('share_light', {
+              surface: 'resource_viewer',
+              title,
+              url,
+              source: (content?.source as string) || '',
+              resource_id: (content?.resource_id as string) || '',
+            })}
             aria-label="Compartir"
             style={{
               pointerEvents: 'auto',

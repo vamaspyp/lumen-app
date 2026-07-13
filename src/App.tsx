@@ -6,7 +6,7 @@ import { ContentArea } from './components/ContentArea'
 import { LandingScan } from './components/LandingScan'
 
 function App() {
-  const { state, dispatch, linkAccount } = useLumi()
+  const { state, dispatch, linkAccount, callRpc } = useLumi()
   const tokens = getModuleTokens(state.contentSource)
 
   const isLandingScan =
@@ -225,6 +225,7 @@ function App() {
                 contentData={state.lumiContentData}
                 actions={state.lumiActions}
                 dispatch={dispatch}
+                callRpc={callRpc}
                 tokens={tokens}
                 experienceRunId={activeRunId}
                 onRegister={linkAccount}
@@ -257,6 +258,7 @@ function App() {
                 contentData={state.lumiContentData}
                 actions={state.lumiActions}
                 dispatch={dispatch}
+                callRpc={callRpc}
                 tokens={tokens}
                 experienceRunId={activeRunId}
                 onRegister={linkAccount}

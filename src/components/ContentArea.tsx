@@ -3,12 +3,14 @@ import type { ModuleTokens } from '../lib/tokens'
 import { Pill } from './Pill'
 import { ResourceCard, ResourceListCard } from './ResourceCard'
 import { SanctuaryDetail } from './SanctuaryDetail'
+import { ExperienceDetailCard } from './ExperienceDetailCard'
 import { NoteEditor } from './NoteEditor'
 import { NamePrompt } from './NamePrompt'
 import { ListFilterPanel } from './ListFilterPanel'
 import { ResourceViewer } from './ResourceViewer'
 import { ExperiencePreview } from './ExperiencePreview'
 import { RegisterForm } from './RegisterForm.tsx'
+import { ShareLightEditor } from './ShareLightEditor'
 // ─── FarosPanel ───────────────────────────────────────────────────
 
 function FarosPanel({
@@ -252,6 +254,7 @@ export function ContentArea({
   contentData,
   actions,
   dispatch,
+  callRpc,
   tokens,
   experienceRunId = '',
   onRegister,
@@ -260,10 +263,23 @@ export function ContentArea({
   contentData: Record<string, unknown>
   actions: Array<{ label: string; action: string; value?: string; variant?: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
+  callRpc: (rpcName: string, params: Record<string, string>) => Promise<Record<string, unknown> | null>
   tokens: ModuleTokens
   experienceRunId?: string
   onRegister?: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>
 }) {
+
+  if (contentType === 'share_light_editor' || contentData.type === 'share_light_editor') {
+    return (
+      <ShareLightEditor
+        content={contentData}
+        actions={actions}
+        dispatch={dispatch}
+        callRpc={callRpc}
+        tokens={tokens}
+      />
+    )
+  }
 
   if (contentType === 'resource_card') {
     return (
@@ -516,6 +532,32 @@ if (contentType === 'activity_detail') {
                   format:            (contentData.format as string) || '',
                   duration:          String(contentData.duration_min || ''),
                   url:               (contentData.url as string) || '',
+                })}
+                tokens={tokens}
+              />
+            ))}
+          </div>
+        </>
+      )
+    }
+
+    if (detailKind === 'shared_light_entry') {
+      return (
+        <>
+          <ExperienceDetailCard
+            tokens={tokens}
+            title={(contentData.title as string) || ''}
+            objective={(contentData.privacy_hint as string) || undefined}
+            descriptionShort={(contentData.description_short as string) || undefined}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+            {actions.map((action, idx) => (
+              <Pill
+                key={`${action.action}-${idx}`}
+                label={action.label}
+                variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
+                onClick={() => dispatch(action.action, {
+                  ...(action.value ? { value: action.value } : {}),
                 })}
                 tokens={tokens}
               />

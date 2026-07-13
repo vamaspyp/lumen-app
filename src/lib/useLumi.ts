@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { supabase } from './supabase'
-import { shareLight } from './shareLight'
 
 // ───────── Types ─────────
 
@@ -43,7 +42,12 @@ export interface LumiState {
 
   // Experiencia (modelo nuevo)
   currentExperienceRunId: string
+  currentExperienceId: string
   selectedIkKey: string
+
+  // Circular Luz
+  currentShareLightId: string
+  currentShareToken: string
 
   // Reflejo
   reflectionHint: string
@@ -74,7 +78,11 @@ checkinState: '',
   checkinFaro: '',
   checkinCapability: '',
   currentExperienceRunId: '',
+  currentExperienceId: '',
   selectedIkKey: '',
+
+  currentShareLightId: '',
+  currentShareToken: '',
 
   reflectionHint: '',
 }
@@ -98,7 +106,20 @@ function buildParams(state: LumiState): Record<string, string> {
     checkin_capability:  state.checkinCapability,
     // Experiencia activa (modelo nuevo)
     experience_run_id: state.currentExperienceRunId,
+    experience_id: state.currentExperienceId,
+    // Circular Luz
+    share_light_id: state.currentShareLightId,
+    share_token: state.currentShareToken,
   }
+}
+
+// Actions cuyo nodo real se resuelve con una RPC específica en vez del
+// dispatcher genérico lumi_dispatch.
+const DIRECT_RPC_ACTIONS: Record<string, string> = {
+  share_light: 'lumi_share_light',
+  start_shared_light: 'lumi_start_shared_light',
+  complete_shared_light: 'lumi_complete_shared_light',
+  submit_shared_light_signal: 'lumi_submit_shared_light_signal',
 }
 
 function updateState(
@@ -156,28 +177,50 @@ export function useLumi() {
 
   const dispatch = useCallback(
     async (action: string, extra?: Record<string, string>) => {
-      // share_light es una acción técnica local: nunca llama a Supabase,
-      // nunca cambia de nodo ni limpia estado.
-      if (action === 'share_light') {
-        await shareLight({ ...stateRef.current.lumiContentData, ...extra })
-        return
-      }
+      const params = { ...buildParams(stateRef.current), ...extra }
 
-      const { data, error } = await supabase.rpc('lumi_dispatch', {
-        p_action: action,
-        p_params: { ...buildParams(stateRef.current), ...extra },
-      })
+      // Algunas actions resuelven su nodo real con una RPC específica
+      // (Circular Luz) en vez del dispatcher genérico. Se aplica siempre
+      // como cualquier respuesta de nodo: Supabase decide, React renderiza.
+      const rpcName = DIRECT_RPC_ACTIONS[action]
+      const { data, error } = rpcName
+        ? await supabase.rpc(rpcName, { p_params: params })
+        : await supabase.rpc('lumi_dispatch', { p_action: action, p_params: params })
 
       if (error) {
-        console.error('[useLumi] dispatch error:', error)
+        console.error(`[useLumi] ${action} error:`, error)
         return
       }
 
       if (data?.ok) {
         updateState(setState, data as Record<string, unknown>)
       } else {
-        console.warn('[useLumi] dispatch returned not-ok:', data)
+        console.warn(`[useLumi] ${action} returned not-ok:`, data)
       }
+    },
+    []
+  )
+
+  // Llamada directa a una RPC de nodo (usada por flujos que necesitan
+  // intercalar efectos de cliente —clipboard/share— entre dos llamadas,
+  // como la secuencia de copiar/compartir de ShareLightEditor). Aplica
+  // la respuesta exactamente igual que dispatch: nunca inventa estado.
+  const callRpc = useCallback(
+    async (rpcName: string, params: Record<string, string>) => {
+      const { data, error } = await supabase.rpc(rpcName, { p_params: params })
+
+      if (error) {
+        console.error(`[useLumi] ${rpcName} error:`, error)
+        return null
+      }
+
+      if (data?.ok) {
+        updateState(setState, data as Record<string, unknown>)
+      } else {
+        console.warn(`[useLumi] ${rpcName} returned not-ok:`, data)
+      }
+
+      return data as Record<string, unknown> | null
     },
     []
   )
@@ -187,6 +230,27 @@ export function useLumi() {
     let cancelled = false
 
     async function bootstrap() {
+      // Luz compartida recibida por link: se vive sin crear usuario.
+      // Solo si Supabase no puede resolver el token, se cae al bootstrap normal.
+      const sharedToken = new URLSearchParams(window.location.search).get('share_light')
+
+      if (sharedToken) {
+        const { data, error } = await supabase.rpc('lumi_open_shared_light', {
+          p_share_token: sharedToken,
+          p_params: {},
+        })
+
+        if (cancelled) return
+
+        if (!error && data?.ok) {
+          updateState(setState, data as Record<string, unknown>)
+          return
+        }
+
+        if (error) console.error('[useLumi] lumi_open_shared_light error:', error)
+        else console.warn('[useLumi] lumi_open_shared_light returned not-ok:', data)
+      }
+
       const { userId, isAnonymous } = await ensureUser()
 
       if (cancelled) return
@@ -237,5 +301,5 @@ export function useLumi() {
     []
   )
 
-  return { state, dispatch, linkAccount }
+  return { state, dispatch, linkAccount, callRpc }
 }
