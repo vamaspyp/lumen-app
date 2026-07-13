@@ -324,16 +324,21 @@ export function ContentArea({
         format?: string
         duration_min?: number
         author?: string
+        life_area_key?: string
         has_note?: boolean
         note_preview?: string
         action: string
         value?: string
         source?: string
         experience_id?: string
+        experience_run_id?: string
         resource_id?: string
+        sanctuary_item_id?: string
         why_now?: string
         minimum_step?: string
         capability_key?: string
+        capability_label?: string
+        help_signal?: string
         editorial_status?: string
         source_control?: string
       }>) || []
@@ -425,21 +430,30 @@ export function ContentArea({
                   durationMin={item.duration_min}
                   whyNow={item.why_now}
                   minimumStep={item.minimum_step}
+                  capabilityLabel={item.capability_label}
+                  helpSignal={item.help_signal}
+                  hasNote={item.has_note}
                   onClick={() => {
                     const extra: Record<string, string> = {
-                      source: item.value || item.source || source || '',
-                      value:  item.value || item.source || source || '',
-                    }
-
-                    if (item.experience_id) {
-                      extra.experience_id = item.experience_id
+                      source: source || item.source || '',
+                      value:  item.value || item.id,
                     }
 
                     if (item.resource_id) {
                       extra.resource_id = item.resource_id
                     }
 
-                    if (item.action === 'open_sanctuary_item') {
+                    if (item.experience_id) {
+                      extra.experience_id = item.experience_id
+                    }
+
+                    if (item.experience_run_id) {
+                      extra.experience_run_id = item.experience_run_id
+                    }
+
+                    if (item.sanctuary_item_id) {
+                      extra.sanctuary_item_id = item.sanctuary_item_id
+                    } else if (item.action === 'open_sanctuary_item') {
                       extra.sanctuary_item_id = item.id
                     }
 

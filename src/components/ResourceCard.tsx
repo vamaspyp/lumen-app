@@ -90,6 +90,13 @@ function GenerativeThumbnail({ format, title }: { format: string; title: string 
 
 // ─── ResourceListCard ─────────────────────────────────────────────
 
+const helpSignalLabel: Record<string, string> = {
+  'me_sirvio':             'Te sirvió',
+  'me_dejo_un_poco_mejor': 'Te dejó un poco mejor',
+  'no_era_para_mi':        'No era para vos',
+  'guardado':              'Lo guardaste',
+}
+
 export function ResourceListCard({
   title,
   subtitle,
@@ -98,6 +105,9 @@ export function ResourceListCard({
   durationMin,
   whyNow,
   minimumStep,
+  capabilityLabel,
+  helpSignal,
+  hasNote,
   onClick,
   tokens,
 }: {
@@ -108,6 +118,9 @@ export function ResourceListCard({
   durationMin?: number
   whyNow?: string
   minimumStep?: string
+  capabilityLabel?: string
+  helpSignal?: string
+  hasNote?: boolean
   onClick: () => void
   tokens: ModuleTokens
 }) {
@@ -129,6 +142,7 @@ export function ResourceListCard({
     : '#6E665C'
   const formatDisplay = derivedFormat.charAt(0).toUpperCase() + derivedFormat.slice(1)
   const badgeText = [formatDisplay, durationMin != null ? `${durationMin} min` : ''].filter(Boolean).join(' · ')
+  const helpSignalText = helpSignal && helpSignalLabel[helpSignal] ? helpSignalLabel[helpSignal] : ''
 
   return (
     <button
@@ -152,15 +166,44 @@ export function ResourceListCard({
     >
       <GenerativeThumbnail format={derivedFormat} title={title} />
       <div style={{ padding: '10px 14px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
-        {badgeText && (
+        {(badgeText || capabilityLabel || helpSignalText || hasNote) && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '5px' }}>
-            <span style={{
-              fontSize: '10px', letterSpacing: '0.3px', padding: '2px 7px',
-              borderRadius: '999px', width: 'fit-content',
-              background: badgeBg, color: badgeColor, display: 'inline-block', lineHeight: 1.4,
-            }}>
-              {badgeText}
-            </span>
+            {badgeText && (
+              <span style={{
+                fontSize: '10px', letterSpacing: '0.3px', padding: '2px 7px',
+                borderRadius: '999px', width: 'fit-content',
+                background: badgeBg, color: badgeColor, display: 'inline-block', lineHeight: 1.4,
+              }}>
+                {badgeText}
+              </span>
+            )}
+            {capabilityLabel && (
+              <span style={{
+                fontSize: '10px', letterSpacing: '0.3px', padding: '2px 7px',
+                borderRadius: '999px', width: 'fit-content',
+                background: tokens.accentSoft10, color: tokens.textMuted, display: 'inline-block', lineHeight: 1.4,
+              }}>
+                {capabilityLabel}
+              </span>
+            )}
+            {helpSignalText && (
+              <span style={{
+                fontSize: '10px', letterSpacing: '0.3px', padding: '2px 7px',
+                borderRadius: '999px', width: 'fit-content',
+                background: tokens.accentSoft10, color: tokens.textMuted, display: 'inline-block', lineHeight: 1.4,
+              }}>
+                {helpSignalText}
+              </span>
+            )}
+            {hasNote && (
+              <span style={{
+                fontSize: '10px', letterSpacing: '0.3px', padding: '2px 7px',
+                borderRadius: '999px', width: 'fit-content',
+                background: tokens.accentSoft10, color: tokens.textMuted, display: 'inline-block', lineHeight: 1.4,
+              }}>
+                Con nota
+              </span>
+            )}
           </div>
         )}
         <p style={{ fontSize: '14px', fontWeight: 500, lineHeight: 1.35, color: tokens.textPrimary, margin: 0 }}>
