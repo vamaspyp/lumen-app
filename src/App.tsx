@@ -114,6 +114,68 @@ function App() {
           boxSizing: 'border-box',
         }}
       >
+        {import.meta.env.DEV && (
+          <details
+            style={{
+              maxWidth: 560,
+              margin: '0 auto 1rem',
+              padding: '0.75rem 1rem',
+              border: `1px solid ${tokens.cardBorder}`,
+              borderRadius: '10px',
+              background: tokens.accentSoft10,
+              textAlign: 'left',
+              opacity: 1,
+            }}
+          >
+            <summary
+              style={{
+                cursor: 'pointer',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: tokens.textSecondary,
+              }}
+            >
+              DEBUG MVP
+            </summary>
+            <pre
+              style={{
+                margin: '0.5rem 0 0',
+                fontSize: '0.75rem',
+                lineHeight: 1.5,
+                color: tokens.textPrimary,
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+              }}
+            >
+              {JSON.stringify(
+                {
+                  code: state.lumiCode,
+                  content_type: state.lumiContentType,
+                  source: state.contentSource,
+                  module: state.contentSource,
+                  session: state.currentSessionId,
+                  resource: state.currentItemId || state.currentResourceId,
+                  sanctuary_item: state.currentSanctuaryItemId,
+                  experience_run: state.currentExperienceRunId,
+                  checkin: {
+                    hemisphere: state.checkinHemisphere,
+                    area: state.checkinArea,
+                    state: state.checkinState,
+                    faro: state.checkinFaro,
+                    capability: state.checkinCapability,
+                    time: state.checkinTime,
+                  },
+                  actions: state.lumiActions,
+                },
+                null,
+                2
+              )}
+            </pre>
+          </details>
+        )}
+
         {isLandingScan ? (
           <LandingScan
             message={state.lumiMessage}
