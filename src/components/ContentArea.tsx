@@ -513,60 +513,8 @@ if (contentType === 'activity_detail') {
       ''
 
     if (detailKind === 'sanctuary') {
-      const renderSanctuaryActionPill = (action: typeof actions[number], key: string) => (
-        <Pill
-          key={key}
-          label={action.label}
-          variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
-          onClick={() => dispatch(action.action, {
-            ...(action.value ? { value: action.value } : {}),
-            resource_id:       (contentData.resource_id as string) || '',
-            sanctuary_item_id: (contentData.sanctuary_item_id as string) || '',
-            experience_id:     (contentData.experience_id as string) || '',
-            experience_run_id: (contentData.experience_run_id as string) || '',
-            title:             (contentData.title as string) || '',
-            format:            (contentData.format as string) || '',
-            duration:          String(contentData.duration_min || ''),
-            url:               (contentData.url as string) || '',
-          })}
-          tokens={tokens}
-        />
-      )
-
-      // "Compartir luz" no viene en actions_json de este nodo — es un
-      // disparador local de la action canónica share_light, igual que
-      // el botón de abrir recurso. Se ubica junto a las acciones de la
-      // experiencia (no dentro de la ficha íntima) en la posición
-      // recomendada: después de la primera acción del backend.
-      const shareLightPill = (
-        <Pill
-          key="share_light"
-          label="Compartir luz"
-          variant="outline"
-          onClick={() => dispatch('share_light', {
-            surface: 'sanctuary_detail',
-            title: (contentData.title as string) || '',
-            description_short: (contentData.description_short as string) || '',
-            url: (contentData.url as string) || '',
-            source: 'sanctuary',
-            resource_id:       (contentData.resource_id as string) || '',
-            experience_id:     (contentData.experience_id as string) || '',
-            experience_run_id: (contentData.experience_run_id as string) || '',
-            sanctuary_item_id: (contentData.sanctuary_item_id as string) || '',
-          })}
-          tokens={tokens}
-        />
-      )
-
       return (
-        <>
-          <SanctuaryDetail content={contentData} dispatch={dispatch} tokens={tokens} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-            {actions.slice(0, 1).map((action, idx) => renderSanctuaryActionPill(action, `${action.action}-${idx}`))}
-            {shareLightPill}
-            {actions.slice(1).map((action, idx) => renderSanctuaryActionPill(action, `${action.action}-${idx + 1}`))}
-          </div>
-        </>
+        <SanctuaryDetail content={contentData} actions={actions} dispatch={dispatch} tokens={tokens} />
       )
     }
 
