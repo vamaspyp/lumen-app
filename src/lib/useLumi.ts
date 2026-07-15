@@ -183,9 +183,18 @@ export function useLumi() {
       // (Circular Luz) en vez del dispatcher genérico. Se aplica siempre
       // como cualquier respuesta de nodo: Supabase decide, React renderiza.
       const rpcName = DIRECT_RPC_ACTIONS[action]
+
+      if (import.meta.env.DEV) {
+        console.log('[LUMI ACTION]', action, { rpc: rpcName || 'lumi_dispatch', extra, params })
+      }
+
       const { data, error } = rpcName
         ? await supabase.rpc(rpcName, { p_params: params })
         : await supabase.rpc('lumi_dispatch', { p_action: action, p_params: params })
+
+      if (import.meta.env.DEV) {
+        console.log('[LUMI RPC RESULT]', rpcName || 'lumi_dispatch', { data, error })
+      }
 
       if (error) {
         console.error(`[useLumi] ${action} error:`, error)
