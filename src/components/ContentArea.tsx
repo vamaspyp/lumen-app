@@ -257,6 +257,7 @@ export function ContentArea({
   callRpc,
   tokens,
   experienceRunId = '',
+  shareToken = '',
   onRegister,
 }: {
   contentType: string
@@ -266,6 +267,7 @@ export function ContentArea({
   callRpc: (rpcName: string, params: Record<string, string>) => Promise<Record<string, unknown> | null>
   tokens: ModuleTokens
   experienceRunId?: string
+  shareToken?: string
   onRegister?: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>
 }) {
 
@@ -277,6 +279,7 @@ export function ContentArea({
         dispatch={dispatch}
         callRpc={callRpc}
         tokens={tokens}
+        shareToken={shareToken}
       />
     )
   }
