@@ -3,6 +3,39 @@ import type { ModuleTokens } from '../lib/tokens'
 import { buildShareLightText } from '../lib/shareLight'
 import { Pill } from './Pill'
 
+// Acciones de compartir que el backend pudiera seguir enviando desde
+// versiones previas del nodo — la UI unifica todo en un solo CTA
+// ("Compartir luz") y nunca renderiza estos botones sueltos.
+const LEGACY_SHARE_ACTIONS = new Set(['native_share_light', 'copy_share_light_link', 'copy_share_light'])
+
+// Helper puro: arma el link público y el texto final a partir del
+// content que devuelve Supabase + el texto editado en pantalla.
+// No decide flujo de negocio, solo compone strings.
+function buildSharePayload(
+  content: Record<string, unknown>,
+  editedText: string,
+  currentShareToken: string
+): { publicUrl: string; finalShareText: string } {
+  const token =
+    (content.share_token as string) ||
+    currentShareToken ||
+    (content.token as string) ||
+    ''
+
+  const publicUrl =
+    (content.public_url as string) ||
+    (token ? `${window.location.origin}/?share_light=${encodeURIComponent(token)}` : '')
+
+  if (!token && import.meta.env.DEV) {
+    console.warn('[ShareLightEditor] sin share_token disponible — se comparte sin link público', content)
+  }
+
+  const trimmedText = editedText.trim()
+  const finalShareText = publicUrl ? `${trimmedText}\n\n${publicUrl}` : trimmedText
+
+  return { publicUrl, finalShareText }
+}
+
 export function ShareLightEditor({
   content,
   actions,
@@ -34,114 +67,71 @@ export function ShareLightEditor({
   const editorHelper = (content.editor_helper as string) || ''
   const privacyHint = (content.privacy_hint as string) || ''
 
-  // El token del receptor anónimo puede venir en distintas formas según
-  // el nodo que lo emitió; el link se arma sólo si no llega ya resuelto.
-  const token =
-    (content.share_token as string) ||
-    (content.shareToken as string) ||
-    shareToken ||
-    ''
-
-  const shareUrl =
-    content.url && String(content.url).trim()
-      ? String(content.url).trim()
-      : token
-        ? `${window.location.origin}${window.location.pathname}?share_light=${encodeURIComponent(token)}`
-        : ''
-
-  const shareText =
-    editedText ||
-    (content.editable_text as string) ||
-    (content.share_text as string) ||
-    (content.default_text as string) ||
-    ''
-
   const canNativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function'
 
-  const persistEditedText = () =>
-    callRpc('lumi_update_share_light_text', {
+  // Pills que el backend haya enviado además del CTA de compartir
+  // (p.ej. "Volver") siguen su patrón canónico normal.
+  const otherActions = actions.filter(
+    a => !LEGACY_SHARE_ACTIONS.has(a.action) && a.label !== 'Copiar texto'
+  )
+
+  const completeShareLight = (channel: string, result: string, success: boolean, finalText: string) =>
+    callRpc('lumi_complete_share_light', {
+      share_light_id: shareLightId,
+      channel,
+      surface: 'share_light_editor',
+      result,
+      success: String(success),
+      final_text: finalText,
+    })
+
+  const copyToClipboardFallback = async (finalShareText: string) => {
+    let success = true
+    try {
+      await navigator.clipboard.writeText(finalShareText)
+      setFeedback('Link copiado')
+    } catch {
+      success = false
+      setFeedback('No pudimos copiar el link.')
+    }
+
+    await completeShareLight('clipboard', success ? 'copied' : 'failed', success, finalShareText)
+  }
+
+  const runShareLight = async () => {
+    setBusy(true)
+    setFeedback('')
+
+    await callRpc('lumi_update_share_light_text', {
       share_light_id: shareLightId,
       editable_text: editedText,
     })
 
-  const completeShareLight = (channel: string, result: string, success: boolean) =>
-    callRpc('lumi_complete_share_light', {
-      share_light_id: shareLightId,
-      channel,
-      result,
-      success: String(success),
-      final_text: shareText,
-    })
+    const { publicUrl, finalShareText } = buildSharePayload(content, editedText, shareToken)
 
-  const runNativeShare = async () => {
-    setBusy(true)
-    setFeedback('')
-    await persistEditedText()
-
-    let success = true
-    let result: 'shared' | 'copied' | 'failed' = 'shared'
-    const channel = canNativeShare ? 'native_share' : 'clipboard'
-
-    try {
-      if (canNativeShare) {
+    if (canNativeShare) {
+      try {
         await navigator.share({
           title: (content.title as string) || 'Una luz de LUMEN',
-          text: shareText,
-          url: shareUrl || undefined,
+          text: finalShareText,
+          url: publicUrl || undefined,
         })
-        result = 'shared'
         setFeedback('Compartido')
-      } else if (shareUrl) {
-        await navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`)
-        result = 'copied'
-        setFeedback('Link copiado')
-      } else {
-        await navigator.clipboard.writeText(shareText)
-        result = 'copied'
-        setFeedback('Copiado')
+        await completeShareLight('native_share', 'shared', true, finalShareText)
+      } catch (err) {
+        // Cancelación del usuario: no hay evento que registrar dos veces
+        // ni fallback — simplemente no se completó el acto de compartir.
+        if ((err as Error)?.name === 'AbortError') {
+          setBusy(false)
+          return
+        }
+        await copyToClipboardFallback(finalShareText)
       }
-    } catch (err) {
-      if (canNativeShare && (err as Error)?.name === 'AbortError') {
-        setBusy(false)
-        return
-      }
-      success = false
-    }
-
-    await completeShareLight(channel, success ? result : 'failed', success)
-    setBusy(false)
-  }
-
-  const runCopyLink = async () => {
-    if (!shareUrl) {
-      setFeedback('No pudimos generar el link todavía.')
-      return
-    }
-
-    setBusy(true)
-    setFeedback('')
-    await persistEditedText()
-
-    let success = true
-    try {
-      await navigator.clipboard.writeText(shareUrl)
-      setFeedback('Link copiado')
-    } catch {
-      success = false
-    }
-
-    await completeShareLight('link_copy', success ? 'copied' : 'failed', success)
-    setBusy(false)
-  }
-
-  const handleAction = (actionName: string) => {
-    if (actionName === 'native_share_light') {
-      runNativeShare()
-    } else if (actionName === 'copy_share_light_link') {
-      runCopyLink()
     } else {
-      dispatch(actionName)
+      await copyToClipboardFallback(finalShareText)
     }
+
+    setBusy(false)
   }
 
   return (
@@ -240,12 +230,18 @@ export function ShareLightEditor({
           marginTop: '1.5rem',
         }}
       >
-        {actions.map((action, idx) => (
+        <Pill
+          label="Compartir luz"
+          variant="solid"
+          onClick={() => !busy && runShareLight()}
+          tokens={tokens}
+        />
+        {otherActions.map((action, idx) => (
           <Pill
             key={`${action.action}-${idx}`}
             label={action.label}
             variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
-            onClick={() => !busy && handleAction(action.action)}
+            onClick={() => !busy && dispatch(action.action)}
             tokens={tokens}
           />
         ))}
