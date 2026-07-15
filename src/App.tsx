@@ -228,7 +228,6 @@ function App() {
                 callRpc={callRpc}
                 tokens={tokens}
                 experienceRunId={activeRunId}
-                shareToken={state.currentShareToken}
                 onRegister={linkAccount}
               />
             </div>
@@ -262,7 +261,6 @@ function App() {
                 callRpc={callRpc}
                 tokens={tokens}
                 experienceRunId={activeRunId}
-                shareToken={state.currentShareToken}
                 onRegister={linkAccount}
               />
             </div>

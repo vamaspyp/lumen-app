@@ -3,31 +3,27 @@ import type { ModuleTokens } from '../lib/tokens'
 import { buildShareLightText } from '../lib/shareLight'
 import { Pill } from './Pill'
 
-// Acciones de compartir que el backend pudiera seguir enviando desde
-// versiones previas del nodo — la UI unifica todo en un solo CTA
-// ("Compartir luz") y nunca renderiza estos botones sueltos.
-const LEGACY_SHARE_ACTIONS = new Set(['native_share_light', 'copy_share_light_link', 'copy_share_light'])
+// Nombres de action que resuelven al mismo handler técnico de compartir.
+// copy_share_light / copy_share_light_link son alias defensivos de
+// nodos viejos: mismo comportamiento, sin agregar botones ni labels
+// propios — la pill y su texto siguen viniendo de Supabase.
+const SHARE_ACTION_ALIASES = new Set(['native_share_light', 'copy_share_light', 'copy_share_light_link'])
 
 // Helper puro: arma el link público y el texto final a partir del
 // content que devuelve Supabase + el texto editado en pantalla.
 // No decide flujo de negocio, solo compone strings.
 function buildSharePayload(
   content: Record<string, unknown>,
-  editedText: string,
-  currentShareToken: string
+  editedText: string
 ): { publicUrl: string; finalShareText: string } {
-  const token =
-    (content.share_token as string) ||
-    currentShareToken ||
-    (content.token as string) ||
-    ''
-
   const publicUrl =
     (content.public_url as string) ||
-    (token ? `${window.location.origin}/?share_light=${encodeURIComponent(token)}` : '')
+    (content.share_url as string) ||
+    (content.share_path ? `${window.location.origin}${content.share_path as string}` : '') ||
+    (content.share_token ? `${window.location.origin}/?share_light=${content.share_token as string}` : '')
 
-  if (!token && import.meta.env.DEV) {
-    console.warn('[ShareLightEditor] sin share_token disponible — se comparte sin link público', content)
+  if (!publicUrl && import.meta.env.DEV) {
+    console.warn('[ShareLightEditor] sin link público disponible en content — se comparte sin link', content)
   }
 
   const trimmedText = editedText.trim()
@@ -42,14 +38,12 @@ export function ShareLightEditor({
   dispatch,
   callRpc,
   tokens,
-  shareToken = '',
 }: {
   content: Record<string, unknown>
   actions: Array<{ label: string; action: string; variant?: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
   callRpc: (rpcName: string, params: Record<string, string>) => Promise<Record<string, unknown> | null>
   tokens: ModuleTokens
-  shareToken?: string
 }) {
   const shareLightId = (content.share_light_id as string) || ''
 
@@ -68,12 +62,6 @@ export function ShareLightEditor({
   const privacyHint = (content.privacy_hint as string) || ''
 
   const canNativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function'
-
-  // Pills que el backend haya enviado además del CTA de compartir
-  // (p.ej. "Volver") siguen su patrón canónico normal.
-  const otherActions = actions.filter(
-    a => !LEGACY_SHARE_ACTIONS.has(a.action) && a.label !== 'Copiar texto'
-  )
 
   const completeShareLight = (channel: string, result: string, success: boolean, finalText: string) =>
     callRpc('lumi_complete_share_light', {
@@ -107,7 +95,7 @@ export function ShareLightEditor({
       editable_text: editedText,
     })
 
-    const { publicUrl, finalShareText } = buildSharePayload(content, editedText, shareToken)
+    const { publicUrl, finalShareText } = buildSharePayload(content, editedText)
 
     if (canNativeShare) {
       try {
@@ -132,6 +120,14 @@ export function ShareLightEditor({
     }
 
     setBusy(false)
+  }
+
+  const handleAction = (actionName: string) => {
+    if (SHARE_ACTION_ALIASES.has(actionName)) {
+      runShareLight()
+    } else {
+      dispatch(actionName)
+    }
   }
 
   return (
@@ -230,18 +226,12 @@ export function ShareLightEditor({
           marginTop: '1.5rem',
         }}
       >
-        <Pill
-          label="Compartir luz"
-          variant="solid"
-          onClick={() => !busy && runShareLight()}
-          tokens={tokens}
-        />
-        {otherActions.map((action, idx) => (
+        {actions.map((action, idx) => (
           <Pill
             key={`${action.action}-${idx}`}
             label={action.label}
             variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
-            onClick={() => !busy && dispatch(action.action)}
+            onClick={() => !busy && handleAction(action.action)}
             tokens={tokens}
           />
         ))}

@@ -1,6 +1,5 @@
 import type { ModuleTokens } from '../lib/tokens'
 import { ExperienceDetailCard } from './ExperienceDetailCard'
-import { Pill } from './Pill'
 
 export function SanctuaryDetail({
   content,
@@ -24,11 +23,6 @@ export function SanctuaryDetail({
 
   const helpSignal   = (content.help_signal as string) || ''
 
-  const resourceId       = (content.resource_id as string) || ''
-  const experienceId     = (content.experience_id as string) || ''
-  const experienceRunId  = (content.experience_run_id as string) || ''
-  const sanctuaryItemId  = (content.sanctuary_item_id as string) || ''
-
   const formatLabel = [
     format && format !== '—' && format.charAt(0).toUpperCase() + format.slice(1),
     durationMin && durationMin !== '—' && `${durationMin} min`,
@@ -39,20 +33,6 @@ export function SanctuaryDetail({
     'me_dejo_un_poco_mejor':    'Te dejó un poco mejor',
     'no_era_para_mi':           'No era para vos',
     'guardado':                 'Lo guardaste',
-  }
-
-  const handleShareLight = () => {
-    dispatch('share_light', {
-      surface: 'sanctuary_detail',
-      title,
-      description_short: description,
-      url,
-      source: 'sanctuary',
-      ...(resourceId ? { resource_id: resourceId } : {}),
-      ...(experienceId ? { experience_id: experienceId } : {}),
-      ...(experienceRunId ? { experience_run_id: experienceRunId } : {}),
-      ...(sanctuaryItemId ? { sanctuary_item_id: sanctuaryItemId } : {}),
-    })
   }
 
   return (
@@ -139,13 +119,6 @@ export function SanctuaryDetail({
             return 'Abrir'
           })()}
         </button>
-      )}
-
-      {/* Compartir luz */}
-      {title && (
-        <div style={{ marginTop: '1.25rem', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem' }}>
-          <Pill label="Compartir luz" variant="ghost" onClick={handleShareLight} tokens={tokens} />
-        </div>
       )}
     </ExperienceDetailCard>
   )
