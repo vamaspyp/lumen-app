@@ -258,6 +258,7 @@ export function ContentArea({
   tokens,
   experienceRunId = '',
   onRegister,
+  currentShareToken = '',
 }: {
   contentType: string
   contentData: Record<string, unknown>
@@ -267,6 +268,7 @@ export function ContentArea({
   tokens: ModuleTokens
   experienceRunId?: string
   onRegister?: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>
+  currentShareToken?: string
 }) {
 
   if (contentType === 'share_light_editor' || contentData.type === 'share_light_editor') {
@@ -277,6 +279,7 @@ export function ContentArea({
         dispatch={dispatch}
         callRpc={callRpc}
         tokens={tokens}
+        currentShareToken={currentShareToken}
       />
     )
   }

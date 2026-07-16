@@ -229,6 +229,7 @@ function App() {
                 tokens={tokens}
                 experienceRunId={activeRunId}
                 onRegister={linkAccount}
+                currentShareToken={state.currentShareToken}
               />
             </div>
           </div>
@@ -262,6 +263,7 @@ function App() {
                 tokens={tokens}
                 experienceRunId={activeRunId}
                 onRegister={linkAccount}
+                currentShareToken={state.currentShareToken}
               />
             </div>
 
