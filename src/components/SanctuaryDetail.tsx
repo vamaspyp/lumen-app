@@ -17,7 +17,6 @@ export function SanctuaryDetail({
   const description  = (content.description_short as string) || ''
   const format       = (content.format as string) || ''
   const durationMin  = (content.duration_min as string) || ''
-  const url          = (content.url as string) || ''
   const note         = (content.note as string) || ''
   const area         = (content.life_area_key as string) || (content.area as string) || ''
   const hasNote      = !!(content.has_note as boolean)
@@ -116,55 +115,13 @@ export function SanctuaryDetail({
             {area.replace(/_/g, ' ')}
           </div>
         )}
-
-        {/* Botón abrir recurso — solo si no hay experience_id (legacy) */}
-        {url && !content.experience_id && (
-          <button
-            onClick={() => dispatch('open_resource_viewer', {
-              source_kind: (content.source_kind as string) || 'external_url',
-              resource_id: (content.resource_id as string) || '',
-              source: 'sanctuary',
-            })}
-            style={{
-              padding: '0.625rem 1.5rem',
-              borderRadius: '999px',
-              background: tokens.accent,
-              border: `1px solid ${tokens.accent}`,
-              color: '#FFFFFF',
-              fontSize: '0.875rem',
-              cursor: 'pointer',
-              fontWeight: 500,
-              fontFamily: 'inherit',
-            }}
-          >
-            {(() => {
-              const fmt = format.toLowerCase()
-              if (fmt === 'práctica' || fmt === 'practica') return 'Empezar la práctica'
-              if (fmt === 'video') return 'Ver el video'
-              if (fmt === 'audio') return 'Escuchar ahora'
-              if (fmt === 'texto' || fmt === 'lectura') return 'Leer ahora'
-              return 'Abrir'
-            })()}
-          </button>
-        )}
       </ExperienceDetailCard>
 
-      {/* Bloque inferior de acciones de la experiencia guardada.
-          "Compartir luz" no viene en actions_json de este nodo — es un
-          disparador local de la action canónica share_light, ubicado
-          entre la primera acción del backend (Volver a vivirla) y el
-          resto (Editar nota / Quitar). Nunca dentro de la nota. */}
+      {/* Acciones de la experiencia guardada — vienen íntegramente de
+          actions_json del backend. Supabase decide, este componente
+          solo renderiza y reenvía el click. */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-        {actions.slice(0, 1).map((action, idx) => renderActionPill(action, `${action.action}-${idx}`))}
-
-        <Pill
-          label="Compartir luz"
-          variant="outline"
-          onClick={() => dispatch('share_light')}
-          tokens={tokens}
-        />
-
-        {actions.slice(1).map((action, idx) => renderActionPill(action, `${action.action}-${idx + 1}`))}
+        {actions.map((action, idx) => renderActionPill(action, `${action.action}-${idx}`))}
       </div>
     </>
   )
