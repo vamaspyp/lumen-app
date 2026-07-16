@@ -288,7 +288,7 @@ export function ResourceCard({
     const runId = (content.run_id as string) || ''
     if (runId) extra.experience_run_id = runId
 
-    dispatch('resource_viewer_active', extra)
+    dispatch('open_resource_viewer', extra)
   }
 
   return (

@@ -120,7 +120,7 @@ export function SanctuaryDetail({
         {/* Botón abrir recurso — solo si no hay experience_id (legacy) */}
         {url && !content.experience_id && (
           <button
-            onClick={() => dispatch('resource_viewer_active', {
+            onClick={() => dispatch('open_resource_viewer', {
               source_kind: (content.source_kind as string) || 'external_url',
               resource_id: (content.resource_id as string) || '',
               source: 'sanctuary',
