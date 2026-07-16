@@ -113,15 +113,6 @@ function buildParams(state: LumiState): Record<string, string> {
   }
 }
 
-// Actions cuyo nodo real se resuelve con una RPC específica en vez del
-// dispatcher genérico lumi_dispatch.
-const DIRECT_RPC_ACTIONS: Record<string, string> = {
-  share_light: 'lumi_share_light',
-  start_shared_light: 'lumi_start_shared_light',
-  complete_shared_light: 'lumi_complete_shared_light',
-  submit_shared_light_signal: 'lumi_submit_shared_light_signal',
-}
-
 function updateState(
   setState: React.Dispatch<React.SetStateAction<LumiState>>,
   result: Record<string, unknown>
@@ -179,21 +170,14 @@ export function useLumi() {
     async (action: string, extra?: Record<string, string>) => {
       const params = { ...buildParams(stateRef.current), ...extra }
 
-      // Algunas actions resuelven su nodo real con una RPC específica
-      // (Circular Luz) en vez del dispatcher genérico. Se aplica siempre
-      // como cualquier respuesta de nodo: Supabase decide, React renderiza.
-      const rpcName = DIRECT_RPC_ACTIONS[action]
-
       if (import.meta.env.DEV) {
-        console.log('[LUMI ACTION]', action, { rpc: rpcName || 'lumi_dispatch', extra, params })
+        console.log('[LUMI ACTION]', action, { extra, params })
       }
 
-      const { data, error } = rpcName
-        ? await supabase.rpc(rpcName, { p_params: params })
-        : await supabase.rpc('lumi_dispatch', { p_action: action, p_params: params })
+      const { data, error } = await supabase.rpc('lumi_dispatch', { p_action: action, p_params: params })
 
       if (import.meta.env.DEV) {
-        console.log('[LUMI RPC RESULT]', rpcName || 'lumi_dispatch', { data, error })
+        console.log('[LUMI RPC RESULT]', 'lumi_dispatch', { data, error })
       }
 
       if (error) {
