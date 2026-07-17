@@ -131,23 +131,25 @@ function updateState(
 
 // ───────── Auth ─────────
 
-async function ensureUser(): Promise<{ userId: string; isAnonymous: boolean }> {
-  // Dev override: si hay VITE_DEV_USER_ID, usarlo directamente
-  const devUserId = import.meta.env.VITE_DEV_USER_ID
-  if (devUserId) {
-    return { userId: devUserId, isAnonymous: false }
-  }
+async function ensureUser(forceAnonymous = false): Promise<{ userId: string; isAnonymous: boolean }> {
+  if (!forceAnonymous) {
+    // Dev override: si hay VITE_DEV_USER_ID, usarlo directamente
+    const devUserId = import.meta.env.VITE_DEV_USER_ID
+    if (devUserId) {
+      return { userId: devUserId, isAnonymous: false }
+    }
 
-  // Buscar sesión existente
-  const { data: { session } } = await supabase.auth.getSession()
-  if (session?.user) {
-    return {
-      userId: session.user.id,
-      isAnonymous: session.user.is_anonymous ?? false,
+    // Buscar sesión existente
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session?.user) {
+      return {
+        userId: session.user.id,
+        isAnonymous: session.user.is_anonymous ?? false,
+      }
     }
   }
 
-  // No hay sesión → sign in anónimo
+  // No hay sesión (o se fuerza anónimo) → sign in anónimo
   const { data, error } = await supabase.auth.signInAnonymously()
   if (error || !data.user) {
     throw new Error('No se pudo crear sesión anónima: ' + (error?.message || 'unknown'))
@@ -157,6 +159,30 @@ async function ensureUser(): Promise<{ userId: string; isAnonymous: boolean }> {
     userId: data.user.id,
     isAnonymous: true,
   }
+}
+
+// ───────── QA: reset a anónimo ─────────
+// Utilidad de testing local. Solo se activa con ?qa_anon=1 en la URL.
+// No cambia ningún comportamiento por default de la app.
+async function maybeApplyQaAnonReset(): Promise<boolean> {
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('qa_anon') !== '1') return false
+
+  await supabase.auth.signOut({ scope: 'local' })
+  localStorage.clear()
+  sessionStorage.clear()
+
+  window.history.replaceState(
+    {},
+    '',
+    window.location.pathname + window.location.search.replace(/[?&]qa_anon=1/, '')
+  )
+
+  if (import.meta.env.DEV) {
+    console.info('[LUMEN QA] Anonymous reset applied')
+  }
+
+  return true
 }
 
 // ───────── Hook ─────────
@@ -223,6 +249,13 @@ export function useLumi() {
     let cancelled = false
 
     async function bootstrap() {
+      const qaAnonReset = await maybeApplyQaAnonReset()
+      if (cancelled) return
+
+      if (qaAnonReset) {
+        setState(initialState)
+      }
+
       // Luz compartida recibida por link: se vive sin crear usuario.
       // Solo si Supabase no puede resolver el token, se cae al bootstrap normal.
       const sharedToken = new URLSearchParams(window.location.search).get('share_light')
@@ -244,7 +277,7 @@ export function useLumi() {
         else console.warn('[useLumi] lumi_open_shared_light returned not-ok:', data)
       }
 
-      const { userId, isAnonymous } = await ensureUser()
+      const { userId, isAnonymous } = await ensureUser(qaAnonReset)
 
       if (cancelled) return
 
