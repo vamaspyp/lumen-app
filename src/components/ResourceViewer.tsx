@@ -414,7 +414,7 @@ export function ResourceViewer({
   url: string
   title: string
   content?: Record<string, unknown>
-  actions: Array<{ label: string; action: string; variant?: string }>
+  actions: Array<{ label: string; action: string; value?: string; variant?: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
   tokens: ModuleTokens
 }) {
@@ -497,12 +497,15 @@ export function ResourceViewer({
       >
         {shareAction && (
           <button
-            onClick={() => dispatch('share_light', {
+            onClick={() => dispatch(shareAction.action, {
+              ...(shareAction.value ? { value: shareAction.value } : {}),
               surface: 'resource_viewer',
               title,
               url,
               source: (content?.source as string) || '',
               resource_id: (content?.resource_id as string) || '',
+              experience_id: (content?.experience_id as string) || '',
+              experience_run_id: (content?.experience_run_id as string) || '',
             })}
             aria-label="Compartir"
             style={{
