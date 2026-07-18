@@ -1,6 +1,24 @@
 import { useState } from 'react'
 import type { ModuleTokens } from '../lib/tokens'
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+// Traduce errores técnicos de Supabase Auth a copy sobrio y accionable.
+// Solo mapea texto de error a texto de error — no decide flujo ni nodo.
+function mapRegisterError(message?: string): string {
+  if (!message) return 'No pudimos crear la cuenta ahora. Probá nuevamente.'
+
+  if (message.includes('New password should be different from the old password')) {
+    return 'Esa clave parece coincidir con una anterior. Probá con otra.'
+  }
+
+  if (message.includes('Email address') || message.trim() === '') {
+    return 'Revisá el email antes de continuar.'
+  }
+
+  return 'No pudimos crear la cuenta ahora. Probá nuevamente.'
+}
+
 export function RegisterForm({
   onRegister,
   dispatch,
@@ -12,27 +30,50 @@ export function RegisterForm({
 }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [confirming, setConfirming] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
-  const canSubmit = email.trim().length > 0 && password.length >= 6
+  const canSubmit = email.trim().length > 0 && password.trim().length >= 6
 
   const handleSubmit = async () => {
-    if (!canSubmit || confirming) return
-    setConfirming(true)
+    if (isSubmitting) return
+
+    const normalizedEmail = email.trim().toLowerCase()
+    const normalizedPassword = password.trim()
+
+    // Validación local antes de tocar Auth: nunca se llama a
+    // onRegister/linkAccount con email o clave inválidos.
+    if (!normalizedEmail || !EMAIL_RE.test(normalizedEmail)) {
+      setError('Revisá el email antes de continuar.')
+      return
+    }
+    if (!normalizedPassword || normalizedPassword.length < 6) {
+      setError('La clave necesita al menos 6 caracteres.')
+      return
+    }
+
+    setIsSubmitting(true)
     setError('')
 
-    const result = await onRegister(email.trim(), password)
+    try {
+      const result = await onRegister(normalizedEmail, normalizedPassword)
 
-    if (result.ok) {
-      // Cuenta creada: el éxito lo confirma Supabase (REGISTRATION_SUCCESS),
-      // nunca un copy local. Se pasa user_id explícito porque, si la
-      // identidad anónima técnica recién se creó en este mismo submit,
-      // el estado del hook todavía no lo refleja en este render.
-      dispatch('complete_registration', result.userId ? { user_id: result.userId } : {})
-    } else {
-      setError(result.error || 'No se pudo crear la cuenta. Intentá de nuevo.')
-      setConfirming(false)
+      if (result.ok) {
+        // Cuenta creada: el éxito lo confirma Supabase (REGISTRATION_SUCCESS),
+        // nunca un copy local. Se pasa user_id explícito porque, si la
+        // identidad anónima técnica recién se creó en este mismo submit,
+        // el estado del hook todavía no lo refleja en este render.
+        dispatch('complete_registration', result.userId ? { user_id: result.userId } : {})
+        return
+      }
+
+      // Email queda cargado a propósito: la persona puede corregir sin
+      // volver a escribir todo.
+      setError(mapRegisterError(result.error))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No pudimos crear la cuenta ahora. Probá nuevamente.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -119,23 +160,23 @@ export function RegisterForm({
 
       <button
         onClick={handleSubmit}
-        disabled={!canSubmit || confirming}
+        disabled={!canSubmit || isSubmitting}
         style={{
           width: '100%',
           padding: '0.75rem 1.25rem',
           borderRadius: '999px',
-          background: canSubmit && !confirming ? tokens.accent : tokens.accentSoft20,
+          background: canSubmit && !isSubmitting ? tokens.accent : tokens.accentSoft20,
           border: `1px solid ${tokens.accent}`,
-          color: canSubmit && !confirming ? '#FFFFFF' : tokens.accentDeep,
+          color: canSubmit && !isSubmitting ? '#FFFFFF' : tokens.accentDeep,
           fontSize: '0.9rem',
-          cursor: canSubmit && !confirming ? 'pointer' : 'default',
+          cursor: canSubmit && !isSubmitting ? 'pointer' : 'default',
           fontWeight: 500,
           fontFamily: 'inherit',
           transition: 'all 0.25s ease',
           marginBottom: '0.75rem',
         }}
       >
-        {confirming ? 'Creando cuenta...' : 'Crear mi cuenta'}
+        {isSubmitting ? 'Creando cuenta...' : 'Crear mi cuenta'}
       </button>
 
       <button

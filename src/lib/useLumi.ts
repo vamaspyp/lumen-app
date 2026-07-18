@@ -355,6 +355,20 @@ export function useLumi() {
   // bootstrap — nunca un mecanismo de auth paralelo.
   const linkAccount = useCallback(
     async (email: string, password: string) => {
+      // Normalización defensiva: RegisterForm ya valida y normaliza antes
+      // de llamar, pero linkAccount nunca debe poder disparar
+      // supabase.auth.updateUser con un email vacío, sea cual sea el
+      // llamador.
+      const normalizedEmail = email?.trim().toLowerCase() ?? ''
+      const normalizedPassword = password?.trim() ?? ''
+
+      if (!normalizedEmail) {
+        throw new Error('Ingresá un email válido.')
+      }
+      if (!normalizedPassword) {
+        throw new Error('Ingresá una clave.')
+      }
+
       let userId = stateRef.current.userId
 
       if (!userId) {
@@ -368,9 +382,18 @@ export function useLumi() {
         }
       }
 
+      if (import.meta.env.DEV) {
+        console.debug('[useLumi] linkAccount payload', {
+          hasEmail: !!normalizedEmail,
+          emailLength: normalizedEmail.length,
+          hasPassword: !!normalizedPassword,
+          userId,
+        })
+      }
+
       const { data, error } = await supabase.auth.updateUser({
-        email,
-        password,
+        email: normalizedEmail,
+        password: normalizedPassword,
       })
       if (error) {
         console.error('[useLumi] linkAccount error:', error)
