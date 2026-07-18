@@ -347,9 +347,27 @@ export function useLumi() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Función para vincular cuenta anónima a cuenta real
+  // Función para vincular cuenta anónima a cuenta real.
+  // El receptor de una Circulación de Luz puede llegar sin sesión Auth
+  // (lumi_open_shared_light vive la experiencia sin crear usuario): antes
+  // de vincular el email hace falta que exista una identidad anónima
+  // técnica, si todavía no existe, reutilizando el mismo ensureUser del
+  // bootstrap — nunca un mecanismo de auth paralelo.
   const linkAccount = useCallback(
     async (email: string, password: string) => {
+      let userId = stateRef.current.userId
+
+      if (!userId) {
+        try {
+          const ensured = await ensureUser()
+          userId = ensured.userId
+          setState(prev => ({ ...prev, userId: ensured.userId, isAnonymous: ensured.isAnonymous }))
+        } catch (err) {
+          console.error('[useLumi] linkAccount anon bootstrap error:', err)
+          return { ok: false, error: 'No se pudo preparar la cuenta. Intentá de nuevo.' }
+        }
+      }
+
       const { data, error } = await supabase.auth.updateUser({
         email,
         password,
@@ -359,7 +377,7 @@ export function useLumi() {
         return { ok: false, error: error.message }
       }
       setState(prev => ({ ...prev, isAnonymous: false }))
-      return { ok: true, user: data.user }
+      return { ok: true, user: data.user, userId }
     },
     []
   )

@@ -6,7 +6,7 @@ export function RegisterForm({
   dispatch,
   tokens,
 }: {
-  onRegister: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>
+  onRegister: (email: string, password: string) => Promise<{ ok: boolean; error?: string; userId?: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
   tokens: ModuleTokens
 }) {
@@ -25,7 +25,11 @@ export function RegisterForm({
     const result = await onRegister(email.trim(), password)
 
     if (result.ok) {
-      dispatch('go_home')
+      // Cuenta creada: el éxito lo confirma Supabase (REGISTRATION_SUCCESS),
+      // nunca un copy local. Se pasa user_id explícito porque, si la
+      // identidad anónima técnica recién se creó en este mismo submit,
+      // el estado del hook todavía no lo refleja en este render.
+      dispatch('complete_registration', result.userId ? { user_id: result.userId } : {})
     } else {
       setError(result.error || 'No se pudo crear la cuenta. Intentá de nuevo.')
       setConfirming(false)

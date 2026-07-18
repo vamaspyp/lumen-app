@@ -277,7 +277,7 @@ export function ContentArea({
   }) => Promise<Record<string, unknown> | null>
   tokens: ModuleTokens
   experienceRunId?: string
-  onRegister?: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>
+  onRegister?: (email: string, password: string) => Promise<{ ok: boolean; error?: string; userId?: string }>
   currentShareToken?: string
 }) {
 
