@@ -50,14 +50,24 @@ export function ShareLightEditor({
   content,
   actions,
   dispatch,
-  callRpc,
+  updateShareLightText,
+  completeShareLight,
   tokens,
   currentShareToken = '',
 }: {
   content: Record<string, unknown>
   actions: Array<{ label: string; action: string; variant?: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
-  callRpc: (rpcName: string, params: Record<string, string>) => Promise<Record<string, unknown> | null>
+  updateShareLightText: (params: { share_light_id: string; editable_text: string }) => Promise<Record<string, unknown> | null>
+  completeShareLight: (params: {
+    share_light_id: string
+    channel: string
+    surface: string
+    result: string
+    success: string
+    final_text: string
+    public_url: string
+  }) => Promise<Record<string, unknown> | null>
   tokens: ModuleTokens
   currentShareToken?: string
 }) {
@@ -79,14 +89,14 @@ export function ShareLightEditor({
 
   const canNativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function'
 
-  const completeShareLight = (
+  const recordShareLightCompletion = (
     channel: string,
     result: string,
     success: boolean,
     finalText: string,
     publicUrl: string
   ) =>
-    callRpc('lumi_complete_share_light', {
+    completeShareLight({
       share_light_id: shareLightId,
       channel,
       surface: 'share_light_editor',
@@ -106,14 +116,14 @@ export function ShareLightEditor({
       setFeedback('No pudimos copiar el link.')
     }
 
-    await completeShareLight('clipboard', success ? 'copied' : 'failed', success, finalShareText, publicUrl)
+    await recordShareLightCompletion('clipboard', success ? 'copied' : 'failed', success, finalShareText, publicUrl)
   }
 
   const runShareLight = async () => {
     setBusy(true)
     setFeedback('')
 
-    await callRpc('lumi_update_share_light_text', {
+    await updateShareLightText({
       share_light_id: shareLightId,
       editable_text: editedText,
     })
@@ -128,7 +138,7 @@ export function ShareLightEditor({
           url: publicUrl || undefined,
         })
         setFeedback('Compartido')
-        await completeShareLight('native_share', 'shared', true, finalShareText, publicUrl)
+        await recordShareLightCompletion('native_share', 'shared', true, finalShareText, publicUrl)
       } catch (err) {
         // Cancelación del usuario: no hay evento que registrar dos veces
         // ni fallback — simplemente no se completó el acto de compartir.

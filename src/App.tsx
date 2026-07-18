@@ -6,7 +6,7 @@ import { ContentArea } from './components/ContentArea'
 import { LandingScan } from './components/LandingScan'
 
 function App() {
-  const { state, dispatch, linkAccount, callRpc } = useLumi()
+  const { state, dispatch, linkAccount, updateShareLightText, completeShareLight } = useLumi()
   const tokens = getModuleTokens(state.contentSource)
 
   const isLandingScan =
@@ -182,7 +182,7 @@ function App() {
             actions={state.lumiActions}
             contentData={state.lumiContentData}
             tokens={tokens}
-            onComplete={() => dispatch('complete_scan')}
+            dispatch={dispatch}
           />
         ) : isSimpleView ? (
           <div
@@ -225,7 +225,8 @@ function App() {
                 contentData={state.lumiContentData}
                 actions={state.lumiActions}
                 dispatch={dispatch}
-                callRpc={callRpc}
+                updateShareLightText={updateShareLightText}
+                completeShareLight={completeShareLight}
                 tokens={tokens}
                 experienceRunId={activeRunId}
                 onRegister={linkAccount}
@@ -259,7 +260,8 @@ function App() {
                 contentData={state.lumiContentData}
                 actions={state.lumiActions}
                 dispatch={dispatch}
-                callRpc={callRpc}
+                updateShareLightText={updateShareLightText}
+                completeShareLight={completeShareLight}
                 tokens={tokens}
                 experienceRunId={activeRunId}
                 onRegister={linkAccount}

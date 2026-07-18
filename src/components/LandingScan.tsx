@@ -9,13 +9,13 @@ export function LandingScan({
   actions,
   contentData,
   tokens,
-  onComplete,
+  dispatch,
 }: {
   message: string
   actions: Action[]
   contentData: Record<string, unknown>
   tokens: ModuleTokens
-  onComplete: () => void
+  dispatch: (action: string, extra?: Record<string, string>) => void
 }) {
   const [phase, setPhase] = useState<'invite' | 'scanning' | 'done'>('invite')
   const [stepIndex, setStepIndex] = useState(0)
@@ -23,9 +23,19 @@ export function LandingScan({
   const steps = (contentData.steps as Array<{ text: string; pause_ms: number }>) || []
   const sourceLabel = (contentData.source_label as string) || ''
 
+  // start_scan es la única action técnica local tolerada (fase visual de
+  // respiración). Cualquier otra action de actions_json (p.ej. "Ahora no")
+  // se despacha tal cual viene de Supabase, tanto al tocarla como al
+  // completarse la animación automáticamente.
+  const continuationAction = actions.find(a => a.action !== 'start_scan')
+
   useEffect(() => {
-    if (phase === 'done') onComplete()
-  }, [phase, onComplete])
+    if (phase !== 'done') return
+    if (continuationAction) {
+      dispatch(continuationAction.action, continuationAction.value ? { value: continuationAction.value } : {})
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase])
 
   useEffect(() => {
     if (phase !== 'scanning' || steps.length === 0) return
@@ -139,8 +149,11 @@ export function LandingScan({
                 label={action.label}
                 variant={(action.variant as 'solid' | 'outline' | 'ghost') || 'outline'}
                 onClick={() => {
-                  if (action.action === 'skip_scan') onComplete()
-                  else if (action.action === 'start_scan') setPhase('scanning')
+                  if (action.action === 'start_scan') {
+                    setPhase('scanning')
+                  } else {
+                    dispatch(action.action, action.value ? { value: action.value } : {})
+                  }
                 }}
                 tokens={tokens}
               />

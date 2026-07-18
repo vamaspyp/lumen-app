@@ -254,7 +254,8 @@ export function ContentArea({
   contentData,
   actions,
   dispatch,
-  callRpc,
+  updateShareLightText,
+  completeShareLight,
   tokens,
   experienceRunId = '',
   onRegister,
@@ -264,7 +265,16 @@ export function ContentArea({
   contentData: Record<string, unknown>
   actions: Array<{ label: string; action: string; value?: string; variant?: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
-  callRpc: (rpcName: string, params: Record<string, string>) => Promise<Record<string, unknown> | null>
+  updateShareLightText: (params: { share_light_id: string; editable_text: string }) => Promise<Record<string, unknown> | null>
+  completeShareLight: (params: {
+    share_light_id: string
+    channel: string
+    surface: string
+    result: string
+    success: string
+    final_text: string
+    public_url: string
+  }) => Promise<Record<string, unknown> | null>
   tokens: ModuleTokens
   experienceRunId?: string
   onRegister?: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>
@@ -277,7 +287,8 @@ export function ContentArea({
         content={contentData}
         actions={actions}
         dispatch={dispatch}
-        callRpc={callRpc}
+        updateShareLightText={updateShareLightText}
+        completeShareLight={completeShareLight}
         tokens={tokens}
         currentShareToken={currentShareToken}
       />

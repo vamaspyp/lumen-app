@@ -124,6 +124,10 @@ function updateState(
     lumiContentType: 'content_type' in result ? (result.content_type as string) : 'empty_presence',
     lumiContentData: ('content' in result && result.content != null) ? (result.content as Record<string, unknown>) : {},
     lumiCode: 'code' in result ? (result.code as string) : prev.lumiCode,
+    // Momento de reflejo sobrio: es de una sola aparición. Se limpia en
+    // cada respuesta salvo que el nodo activo lo traiga explícitamente
+    // en result.state, para que no persista al volver a Home.
+    reflectionHint: '',
     // Supabase decide qué App State actualizar
     ...((result.state as Partial<LumiState>) || {}),
   }))
@@ -220,23 +224,51 @@ export function useLumi() {
     []
   )
 
-  // Llamada directa a una RPC de nodo (usada por flujos que necesitan
-  // intercalar efectos de cliente —clipboard/share— entre dos llamadas,
-  // como la secuencia de copiar/compartir de ShareLightEditor). Aplica
-  // la respuesta exactamente igual que dispatch: nunca inventa estado.
-  const callRpc = useCallback(
-    async (rpcName: string, params: Record<string, string>) => {
-      const { data, error } = await supabase.rpc(rpcName, { p_params: params })
+  // Handlers técnicos acotados de Circular Luz (usados por ShareLightEditor
+  // para intercalar efectos de cliente —clipboard/share nativo— entre dos
+  // llamadas). Aplican la respuesta exactamente igual que dispatch: nunca
+  // inventan estado. No exponen una puerta RPC arbitraria a componentes.
+  const updateShareLightText = useCallback(
+    async (params: { share_light_id: string; editable_text: string }) => {
+      const { data, error } = await supabase.rpc('lumi_update_share_light_text', { p_params: params })
 
       if (error) {
-        console.error(`[useLumi] ${rpcName} error:`, error)
+        console.error('[useLumi] lumi_update_share_light_text error:', error)
         return null
       }
 
       if (data?.ok) {
         updateState(setState, data as Record<string, unknown>)
       } else {
-        console.warn(`[useLumi] ${rpcName} returned not-ok:`, data)
+        console.warn('[useLumi] lumi_update_share_light_text returned not-ok:', data)
+      }
+
+      return data as Record<string, unknown> | null
+    },
+    []
+  )
+
+  const completeShareLight = useCallback(
+    async (params: {
+      share_light_id: string
+      channel: string
+      surface: string
+      result: string
+      success: string
+      final_text: string
+      public_url: string
+    }) => {
+      const { data, error } = await supabase.rpc('lumi_complete_share_light', { p_params: params })
+
+      if (error) {
+        console.error('[useLumi] lumi_complete_share_light error:', error)
+        return null
+      }
+
+      if (data?.ok) {
+        updateState(setState, data as Record<string, unknown>)
+      } else {
+        console.warn('[useLumi] lumi_complete_share_light returned not-ok:', data)
       }
 
       return data as Record<string, unknown> | null
@@ -292,16 +324,21 @@ export function useLumi() {
       const days = (initData?.days_since_last_session as number) ?? 0
       const reflection = (initData?.reflection_hint as string) || ''
 
-      setState(prev => ({
-        ...prev,
-        daysSinceLastSession: days,
-        reflectionHint: reflection,
-      }))
+      setState(prev => ({ ...prev, daysSinceLastSession: days }))
 
       await dispatch('go_home', {
         user_id: userId,
         days_since_last_session: String(days),
       })
+
+      if (cancelled) return
+
+      // Reflejo sobrio: se agrega una sola vez, después de la respuesta
+      // inicial de go_home, para no perderse cuando updateState limpia
+      // reflectionHint en cada respuesta de dispatch.
+      if (reflection) {
+        setState(prev => ({ ...prev, reflectionHint: reflection }))
+      }
     }
 
     bootstrap()
@@ -327,5 +364,5 @@ export function useLumi() {
     []
   )
 
-  return { state, dispatch, linkAccount, callRpc }
+  return { state, dispatch, linkAccount, updateShareLightText, completeShareLight }
 }
