@@ -3,46 +3,39 @@ import type { ModuleTokens } from '../lib/tokens'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-// Traduce errores técnicos de Supabase Auth a copy sobrio y accionable.
-// Solo mapea texto de error a texto de error — no decide flujo ni nodo.
-function mapRegisterError(message?: string): string {
-  if (!message) return 'No pudimos crear la cuenta ahora. Probá nuevamente.'
-
-  if (message.includes('New password should be different from the old password')) {
-    return 'Esa clave parece coincidir con una anterior. Probá con otra.'
-  }
-
-  if (message.includes('Email address') || message.trim() === '') {
-    return 'Revisá el email antes de continuar.'
-  }
-
-  return 'No pudimos crear la cuenta ahora. Probá nuevamente.'
-}
-
 export function RegisterForm({
   onRegister,
   dispatch,
   tokens,
 }: {
-  onRegister: (email: string, password: string) => Promise<{ ok: boolean; error?: string; userId?: string }>
+  onRegister: (name: string, email: string, password: string) => Promise<{ userId: string; name: string; email: string }>
   dispatch: (action: string, extra?: Record<string, string>) => void
   tokens: ModuleTokens
 }) {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
-  const canSubmit = email.trim().length > 0 && password.trim().length >= 6
+  const canSubmit =
+    name.trim().length > 0 &&
+    email.trim().length > 0 &&
+    password.trim().length >= 6
 
   const handleSubmit = async () => {
     if (isSubmitting) return
 
+    const normalizedName = name.trim()
     const normalizedEmail = email.trim().toLowerCase()
     const normalizedPassword = password.trim()
 
     // Validación local antes de tocar Auth: nunca se llama a
-    // onRegister/linkAccount con email o clave inválidos.
+    // onRegister/linkAccount con nombre, email o clave inválidos.
+    if (!normalizedName) {
+      setError('Decime cómo querés que te llame.')
+      return
+    }
     if (!normalizedEmail || !EMAIL_RE.test(normalizedEmail)) {
       setError('Revisá el email antes de continuar.')
       return
@@ -56,21 +49,19 @@ export function RegisterForm({
     setError('')
 
     try {
-      const result = await onRegister(normalizedEmail, normalizedPassword)
+      const result = await onRegister(normalizedName, normalizedEmail, normalizedPassword)
 
-      if (result.ok) {
-        // Cuenta creada: el éxito lo confirma Supabase (REGISTRATION_SUCCESS),
-        // nunca un copy local. Se pasa user_id explícito porque, si la
-        // identidad anónima técnica recién se creó en este mismo submit,
-        // el estado del hook todavía no lo refleja en este render.
-        dispatch('complete_registration', result.userId ? { user_id: result.userId } : {})
-        return
-      }
-
-      // Email queda cargado a propósito: la persona puede corregir sin
-      // volver a escribir todo.
-      setError(mapRegisterError(result.error))
+      // Ningún éxito local ni REGISTRATION_SUCCESS hardcodeado acá:
+      // solo Supabase, vía complete_registration, decide si la cuenta
+      // quedó consolidada y qué nodo corresponde mostrar.
+      dispatch('complete_registration', {
+        user_id: result.userId,
+        name: result.name,
+        email: result.email,
+      })
     } catch (err) {
+      // Nombre/email/clave quedan cargados a propósito: la persona puede
+      // corregir sin volver a escribir todo.
       setError(err instanceof Error ? err.message : 'No pudimos crear la cuenta ahora. Probá nuevamente.')
     } finally {
       setIsSubmitting(false)
@@ -79,6 +70,40 @@ export function RegisterForm({
 
   return (
     <div style={{ textAlign: 'left' }}>
+      <div style={{ marginBottom: '1.25rem' }}>
+        <label
+          style={{
+            display: 'block',
+            fontSize: '0.7rem',
+            color: tokens.textMuted,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            marginBottom: '0.5rem',
+            fontWeight: 500,
+          }}
+        >
+          ¿Cómo querés que te llame?
+        </label>
+        <input
+          type="text"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          placeholder="Tu nombre"
+          style={{
+            width: '100%',
+            padding: '0.75rem 0.875rem',
+            borderRadius: '12px',
+            background: tokens.cardBg,
+            border: `1px solid ${tokens.cardBorder}`,
+            color: tokens.textPrimary,
+            fontSize: '0.95rem',
+            fontFamily: 'inherit',
+            outline: 'none',
+            boxSizing: 'border-box',
+          }}
+        />
+      </div>
+
       <div style={{ marginBottom: '1.25rem' }}>
         <label
           style={{

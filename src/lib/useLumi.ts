@@ -89,6 +89,23 @@ checkinState: '',
 
 // ───────── Helpers ─────────
 
+// Traduce errores técnicos de Supabase Auth a copy sobrio y accionable.
+// Vive acá (no en RegisterForm) porque es acá donde se ve el error crudo
+// de supabase.auth.updateUser — RegisterForm solo muestra lo que se le tira.
+function mapAuthError(message?: string): string {
+  if (!message) return 'No pudimos crear la cuenta ahora. Probá nuevamente.'
+
+  if (message.includes('New password should be different from the old password')) {
+    return 'Esa clave parece coincidir con una anterior. Probá con otra.'
+  }
+
+  if (message.includes('Email address') || message.trim() === '') {
+    return 'Revisá el email antes de continuar.'
+  }
+
+  return 'No pudimos crear la cuenta ahora. Probá nuevamente.'
+}
+
 function buildParams(state: LumiState): Record<string, string> {
   return {
     user_id: state.userId,
@@ -353,15 +370,21 @@ export function useLumi() {
   // de vincular el email hace falta que exista una identidad anónima
   // técnica, si todavía no existe, reutilizando el mismo ensureUser del
   // bootstrap — nunca un mecanismo de auth paralelo.
+  //
+  // Contrato: resuelve con { userId, name, email } solo si la cuenta
+  // quedó realmente vinculada en Auth. Cualquier falla (validación local,
+  // identidad anónima, o el propio updateUser) se propaga con throw —
+  // nunca un { ok: false } silencioso — para que RegisterForm no pueda
+  // interpretar una falla como éxito.
   const linkAccount = useCallback(
-    async (email: string, password: string) => {
-      // Normalización defensiva: RegisterForm ya valida y normaliza antes
-      // de llamar, pero linkAccount nunca debe poder disparar
-      // supabase.auth.updateUser con un email vacío, sea cual sea el
-      // llamador.
+    async (name: string, email: string, password: string) => {
+      const normalizedName = name?.trim() ?? ''
       const normalizedEmail = email?.trim().toLowerCase() ?? ''
       const normalizedPassword = password?.trim() ?? ''
 
+      if (!normalizedName) {
+        throw new Error('Decime cómo querés que te llame.')
+      }
       if (!normalizedEmail) {
         throw new Error('Ingresá un email válido.')
       }
@@ -372,18 +395,15 @@ export function useLumi() {
       let userId = stateRef.current.userId
 
       if (!userId) {
-        try {
-          const ensured = await ensureUser()
-          userId = ensured.userId
-          setState(prev => ({ ...prev, userId: ensured.userId, isAnonymous: ensured.isAnonymous }))
-        } catch (err) {
-          console.error('[useLumi] linkAccount anon bootstrap error:', err)
-          return { ok: false, error: 'No se pudo preparar la cuenta. Intentá de nuevo.' }
-        }
+        const ensured = await ensureUser()
+        userId = ensured.userId
+        setState(prev => ({ ...prev, userId: ensured.userId, isAnonymous: ensured.isAnonymous }))
       }
 
       if (import.meta.env.DEV) {
         console.debug('[useLumi] linkAccount payload', {
+          hasName: !!normalizedName,
+          nameLength: normalizedName.length,
           hasEmail: !!normalizedEmail,
           emailLength: normalizedEmail.length,
           hasPassword: !!normalizedPassword,
@@ -394,13 +414,25 @@ export function useLumi() {
       const { data, error } = await supabase.auth.updateUser({
         email: normalizedEmail,
         password: normalizedPassword,
+        data: {
+          display_name: normalizedName,
+          first_name: normalizedName,
+          name: normalizedName,
+        },
       })
+
       if (error) {
         console.error('[useLumi] linkAccount error:', error)
-        return { ok: false, error: error.message }
+        throw new Error(mapAuthError(error.message))
       }
+
+      if (!data.user?.id) {
+        console.error('[useLumi] linkAccount: updateUser sin user id válido', data)
+        throw new Error('No pudimos confirmar la cuenta. Probá nuevamente.')
+      }
+
       setState(prev => ({ ...prev, isAnonymous: false }))
-      return { ok: true, user: data.user, userId }
+      return { userId: data.user.id, name: normalizedName, email: normalizedEmail }
     },
     []
   )

@@ -277,7 +277,7 @@ export function ContentArea({
   }) => Promise<Record<string, unknown> | null>
   tokens: ModuleTokens
   experienceRunId?: string
-  onRegister?: (email: string, password: string) => Promise<{ ok: boolean; error?: string; userId?: string }>
+  onRegister?: (name: string, email: string, password: string) => Promise<{ userId: string; name: string; email: string }>
   currentShareToken?: string
 }) {
 
@@ -514,7 +514,7 @@ export function ContentArea({
 if (contentType === 'register_form') {
     return (
       <RegisterForm
-        onRegister={onRegister || (async () => ({ ok: false, error: 'No disponible' }))}
+        onRegister={onRegister || (async () => { throw new Error('No disponible.') })}
         dispatch={dispatch}
         tokens={tokens}
       />
