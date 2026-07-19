@@ -150,6 +150,13 @@ function updateState(
   }))
 }
 
+// ───────── Debug ─────────
+// Habilita los logs temporales de aislamiento de bootstrap/session también
+// en producción vía ?debug_lumi en la URL, sin depender de un build DEV.
+function isLumiDebugEnabled(): boolean {
+  return import.meta.env.DEV || new URLSearchParams(window.location.search).has('debug_lumi')
+}
+
 // ───────── Auth ─────────
 
 async function ensureUser(forceAnonymous = false): Promise<{ userId: string; isAnonymous: boolean }> {
@@ -163,7 +170,7 @@ async function ensureUser(forceAnonymous = false): Promise<{ userId: string; isA
     // Buscar sesión existente
     const { data: { session } } = await supabase.auth.getSession()
 
-    if (import.meta.env.DEV) {
+    if (isLumiDebugEnabled()) {
       console.debug('[useLumi][ensureUser:decision]', {
         forceAnonymous,
         hasExistingSession: !!session,
@@ -179,7 +186,7 @@ async function ensureUser(forceAnonymous = false): Promise<{ userId: string; isA
         isAnonymous: session.user.is_anonymous ?? false,
       }
     }
-  } else if (import.meta.env.DEV) {
+  } else if (isLumiDebugEnabled()) {
     console.debug('[useLumi][ensureUser:decision]', {
       forceAnonymous,
       hasExistingSession: null,
@@ -317,7 +324,7 @@ export function useLumi() {
     let cancelled = false
 
     async function bootstrap() {
-      if (import.meta.env.DEV) {
+      if (isLumiDebugEnabled()) {
         console.debug('[useLumi][bootstrap:start]', {
           url: window.location.href,
           hasQaAnon: new URLSearchParams(window.location.search).has('qa_anon'),
@@ -352,7 +359,7 @@ export function useLumi() {
         else console.warn('[useLumi] lumi_open_shared_light returned not-ok:', data)
       }
 
-      if (import.meta.env.DEV) {
+      if (isLumiDebugEnabled()) {
         const { data: sessionData } = await supabase.auth.getSession()
         console.debug('[useLumi][auth:session-before-ensure]', {
           hasSession: !!sessionData.session,
@@ -367,13 +374,13 @@ export function useLumi() {
 
       if (cancelled) return
 
-      if (import.meta.env.DEV) {
+      if (isLumiDebugEnabled()) {
         console.debug('[useLumi][ensureUser:result]', { userId })
       }
 
       setState(prev => ({ ...prev, userId, isAnonymous }))
 
-      if (import.meta.env.DEV) {
+      if (isLumiDebugEnabled()) {
         console.debug('[useLumi][initData:request]', { userId })
       }
 
@@ -381,7 +388,7 @@ export function useLumi() {
         p_user_id: userId,
       })
 
-      if (import.meta.env.DEV) {
+      if (isLumiDebugEnabled()) {
         // Cast puntual: log de diagnóstico temporal sobre un jsonb cuya
         // forma exacta es justamente lo que se está aislando acá.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
