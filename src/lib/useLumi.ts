@@ -162,12 +162,31 @@ async function ensureUser(forceAnonymous = false): Promise<{ userId: string; isA
 
     // Buscar sesión existente
     const { data: { session } } = await supabase.auth.getSession()
+
+    if (import.meta.env.DEV) {
+      console.debug('[useLumi][ensureUser:decision]', {
+        forceAnonymous,
+        hasExistingSession: !!session,
+        existingUserId: session?.user?.id ?? null,
+        existingEmail: session?.user?.email ?? null,
+        willCreateAnonymous: !session?.user,
+      })
+    }
+
     if (session?.user) {
       return {
         userId: session.user.id,
         isAnonymous: session.user.is_anonymous ?? false,
       }
     }
+  } else if (import.meta.env.DEV) {
+    console.debug('[useLumi][ensureUser:decision]', {
+      forceAnonymous,
+      hasExistingSession: null,
+      existingUserId: null,
+      existingEmail: null,
+      willCreateAnonymous: true,
+    })
   }
 
   // No hay sesión (o se fuerza anónimo) → sign in anónimo
@@ -298,6 +317,13 @@ export function useLumi() {
     let cancelled = false
 
     async function bootstrap() {
+      if (import.meta.env.DEV) {
+        console.debug('[useLumi][bootstrap:start]', {
+          url: window.location.href,
+          hasQaAnon: new URLSearchParams(window.location.search).has('qa_anon'),
+        })
+      }
+
       const qaAnonReset = await maybeApplyQaAnonReset()
       if (cancelled) return
 
@@ -326,15 +352,49 @@ export function useLumi() {
         else console.warn('[useLumi] lumi_open_shared_light returned not-ok:', data)
       }
 
+      if (import.meta.env.DEV) {
+        const { data: sessionData } = await supabase.auth.getSession()
+        console.debug('[useLumi][auth:session-before-ensure]', {
+          hasSession: !!sessionData.session,
+          userId: sessionData.session?.user?.id ?? null,
+          email: sessionData.session?.user?.email ?? null,
+          isAnonymous: sessionData.session?.user?.is_anonymous ?? null,
+          metadata: sessionData.session?.user?.user_metadata ?? null,
+        })
+      }
+
       const { userId, isAnonymous } = await ensureUser(qaAnonReset)
 
       if (cancelled) return
 
+      if (import.meta.env.DEV) {
+        console.debug('[useLumi][ensureUser:result]', { userId })
+      }
+
       setState(prev => ({ ...prev, userId, isAnonymous }))
+
+      if (import.meta.env.DEV) {
+        console.debug('[useLumi][initData:request]', { userId })
+      }
 
       const { data: initData } = await supabase.rpc('lumi_get_init_data', {
         p_user_id: userId,
       })
+
+      if (import.meta.env.DEV) {
+        // Cast puntual: log de diagnóstico temporal sobre un jsonb cuya
+        // forma exacta es justamente lo que se está aislando acá.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const initDataDebug = initData as any
+        console.debug('[useLumi][initData:response]', {
+          code: initDataDebug?.code ?? null,
+          isAnonymous: initDataDebug?.state?.is_anonymous ?? initDataDebug?.is_anonymous ?? null,
+          showRegister:
+            initDataDebug?.state?.showRegistrationPrompt ?? initDataDebug?.show_register_prompt ?? null,
+          firstName: initDataDebug?.state?.first_name ?? initDataDebug?.first_name ?? null,
+          message: initDataDebug?.message ?? null,
+        })
+      }
 
       if (cancelled) return
 
