@@ -48,6 +48,12 @@ export interface LumiState {
   // Circular Luz
   currentShareLightId: string
   currentShareToken: string
+  // Receptor anónimo de una luz compartida: mientras es true, la UI vive
+  // el flujo mínimo de Circular Luz (sin navegación general de LUMEN).
+  // Nunca lo derivamos de currentShareToken/currentShareLightId porque
+  // Supabase no los limpia en result.state (ver nota en updateState) —
+  // por eso es un flag explícito que solo el frontend prende/apaga.
+  sharedLightReceiverMode: boolean
 
   // Reflejo
   reflectionHint: string
@@ -83,6 +89,7 @@ checkinState: '',
 
   currentShareLightId: '',
   currentShareToken: '',
+  sharedLightReceiverMode: false,
 
   reflectionHint: '',
 }
@@ -153,7 +160,7 @@ function updateState(
 // ───────── Debug ─────────
 // Habilita los logs temporales de aislamiento de bootstrap/session también
 // en producción vía ?debug_lumi en la URL, sin depender de un build DEV.
-function isLumiDebugEnabled(): boolean {
+export function isLumiDebugEnabled(): boolean {
   return import.meta.env.DEV || new URLSearchParams(window.location.search).has('debug_lumi')
 }
 
@@ -241,6 +248,15 @@ export function useLumi() {
 
   const dispatch = useCallback(
     async (action: string, extra?: Record<string, string>) => {
+      // Única salida canónica del modo receptor de Circular Luz: la persona
+      // creó cuenta (REGISTRATION_SUCCESS) y tocó "Seguimos" (go_home).
+      // Supabase nunca limpia sharedLightReceiverMode por su cuenta — lo
+      // apaga el frontend acá, después de que la respuesta confirme el ok.
+      const isLeavingSharedLightReceiverMode =
+        action === 'go_home' &&
+        stateRef.current.sharedLightReceiverMode &&
+        stateRef.current.lumiCode === 'REGISTRATION_SUCCESS'
+
       const params = { ...buildParams(stateRef.current), ...extra }
 
       if (import.meta.env.DEV) {
@@ -260,6 +276,14 @@ export function useLumi() {
 
       if (data?.ok) {
         updateState(setState, data as Record<string, unknown>)
+
+        if (isLeavingSharedLightReceiverMode) {
+          setState(prev => ({ ...prev, sharedLightReceiverMode: false }))
+
+          if (isLumiDebugEnabled()) {
+            console.debug('[useLumi][sharedLightMode]', { entering: false, via: 'go_home after REGISTRATION_SUCCESS' })
+          }
+        }
       } else {
         console.warn(`[useLumi] ${action} returned not-ok:`, data)
       }
@@ -352,6 +376,12 @@ export function useLumi() {
 
         if (!error && data?.ok) {
           updateState(setState, data as Record<string, unknown>)
+          setState(prev => ({ ...prev, sharedLightReceiverMode: true }))
+
+          if (isLumiDebugEnabled()) {
+            console.debug('[useLumi][sharedLightMode]', { entering: true, shareToken: sharedToken })
+          }
+
           return
         }
 

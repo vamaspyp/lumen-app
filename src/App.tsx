@@ -1,13 +1,56 @@
-import { useLumi } from './lib/useLumi'
+import { useLumi, isLumiDebugEnabled, type Action } from './lib/useLumi'
 import { getModuleTokens } from './lib/tokens'
 import { LumiOrb } from './components/LumiOrb'
 import { BottomNav } from './components/BottomNav'
 import { ContentArea } from './components/ContentArea'
 import { LandingScan } from './components/LandingScan'
 
+// Modo receptor de Circular Luz: mientras la persona no creó cuenta, solo
+// puede tocar acciones del flujo mínimo (recibir → vivir → feedback →
+// guardar/registrarse). Todo lo demás (navegación general, check-in H1/H2,
+// "dame otra opción", etc.) queda oculto para no exponerla a LUMEN completo.
+const SHARED_LIGHT_RECEIVER_ALLOWED_ACTIONS = new Set([
+  'start_shared_light',
+  'open_resource_viewer',
+  'close_resource_viewer',
+  'complete_shared_light',
+  'submit_shared_light_signal',
+  'save_to_sanctuary',
+  'show_register_form',
+  'dismiss_registration_prompt',
+  'complete_registration',
+  'share_light',
+  'native_share_light',
+  'copy_share_light',
+  'copy_share_light_link',
+])
+
+function isActionAllowedForSharedLightReceiver(action: Action, lumiCode: string): boolean {
+  // "Seguimos" tras REGISTRATION_SUCCESS es la única puerta de salida
+  // legítima hacia el Home general — cualquier otro go_home queda bloqueado.
+  if (action.action === 'go_home') {
+    return lumiCode === 'REGISTRATION_SUCCESS'
+  }
+  return SHARED_LIGHT_RECEIVER_ALLOWED_ACTIONS.has(action.action)
+}
+
 function App() {
   const { state, dispatch, linkAccount, updateShareLightText, completeShareLight } = useLumi()
   const tokens = getModuleTokens(state.contentSource)
+
+  const isSharedLightReceiverMode = state.sharedLightReceiverMode
+
+  const visibleActions = isSharedLightReceiverMode
+    ? state.lumiActions.filter(a => isActionAllowedForSharedLightReceiver(a, state.lumiCode))
+    : state.lumiActions
+
+  if (isSharedLightReceiverMode && isLumiDebugEnabled()) {
+    console.debug('[useLumi][filteredActions]', {
+      lumiCode: state.lumiCode,
+      before: state.lumiActions.map(a => a.action),
+      after: visibleActions.map(a => a.action),
+    })
+  }
 
   const isLandingScan =
     state.lumiContentType === 'activity_detail' &&
@@ -179,7 +222,7 @@ function App() {
         {isLandingScan ? (
           <LandingScan
             message={state.lumiMessage}
-            actions={state.lumiActions}
+            actions={visibleActions}
             contentData={state.lumiContentData}
             tokens={tokens}
             dispatch={dispatch}
@@ -223,7 +266,7 @@ function App() {
               <ContentArea
                 contentType={state.lumiContentType}
                 contentData={state.lumiContentData}
-                actions={state.lumiActions}
+                actions={visibleActions}
                 dispatch={dispatch}
                 updateShareLightText={updateShareLightText}
                 completeShareLight={completeShareLight}
@@ -258,7 +301,7 @@ function App() {
               <ContentArea
                 contentType={state.lumiContentType}
                 contentData={state.lumiContentData}
-                actions={state.lumiActions}
+                actions={visibleActions}
                 dispatch={dispatch}
                 updateShareLightText={updateShareLightText}
                 completeShareLight={completeShareLight}
@@ -272,8 +315,12 @@ function App() {
           </div>
         )}
       </div>
-      <div style={{ height: '80px', flexShrink: 0 }} />
-      <BottomNav currentSource={state.contentSource} dispatch={dispatch} />
+      {!isSharedLightReceiverMode && (
+        <>
+          <div style={{ height: '80px', flexShrink: 0 }} />
+          <BottomNav currentSource={state.contentSource} dispatch={dispatch} />
+        </>
+      )}
     </>
   )
 }
