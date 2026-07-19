@@ -137,24 +137,84 @@ function buildParams(state: LumiState): Record<string, string> {
   }
 }
 
+// Auditoría defensiva: el chain de Circular Luz (lumi_start_shared_light /
+// lumi_complete_shared_light / lumi_submit_shared_light_signal) no siempre
+// trae currentExperienceRunId en result.state — a veces solo viaja en
+// result.content bajo otro nombre. Busca en todas las variantes conocidas
+// para no perderlo si aparece en cualquiera de ellas.
+function extractExperienceRunId(result: Record<string, unknown>): string {
+  const state = (result.state as Record<string, unknown>) || {}
+  const content = (result.content as Record<string, unknown>) || {}
+
+  const candidates = [
+    state.currentExperienceRunId,
+    state.experience_run_id,
+    content.experience_run_id,
+    content.experienceRunId,
+    result.experience_run_id,
+    result.currentExperienceRunId,
+  ]
+
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && candidate.trim() !== '') {
+      return candidate.trim()
+    }
+  }
+
+  return ''
+}
+
 function updateState(
   setState: React.Dispatch<React.SetStateAction<LumiState>>,
   result: Record<string, unknown>
 ) {
-  setState(prev => ({
-    ...prev,
-    lumiMessage: 'message' in result ? (result.message as string) : prev.lumiMessage,
-    lumiActions: 'actions' in result ? (result.actions as Action[]) : [],
-    lumiContentType: 'content_type' in result ? (result.content_type as string) : 'empty_presence',
-    lumiContentData: ('content' in result && result.content != null) ? (result.content as Record<string, unknown>) : {},
-    lumiCode: 'code' in result ? (result.code as string) : prev.lumiCode,
-    // Momento de reflejo sobrio: es de una sola aparición. Se limpia en
-    // cada respuesta salvo que el nodo activo lo traiga explícitamente
-    // en result.state, para que no persista al volver a Home.
-    reflectionHint: '',
-    // Supabase decide qué App State actualizar
-    ...((result.state as Partial<LumiState>) || {}),
-  }))
+  setState(prev => {
+    const merged: LumiState = {
+      ...prev,
+      lumiMessage: 'message' in result ? (result.message as string) : prev.lumiMessage,
+      lumiActions: 'actions' in result ? (result.actions as Action[]) : [],
+      lumiContentType: 'content_type' in result ? (result.content_type as string) : 'empty_presence',
+      lumiContentData: ('content' in result && result.content != null) ? (result.content as Record<string, unknown>) : {},
+      lumiCode: 'code' in result ? (result.code as string) : prev.lumiCode,
+      // Momento de reflejo sobrio: es de una sola aparición. Se limpia en
+      // cada respuesta salvo que el nodo activo lo traiga explícitamente
+      // en result.state, para que no persista al volver a Home.
+      reflectionHint: '',
+      // Supabase decide qué App State actualizar
+      ...((result.state as Partial<LumiState>) || {}),
+    }
+
+    // Mientras se vive el modo receptor de Circular Luz, el run id (y el
+    // contexto de share) no se pierden entre transiciones: si esta
+    // respuesta trae uno nuevo se toma (aunque venga solo en content), y si
+    // no trae ninguno no se limpia el que ya se conocía.
+    if (prev.sharedLightReceiverMode) {
+      const foundRunId = extractExperienceRunId(result)
+
+      if (foundRunId) {
+        merged.currentExperienceRunId = foundRunId
+      } else if (!merged.currentExperienceRunId && prev.currentExperienceRunId) {
+        merged.currentExperienceRunId = prev.currentExperienceRunId
+      }
+
+      if (!merged.currentShareToken && prev.currentShareToken) {
+        merged.currentShareToken = prev.currentShareToken
+      }
+      if (!merged.currentShareLightId && prev.currentShareLightId) {
+        merged.currentShareLightId = prev.currentShareLightId
+      }
+
+      if (isLumiDebugEnabled()) {
+        console.debug('[useLumi][sharedLightExperienceRunId]', {
+          code: merged.lumiCode,
+          foundRunId,
+          currentExperienceRunId: merged.currentExperienceRunId,
+        })
+      }
+    }
+
+    return merged
+  })
 }
 
 // ───────── Debug ─────────
@@ -257,16 +317,52 @@ export function useLumi() {
         stateRef.current.sharedLightReceiverMode &&
         stateRef.current.lumiCode === 'REGISTRATION_SUCCESS'
 
-      const params = { ...buildParams(stateRef.current), ...extra }
+      // save_to_sanctuary depende de experience_run_id/share context vigentes
+      // en el hook — nunca de lo que traiga `extra`, que puede venir vacío o
+      // desactualizado desde el pill que lo dispara. Se reafirman acá en vez
+      // de confiar únicamente en buildParams para dejar explícito que este
+      // guardado es el mismo mecanismo normal, solo con el contexto correcto.
+      const mergedExtra = action === 'save_to_sanctuary'
+        ? {
+            ...extra,
+            experience_run_id: stateRef.current.currentExperienceRunId,
+            currentExperienceRunId: stateRef.current.currentExperienceRunId,
+            share_token: stateRef.current.currentShareToken,
+            currentShareToken: stateRef.current.currentShareToken,
+            share_light_id: stateRef.current.currentShareLightId,
+            currentShareLightId: stateRef.current.currentShareLightId,
+          }
+        : extra
+
+      const params = { ...buildParams(stateRef.current), ...mergedExtra }
 
       if (import.meta.env.DEV) {
-        console.log('[LUMI ACTION]', action, { extra, params })
+        console.log('[LUMI ACTION]', action, { extra: mergedExtra, params })
+      }
+
+      if (action === 'save_to_sanctuary' && isLumiDebugEnabled()) {
+        console.debug('[useLumi][saveToSanctuaryPayload]', {
+          action,
+          currentExperienceRunId: stateRef.current.currentExperienceRunId,
+          currentShareToken: stateRef.current.currentShareToken,
+          currentShareLightId: stateRef.current.currentShareLightId,
+          params,
+        })
       }
 
       const { data, error } = await supabase.rpc('lumi_dispatch', { p_action: action, p_params: params })
 
       if (import.meta.env.DEV) {
         console.log('[LUMI RPC RESULT]', 'lumi_dispatch', { data, error })
+      }
+
+      if (action === 'save_to_sanctuary' && isLumiDebugEnabled()) {
+        console.debug('[useLumi][saveToSanctuaryResult]', {
+          ok: data?.ok,
+          code: data?.code,
+          error: error?.message || data?.error,
+          message: data?.message,
+        })
       }
 
       if (error) {
