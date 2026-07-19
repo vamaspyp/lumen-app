@@ -5,33 +5,27 @@ import { BottomNav } from './components/BottomNav'
 import { ContentArea } from './components/ContentArea'
 import { LandingScan } from './components/LandingScan'
 
-// Modo receptor de Circular Luz: mientras la persona no creó cuenta, solo
-// puede tocar acciones del flujo mínimo (recibir → vivir → feedback →
-// guardar/registrarse). Todo lo demás (navegación general, check-in H1/H2,
-// "dame otra opción", etc.) queda oculto para no exponerla a LUMEN completo.
-const SHARED_LIGHT_RECEIVER_ALLOWED_ACTIONS = new Set([
-  'start_shared_light',
-  'open_resource_viewer',
-  'close_resource_viewer',
-  'complete_shared_light',
-  'submit_shared_light_signal',
-  'save_to_sanctuary',
-  'show_register_form',
-  'dismiss_registration_prompt',
-  'complete_registration',
-  'share_light',
-  'native_share_light',
-  'copy_share_light',
-  'copy_share_light_link',
+// Modo receptor de Circular Luz: React no decide el flujo — Supabase ya
+// devuelve exactamente las actions válidas para el nodo actual. React solo
+// bloquea, en este modo, las salidas explícitas hacia navegación general de
+// LUMEN. Deny-list (no allow-list) a propósito: una allow-list se come
+// actions legítimas de nodos que no anticipamos; una deny-list solo saca
+// lo que sabemos que es navegación general.
+const SHARED_LIGHT_RECEIVER_DENIED_ACTIONS = new Set([
+  'next_experience',
+  'submit_checkin_hemisphere',
+  'open_source',
+  'open_fuente',
+  'open_sanctuary',
 ])
 
 function isActionAllowedForSharedLightReceiver(action: Action, lumiCode: string): boolean {
-  // "Seguimos" tras REGISTRATION_SUCCESS es la única puerta de salida
-  // legítima hacia el Home general — cualquier otro go_home queda bloqueado.
+  // go_home es la única acción que depende del contexto: solo se permite
+  // como "Seguimos" tras REGISTRATION_SUCCESS, nunca como salida general.
   if (action.action === 'go_home') {
     return lumiCode === 'REGISTRATION_SUCCESS'
   }
-  return SHARED_LIGHT_RECEIVER_ALLOWED_ACTIONS.has(action.action)
+  return !SHARED_LIGHT_RECEIVER_DENIED_ACTIONS.has(action.action)
 }
 
 function App() {
@@ -45,10 +39,15 @@ function App() {
     : state.lumiActions
 
   if (isSharedLightReceiverMode && isLumiDebugEnabled()) {
-    console.debug('[useLumi][filteredActions]', {
+    const removedActions = state.lumiActions.filter(a => !visibleActions.includes(a))
+    const toLog = (a: Action) => ({ label: a.label, action: a.action, value: a.value })
+
+    console.debug('[App][sharedLightActionsFilter]', {
       lumiCode: state.lumiCode,
-      before: state.lumiActions.map(a => a.action),
-      after: visibleActions.map(a => a.action),
+      sharedLightReceiverMode: isSharedLightReceiverMode,
+      originalActions: state.lumiActions.map(toLog),
+      filteredActions: visibleActions.map(toLog),
+      removedActions: removedActions.map(toLog),
     })
   }
 
