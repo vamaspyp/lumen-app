@@ -281,7 +281,11 @@ export function useLumi() {
           setState(prev => ({ ...prev, sharedLightReceiverMode: false }))
 
           if (isLumiDebugEnabled()) {
-            console.debug('[useLumi][sharedLightMode]', { entering: false, via: 'go_home after REGISTRATION_SUCCESS' })
+            console.debug('[useLumi][sharedLightReceiverMode]', {
+              enter: false,
+              exit: true,
+              reason: 'go_home after REGISTRATION_SUCCESS',
+            })
           }
         }
       } else {
@@ -379,7 +383,12 @@ export function useLumi() {
           setState(prev => ({ ...prev, sharedLightReceiverMode: true }))
 
           if (isLumiDebugEnabled()) {
-            console.debug('[useLumi][sharedLightMode]', { entering: true, shareToken: sharedToken })
+            console.debug('[useLumi][sharedLightReceiverMode]', {
+              enter: true,
+              exit: false,
+              reason: 'lumi_open_shared_light ok',
+              shareToken: sharedToken,
+            })
           }
 
           return
