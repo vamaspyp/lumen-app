@@ -1,9 +1,12 @@
+import { useState } from 'react'
 import { useLumi, isLumiDebugEnabled, type Action } from './lib/useLumi'
 import { getModuleTokens } from './lib/tokens'
 import { LumiOrb } from './components/LumiOrb'
 import { BottomNav } from './components/BottomNav'
 import { ContentArea } from './components/ContentArea'
 import { LandingScan } from './components/LandingScan'
+import { LumenIntro } from './components/LumenIntro'
+import { hasSeenLumenIntro } from './lib/lumenIntro'
 
 // Modo receptor de Circular Luz: React no decide el flujo — Supabase ya
 // devuelve exactamente las actions válidas para el nodo actual. React solo
@@ -31,6 +34,10 @@ function isActionAllowedForSharedLightReceiver(action: Action, lumiCode: string)
 function App() {
   const { state, dispatch, linkAccount, updateShareLightText, completeShareLight } = useLumi()
   const tokens = getModuleTokens(state.contentSource)
+
+  // Capa visual local: se reproduce una vez por sesión de navegación mientras
+  // useLumi carga en paralelo por debajo. No bloquea bootstrap ni flujos.
+  const [showIntro, setShowIntro] = useState(() => !hasSeenLumenIntro())
 
   const isSharedLightReceiverMode = state.sharedLightReceiverMode
 
@@ -133,6 +140,8 @@ function App() {
 
   return (
     <>
+      {showIntro && <LumenIntro onComplete={() => setShowIntro(false)} />}
+
       <style>{`
         @keyframes lumiAppear {
           from { opacity: 0; transform: translateY(8px); }
