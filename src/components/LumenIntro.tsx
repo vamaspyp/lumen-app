@@ -4,26 +4,23 @@ import { LumenWordmark } from './LumenWordmark'
 import { getModuleTokens } from '../lib/tokens'
 import { markLumenIntroSeen } from '../lib/lumenIntro'
 
-// Fases plenas: la palabra se escribe, se sostiene un instante, colapsa
-// hacia el centro, estalla en un destello breve y de ese destello nace el
-// orbe de LUMI, que late dos veces antes del crossfade final.
-type IntroPhase = 'writing' | 'settle' | 'implode' | 'flash' | 'orb' | 'complete'
+// Secuencia: trazo previo → escritura cursiva de "Lumen" → trazo posterior
+// (las tres cosas son UN solo path, ver LumenWordmark) → concentración/
+// implosión → nace LumiOrb → fin de intro.
+type IntroPhase = 'writing' | 'implode' | 'orb' | 'complete'
 
 const DURATIONS = {
   writing: 6000,
-  settle: 450,
-  implode: 700,
-  flash: 320,
-  orb: 1650,
-  completeFade: 400,
+  implode: 650,
+  orb: 900,
+  completeFade: 350,
 }
 
-// Movimiento reducido: sin escritura larga ni implosión. Aparición breve
-// de la palabra (el mismo LumenWordmark, comprimido a este tiempo) y
-// transición rápida y sin latidos hacia el orbe.
+// Movimiento reducido: no se ejecuta la escritura. El wordmark aparece ya
+// trazado y cruza a LumiOrb en una transición breve (~280ms), sin
+// implosión ni efectos de escala/blur.
 const REDUCED_DURATIONS = {
-  settle: 350,
-  orb: 450,
+  crossfade: 280,
   completeFade: 150,
 }
 
@@ -39,7 +36,7 @@ function prefersReducedMotion(): boolean {
 function LumenIntroSequence({ onComplete }: { onComplete: () => void }) {
   const tokens = getModuleTokens('lumi')
   const [reduced] = useState(prefersReducedMotion)
-  const [phase, setPhase] = useState<IntroPhase>(reduced ? 'settle' : 'writing')
+  const [phase, setPhase] = useState<IntroPhase>('writing')
   const finishedRef = useRef(false)
 
   const finish = () => {
@@ -53,22 +50,19 @@ function LumenIntroSequence({ onComplete }: { onComplete: () => void }) {
     let timer: number | undefined
 
     if (reduced) {
-      if (phase === 'settle') {
-        timer = window.setTimeout(() => setPhase('orb'), REDUCED_DURATIONS.settle)
+      if (phase === 'writing') {
+        // Nada que escribir: pasa directo al cruce hacia el orbe.
+        timer = window.setTimeout(() => setPhase('orb'), 0)
       } else if (phase === 'orb') {
-        timer = window.setTimeout(() => setPhase('complete'), REDUCED_DURATIONS.orb)
+        timer = window.setTimeout(() => setPhase('complete'), REDUCED_DURATIONS.crossfade)
       } else if (phase === 'complete') {
         timer = window.setTimeout(finish, REDUCED_DURATIONS.completeFade)
       }
     } else {
       if (phase === 'writing') {
-        timer = window.setTimeout(() => setPhase('settle'), DURATIONS.writing)
-      } else if (phase === 'settle') {
-        timer = window.setTimeout(() => setPhase('implode'), DURATIONS.settle)
+        timer = window.setTimeout(() => setPhase('implode'), DURATIONS.writing)
       } else if (phase === 'implode') {
-        timer = window.setTimeout(() => setPhase('flash'), DURATIONS.implode)
-      } else if (phase === 'flash') {
-        timer = window.setTimeout(() => setPhase('orb'), DURATIONS.flash)
+        timer = window.setTimeout(() => setPhase('orb'), DURATIONS.implode)
       } else if (phase === 'orb') {
         timer = window.setTimeout(() => setPhase('complete'), DURATIONS.orb)
       } else if (phase === 'complete') {
@@ -85,26 +79,34 @@ function LumenIntroSequence({ onComplete }: { onComplete: () => void }) {
   const completeFadeMs = reduced ? REDUCED_DURATIONS.completeFade : DURATIONS.completeFade
 
   const isImploding = !reduced && phase === 'implode'
-  const isFlashing = !reduced && phase === 'flash'
-  const reducedFadeOut = reduced && phase === 'orb'
-
-  const showWordmark =
-    phase === 'writing' || phase === 'settle' || phase === 'implode' || reducedFadeOut
-  const showBurst = isImploding || isFlashing
+  const showWordmark = phase === 'writing' || phase === 'implode' || (reduced && phase === 'orb')
   const showOrb = phase === 'orb' || phase === 'complete'
 
+  // Implosión: el trazo recogido pierde extensión horizontal, se concentra
+  // hacia el centro, reduce escala y suma blur/opacidad — nunca un fade simple.
   const wordmarkWrapperStyle: CSSProperties = isImploding
     ? {
-        transform: 'scale(0.08, 0.85)',
+        transform: 'scale(0.05, 0.5)',
         transformOrigin: 'center',
-        filter: 'blur(10px)',
+        filter: 'blur(9px)',
         opacity: 0,
         transition:
-          'transform 700ms cubic-bezier(0.6,0,0.85,0.35), filter 700ms ease-in, opacity 700ms ease-in 260ms',
+          'transform 650ms cubic-bezier(0.6,0,0.85,0.35), filter 650ms ease-in, opacity 650ms ease-in 200ms',
       }
-    : reducedFadeOut
-      ? { opacity: 0, transition: 'opacity 200ms ease' }
-      : { transform: 'scale(1, 1)', opacity: 1 }
+    : reduced && phase === 'orb'
+      ? { opacity: 0, transition: `opacity ${REDUCED_DURATIONS.crossfade}ms ease` }
+      : { transform: 'scale(1,1)', opacity: 1 }
+
+  const orbWrapperStyle: CSSProperties =
+    reduced
+      ? {
+          opacity: phase === 'orb' || phase === 'complete' ? 1 : 0,
+          transform: phase === 'orb' || phase === 'complete' ? 'scale(1)' : 'scale(0.92)',
+          transition: `opacity ${REDUCED_DURATIONS.crossfade}ms ease, transform ${REDUCED_DURATIONS.crossfade}ms ease`,
+        }
+      : {
+          animation: 'lumenIntroOrbBirth 900ms cubic-bezier(0.25,0.85,0.35,1) both',
+        }
 
   return (
     <div
@@ -135,6 +137,7 @@ function LumenIntroSequence({ onComplete }: { onComplete: () => void }) {
           letterSpacing: '0.04em',
           cursor: 'pointer',
           padding: '0.5rem 0.75rem',
+          zIndex: 1,
         }}
       >
         Omitir
@@ -143,58 +146,22 @@ function LumenIntroSequence({ onComplete }: { onComplete: () => void }) {
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {showWordmark && (
           <div style={wordmarkWrapperStyle}>
-            <LumenWordmark tokens={tokens} writingMs={reducedFadeOut ? REDUCED_DURATIONS.settle : DURATIONS.writing} />
+            <LumenWordmark tokens={tokens} writingMs={DURATIONS.writing} reduced={reduced} />
           </div>
         )}
 
-        {showBurst && (
-          <div
-            style={{
-              position: 'absolute',
-              width: '140px',
-              height: '140px',
-              borderRadius: '50%',
-              pointerEvents: 'none',
-              background: `radial-gradient(circle, rgba(255,255,255,0.9) 0%, ${tokens.accent} 45%, transparent 72%)`,
-              opacity: isImploding ? 0.55 : undefined,
-              transform: isImploding ? 'scale(0.9)' : undefined,
-              transition: isImploding ? 'opacity 700ms ease-in, transform 700ms ease-in' : undefined,
-              animation: isFlashing ? `lumenIntroFlash ${DURATIONS.flash}ms ease-out forwards` : undefined,
-            }}
-          />
-        )}
-
         {showOrb && (
-          <div
-            style={{
-              animation: !reduced
-                ? 'lumenIntroPulseTwice 1300ms ease-in-out both'
-                : 'lumenIntroOrbFadeIn 250ms ease-out both',
-            }}
-          >
+          <div style={{ ...orbWrapperStyle, position: showWordmark ? 'absolute' : 'static' }}>
             <LumiOrb tokens={tokens} />
           </div>
         )}
       </div>
 
       <style>{`
-        @keyframes lumenIntroFlash {
-          0%   { opacity: 0.55; transform: scale(0.9); }
-          40%  { opacity: 0.9; transform: scale(1.05); }
-          100% { opacity: 0; transform: scale(1.3); }
-        }
-        @keyframes lumenIntroPulseTwice {
-          0%   { transform: scale(0.75); opacity: 0; }
-          12%  { opacity: 1; }
-          26%  { transform: scale(1.15); }
-          42%  { transform: scale(0.98); }
-          58%  { transform: scale(1.12); }
-          74%  { transform: scale(1); }
-          100% { transform: scale(1); }
-        }
-        @keyframes lumenIntroOrbFadeIn {
-          from { opacity: 0; transform: scale(0.85); }
-          to   { opacity: 1; transform: scale(1); }
+        @keyframes lumenIntroOrbBirth {
+          0%   { transform: scale(0.12); opacity: 0; }
+          55%  { transform: scale(1.08); opacity: 1; }
+          100% { transform: scale(1); opacity: 1; }
         }
       `}</style>
     </div>
@@ -209,8 +176,9 @@ class LumenIntroBoundary extends Component<{ children: ReactNode; onFallback: ()
   }
 
   componentDidCatch() {
-    // Ante cualquier error de la intro, no reintenta: cae directo a LumiOrb
-    // (la vista normal de App ya lo renderiza por debajo de este overlay).
+    // Ante cualquier error de la intro (p.ej. el asset del trazo), no
+    // reintenta: cae directo a LumiOrb (la vista normal de App ya lo
+    // renderiza por debajo de este overlay).
     markLumenIntroSeen()
     this.props.onFallback()
   }
@@ -222,8 +190,8 @@ class LumenIntroBoundary extends Component<{ children: ReactNode; onFallback: ()
 }
 
 /**
- * Overlay local de entrada (writing → settle → implode → flash → orb →
- * complete). No crea nodos, no llama a Supabase y no participa del
+ * Overlay local de entrada (escritura → implosión → nace el orbe →
+ * completo). No crea nodos, no llama a Supabase y no participa del
  * dispatcher: solo decide, vía sessionStorage, si corresponde reproducirse
  * una vez por sesión.
  */
