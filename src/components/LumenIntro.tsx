@@ -82,16 +82,17 @@ function LumenIntroSequence({ onComplete }: { onComplete: () => void }) {
   const showWordmark = phase === 'writing' || phase === 'implode' || (reduced && phase === 'orb')
   const showOrb = phase === 'orb' || phase === 'complete'
 
-  // Implosión: el trazo recogido pierde extensión horizontal, se concentra
-  // hacia el centro, reduce escala y suma blur/opacidad — nunca un fade simple.
+  // Implosión: "lumen" se comprime desde los costados hacia el centro
+  // (squeeze horizontal fuerte, casi sin reducir alto) y se disuelve justo
+  // donde va a nacer el orbe — nunca un fade simple.
   const wordmarkWrapperStyle: CSSProperties = isImploding
     ? {
-        transform: 'scale(0.05, 0.5)',
+        transform: 'scale(0.03, 0.85)',
         transformOrigin: 'center',
-        filter: 'blur(9px)',
+        filter: 'blur(8px)',
         opacity: 0,
         transition:
-          'transform 650ms cubic-bezier(0.6,0,0.85,0.35), filter 650ms ease-in, opacity 650ms ease-in 200ms',
+          `transform ${DURATIONS.implode}ms cubic-bezier(0.6,0,0.85,0.35), filter ${DURATIONS.implode}ms ease-in, opacity ${DURATIONS.implode}ms ease-in 180ms`,
       }
     : reduced && phase === 'orb'
       ? { opacity: 0, transition: `opacity ${REDUCED_DURATIONS.crossfade}ms ease` }
@@ -105,7 +106,7 @@ function LumenIntroSequence({ onComplete }: { onComplete: () => void }) {
           transition: `opacity ${REDUCED_DURATIONS.crossfade}ms ease, transform ${REDUCED_DURATIONS.crossfade}ms ease`,
         }
       : {
-          animation: 'lumenIntroOrbBirth 900ms cubic-bezier(0.25,0.85,0.35,1) both',
+          animation: `lumenIntroOrbBirth ${DURATIONS.orb}ms cubic-bezier(0.25,0.85,0.35,1) both`,
         }
 
   return (
@@ -159,7 +160,7 @@ function LumenIntroSequence({ onComplete }: { onComplete: () => void }) {
 
       <style>{`
         @keyframes lumenIntroOrbBirth {
-          0%   { transform: scale(0.12); opacity: 0; }
+          0%   { transform: scale(0.18); opacity: 0.35; }
           55%  { transform: scale(1.08); opacity: 1; }
           100% { transform: scale(1); opacity: 1; }
         }
