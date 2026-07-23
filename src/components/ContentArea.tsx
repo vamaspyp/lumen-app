@@ -11,121 +11,9 @@ import { ResourceViewer } from './ResourceViewer'
 import { ExperiencePreview } from './ExperiencePreview'
 import { RegisterForm } from './RegisterForm.tsx'
 import { ShareLightEditor } from './ShareLightEditor'
-// ─── FarosPanel ───────────────────────────────────────────────────
-
-function FarosPanel({
-  content,
-  dispatch,
-  tokens,
-}: {
-  content: Record<string, unknown>
-  dispatch: (action: string, extra?: Record<string, string>) => void
-  tokens: ModuleTokens
-}) {
-  const faros = (content.faros as Array<{
-    area: string
-    label: string
-    hint?: string
-    faro_text: string
-    has_faro: boolean
-  }>) || []
-
-  const privacyHint = (content.privacy_hint as string) || ''
-
-  const [texts, setTexts] = useState<Record<string, string>>(() => {
-    const initial: Record<string, string> = {}
-    for (const f of faros) initial[f.area] = f.faro_text || ''
-    return initial
-  })
-
-  const handleBlur = (area: string) => {
-    const text = texts[area] ?? ''
-    dispatch('save_faro', { area, faro_text: text })
-  }
-
-  return (
-    <div style={{ textAlign: 'left' }}>
-      <p
-        style={{
-          fontFamily: 'Georgia, "Times New Roman", serif',
-          fontStyle: 'italic',
-          fontSize: '0.95rem',
-          color: tokens.textSecondary,
-          textAlign: 'center',
-          margin: '0 0 1.75rem 0',
-          maxWidth: '38ch',
-          marginLeft: 'auto',
-          marginRight: 'auto',
-        }}
-      >
-        ¿Hacia dónde querés orientar tu energía en cada área?
-      </p>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-        {faros.map(faro => (
-          <div
-            key={faro.area}
-            style={{
-              background: tokens.cardBg,
-              border: `1px solid ${tokens.cardBorder}`,
-              borderRadius: '14px',
-              padding: '1rem 1.125rem',
-            }}
-          >
-            <div
-              style={{
-                fontSize: '0.7rem',
-                color: tokens.accentDeep,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                fontWeight: 500,
-                marginBottom: '0.5rem',
-              }}
-            >
-              {faro.label}
-            </div>
-            <textarea
-              value={texts[faro.area] ?? ''}
-              onChange={e => setTexts(t => ({ ...t, [faro.area]: e.target.value }))}
-              onBlur={() => handleBlur(faro.area)}
-              rows={2}
-              placeholder="Tu orientación para esta área..."
-              style={{
-                width: '100%',
-                padding: '0.5rem 0',
-                background: 'transparent',
-                border: 'none',
-                outline: 'none',
-                fontFamily: 'Georgia, "Times New Roman", serif',
-                fontStyle: 'italic',
-                fontSize: '1rem',
-                color: tokens.textPrimary,
-                lineHeight: 1.5,
-                resize: 'none',
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-        ))}
-      </div>
-
-      {privacyHint && (
-        <p
-          style={{
-            fontSize: '0.72rem',
-            color: tokens.textMuted,
-            fontStyle: 'italic',
-            textAlign: 'center',
-            marginTop: '1.5rem',
-            marginBottom: '1.5rem',
-          }}
-        >
-          {privacyHint}
-        </p>
-      )}
-    </div>
-  )
-}
+import { FarosPanel } from './FarosPanel'
+import { FaroJourneyDetail } from './FaroJourneyDetail'
+import { FaroCloseForm } from './FaroCloseForm'
 
 // ─── ContributionForm ─────────────────────────────────────────────
 
@@ -569,6 +457,14 @@ if (contentType === 'activity_detail') {
           </div>
         </>
       )
+    }
+
+    if (detailKind === 'faro_journey') {
+      return <FaroJourneyDetail content={contentData} actions={actions} dispatch={dispatch} tokens={tokens} />
+    }
+
+    if (detailKind === 'faro_close') {
+      return <FaroCloseForm content={contentData} actions={actions} dispatch={dispatch} tokens={tokens} />
     }
 
     if (detailKind === 'experience_preview') {
