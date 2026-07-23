@@ -16,6 +16,28 @@ const GLYPH_PATH =
 const PRE_FLOURISH = 'M -100 10 Q -50 -12 22.8 0.6'
 const POST_FLOURISH = 'M 543.3 0.6 Q 595 25 645 -2'
 
+// Guía invisible del gesto de escritura: sigue el recorrido real de la
+// pluma (sube al asta de la "l", baja y sube por cada joroba de u/m/n,
+// entra y sale del lazo de la "e"). Se usa únicamente dentro de la
+// máscara — nunca se pinta — como un tubo grueso que se traza con
+// stroke-dasharray/dashoffset real (pathLength normalizado) y va
+// revelando el glifo bueno a medida que "la mano" pasa por cada zona,
+// en vez de una barra recta de izquierda a derecha.
+const GUIDE_PATH =
+  'M -100 0 ' +
+  'C -40 -60 -10 -150 20 -145 ' +
+  'C 45 -140 55 -60 75 -10 ' +
+  'C 95 30 115 -80 140 -85 ' +
+  'C 165 -90 185 -50 205 -10 ' +
+  'C 225 30 245 -80 270 -85 ' +
+  'C 295 -90 315 -50 330 -10 ' +
+  'C 345 30 370 -80 390 -85 ' +
+  'C 405 -88 420 -20 430 15 ' +
+  'C 440 45 460 -80 475 -85 ' +
+  'C 495 -90 515 -50 530 -10 ' +
+  'C 550 30 570 -80 590 -85 ' +
+  'C 610 -90 630 -30 645 0'
+
 const VB_X = -115
 const VB_Y = -165
 const VB_W = 775
@@ -25,12 +47,14 @@ const VIEW_BOX = `${VB_X} ${VB_Y} ${VB_W} ${VB_H}`
 /**
  * Wordmark trazable de LUMEN para la intro: tipografía cursiva real
  * (glifo vectorial, no una aproximación dibujada a mano) con trazo previo
- * y posterior que llegan al borde del viewBox. El reveal usa un
- * <clipPath> con un <rect> cuyo ancho anima de 0 al ancho completo vía
- * SMIL (<animate>) — un único gesto de izquierda a derecha que revela
- * trazo previo, letras y trazo posterior a la vez, sin depender de
- * temporización de re-renders de React (más robusto que animar
- * stroke-dashoffset vía estado + CSS transition).
+ * y posterior que arrancan/terminan sobre el propio glifo.
+ *
+ * El reveal simula escritura real en vez de un wipe plano: una máscara
+ * en forma de tubo grueso viaja a lo largo de GUIDE_PATH (que sube y baja
+ * siguiendo la forma de cada letra) y se traza con stroke-dasharray/
+ * dashoffset real vía SMIL (<animate>, pathLength normalizado) — el
+ * glifo se va descubriendo con el mismo recorrido de subida/bajada que
+ * tendría la mano al escribirlo, no con un rectángulo que crece parejo.
  */
 export function LumenWordmark({
   tokens,
@@ -41,7 +65,15 @@ export function LumenWordmark({
   writingMs: number
   reduced?: boolean
 }) {
-  const clipId = `lumen-wordmark-reveal-${useId()}`
+  const maskId = `lumen-wordmark-write-${useId()}`
+
+  const content = (
+    <>
+      <path d={PRE_FLOURISH} fill="none" stroke={tokens.accentDeep} strokeWidth={5} strokeLinecap="round" />
+      <path d={POST_FLOURISH} fill="none" stroke={tokens.accentDeep} strokeWidth={5} strokeLinecap="round" />
+      <path d={GLYPH_PATH} fill={tokens.accentDeep} />
+    </>
+  )
 
   return (
     <svg
@@ -55,28 +87,38 @@ export function LumenWordmark({
         overflow: 'visible',
       }}
     >
-      <defs>
-        <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
-          <rect x={VB_X} y={VB_Y} width={reduced ? VB_W : 0} height={VB_H}>
-            {!reduced && (
-              <animate
-                attributeName="width"
-                from={0}
-                to={VB_W}
-                dur={`${writingMs}ms`}
-                begin="0s"
-                fill="freeze"
-                calcMode="linear"
-              />
-            )}
-          </rect>
-        </clipPath>
-      </defs>
-      <g clipPath={`url(#${clipId})`}>
-        <path d={PRE_FLOURISH} fill="none" stroke={tokens.accentDeep} strokeWidth={5} strokeLinecap="round" />
-        <path d={POST_FLOURISH} fill="none" stroke={tokens.accentDeep} strokeWidth={5} strokeLinecap="round" />
-        <path d={GLYPH_PATH} fill={tokens.accentDeep} />
-      </g>
+      {reduced ? (
+        content
+      ) : (
+        <>
+          <defs>
+            <mask id={maskId} maskUnits="userSpaceOnUse" x={VB_X} y={VB_Y} width={VB_W} height={VB_H}>
+              <path
+                d={GUIDE_PATH}
+                fill="none"
+                stroke="#FFFFFF"
+                strokeWidth={230}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                pathLength={1000}
+                strokeDasharray={1000}
+                strokeDashoffset={1000}
+              >
+                <animate
+                  attributeName="stroke-dashoffset"
+                  from={1000}
+                  to={0}
+                  dur={`${writingMs}ms`}
+                  begin="0s"
+                  fill="freeze"
+                  calcMode="linear"
+                />
+              </path>
+            </mask>
+          </defs>
+          <g mask={`url(#${maskId})`}>{content}</g>
+        </>
+      )}
     </svg>
   )
 }
