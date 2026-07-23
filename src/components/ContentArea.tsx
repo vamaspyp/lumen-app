@@ -258,6 +258,11 @@ export function ContentArea({
         life_area_key?: string
         has_note?: boolean
         note_preview?: string
+        excerpt?: string
+        origin_type?: string
+        origin_id?: string
+        date?: string
+        edit_action?: string
         action: string
         value?: string
         source?: string
@@ -351,6 +356,70 @@ export function ContentArea({
             {items.map(item => {
               const subtitle = item.subtitle ?? [item.format].filter(Boolean).join(' · ')
 
+              const buildExtra = (): Record<string, string> => {
+                const extra: Record<string, string> = {
+                  source: source || item.source || '',
+                  value:  item.value || item.id,
+                }
+                if (item.resource_id) extra.resource_id = item.resource_id
+                if (item.experience_id) extra.experience_id = item.experience_id
+                if (item.experience_run_id) extra.experience_run_id = item.experience_run_id
+                if (item.sanctuary_item_id) {
+                  extra.sanctuary_item_id = item.sanctuary_item_id
+                } else if (item.action === 'open_sanctuary_item') {
+                  extra.sanctuary_item_id = item.id
+                }
+                return extra
+              }
+
+              // Notas y reflexiones: la nota es el contenido principal, visible
+              // desde la lista sin necesidad de abrir el item. Solo para esta
+              // fuente — el resto de las listas (Fuente, recorridos, guardados)
+              // sigue usando ResourceListCard sin cambios.
+              if (source === 'sanctuary_reflections') {
+                const noteText = item.note_preview || item.subtitle || item.excerpt || ''
+                const originLine = [item.title, item.date].filter(Boolean).join(' · ')
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => dispatch(item.action, buildExtra())}
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      textAlign: 'left',
+                      background: tokens.cardBg,
+                      border: `0.5px solid ${tokens.cardBorder}`,
+                      borderRadius: '12px',
+                      padding: '0.875rem 1.125rem',
+                      fontFamily: 'inherit',
+                      cursor: 'pointer',
+                      boxSizing: 'border-box',
+                    }}
+                  >
+                    {originLine && (
+                      <div style={{ fontSize: '0.7rem', color: tokens.textMuted, marginBottom: '0.35rem' }}>
+                        {originLine}
+                      </div>
+                    )}
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: '0.92rem',
+                        color: tokens.textPrimary,
+                        lineHeight: 1.45,
+                        whiteSpace: 'pre-wrap',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 4,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      {noteText}
+                    </p>
+                  </button>
+                )
+              }
+
               return (
                 <ResourceListCard
                   key={item.id}
@@ -364,32 +433,7 @@ export function ContentArea({
                   capabilityLabel={item.capability_label}
                   helpSignal={item.help_signal}
                   hasNote={item.has_note}
-                  onClick={() => {
-                    const extra: Record<string, string> = {
-                      source: source || item.source || '',
-                      value:  item.value || item.id,
-                    }
-
-                    if (item.resource_id) {
-                      extra.resource_id = item.resource_id
-                    }
-
-                    if (item.experience_id) {
-                      extra.experience_id = item.experience_id
-                    }
-
-                    if (item.experience_run_id) {
-                      extra.experience_run_id = item.experience_run_id
-                    }
-
-                    if (item.sanctuary_item_id) {
-                      extra.sanctuary_item_id = item.sanctuary_item_id
-                    } else if (item.action === 'open_sanctuary_item') {
-                      extra.sanctuary_item_id = item.id
-                    }
-
-                    dispatch(item.action, extra)
-                  }}
+                  onClick={() => dispatch(item.action, buildExtra())}
                   tokens={tokens}
                 />
               )
@@ -434,8 +478,20 @@ if (contentType === 'activity_detail') {
     }
 
     if (detailKind === 'shared_light_entry') {
+      const senderName = (contentData.sender_name as string) || ''
+      const senderNote = (contentData.sender_note as string) || ''
       return (
         <>
+          <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+            <p style={{ fontSize: '0.95rem', color: tokens.textSecondary, margin: 0 }}>
+              {senderName ? `${senderName} te compartió esta luz` : 'Alguien te compartió esta luz'}
+            </p>
+            {senderNote && (
+              <p style={{ fontSize: '0.95rem', color: tokens.textPrimary, fontStyle: 'italic', margin: '0.5rem 0 0', lineHeight: 1.5 }}>
+                “{senderNote}”
+              </p>
+            )}
+          </div>
           <ExperienceDetailCard
             tokens={tokens}
             title={(contentData.title as string) || ''}

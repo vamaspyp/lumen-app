@@ -27,9 +27,9 @@ const CANON = {
     energy:     'claridad · sabiduría',
   },
   sanctuary: {
-    background: '#F4EEDE', // ámbar lechoso
-    accent:     '#A88860', // dorado tierra
-    accentDeep: '#7A6240', // dorado profundo
+    background: '#EEF4F6', // celeste lechoso
+    accent:     '#7FAEC2', // celeste Santuario
+    accentDeep: '#567F91', // celeste profundo
     energy:     'intimidad · memoria',
   },
   circles: {
