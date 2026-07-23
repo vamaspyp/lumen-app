@@ -1,27 +1,35 @@
-import { useEffect, useRef, useState } from 'react'
+import { useId } from 'react'
 import type { ModuleTokens } from '../lib/tokens'
 
-// Trazo cursivo único de "Lumen": trazo previo, las cinco letras conectadas
-// sin levantar la pluma y trazo posterior de remate — un solo <path>, un
-// solo gesto. El viewBox es fijo (coordenadas del vector); el tamaño real
-// en pantalla lo decide el contenedor vía CSS responsivo, nunca acá.
-const WORDMARK_PATH =
-  'M 0 168 C 18 152 34 132 46 108 C 34 88 40 58 66 46 C 92 34 112 50 98 70 ' +
-  'C 88 84 70 92 62 112 C 56 134 58 160 66 196 C 80 208 100 204 120 184 ' +
-  'C 123.5 200 127 200 134 190 C 161.8 190 154.2 132 182 132 C 209.8 132 202.2 190 230 190 ' +
-  'C 232.5 200 235 200 240 190 C 258.6 190 253.4 132 272 132 C 290.6 132 285.4 190 304 190 ' +
-  'C 322.6 190 317.4 132 336 132 C 354.6 132 349.4 190 368 190 C 370.5 200 373 200 378 190 ' +
-  'C 388 180 372 126 408 112 C 444 98 456 142 422 166 C 398 184 412 186 452 190 ' +
-  'C 454.5 200 457 200 462 190 C 489.8 190 482.2 132 510 132 C 537.8 132 530.2 190 558 190 ' +
-  'C 578 198 603 206 628 178 C 653 158 678 154 708 146'
+// Trazado real de "Lumen" (glifo de Alex Brush, extraído con opentype.js —
+// fuente cursiva real, no una aproximación dibujada a mano) más dos trazos
+// finos de remate (previo y posterior) que llegan hasta el borde del
+// viewBox para dar la sensación de nacer y terminar en el borde de la
+// pantalla, igual que una firma caligráfica.
+const GLYPH_PATH =
+  'M163.50 32.70Q146.70 32.70 129 27.75Q111.30 22.80 95.55 13.20Q79.80 3.60 68.40-9.60Q44.40 14.40 22.80 14.40Q11.70 14.40 6.30 7.95Q0.90 1.50 0.90-8.70Q0.90-27.60 15.30-53.10Q28.80-77.10 36.90-78.30Q42.90-78.30 49.20-66L68.10-29.40Q84-50.70 101.40-75.30Q76.80-86.40 76.80-107.40Q76.80-116.40 81.15-124.05Q85.50-131.70 92.40-136.50Q99.30-141.30 106.50-141.30Q116.40-141.30 120.90-132Q121.50-131.10 121.05-130.20Q120.60-129.30 120-129.60Q117.90-132 114-133.80Q110.10-135.60 106.80-135.60Q100.50-135.60 95.25-130.65Q90-125.70 87.15-119.10Q84.30-112.50 84.90-107.40Q84.90-92.10 106.50-80.70Q111.60-88.20 117.60-97.05Q123.60-105.90 130.50-116.10Q190.20-203.70 229.80-203.70Q257.70-203.70 257.70-177.60Q257.70-153.90 234.60-121.80Q223.20-105.90 205.80-93.30Q188.40-80.70 169.05-73.35Q149.70-66 131.70-66Q127.50-66 123.45-66.45Q119.40-66.90 116.10-68.10Q108.30-57.90 98.10-45.30Q87.90-32.70 75.60-17.40Q81-9.90 91.05-2.40Q101.10 5.10 113.70 10.95Q126.30 16.80 138.60 20.40Q150.90 24 160.80 24Q172.20 24 181.80 21.45Q191.40 18.90 197.40 13.35Q203.40 7.80 203.40-1.20Q203.40-2.40 203.40-3.60Q203.40-4.80 203.10-6Q203.10-6.60 202.95-6.90Q202.80-7.20 202.80-7.50Q202.80-10.50 204.60-10.50Q207.60-10.50 209.40-5.85Q211.20-1.20 211.20 1.50Q211.20 10.80 204 17.85Q196.80 24.90 185.85 28.80Q174.90 32.70 163.50 32.70M129.60-73.80Q144.90-73.80 162.30-80.85Q179.70-87.90 195.15-99.45Q210.60-111 220.20-124.50Q247.50-162.60 247.50-182.40Q247.50-190.80 242.70-194.70Q237.90-198.60 231-198.60Q216-198.60 193.80-173.40Q186.90-165.30 175.65-150.15Q164.40-135 149.10-112.80Q143.10-104.10 135.90-94.50Q128.70-84.90 120.90-74.70Q125.10-73.80 129.60-73.80M23.40 6.30Q29.10 6.30 36.15 2.25Q43.20-1.80 49.80-7.80Q56.40-13.80 60.60-19.50Q56.40-25.50 51.60-33.90Q46.80-42.30 41.10-53.40Q34.20-67.80 30.60-66.30Q25.20-65.40 18.90-47.10Q12.60-28.80 12.60-12.90Q12.60 6.30 23.40 6.30M211.50 3.30Q198 3.30 198-13.80Q198-20.40 202.05-29.55Q206.10-38.70 213.60-48.90Q213.60-48.90 208.20-43.80Q202.80-38.70 195.90-30.90Q194.70-29.70 192.90-29.70Q191.70-29.70 191.70-31.20Q191.70-32.70 194.40-36.30L235.80-84.90Q243.60-93.90 252.90-93.90Q259.80-93.90 259.80-88.50Q259.80-86.40 258-84.60Q252.30-79.20 244.05-69.30Q235.80-59.40 228-48Q220.20-36.60 214.95-26.25Q209.70-15.90 209.70-9.60Q209.70-4.20 213.30-4.20Q215.40-4.20 219.90-5.85Q224.40-7.50 231.90-12.75Q239.40-18 249.90-29.10Q251.70-30.90 259.50-39.90Q267.30-48.90 280.50-65.70Q303.90-94.80 311.10-94.80Q321-94.80 321.90-86.70Q322.50-84 309.30-69Q292.20-48.30 285.90-39.30Q274.20-22.20 274.20-12.60Q274.20-6 278.70-6Q283.20-6 290.25-10.35Q297.30-14.70 305.10-21.45Q312.90-28.20 320.25-35.55Q327.60-42.90 333-49.20Q334.80-51.30 336.60-51.30Q338.40-51.30 338.40-49.50Q338.40-48.90 338.10-47.70Q337.80-46.50 336.30-45Q331.50-39.60 324-31.65Q316.50-23.70 307.80-15.90Q299.10-8.10 291-3Q282.90 2.10 277.20 2.10Q270.30 2.10 265.20-1.65Q260.10-5.40 260.10-12Q260.10-18.60 262.20-25.35Q264.30-32.10 265.50-36.90Q251.40-20.40 240.75-11.70Q230.10-3 222.90 0.15Q215.70 3.30 211.50 3.30M395.70 0.60Q388.50 0.60 388.50-7.50Q391.80-24.30 402-45.30Q406.80-55.50 411.75-65.40Q416.70-75.30 421.50-85.50Q410.40-78 399.30-68.85Q388.20-59.70 377.70-48.30Q365.40-35.10 349.20-14.40Q337.50 0.30 335.70 0.30Q331.50 0.30 328.80-3.60Q326.10-7.50 326.10-10.20Q326.10-14.10 333-30.30Q335.10-35.40 337.35-40.35Q339.60-45.30 341.70-50.10L323.70-31.20Q323.10-30.60 320.10-27.60Q317.10-24.60 315.30-24.60Q313.80-24.60 313.80-26.70Q313.80-27.30 314.25-28.35Q314.70-29.40 316.20-30.90Q320.70-35.40 325.50-40.50Q330.30-45.60 335.40-52.20Q339.30-57.30 346.65-67.35Q354-77.40 364.80-92.70Q368.10-97.20 374.10-97.20Q380.10-97.20 380.10-91.50Q380.10-89.40 364.80-63.60Q357-49.80 352.35-41.10Q347.70-32.40 346.50-28.20Q353.10-35.40 362.25-44.40Q371.40-53.40 383.40-64.50Q420.30-98.70 432-98.70Q435.30-98.70 438.45-96.60Q441.60-94.50 441.60-91.20Q441.60-89.70 429.90-69.30Q418.50-48.60 417.30-44.70Q450.60-72.60 450.60-72.90Q478.80-94.80 491.10-94.80Q494.70-94.80 497.85-92.55Q501-90.30 501-87.30Q501-86.70 481.80-62.10Q462-37.20 459.60-21.30Q458.40-10.50 470.70-10.50Q478.20-10.50 491.70-20.10Q505.20-29.70 519.90-46.50Q521.70-48.60 523.80-50.55Q525.90-52.50 527.40-52.50Q529.20-52.50 529.20-51Q529.20-48.90 526.50-46.20Q518.70-36.90 508.05-27Q497.40-17.10 486.90-10.35Q476.40-3.60 468.30-3.60Q447.90-3.60 447.90-22.50Q447.90-29.10 451.50-37.95Q455.10-46.80 458.70-54Q467.40-70.80 477.60-83.70Q468-78.90 457.65-71.10Q447.30-63.30 436.20-52.80Q410.40-27.60 400.80-1.80Q399.30 0.60 395.70 0.60M529.50 3.90Q519.90 3.90 512.10-2.25Q504.30-8.40 504.30-18.60Q504.30-39.90 530.40-67.20Q557.10-94.80 578.10-94.80Q585-94.80 589.35-91.05Q593.70-87.30 593.70-81.90Q593.70-65.10 567-48.90Q543.30-34.50 527.10-34.50Q524.70-34.50 522.90-35.10Q518.40-27 518.40-18Q518.40-2.40 533.10-2.40Q548.10-2.40 571.80-22.50Q590.10-37.20 603-53.70Q605.70-57.30 607.80-57.30Q609.60-57.30 609.60-55.50Q609.60-53.70 607.20-50.40Q598.80-39.30 589.20-30Q579.60-20.70 568.50-12.90Q545.40 3.90 529.50 3.90M531.30-41.10Q542.70-41.10 561-52.50Q567-56.70 572.85-61.95Q578.70-67.20 582.45-72.60Q586.20-78 586.20-82.20Q586.20-86.10 579.90-86.10Q570.90-86.10 554.70-72.60Q546.90-66 539.70-58.20Q532.50-50.40 527.40-41.70Q529.20-41.10 531.30-41.10M667.80 0.60Q659.70 0.60 656.40-4.05Q653.10-8.70 653.10-15.60Q653.10-33 665.10-52.80L684.30-84Q663.90-69 643.80-46.50Q638.40-40.50 631.65-32.40Q624.90-24.30 616.80-13.80Q606 0.30 603.90 0.30Q599.70 0.30 597-3.45Q594.30-7.20 594.30-10.20Q594.30-12.60 595.80-19.05Q597.30-25.50 599.40-30.30Q601.50-35.40 603.75-40.35Q606-45.30 608.10-50.10L590.10-31.20Q589.50-30.60 586.50-27.60Q583.50-24.60 581.70-24.60Q580.20-24.60 580.20-26.70Q580.20-27.30 580.65-28.35Q581.10-29.40 582.60-30.90Q587.10-35.40 591.90-40.50Q596.70-45.60 601.80-52.20Q604.50-55.50 609.90-62.25Q615.30-69 621.75-76.80Q628.20-84.60 633.90-91.20Q635.40-93.30 637.20-94.05Q639-94.80 639.60-94.80Q647.70-94.80 647.70-88.50Q647.70-86.70 646.80-84.90Q619.80-47.70 614.40-28.20Q649.20-63 670.35-80.55Q691.50-98.10 700.50-98.10Q705.30-98.10 707.85-96.60Q710.40-95.10 710.40-90.90Q710.40-89.40 710.10-88.50Q709.20-86.40 697.80-71.70Q690.90-63.30 685.65-56.40Q680.40-49.50 677.10-44.40Q671.70-36 669-28.65Q666.30-21.30 666.30-16.20Q666.30-14.10 666.90-11.10Q667.50-8.10 670.50-8.10Q677.40-8.10 692.10-20.10Q699-26.10 705-32.25Q711-38.40 716.40-44.40Q717.60-45.60 720.30-49.05Q723-52.50 723.60-52.50Q724.80-52.50 724.80-50.10Q724.80-48.90 723.45-46.05Q722.10-43.20 720.60-41.70Q717.30-37.80 710.85-30.90Q704.40-24 696.45-16.80Q688.50-9.60 681-4.50Q673.50 0.60 667.80 0.60'
 
-const VIEW_BOX = '-10 0 718 260'
+// Trazo previo y posterior: línea fina de remate (no la misma pluma que
+// las letras) que arranca/termina en el borde del viewBox y se apoya en
+// el punto donde empieza/termina el glifo real.
+const PRE_FLOURISH = 'M -560 -20 C -400 -60 -250 20 -140 -30 C -80 -55 -20 -15 3 -7'
+const POST_FLOURISH = 'M 724.8 -50 C 800 -20 900 -70 1050 -35 C 1150 -10 1250 -55 1320 -25'
+
+const VB_X = -580
+const VB_Y = -260
+const VB_W = 1930
+const VB_H = 350
+const VIEW_BOX = `${VB_X} ${VB_Y} ${VB_W} ${VB_H}`
 
 /**
- * Wordmark trazable de LUMEN para la intro: una mano escribiendo "Lumen" en
- * cursiva, de izquierda a derecha, en un único gesto continuo, vía
- * stroke-dasharray/stroke-dashoffset real sobre un path SVG (no texto HTML,
- * no línea decorativa aparte).
+ * Wordmark trazable de LUMEN para la intro: tipografía cursiva real
+ * (glifo vectorial, no una aproximación dibujada a mano) con trazo previo
+ * y posterior que llegan al borde del viewBox. El reveal usa un
+ * <clipPath> con un <rect> cuyo ancho anima de 0 al ancho completo vía
+ * SMIL (<animate>) — un único gesto de izquierda a derecha que revela
+ * trazo previo, letras y trazo posterior a la vez, sin depender de
+ * temporización de re-renders de React (más robusto que animar
+ * stroke-dashoffset vía estado + CSS transition).
  */
 export function LumenWordmark({
   tokens,
@@ -32,65 +40,42 @@ export function LumenWordmark({
   writingMs: number
   reduced?: boolean
 }) {
-  const pathRef = useRef<SVGPathElement | null>(null)
-  const [length, setLength] = useState(0)
-  const [drawn, setDrawn] = useState(reduced)
-
-  useEffect(() => {
-    setLength(pathRef.current?.getTotalLength() ?? 0)
-  }, [])
-
-  useEffect(() => {
-    if (reduced || !length) return
-    // Doble rAF: deja que el navegador pinte al menos un frame con el
-    // trazo oculto (dashoffset = length) antes de animar hacia 0 — con un
-    // solo rAF ambos estados caen en el mismo frame y la transición nunca
-    // se dispara (el trazo aparece ya completo, sin animar).
-    let inner = 0
-    const outer = requestAnimationFrame(() => {
-      inner = requestAnimationFrame(() => setDrawn(true))
-    })
-    return () => {
-      cancelAnimationFrame(outer)
-      cancelAnimationFrame(inner)
-    }
-  }, [length, reduced])
+  const clipId = `lumen-wordmark-reveal-${useId()}`
 
   return (
     <svg
       viewBox={VIEW_BOX}
       preserveAspectRatio="xMidYMid meet"
       style={{
-        width: 'min(87vw, 640px)',
-        maxWidth: '92vw',
+        width: 'min(90vw, 720px)',
+        maxWidth: '94vw',
         height: 'auto',
         display: 'block',
         overflow: 'visible',
       }}
     >
-      <path
-        ref={pathRef}
-        d={WORDMARK_PATH}
-        fill="none"
-        stroke={tokens.accentDeep}
-        strokeWidth={13}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        style={{
-          // Strings, no numbers: React le agrega "px" a valores numéricos
-          // de estilos que no reconoce como unitless, y stroke-dasharray/
-          // stroke-dashoffset con "px" se resuelven distinto a las unidades
-          // de usuario del path — el trazo queda invisible/siempre completo.
-          strokeDasharray: String(length || 1),
-          strokeDashoffset: String(drawn ? 0 : length || 1),
-          // Ojo: la transición se habilita recién cuando `drawn` pasa a
-          // true, nunca antes. Si se habilitara ya en cuanto `length` se
-          // conoce, el propio salto de "longitud desconocida" (1) a
-          // "longitud real medida" también quedaría animado y se comería
-          // gran parte del recorrido antes de que arrancara el dibujo real.
-          transition: reduced || !drawn ? 'none' : `stroke-dashoffset ${writingMs}ms linear`,
-        }}
-      />
+      <defs>
+        <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+          <rect x={VB_X} y={VB_Y} width={reduced ? VB_W : 0} height={VB_H}>
+            {!reduced && (
+              <animate
+                attributeName="width"
+                from={0}
+                to={VB_W}
+                dur={`${writingMs}ms`}
+                begin="0s"
+                fill="freeze"
+                calcMode="linear"
+              />
+            )}
+          </rect>
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${clipId})`}>
+        <path d={PRE_FLOURISH} fill="none" stroke={tokens.accentDeep} strokeWidth={5} strokeLinecap="round" />
+        <path d={POST_FLOURISH} fill="none" stroke={tokens.accentDeep} strokeWidth={5} strokeLinecap="round" />
+        <path d={GLYPH_PATH} fill={tokens.accentDeep} />
+      </g>
     </svg>
   )
 }
