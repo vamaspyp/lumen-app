@@ -326,9 +326,22 @@ export function ContentArea({
   if (contentType === 'checkin_options') {
     const step = (contentData.step as string) || ''
     const options =
-      (contentData.options as Array<{ value: string; label: string; hint?: string }>) || []
+      (contentData.options as Array<{ value: string; label: string; hint?: string; [key: string]: unknown }>) || []
     const actionName = step === 'effect' ? 'submit_feedback_effect' : `submit_checkin_${step}`
     const paramKey   = step === 'effect' ? 'perceived_capability_key' : `checkin_${step}`
+
+    // Reenvía cada campo contextual que la option traiga (p.ej.
+    // user_area_faro_id en step=faro) sin asumir cuáles existen — label/hint
+    // son solo presentación y no viajan como parámetro de la action.
+    const buildOptionParams = (opt: (typeof options)[number]): Record<string, string> => {
+      const params: Record<string, string> = {}
+      for (const [key, val] of Object.entries(opt)) {
+        if (key === 'label' || key === 'hint' || val == null) continue
+        params[key] = String(val)
+      }
+      params[paramKey] = String(opt.value)
+      return params
+    }
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
@@ -337,7 +350,7 @@ export function ContentArea({
             key={opt.value}
             label={opt.label}
             hint={opt.hint}
-            onClick={() => dispatch(actionName, { [paramKey]: opt.value, value: opt.value })}
+            onClick={() => dispatch(actionName, buildOptionParams(opt))}
             tokens={tokens}
           />
         ))}
