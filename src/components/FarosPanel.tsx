@@ -184,7 +184,10 @@ function TagChip({
         justifyContent: 'flex-start',
         minHeight: '5rem',
         width: '100%',
+        maxWidth: '100%',
+        minWidth: 0,
         boxSizing: 'border-box',
+        overflow: 'hidden',
         padding: '0.65rem 0.85rem',
         borderRadius: '12px',
         background: tokens.accentSoft20,
@@ -195,7 +198,16 @@ function TagChip({
         cursor: 'pointer',
       }}
     >
-      <span style={{ fontSize: '0.85rem', fontWeight: 500, lineHeight: 1.3 }}>
+      <span
+        style={{
+          fontSize: '0.85rem',
+          fontWeight: 500,
+          lineHeight: 1.3,
+          overflowWrap: 'anywhere',
+          wordBreak: 'break-word',
+          maxWidth: '100%',
+        }}
+      >
         {tag.label || tag.faro_key}
       </span>
       <span
@@ -209,6 +221,9 @@ function TagChip({
           color: tokens.textMuted,
           marginTop: '0.3rem',
           lineHeight: 0.95,
+          overflowWrap: 'anywhere',
+          wordBreak: 'break-word',
+          maxWidth: '100%',
         }}
       >
         {hint}
@@ -283,7 +298,16 @@ export function FarosPanel({
                 <div style={{ fontSize: '0.72rem', color: tokens.textSecondary, fontWeight: 500, marginBottom: '0.5rem' }}>
                   {areaGroup.label}
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '0.5rem' }}>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr))',
+                    gap: '0.5rem',
+                    width: '100%',
+                    maxWidth: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                >
                   {areaGroup.items.map((tag, idx) => (
                     <TagChip key={`${tag.faro_key}-${idx}`} tag={tag} dispatch={dispatch} tokens={tokens} />
                   ))}

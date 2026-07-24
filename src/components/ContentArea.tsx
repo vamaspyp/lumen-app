@@ -327,7 +327,14 @@ export function ContentArea({
             filterOptions={filterOptions}
             currentFilters={currentFilters}
             dispatch={dispatch}
-            action={source === 'sanctuary' ? 'open_sanctuary' : 'open_fuente'}
+            action={
+              source === 'sanctuary_saved'       ? 'open_sanctuary_saved' :
+              source === 'sanctuary_reflections' ? 'open_sanctuary_reflections' :
+              source === 'sanctuary_journeys'    ? 'open_sanctuary_journeys' :
+              source === 'sanctuary_faros'       ? 'open_faros' :
+              source === 'sanctuary'             ? 'open_sanctuary' :
+              'open_fuente'
+            }
             tokens={tokens}
           />
         )}
@@ -478,20 +485,19 @@ if (contentType === 'activity_detail') {
     }
 
     if (detailKind === 'shared_light_entry') {
-      const senderName = (contentData.sender_name as string) || ''
+      // sender_name ya fue usado por Supabase para construir el mensaje de
+      // LUMI (LumiStrip) — acá NO se repite como encabezado. Solo se
+      // muestra sender_note, cuando exista, como contenido principal.
       const senderNote = (contentData.sender_note as string) || ''
       return (
         <>
-          <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
-            <p style={{ fontSize: '0.95rem', color: tokens.textSecondary, margin: 0 }}>
-              {senderName ? `${senderName} te compartió esta luz` : 'Alguien te compartió esta luz'}
-            </p>
-            {senderNote && (
-              <p style={{ fontSize: '0.95rem', color: tokens.textPrimary, fontStyle: 'italic', margin: '0.5rem 0 0', lineHeight: 1.5 }}>
+          {senderNote && (
+            <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+              <p style={{ fontSize: '0.95rem', color: tokens.textPrimary, fontStyle: 'italic', margin: 0, lineHeight: 1.5 }}>
                 “{senderNote}”
               </p>
-            )}
-          </div>
+            </div>
+          )}
           <ExperienceDetailCard
             tokens={tokens}
             title={(contentData.title as string) || ''}
