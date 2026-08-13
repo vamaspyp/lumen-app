@@ -14,6 +14,9 @@ La unidad estratégica principal no es el recurso — es la ayuda ofrecida.
 - **Repo:** github.com/vamaspyp/lumen-app
 - **Dev:** VS Code + Claude Code extension
 
+## Definition of Done
+Para cambios significativos, `npm run verify` (lint + build + smoke Playwright) debe quedar verde. Si `verify` falla, el cambio no está terminado.
+
 ## Estructura del proyecto (post-refactor)
 ```
 src/
