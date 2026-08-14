@@ -8,6 +8,44 @@ interface Option {
   hint?: string
 }
 
+function OptionRow({
+  options,
+  selected,
+  onSelect,
+  tokens,
+}: {
+  options: Option[]
+  selected: string
+  onSelect: (v: string) => void
+  tokens: ModuleTokens
+}) {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+      {options.map(opt => {
+        const active = selected === opt.value
+        return (
+          <button
+            key={opt.value}
+            onClick={() => onSelect(opt.value)}
+            style={{
+              padding: '0.55rem 1rem',
+              borderRadius: '999px',
+              background: active ? tokens.accentSoft20 : 'transparent',
+              border: `1px solid ${active ? tokens.accent : tokens.accentSoft30}`,
+              color: tokens.accentDeep,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            {opt.label}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 // Formulario acotado de cierre de Faro: valoración, capitalización y
 // reflexión opcional — sobrio y conversacional, no administrativo. Las
 // opciones vienen siempre del contrato (sentiment_options/value_options);
@@ -52,40 +90,6 @@ export function FaroCloseForm({
     }
   }
 
-  const OptionRow = ({
-    options,
-    selected,
-    onSelect,
-  }: {
-    options: Option[]
-    selected: string
-    onSelect: (v: string) => void
-  }) => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-      {options.map(opt => {
-        const active = selected === opt.value
-        return (
-          <button
-            key={opt.value}
-            onClick={() => onSelect(opt.value)}
-            style={{
-              padding: '0.55rem 1rem',
-              borderRadius: '999px',
-              background: active ? tokens.accentSoft20 : 'transparent',
-              border: `1px solid ${active ? tokens.accent : tokens.accentSoft30}`,
-              color: tokens.accentDeep,
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              fontFamily: 'inherit',
-            }}
-          >
-            {opt.label}
-          </button>
-        )
-      })}
-    </div>
-  )
-
   return (
     <div style={{ textAlign: 'left' }}>
       {(areaLabel || title) && (
@@ -104,7 +108,7 @@ export function FaroCloseForm({
           <label style={{ display: 'block', fontSize: '0.7rem', color: tokens.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.5rem' }}>
             ¿Cómo lo sentís?
           </label>
-          <OptionRow options={sentimentOptions} selected={sentiment} onSelect={setSentiment} />
+          <OptionRow options={sentimentOptions} selected={sentiment} onSelect={setSentiment} tokens={tokens} />
         </div>
       )}
 
@@ -113,7 +117,7 @@ export function FaroCloseForm({
           <label style={{ display: 'block', fontSize: '0.7rem', color: tokens.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.5rem' }}>
             ¿Qué te llevás de este tramo?
           </label>
-          <OptionRow options={valueOptions} selected={valueKey} onSelect={setValueKey} />
+          <OptionRow options={valueOptions} selected={valueKey} onSelect={setValueKey} tokens={tokens} />
         </div>
       )}
 

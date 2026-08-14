@@ -1,6 +1,63 @@
 import { useState } from 'react'
 import type { ModuleTokens } from '../lib/tokens'
 
+function Row({
+  label,
+  options,
+  group,
+  selected,
+  tokens,
+  onToggle,
+}: {
+  label: string
+  options: Array<{ value: string; label: string }>
+  group: 'area' | 'format' | 'duration' | 'has_note' | 'necesito'
+  selected: string
+  tokens: ModuleTokens
+  onToggle: (group: 'area' | 'format' | 'duration' | 'has_note' | 'necesito', value: string) => void
+}) {
+  return (
+    <div style={{ marginBottom: '0.625rem' }}>
+      <div
+        style={{
+          fontSize: '0.65rem',
+          color: tokens.textMuted,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          marginBottom: '0.375rem',
+          fontWeight: 500,
+        }}
+      >
+        {label}
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem' }}>
+        {options.map(opt => {
+          const active = selected === opt.value
+          return (
+            <button
+              key={opt.value}
+              onClick={() => onToggle(group, opt.value)}
+              style={{
+                padding: '0.375rem 0.75rem',
+                borderRadius: '999px',
+                background: active ? tokens.accentSoft20 : 'transparent',
+                border: `1px solid ${active ? tokens.accent : tokens.accentSoft30}`,
+                color: active ? tokens.accentDeep : tokens.textSecondary,
+                fontSize: '0.75rem',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {opt.label}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 export function ListFilterPanel({
   filterOptions,
   currentFilters,
@@ -61,57 +118,6 @@ export function ListFilterPanel({
       filter_necesito: '',
     })
   }
-
-  const Row = ({
-    label,
-    options,
-    group,
-    selected,
-  }: {
-    label: string
-    options: Array<{ value: string; label: string }>
-    group: 'area' | 'format' | 'duration' | 'has_note' | 'necesito'
-    selected: string
-  }) => (
-    <div style={{ marginBottom: '0.625rem' }}>
-      <div
-        style={{
-          fontSize: '0.65rem',
-          color: tokens.textMuted,
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          marginBottom: '0.375rem',
-          fontWeight: 500,
-        }}
-      >
-        {label}
-      </div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem' }}>
-        {options.map(opt => {
-          const active = selected === opt.value
-          return (
-            <button
-              key={opt.value}
-              onClick={() => handleToggle(group, opt.value)}
-              style={{
-                padding: '0.375rem 0.75rem',
-                borderRadius: '999px',
-                background: active ? tokens.accentSoft20 : 'transparent',
-                border: `1px solid ${active ? tokens.accent : tokens.accentSoft30}`,
-                color: active ? tokens.accentDeep : tokens.textSecondary,
-                fontSize: '0.75rem',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              {opt.label}
-            </button>
-          )
-        })}
-      </div>
-    </div>
-  )
 
   const hasArea     = filterOptions.area && filterOptions.area.length > 0
   const hasFormat   = filterOptions.format && filterOptions.format.length > 0
@@ -206,11 +212,11 @@ export function ListFilterPanel({
 
       {expanded && (
         <div style={{ padding: '0 0.875rem 0.75rem' }}>
-         {hasNecesito && <Row label="Necesito" options={filterOptions.necesito!} group="necesito" selected={currentFilters.necesito || ''} />}
-          {hasArea     && <Row label="Área"     options={filterOptions.area!}     group="area"     selected={currentFilters.area || ''} />}
-          {hasFormat   && <Row label="Formato"  options={filterOptions.format!}   group="format"   selected={currentFilters.format || ''} />}
-          {hasDuration && <Row label="Duración" options={filterOptions.duration!} group="duration" selected={currentFilters.duration || ''} />}
-          {hasNote     && <Row label="Nota"     options={filterOptions.has_note!} group="has_note" selected={currentFilters.has_note || ''} />}
+         {hasNecesito && <Row label="Necesito" options={filterOptions.necesito!} group="necesito" selected={currentFilters.necesito || ''} tokens={tokens} onToggle={handleToggle} />}
+          {hasArea     && <Row label="Área"     options={filterOptions.area!}     group="area"     selected={currentFilters.area || ''} tokens={tokens} onToggle={handleToggle} />}
+          {hasFormat   && <Row label="Formato"  options={filterOptions.format!}   group="format"   selected={currentFilters.format || ''} tokens={tokens} onToggle={handleToggle} />}
+          {hasDuration && <Row label="Duración" options={filterOptions.duration!} group="duration" selected={currentFilters.duration || ''} tokens={tokens} onToggle={handleToggle} />}
+          {hasNote     && <Row label="Nota"     options={filterOptions.has_note!} group="has_note" selected={currentFilters.has_note || ''} tokens={tokens} onToggle={handleToggle} />}
         </div>
       )}
     </div>

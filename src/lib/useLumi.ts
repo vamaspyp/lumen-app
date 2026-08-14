@@ -304,7 +304,10 @@ async function maybeApplyQaAnonReset(): Promise<boolean> {
 export function useLumi() {
   const [state, setState] = useState<LumiState>(initialState)
   const stateRef = useRef(state)
-  stateRef.current = state
+
+  useEffect(() => {
+    stateRef.current = state
+  }, [state])
 
   const dispatch = useCallback(
     async (action: string, extra?: Record<string, string>) => {
