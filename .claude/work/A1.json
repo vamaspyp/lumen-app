@@ -1,0 +1,84 @@
+{
+  "acto_id": "A1",
+  "focus_id": "F1",
+  "purpose": "Auditoría acumulativa única de base y código",
+  "dod": [
+    "El informe identifica el origen de cada dato relevante como LEÍDO o DERIVADO.",
+    "Todo dato material que no pueda verificarse se marca NO_VERIFICADO."
+  ],
+  "skill": "V25",
+  "authorities": [
+    {
+      "id": "V3",
+      "name": "Sistema de Conducción",
+      "location": "Google Drive / Sistema de Conduccion / VA+LUMEN_Sistema_de_Conduccion_V0",
+      "status": "VERIFIED",
+      "checked_at": "2026-08-28"
+    },
+    {
+      "id": "V32",
+      "name": "Modelo Canónico de Organización IA-Native, EXO-Lean y Evolución Autopoiética",
+      "location": "Google Drive / 2 · AUTORIDAD DE CONOCIMIENTO/Canon/VA_LUMEN_Modelo_Canonico_Organizacion_IA-Native_EXO-Lean_y_Evolucion_Autopoietica_V2.docx",
+      "status": "VERIFIED",
+      "checked_at": "2026-08-28"
+    },
+    {
+      "id": "V27",
+      "name": "Ficha Agente de Construcción",
+      "location": "Google Drive file 11z3dRk9l_mop3Gjfj0cVrnK70IO5B6Ye",
+      "status": "VERIFIED",
+      "checked_at": "2026-08-28"
+    }
+  ],
+  "requested_actions": [
+    {
+      "id": "repo-read",
+      "target": "github:read",
+      "reversible": true,
+      "destructive": false,
+      "touches_secrets": false,
+      "production": false,
+      "irreversible": false
+    },
+    {
+      "id": "db-read",
+      "target": "supabase:read",
+      "reversible": true,
+      "destructive": false,
+      "touches_secrets": false,
+      "production": false,
+      "irreversible": false
+    },
+    {
+      "id": "evidence-write",
+      "target": "github:branch-write",
+      "reversible": true,
+      "destructive": false,
+      "touches_secrets": false,
+      "production": false,
+      "irreversible": false
+    }
+  ],
+  "candidates": [
+    {
+      "id": "claude-code",
+      "preferred": true,
+      "available": false,
+      "capacity_score": 5,
+      "risk_fit_score": 5,
+      "reversibility_fit_score": 5,
+      "cost_efficiency_score": 4,
+      "effective_permissions": []
+    },
+    {
+      "id": "chatgpt-conductor-alternate",
+      "preferred": false,
+      "available": true,
+      "capacity_score": 4,
+      "risk_fit_score": 5,
+      "reversibility_fit_score": 5,
+      "cost_efficiency_score": 4,
+      "effective_permissions": ["github:read", "supabase:read", "github:branch-write"]
+    }
+  ]
+}
