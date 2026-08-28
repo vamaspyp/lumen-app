@@ -1,0 +1,72 @@
+{
+  "acto_id": "A1",
+  "estado": "EN_CURSO",
+  "evidencia": [
+    {
+      "origin": "LEÍDO",
+      "statement": "El frontend usa lumi_dispatch como puerta canónica para las acciones generales; useLumi conserva RPCs directos acotados para init y Circular Luz.",
+      "reference": "GitHub branch acto/A20-runtime-minimo-skills · src/lib/useLumi.ts"
+    },
+    {
+      "origin": "LEÍDO",
+      "statement": "public.lumi_dispatch construye dinámicamente lumi_<action> y ejecuta la función destino sin conocimiento de negocio del dispatcher.",
+      "reference": "Supabase xezolunwsizllyqaxdkc · pg_get_functiondef(public.lumi_dispatch) · 2026-08-28"
+    },
+    {
+      "origin": "LEÍDO",
+      "statement": "El proyecto Supabase está ACTIVE_HEALTHY; al momento del chequeo existen 26 tablas públicas y 105 rutinas públicas.",
+      "reference": "Supabase xezolunwsizllyqaxdkc · metadata query · 2026-08-28T17:04:07Z"
+    },
+    {
+      "origin": "LEÍDO",
+      "statement": "El matching activo de lumi_checkin_candidates y lumi_select_experience lee public.experience_hypotheses; lumi_select_experience persiste experience_hypothesis_id e hypothesis_json en experience_runs.",
+      "reference": "Supabase xezolunwsizllyqaxdkc · pg_get_functiondef(lumi_checkin_candidates,lumi_select_experience) · 2026-08-28"
+    },
+    {
+      "origin": "LEÍDO",
+      "statement": "La base contiene 55 experiencias elegibles, 196 hipótesis activas, 73 recursos activos y 165 experience_runs al momento de la consulta.",
+      "reference": "Supabase xezolunwsizllyqaxdkc · count query · 2026-08-28"
+    },
+    {
+      "origin": "LEÍDO",
+      "statement": "experience_runs mantiene campos actuales de hemisferio/capacidad junto con experience_hypothesis_id, hypothesis_json y columnas legacy_help_intent_key/legacy_ik_key.",
+      "reference": "Supabase xezolunwsizllyqaxdkc · information_schema.columns experience_runs · 2026-08-28"
+    },
+    {
+      "origin": "DERIVADO",
+      "statement": "La espina técnica Supabase decide → dispatcher ejecuta → React renderiza está materializada en el camino general observado; la convivencia de matching por hipótesis es un hecho de implementación a reconciliar con la autoridad de producto en la continuación de A1/A2, no dentro de A20.",
+      "reference": "Derivado de src/lib/useLumi.ts + public.lumi_dispatch + public.lumi_select_experience"
+    },
+    {
+      "origin": "NO_VERIFICADO",
+      "statement": "No se verificó en este piloto el recorrido UI end-to-end, Vercel Preview, RLS/seguridad completa ni la totalidad del código y funciones; esas verificaciones quedan pendientes de la auditoría acumulativa A1.",
+      "reference": "Limitación declarada del piloto A1 dentro de A20"
+    }
+  ],
+  "resultado": "A1 atravesó el runtime V25 con routing real hacia un actor alternativo disponible y produjo una primera auditoría factual del spine código/base. No se cierra A1: quedan áreas de auditoría acumulativa pendientes.",
+  "aprendizaje": "El runtime necesita distinguir permiso nominal de permiso efectivo y separar con rigor LEÍDO/DERIVADO/NO_VERIFICADO. El primer piloto también confirma que el estado real puede contener capas legacy activas o coexistentes y debe auditarse antes de corregir.",
+  "referencias": [
+    "A1",
+    "F1",
+    "V7",
+    "V8",
+    "V25",
+    "V27",
+    "V32",
+    "GitHub acto/A20-runtime-minimo-skills",
+    "Supabase xezolunwsizllyqaxdkc"
+  ],
+  "esfuerzo_real": "persona_h=0; agente_sesiones=1",
+  "dod_check": [
+    {
+      "item": "Cada dato relevante del informe identifica origen LEÍDO o DERIVADO.",
+      "status": "PASS",
+      "evidence": "Todos los hallazgos materiales del piloto llevan origin explícito."
+    },
+    {
+      "item": "Todo dato material no verificable queda marcado NO_VERIFICADO.",
+      "status": "PASS",
+      "evidence": "El retorno lista explícitamente las áreas no verificadas y no las presenta como hechos."
+    }
+  ]
+}
