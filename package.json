@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "e2e:smoke": "playwright test",
-    "verify": "npm run lint && npm run build && npm run e2e:smoke"
+    "agentic:verify": "node .claude/runtime/test.mjs",
+    "verify": "npm run lint && npm run build && npm run agentic:verify && npm run e2e:smoke"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.2",
