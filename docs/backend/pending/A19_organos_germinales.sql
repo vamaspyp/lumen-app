@@ -5,20 +5,25 @@
 -- Alcance: Mercado, Comunidad, Círculos y Común en forma germinal; sin pagos,
 -- feed social, participantes reales obligatorios ni publicación del Común.
 --
--- Seguridad del delta:
--- - tablas nuevas con RLS habilitado;
--- - sin acceso directo anon/authenticated;
--- - mutaciones controladas no usan prefijo lumi_ salvo submit_contribution,
---   que completa una acción existente y exige session_id válido;
--- - funciones SECURITY DEFINER fijan search_path vacío y califican esquemas.
+-- Diseño de seguridad:
+-- - persistencia A19 en schema private, no expuesto al Data API;
+-- - RLS también habilitado en tablas privadas como defensa en profundidad;
+-- - sólo RPCs de lectura/acción necesarios quedan en public para el dispatcher;
+-- - mutaciones administrativas de Círculos y Común quedan en private + service_role;
+-- - submit_contribution completa una acción visible ya existente y exige session_id válido;
+-- - SECURITY DEFINER fija search_path vacío y califica todos los objetos.
 
 begin;
+
+create schema if not exists private;
+revoke all on schema private from public, anon, authenticated;
+grant usage on schema private to service_role;
 
 -- ---------------------------------------------------------------------------
 -- 1. MERCADO · una oferta/proveedor elegible y conexión externa, sin pagos
 -- ---------------------------------------------------------------------------
 
-create table if not exists public.lumen_market_offers (
+create table if not exists private.lumen_market_offers (
   id uuid primary key default gen_random_uuid(),
   source_resource_id uuid not null references public.resources(id),
   provider_name text not null,
@@ -33,12 +38,12 @@ create table if not exists public.lumen_market_offers (
   unique (source_resource_id)
 );
 
-alter table public.lumen_market_offers enable row level security;
-revoke all privileges on table public.lumen_market_offers from anon, authenticated;
-grant all privileges on table public.lumen_market_offers to service_role;
+alter table private.lumen_market_offers enable row level security;
+revoke all privileges on table private.lumen_market_offers from public, anon, authenticated;
+grant all privileges on table private.lumen_market_offers to service_role;
 
 -- Semilla real y ya curada en Fuente: proveedor externo + URL existente.
-insert into public.lumen_market_offers (
+insert into private.lumen_market_offers (
   source_resource_id,
   provider_name,
   offer_title,
@@ -72,7 +77,7 @@ set provider_name = excluded.provider_name,
     description = excluded.description,
     connection_url = excluded.connection_url,
     status = excluded.status,
-    metadata = public.lumen_market_offers.metadata || excluded.metadata,
+    metadata = private.lumen_market_offers.metadata || excluded.metadata,
     updated_at = now();
 
 create or replace function public.lumi_open_mercado(p_params jsonb default '{}'::jsonb)
@@ -101,7 +106,7 @@ as $function$
             'source', 'mercado'
           ) order by mo.created_at asc
         )
-        from public.lumen_market_offers mo
+        from private.lumen_market_offers mo
         where mo.status = 'available'
       ), '[]'::jsonb)
     ),
@@ -109,14 +114,14 @@ as $function$
   );
 $function$;
 
-revoke execute on function public.lumi_open_mercado(jsonb) from public;
+revoke execute on function public.lumi_open_mercado(jsonb) from public, anon, authenticated, service_role;
 grant execute on function public.lumi_open_mercado(jsonb) to anon, authenticated, service_role;
 
 -- ---------------------------------------------------------------------------
--- 2. COMUNIDAD · contribución mínima, sin feed/likes/rankings
+-- 2. COMUNIDAD · puerta mínima de contribución, sin feed/likes/rankings
 -- ---------------------------------------------------------------------------
 
-create table if not exists public.lumen_community_contributions (
+create table if not exists private.lumen_community_contributions (
   id uuid primary key default gen_random_uuid(),
   session_id uuid not null references public.sessions(id),
   user_id uuid references public.users(id),
@@ -130,9 +135,33 @@ create table if not exists public.lumen_community_contributions (
   updated_at timestamptz not null default now()
 );
 
-alter table public.lumen_community_contributions enable row level security;
-revoke all privileges on table public.lumen_community_contributions from anon, authenticated;
-grant all privileges on table public.lumen_community_contributions to service_role;
+alter table private.lumen_community_contributions enable row level security;
+revoke all privileges on table private.lumen_community_contributions from public, anon, authenticated;
+grant all privileges on table private.lumen_community_contributions to service_role;
+
+create or replace function public.lumi_open_comunidad(p_params jsonb default '{}'::jsonb)
+returns jsonb
+language sql
+security definer
+set search_path = ''
+as $function$
+  select jsonb_build_object(
+    'ok', true,
+    'code', 'COMMUNITY_ENTRY',
+    'message', 'Si conocés algo que podría ayudar a otra persona, podés acercarlo.',
+    'actions', jsonb_build_array(
+      jsonb_build_object('label', 'Enviar propuesta', 'action', 'submit_contribution', 'variant', 'solid'),
+      jsonb_build_object('label', 'Ahora no', 'action', 'go_home', 'variant', 'ghost')
+    ),
+    'content_type', 'contribution_form',
+    'content', jsonb_build_object(
+      'type', 'contribution_form',
+      'form_kind', 'resource_contribution',
+      'source', 'community'
+    ),
+    'state', jsonb_build_object('contentSource', 'community')
+  );
+$function$;
 
 create or replace function public.lumi_submit_contribution(p_params jsonb)
 returns jsonb
@@ -147,7 +176,6 @@ declare
   v_url text;
   v_why text;
   v_id uuid;
-  v_node jsonb;
 begin
   p_params := public.lumi_normalize_params(coalesce(p_params, '{}'::jsonb));
 
@@ -168,10 +196,11 @@ begin
       'error', 'session_id y contribution_title son requeridos',
       'message', 'Necesito una sesión válida y un título para recibir la propuesta.',
       'actions', jsonb_build_array(
-        jsonb_build_object('label', 'Volver', 'action', 'open_contribution_form', 'variant', 'outline')
+        jsonb_build_object('label', 'Volver', 'action', 'open_comunidad', 'variant', 'outline')
       ),
       'content_type', 'empty_presence',
-      'content', jsonb_build_object('type', 'empty_presence', 'source', 'community')
+      'content', jsonb_build_object('type', 'empty_presence', 'source', 'community'),
+      'state', jsonb_build_object('contentSource', 'community')
     );
   end if;
 
@@ -187,14 +216,15 @@ begin
       'error', 'session_not_found',
       'message', 'No pude vincular esta contribución a una sesión válida.',
       'actions', jsonb_build_array(
-        jsonb_build_object('label', 'Volver', 'action', 'open_contribution_form', 'variant', 'outline')
+        jsonb_build_object('label', 'Volver', 'action', 'open_comunidad', 'variant', 'outline')
       ),
       'content_type', 'empty_presence',
-      'content', jsonb_build_object('type', 'empty_presence', 'source', 'community')
+      'content', jsonb_build_object('type', 'empty_presence', 'source', 'community'),
+      'state', jsonb_build_object('contentSource', 'community')
     );
   end if;
 
-  insert into public.lumen_community_contributions (
+  insert into private.lumen_community_contributions (
     session_id, user_id, title, url, why, metadata
   ) values (
     v_session_id,
@@ -205,33 +235,31 @@ begin
     jsonb_build_object('act', 'A19', 'germinal', true)
   ) returning id into v_id;
 
-  v_node := public.lumi_get_node('CONTRIBUTION_SUBMITTED');
-
-  return v_node || jsonb_build_object(
+  return jsonb_build_object(
     'ok', true,
     'code', 'CONTRIBUTION_SUBMITTED',
-    'contribution_id', v_id::text,
+    'message', 'Gracias. Lo recibimos para revisarlo con cuidado.',
+    'actions', jsonb_build_array(
+      jsonb_build_object('label', 'Volver al inicio', 'action', 'go_home', 'variant', 'solid')
+    ),
     'content_type', 'empty_presence',
     'content', jsonb_build_object('type', 'empty_presence', 'source', 'community'),
-    'state', jsonb_build_object('contentSource', 'community')
+    'state', jsonb_build_object('contentSource', 'community'),
+    'contribution_id', v_id::text
   );
 end;
 $function$;
 
-revoke execute on function public.lumi_submit_contribution(jsonb) from public;
+revoke execute on function public.lumi_open_comunidad(jsonb) from public, anon, authenticated, service_role;
+revoke execute on function public.lumi_submit_contribution(jsonb) from public, anon, authenticated, service_role;
+grant execute on function public.lumi_open_comunidad(jsonb) to anon, authenticated, service_role;
 grant execute on function public.lumi_submit_contribution(jsonb) to anon, authenticated, service_role;
-
--- Los nodos ya existen pero estaban dormidos. Se activa sólo la presencia germinal.
-update public.lumen_nodes
-set active = true,
-    updated_at = now()
-where code in ('CONTRIBUTION_FORM', 'CONTRIBUTION_SUBMITTED');
 
 -- ---------------------------------------------------------------------------
 -- 3. CÍRCULOS · pequeño, cerrado, temporal y gestionable en entorno controlado
 -- ---------------------------------------------------------------------------
 
-create table if not exists public.lumen_circles (
+create table if not exists private.lumen_circles (
   id uuid primary key default gen_random_uuid(),
   title text not null,
   purpose text,
@@ -248,11 +276,11 @@ create table if not exists public.lumen_circles (
   check (starts_at is null or ends_at > starts_at)
 );
 
-alter table public.lumen_circles enable row level security;
-revoke all privileges on table public.lumen_circles from anon, authenticated;
-grant all privileges on table public.lumen_circles to service_role;
+alter table private.lumen_circles enable row level security;
+revoke all privileges on table private.lumen_circles from public, anon, authenticated;
+grant all privileges on table private.lumen_circles to service_role;
 
-create or replace function public.lumen_create_circle(p_params jsonb)
+create or replace function private.lumen_create_circle(p_params jsonb)
 returns jsonb
 language plpgsql
 security definer
@@ -268,9 +296,14 @@ declare
 begin
   v_title := nullif(left(trim(coalesce(p_params->>'title', '')), 180), '');
   v_purpose := nullif(left(trim(coalesce(p_params->>'purpose', '')), 1000), '');
-  v_starts_at := nullif(trim(coalesce(p_params->>'starts_at', '')), '')::timestamptz;
-  v_ends_at := nullif(trim(coalesce(p_params->>'ends_at', '')), '')::timestamptz;
-  v_max_people := greatest(2, least(12, coalesce((p_params->>'max_people')::integer, 8)));
+
+  begin
+    v_starts_at := nullif(trim(coalesce(p_params->>'starts_at', '')), '')::timestamptz;
+    v_ends_at := nullif(trim(coalesce(p_params->>'ends_at', '')), '')::timestamptz;
+    v_max_people := greatest(2, least(12, coalesce((p_params->>'max_people')::integer, 8)));
+  exception when invalid_text_representation or datetime_field_overflow then
+    return jsonb_build_object('ok', false, 'error', 'parámetros temporales o max_people inválidos');
+  end;
 
   if v_title is null or v_ends_at is null then
     return jsonb_build_object('ok', false, 'error', 'title y ends_at son requeridos');
@@ -280,7 +313,7 @@ begin
     return jsonb_build_object('ok', false, 'error', 'ends_at debe ser posterior a starts_at');
   end if;
 
-  insert into public.lumen_circles (
+  insert into private.lumen_circles (
     title, purpose, status, starts_at, ends_at, max_people, metadata
   ) values (
     v_title,
@@ -296,7 +329,7 @@ begin
 end;
 $function$;
 
-create or replace function public.lumen_close_circle(p_params jsonb)
+create or replace function private.lumen_close_circle(p_params jsonb)
 returns jsonb
 language plpgsql
 security definer
@@ -304,20 +337,31 @@ set search_path = ''
 as $function$
 declare
   v_id uuid;
+  v_changed integer;
 begin
-  v_id := nullif(trim(coalesce(p_params->>'circle_id', '')), '')::uuid;
+  begin
+    v_id := nullif(trim(coalesce(p_params->>'circle_id', '')), '')::uuid;
+  exception when invalid_text_representation then
+    v_id := null;
+  end;
 
-  update public.lumen_circles
+  if v_id is null then
+    return jsonb_build_object('ok', false, 'error', 'circle_id requerido');
+  end if;
+
+  update private.lumen_circles
   set status = 'closed',
       closed_at = now(),
       updated_at = now()
   where id = v_id
     and status <> 'closed';
 
+  get diagnostics v_changed = row_count;
+
   return jsonb_build_object(
-    'ok', found,
-    'circle_id', coalesce(v_id::text, ''),
-    'status', case when found then 'closed' else 'not_changed' end
+    'ok', v_changed = 1,
+    'circle_id', v_id::text,
+    'status', case when v_changed = 1 then 'closed' else 'not_changed' end
   );
 end;
 $function$;
@@ -342,20 +386,21 @@ as $function$
           'source', 'circulos'
         ) order by c.created_at desc
       )
-      from public.lumen_circles c
+      from private.lumen_circles c
       where c.status = 'open'
         and c.ends_at > now()
     ), '[]'::jsonb)
   );
 $function$;
 
-revoke execute on function public.lumen_create_circle(jsonb) from public, anon, authenticated;
-revoke execute on function public.lumen_close_circle(jsonb) from public, anon, authenticated;
-grant execute on function public.lumen_create_circle(jsonb) to service_role;
-grant execute on function public.lumen_close_circle(jsonb) to service_role;
-revoke execute on function public.lumi_get_circulos_activities(text) from public;
+revoke execute on function private.lumen_create_circle(jsonb) from public, anon, authenticated, service_role;
+revoke execute on function private.lumen_close_circle(jsonb) from public, anon, authenticated, service_role;
+grant execute on function private.lumen_create_circle(jsonb) to service_role;
+grant execute on function private.lumen_close_circle(jsonb) to service_role;
+revoke execute on function public.lumi_get_circulos_activities(text) from public, anon, authenticated, service_role;
 grant execute on function public.lumi_get_circulos_activities(text) to anon, authenticated, service_role;
 
+-- Los nodos ya existen pero estaban dormidos. Se activa sólo entrada/vacío germinal.
 update public.lumen_nodes
 set active = true,
     updated_at = now()
@@ -365,7 +410,7 @@ where code in ('CIRCULOS_ENTRY', 'CIRCULOS_EMPTY');
 -- 4. COMÚN · evidencia/aprendizaje interno estructurado, no publicación abierta
 -- ---------------------------------------------------------------------------
 
-create table if not exists public.lumen_common_entries (
+create table if not exists private.lumen_common_entries (
   id uuid primary key default gen_random_uuid(),
   experience_run_id uuid not null references public.experience_runs(id) on delete cascade,
   entry_key text not null,
@@ -378,11 +423,11 @@ create table if not exists public.lumen_common_entries (
   unique (experience_run_id, entry_key)
 );
 
-alter table public.lumen_common_entries enable row level security;
-revoke all privileges on table public.lumen_common_entries from anon, authenticated;
-grant all privileges on table public.lumen_common_entries to service_role;
+alter table private.lumen_common_entries enable row level security;
+revoke all privileges on table private.lumen_common_entries from public, anon, authenticated;
+grant all privileges on table private.lumen_common_entries to service_role;
 
-create or replace function public.lumen_capture_common_learning(p_params jsonb)
+create or replace function private.lumen_capture_common_learning(p_params jsonb)
 returns jsonb
 language plpgsql
 security definer
@@ -395,7 +440,12 @@ declare
   v_evidence jsonb;
   v_id uuid;
 begin
-  v_run_id := nullif(trim(coalesce(p_params->>'experience_run_id', '')), '')::uuid;
+  begin
+    v_run_id := nullif(trim(coalesce(p_params->>'experience_run_id', '')), '')::uuid;
+  exception when invalid_text_representation then
+    v_run_id := null;
+  end;
+
   v_entry_key := nullif(left(trim(coalesce(p_params->>'entry_key', '')), 120), '');
   v_summary := nullif(left(trim(coalesce(p_params->>'summary', '')), 1000), '');
   v_evidence := coalesce(p_params->'evidence', '{}'::jsonb);
@@ -408,7 +458,7 @@ begin
     return jsonb_build_object('ok', false, 'error', 'experience_run_not_found');
   end if;
 
-  insert into public.lumen_common_entries (
+  insert into private.lumen_common_entries (
     experience_run_id, entry_key, summary, evidence, shareable, metadata
   ) values (
     v_run_id,
@@ -422,7 +472,7 @@ begin
   set summary = excluded.summary,
       evidence = excluded.evidence,
       shareable = false,
-      metadata = public.lumen_common_entries.metadata || excluded.metadata,
+      metadata = private.lumen_common_entries.metadata || excluded.metadata,
       updated_at = now()
   returning id into v_id;
 
@@ -430,7 +480,7 @@ begin
 end;
 $function$;
 
-create or replace function public.lumen_get_common_learning(p_experience_run_id uuid)
+create or replace function private.lumen_get_common_learning(p_experience_run_id uuid)
 returns jsonb
 language sql
 security definer
@@ -450,15 +500,15 @@ as $function$
           'created_at', ce.created_at
         ) order by ce.created_at asc
       )
-      from public.lumen_common_entries ce
+      from private.lumen_common_entries ce
       where ce.experience_run_id = p_experience_run_id
     ), '[]'::jsonb)
   );
 $function$;
 
-revoke execute on function public.lumen_capture_common_learning(jsonb) from public, anon, authenticated;
-revoke execute on function public.lumen_get_common_learning(uuid) from public, anon, authenticated;
-grant execute on function public.lumen_capture_common_learning(jsonb) to service_role;
-grant execute on function public.lumen_get_common_learning(uuid) to service_role;
+revoke execute on function private.lumen_capture_common_learning(jsonb) from public, anon, authenticated, service_role;
+revoke execute on function private.lumen_get_common_learning(uuid) from public, anon, authenticated, service_role;
+grant execute on function private.lumen_capture_common_learning(jsonb) to service_role;
+grant execute on function private.lumen_get_common_learning(uuid) to service_role;
 
 commit;
