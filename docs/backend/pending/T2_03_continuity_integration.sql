@@ -546,7 +546,7 @@ begin
         'reason','due_commitment',
         'commitment',v_due_commitment
       ),
-      'state',public.lumi_clear_conversation_state('lumi','#7860E0','','continuity')
+      'state',public.lumi_clear_conversation_state('continuity','#7860E0','','')
     );
   end if;
 
@@ -573,7 +573,7 @@ begin
         'reason','due_faro_remeasurement',
         'measurement',v_due_remeasurement
       ),
-      'state',public.lumi_clear_conversation_state('lumi','#7860E0','','faros')
+      'state',public.lumi_clear_conversation_state('faros','#7860E0','','')
     );
   end if;
 
@@ -612,10 +612,20 @@ begin
 end;
 $function$;
 
+-- El contexto enriquecido deja de ser un endpoint público directo: sólo lo
+-- consumen funciones backend SECURITY DEFINER verificadas. Esto evita ampliar
+-- la deuda de privacidad legacy al sumar datos de Continuidad.
+revoke execute on function public.lumi_get_presence_context(uuid) from public, anon, authenticated;
+grant execute on function public.lumi_get_presence_context(uuid) to service_role;
+
+revoke execute on function public.lumi_activate_faro(jsonb) from public, anon;
+revoke execute on function public.lumi_go_home(jsonb) from public, anon;
 revoke execute on function public.lumi_submit_checkin_faro_baseline(jsonb) from public, anon;
 revoke execute on function public.lumi_open_faro_remeasurement(jsonb) from public, anon;
 revoke execute on function public.lumi_submit_checkin_faro_remeasurement(jsonb) from public, anon;
 
+grant execute on function public.lumi_activate_faro(jsonb) to authenticated, service_role;
+grant execute on function public.lumi_go_home(jsonb) to authenticated, service_role;
 grant execute on function public.lumi_submit_checkin_faro_baseline(jsonb) to authenticated, service_role;
 grant execute on function public.lumi_open_faro_remeasurement(jsonb) to authenticated, service_role;
 grant execute on function public.lumi_submit_checkin_faro_remeasurement(jsonb) to authenticated, service_role;
