@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, greenfield-v04-s0]
+    branches: [main, greenfield-v04-s0, greenfield-v04-s1]
 
 jobs:
   verify:
@@ -19,5 +19,4 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run verify
       - name: Certify live greenfield backend
-        if: github.ref == 'refs/heads/greenfield-v04-s0'
         run: npm run test:live
