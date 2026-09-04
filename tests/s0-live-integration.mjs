@@ -39,6 +39,7 @@ const { data: embryo, error: embryoError } = await supabase.rpc('lumen_embryo_he
 assert.equal(embryoError, null, `Embryo health RPC failed: ${embryoError?.message ?? 'unknown'}`)
 assert.equal(embryo?.state, 'operational')
 assert.equal(embryo?.release_contract, 'embryo.v0.4')
+assert.deepEqual(Object.keys(embryo ?? {}).sort(), ['evolution', 'operations', 'prelaunch_reset_required', 'release_contract', 'slices', 'source', 'state'].sort(), 'Public health must remain a narrow operational projection')
 assert.deepEqual(embryo?.slices, {
   s0: 'closed', s1: 'closed', s2: 'closed', s3: 'closed',
   s4: 'closed', s5: 'closed', s6: 'closed', s7: 'closed',
@@ -57,6 +58,13 @@ const { data: source, error: sourceError } = await supabase.rpc('lumen_source_di
 assert.equal(sourceError, null, `Public Source discovery failed: ${sourceError?.message ?? 'unknown'}`)
 assert.ok(Array.isArray(source), 'Source discovery must return an array')
 assert.ok(source.length >= 16, `Expected at least 16 discoverable possibilities, got ${source.length}`)
+assert.ok(source.length <= 50, 'Public Source discovery must enforce its hard result cap')
+
+const allowedSourceKeys = new Set(['help_id', 'canonical_code', 'help_type', 'lifecycle', 'risk_class', 'evidence_class', 'title', 'summary', 'content', 'duration_minutes', 'energy', 'provider', 'needs', 'localization_provenance'])
+for (const item of source) {
+  for (const field of Object.keys(item ?? {})) assert.ok(allowedSourceKeys.has(field), `Unexpected public Source field: ${field}`)
+  assert.equal(Object.hasOwn(item ?? {}, 'person_id'), false, 'Public Source must never expose person_id')
+}
 
 const providers = new Set(source.map((item) => item?.provider?.name).filter(Boolean))
 const helpTypes = new Set(source.map((item) => item?.help_type).filter(Boolean))
@@ -64,4 +72,8 @@ assert.ok(providers.size >= 4, `Expected diverse Source provenance, got ${provid
 assert.ok(helpTypes.size >= 4, `Expected several semantic help types, got ${helpTypes.size}`)
 assert.ok(source.some((item) => typeof item?.content?.external_url === 'string'), 'Source must include at least one traceable external resource')
 
-console.log(`Embryo live integration PASS: health=${embryo.state}; source=${source.length}; providers=${providers.size}; types=${helpTypes.size}`)
+const { data: privateData, error: privateError } = await supabase.rpc('lumen_s2_snapshot')
+assert.equal(privateData, null, 'Anonymous callers must never receive personal continuity data')
+assert.ok(privateError, 'Anonymous personal RPC must be rejected')
+
+console.log(`Embryo live integration PASS: health=${embryo.state}; source=${source.length}; providers=${providers.size}; types=${helpTypes.size}; anon-personal=blocked`)
