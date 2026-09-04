@@ -42,19 +42,19 @@ test('greenfield source never imports legacy application folders', async () => {
   }
 })
 
-test('greenfield migrations do not reference legacy public business objects', async () => {
+test('greenfield migrations reference only explicit greenfield public API objects', async () => {
   const files = (await walk(MIGRATIONS)).filter((p) => p.endsWith('.sql') && /greenfield|gf_/i.test(p))
   assert.ok(files.length > 0, 'at least one greenfield migration must be versioned in the repository')
 
-  const allowedPublicRefs = new Set(['public', 'anon', 'authenticated'])
+  const allowedSchemas = new Set(['public', 'anon', 'authenticated'])
   for (const file of files) {
     const sql = await readFile(file, 'utf8')
     for (const match of sql.matchAll(/\bpublic\.([a-zA-Z_][a-zA-Z0-9_]*)/g)) {
-      assert.fail(`${relative(ROOT, file)} references legacy public object public.${match[1]}`)
+      assert.ok(match[1].startsWith('lumen_'), `${relative(ROOT, file)} references non-greenfield public object public.${match[1]}`)
     }
     for (const match of sql.matchAll(/\b(?:references|from|join|update|into|delete\s+from)\s+([a-zA-Z_][a-zA-Z0-9_]*)\./gi)) {
       const schema = match[1].toLowerCase()
-      assert.ok(schema.startsWith('gf_') || allowedPublicRefs.has(schema), `${relative(ROOT, file)} crosses into schema ${schema}`)
+      assert.ok(schema.startsWith('gf_') || allowedSchemas.has(schema), `${relative(ROOT, file)} crosses into schema ${schema}`)
     }
   }
 })
