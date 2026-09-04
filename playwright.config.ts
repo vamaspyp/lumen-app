@@ -1,9 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
-// Puerto fijo con --strictPort: si Vite eligiera otro puerto en automático
-// (p.ej. porque el 5173 está ocupado), Playwright quedaría apuntando a la
-// URL equivocada. --strictPort hace fallar el arranque en vez de migrar de
-// puerto en silencio.
+// Fixed port + --strictPort keeps E2E deterministic: if the port is occupied,
+// fail instead of silently testing a different local server.
 const PORT = 5183
 const BASE_URL = `http://localhost:${PORT}`
 
@@ -13,9 +11,6 @@ export default defineConfig({
   reporter: 'list',
   use: {
     baseURL: BASE_URL,
-    // La intro animada de LUMEN (~7.5s) ya respeta prefers-reduced-motion
-    // (ver src/components/LumenIntro.tsx); se activa acá para que el smoke
-    // no dependa del timing de esa animación.
     reducedMotion: 'reduce',
   },
   projects: [
