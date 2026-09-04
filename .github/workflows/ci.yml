@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, greenfield-v04-s0, greenfield-v04-s1]
+    branches: [main, greenfield-v04-s0, greenfield-v04-s1, greenfield-v04-embryo]
 
 jobs:
   verify:
