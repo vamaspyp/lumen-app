@@ -22,11 +22,13 @@ export async function requestMagicLink(email: string, redirectTo?: string): Prom
   const normalized = email.trim().toLowerCase()
   if (!normalized || !normalized.includes('@')) throw new Error('A valid email is required')
 
+  const configuredRedirect = import.meta.env.VITE_LUMEN_AUTH_REDIRECT_URL?.trim()
+  const effectiveRedirect = configuredRedirect || redirectTo
   const traceId = newTraceId()
   const supabase = getGreenfieldSupabase()
   const { error } = await supabase.auth.signInWithOtp({
     email: normalized,
-    options: redirectTo ? { emailRedirectTo: redirectTo } : undefined,
+    options: effectiveRedirect ? { emailRedirectTo: effectiveRedirect } : undefined,
   })
 
   if (error) {
