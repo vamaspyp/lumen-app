@@ -44,9 +44,9 @@ test('V40 bounded contexts are represented exactly once', async () => {
   }
 })
 
-test('irrecoverable decision events have canonical names', async () => {
+test('irrecoverable foundation and decision events have canonical names', async () => {
   const source = await readFile(join(GREENFIELD, 'kernel', 'events.ts'), 'utf8')
-  for (const event of ['MomentReceived', 'CandidateSetGenerated', 'CandidateExposed', 'NoMatchDeclared', 'OutcomeReported', 'CoverageGapDetected', 'PolicyRolledBack']) {
+  for (const event of ['PersonBootstrapped', 'ConsentChanged', 'MomentReceived', 'CandidateSetGenerated', 'CandidateExposed', 'NoMatchDeclared', 'OutcomeReported', 'CoverageGapDetected', 'PolicyRolledBack']) {
     assert.match(source, new RegExp(`'${event}'`))
   }
 })

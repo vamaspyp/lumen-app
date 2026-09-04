@@ -1,4 +1,6 @@
 export const DOMAIN_EVENT_TYPES = [
+  'PersonBootstrapped',
+  'ConsentChanged',
   'MomentReceived',
   'MomentInterpreted',
   'TrajectoryCreated',

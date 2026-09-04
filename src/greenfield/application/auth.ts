@@ -3,6 +3,8 @@ import {
   type GreenfieldSession,
   type GreenfieldUser,
 } from '../adapters/supabase/client'
+import { emitOperationalLog } from '../kernel/observability'
+import { newTraceId } from '../kernel/trace'
 
 export type AuthSnapshot = {
   session: GreenfieldSession | null
@@ -20,15 +22,27 @@ export async function requestMagicLink(email: string, redirectTo?: string): Prom
   const normalized = email.trim().toLowerCase()
   if (!normalized || !normalized.includes('@')) throw new Error('A valid email is required')
 
+  const traceId = newTraceId()
   const supabase = getGreenfieldSupabase()
   const { error } = await supabase.auth.signInWithOtp({
     email: normalized,
     options: redirectTo ? { emailRedirectTo: redirectTo } : undefined,
   })
-  if (error) throw error
+
+  if (error) {
+    emitOperationalLog('error', 'foundation.auth.magic_link.failed', traceId, { code: error.code })
+    throw error
+  }
+
+  emitOperationalLog('info', 'foundation.auth.magic_link.requested', traceId)
 }
 
 export async function signOut(): Promise<void> {
+  const traceId = newTraceId()
   const { error } = await getGreenfieldSupabase().auth.signOut()
-  if (error) throw error
+  if (error) {
+    emitOperationalLog('error', 'foundation.auth.signout.failed', traceId, { code: error.code })
+    throw error
+  }
+  emitOperationalLog('info', 'foundation.auth.signed_out', traceId)
 }
