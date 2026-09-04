@@ -11,7 +11,8 @@
     "test:live": "node tests/s0-live-integration.mjs",
     "preview": "vite preview",
     "e2e:smoke": "playwright test",
-    "verify": "npm run test:unit && npm run lint && npm run build && npm run e2e:smoke"
+    "test:regression": "playwright test e2e/smoke.spec.ts",
+    "verify": "npm run test:unit && npm run lint && npm run build && npm run test:regression"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.2",
