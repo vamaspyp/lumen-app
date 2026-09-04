@@ -89,13 +89,13 @@ function HelpContent({ help }: { help: HelpPossibility }) {
   )
 }
 
-function PrivateGate({ onGoNow }: { onGoNow: () => void }) {
+function PrivateGate({ spaceName, copy, onGoNow }: { spaceName: string; copy: string; onGoNow: () => void }) {
   return (
     <section className="space-scene compact-space">
-      <p className="presence-label">Un espacio personal</p>
-      <h1>Esto necesita ser tuyo.</h1>
-      <p className="lumi-line">Entrá desde Ahora para que LUMEN pueda sostener continuidad sin mezclar tu vida con otra.</p>
-      <button className="primary-action centered-action" type="button" onClick={onGoNow}>Ir a Ahora</button>
+      <p className="presence-label">{spaceName.toUpperCase()} · espacio personal</p>
+      <h1>{spaceName} necesita saber que sos vos.</h1>
+      <p className="lumi-line">{copy}</p>
+      <button className="primary-action centered-action" type="button" onClick={onGoNow}>Ir a Ahora para entrar</button>
     </section>
   )
 }
@@ -514,6 +514,7 @@ function App() {
     setExpression('')
     setError('')
     setClosingMessage(message)
+    setMagicLinkSent(false)
     setStage(message ? 'closed' : 'home')
   }
 
@@ -542,6 +543,12 @@ function App() {
     try { await requestMagicLink(email, window.location.origin); setMagicLinkSent(true) }
     catch (cause) { setError(cause instanceof Error ? cause.message : 'No pude enviar el acceso.') }
     finally { setBusy(false) }
+  }
+
+  const declineIdentity = () => {
+    resetHome()
+    setEmail('')
+    setSpace('fuente')
   }
 
   const submitClarification = async (event: FormEvent) => {
@@ -607,9 +614,9 @@ function App() {
       </header>
 
       {space === 'fuente' && <SourceSpace />}
-      {space === 'trayectoria' && (authenticated ? <TrajectorySpace /> : <PrivateGate onGoNow={() => openSpace('ahora')} />)}
-      {space === 'santuario' && (authenticated ? <SanctuarySpace /> : <PrivateGate onGoNow={() => openSpace('ahora')} />)}
-      {space === 'tejido' && (authenticated ? <TissueSpace /> : <PrivateGate onGoNow={() => openSpace('ahora')} />)}
+      {space === 'trayectoria' && (authenticated ? <TrajectorySpace /> : <PrivateGate spaceName="Trayectoria" copy="Tus Faros, Camino y repertorio necesitan una identidad para no mezclarse con los de otra persona." onGoNow={() => openSpace('ahora')} />)}
+      {space === 'santuario' && (authenticated ? <SanctuarySpace /> : <PrivateGate spaceName="Santuario" copy="Lo que guardes acá es íntimo y sólo puede abrirse cuando LUMEN sabe que sos vos." onGoNow={() => openSpace('ahora')} />)}
+      {space === 'tejido' && (authenticated ? <TissueSpace /> : <PrivateGate spaceName="Tejido" copy="Los Círculos son privados y por invitación. Para entrar, crear o compartir, LUMEN necesita saber qué persona está participando." onGoNow={() => openSpace('ahora')} />)}
 
       {space === 'ahora' && (
         <section className="lumi-scene" aria-live="polite">
@@ -630,13 +637,13 @@ function App() {
               {stage === 'auth' && (
                 <div className="auth-panel">
                   <h2>Antes de seguir</h2>
-                  <p>Para sostener este encuentro sin mezclar vidas, necesito que entres con un correo. Si salís de esta pantalla, lo que escribiste acá no queda guardado.</p>
+                  <p>Para sostener este encuentro sin mezclar vidas, necesito que entres con un correo. Si preferís no hacerlo ahora, podés seguir explorando Fuente sin identificarte; este texto no se guarda.</p>
                   {magicLinkSent ? <p className="success-note">Te envié un enlace de acceso. Al volver, podés contármelo otra vez; LUMEN no habrá guardado este texto.</p> : (
                     <form onSubmit={sendMagicLink} className="email-form">
                       <label htmlFor="email">Tu correo</label>
                       <input id="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
                       <button className="primary-action" type="submit" disabled={busy}>{busy ? 'Enviando…' : 'Enviarme un enlace'}</button>
-                      <button className="secondary-action" type="button" onClick={() => setStage('home')}>Ahora no</button>
+                      <button className="secondary-action" type="button" onClick={declineIdentity}>Ahora no · explorar sin entrar</button>
                     </form>
                   )}
                 </div>
