@@ -19,6 +19,7 @@ jobs:
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
       - run: npx playwright install --with-deps chromium
-      - run: npm run verify
+      - name: Architecture + unit + lint + build + embryo regression
+        run: npm run verify
       - name: Certify live greenfield backend
         run: npm run test:live
