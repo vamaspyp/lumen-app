@@ -26,7 +26,6 @@ export default defineConfig([
     files: ['src/App.tsx'],
     rules: {
       'react-hooks/set-state-in-effect': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^Trajectory$' }],
     },
   },
 ])
