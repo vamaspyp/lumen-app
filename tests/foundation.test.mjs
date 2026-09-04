@@ -50,3 +50,16 @@ test('irrecoverable foundation and decision events have canonical names', async 
     assert.match(source, new RegExp(`'${event}'`))
   }
 })
+
+test('magic-link callback is canonicalized to an allowed origin root', async () => {
+  const auth = await readFile(join(GREENFIELD, 'application', 'auth.ts'), 'utf8')
+  const env = await readFile(join(ROOT, '.env.production'), 'utf8')
+
+  assert.match(auth, /function canonicalAuthRedirect/)
+  assert.match(auth, /url\.pathname = '\/'/)
+  assert.match(auth, /url\.search = ''/)
+  assert.match(auth, /url\.hash = ''/)
+  assert.match(auth, /emailRedirectTo: effectiveRedirect/)
+  assert.equal(env.includes('VITE_LUMEN_AUTH_REDIRECT_URL=http://localhost'), false)
+  assert.match(env, /VITE_LUMEN_AUTH_REDIRECT_URL=https:\/\/lumen-app-git-greenfield-v04-embryo-vamaspyps-projects\.vercel\.app/)
+})
