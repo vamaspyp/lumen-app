@@ -1,9 +1,12 @@
-import type { Session, User } from '@supabase/supabase-js'
-import { getGreenfieldSupabase } from '../adapters/supabase/client'
+import {
+  getGreenfieldSupabase,
+  type GreenfieldSession,
+  type GreenfieldUser,
+} from '../adapters/supabase/client'
 
 export type AuthSnapshot = {
-  session: Session | null
-  user: User | null
+  session: GreenfieldSession | null
+  user: GreenfieldUser | null
 }
 
 export async function getAuthSnapshot(): Promise<AuthSnapshot> {
