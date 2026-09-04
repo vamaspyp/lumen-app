@@ -6,7 +6,7 @@ export type GreenfieldUser = User
 
 let singleton: GreenfieldSupabase | null = null
 
-function env(name: 'VITE_SUPABASE_URL' | 'VITE_SUPABASE_ANON_KEY'): string {
+function env(name: 'VITE_SUPABASE_URL' | 'VITE_SUPABASE_PUBLISHABLE_KEY'): string {
   const value = import.meta.env[name]
   if (!value) throw new Error(`Missing ${name}`)
   return value
@@ -18,7 +18,7 @@ function env(name: 'VITE_SUPABASE_URL' | 'VITE_SUPABASE_ANON_KEY'): string {
  */
 export function getGreenfieldSupabase(): GreenfieldSupabase {
   if (!singleton) {
-    singleton = createClient(env('VITE_SUPABASE_URL'), env('VITE_SUPABASE_ANON_KEY'), {
+    singleton = createClient(env('VITE_SUPABASE_URL'), env('VITE_SUPABASE_PUBLISHABLE_KEY'), {
       auth: {
         persistSession: true,
         autoRefreshToken: true,

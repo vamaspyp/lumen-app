@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "additionalDirectories": [
-      "c:\\DEV\\lumen-app\\src",
-      "c:\\DEV\\lumen-app\\src\\lib"
-    ]
-  }
-}
