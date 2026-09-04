@@ -4,27 +4,17 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, greenfield-v04-s0]
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      # package.json no declara "engines"; se usa la versión de Node del
-      # entorno de desarrollo actual (v24) como punto de partida, no como
-      # política fija.
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
-
       - run: npm ci
-
       - run: npx playwright install --with-deps chromium
-
       - run: npm run verify
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}

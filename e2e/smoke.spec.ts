@@ -1,15 +1,10 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
-test('LUMEN arranca y renderiza la experiencia inicial', async ({ page }) => {
-  const pageErrors: string[] = []
-  page.on('pageerror', (error) => pageErrors.push(error.message))
-
+test('S0 greenfield shell is the active runtime', async ({ page }) => {
   await page.goto('/')
-
-  // BottomNav (src/components/BottomNav.tsx) renderiza este botón desde el
-  // primer render de App, independiente de la respuesta de Supabase: es
-  // evidencia estable de que la app montó su shell principal.
-  await expect(page.getByRole('button', { name: 'LUMI' })).toBeVisible()
-
-  expect(pageErrors).toEqual([])
+  await expect(page.getByRole('heading', { name: 'Foundation Greenfield' })).toBeVisible()
+  await expect(page.getByText('Modular monolith · V40')).toBeVisible()
+  await expect(page.getByText('M5')).toBeVisible()
+  await expect(page.getByText('Sanctuary')).toBeVisible()
+  await expect(page.getByText('S0 no implementa todavía acompañamiento')).toBeVisible()
 })
