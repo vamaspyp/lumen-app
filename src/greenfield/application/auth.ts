@@ -11,12 +11,6 @@ export type AuthSnapshot = {
   user: GreenfieldUser | null
 }
 
-function normalizeEmail(email: string): string {
-  const normalized = email.trim().toLowerCase()
-  if (!normalized || !normalized.includes('@')) throw new Error('A valid email is required')
-  return normalized
-}
-
 export async function getAuthSnapshot(): Promise<AuthSnapshot> {
   const supabase = getGreenfieldSupabase()
   const { data, error } = await supabase.auth.getSession()
@@ -24,38 +18,25 @@ export async function getAuthSnapshot(): Promise<AuthSnapshot> {
   return { session: data.session, user: data.session?.user ?? null }
 }
 
-export async function requestEmailCode(email: string): Promise<void> {
-  const normalized = normalizeEmail(email)
+export async function requestMagicLink(email: string, redirectTo?: string): Promise<void> {
+  const normalized = email.trim().toLowerCase()
+  if (!normalized || !normalized.includes('@')) throw new Error('A valid email is required')
+
+  const configuredRedirect = import.meta.env.VITE_LUMEN_AUTH_REDIRECT_URL?.trim()
+  const effectiveRedirect = configuredRedirect || redirectTo
   const traceId = newTraceId()
-  const { error } = await getGreenfieldSupabase().auth.signInWithOtp({ email: normalized })
-
-  if (error) {
-    emitOperationalLog('error', 'foundation.auth.email_otp.failed', traceId, { code: error.code })
-    throw error
-  }
-
-  emitOperationalLog('info', 'foundation.auth.email_otp.requested', traceId)
-}
-
-export async function verifyEmailCode(email: string, token: string): Promise<void> {
-  const normalized = normalizeEmail(email)
-  const cleanToken = token.trim()
-  if (!/^\d{6}$/.test(cleanToken)) throw new Error('El código debe tener 6 dígitos')
-
-  const traceId = newTraceId()
-  const { data, error } = await getGreenfieldSupabase().auth.verifyOtp({
+  const supabase = getGreenfieldSupabase()
+  const { error } = await supabase.auth.signInWithOtp({
     email: normalized,
-    token: cleanToken,
-    type: 'email',
+    options: effectiveRedirect ? { emailRedirectTo: effectiveRedirect } : undefined,
   })
 
   if (error) {
-    emitOperationalLog('error', 'foundation.auth.email_otp.verify_failed', traceId, { code: error.code })
+    emitOperationalLog('error', 'foundation.auth.magic_link.failed', traceId, { code: error.code })
     throw error
   }
-  if (!data.session || !data.user) throw new Error('No se pudo abrir una sesión con ese código')
 
-  emitOperationalLog('info', 'foundation.auth.email_otp.verified', traceId)
+  emitOperationalLog('info', 'foundation.auth.magic_link.requested', traceId)
 }
 
 export async function signOut(): Promise<void> {
