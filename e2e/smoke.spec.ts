@@ -117,7 +117,7 @@ test('authenticated embryo exposes the five canonical living spaces', async ({ p
   await page.getByRole('button', { name: 'Tejido' }).click()
   await expect(page.getByRole('heading', { name: 'La vida también puede circular entre personas.' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Crear un Círculo' })).toBeVisible()
-  await expect(page.getByText('Todavía no pertenecés a ningún Círculo. Tejido puede empezar pequeño.')).toBeVisible()
+  await expect.poll(() => calls.includes('lumen_s5_snapshot')).toBe(true)
 
   expect(calls).toContain('lumen_bootstrap_person')
   expect(calls).toContain('lumen_s2_snapshot')
