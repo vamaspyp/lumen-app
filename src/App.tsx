@@ -1,4 +1,5 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import type { FormEvent } from 'react'
 import './App.css'
 import { getAuthSnapshot, requestMagicLink, signOut } from './greenfield/application/auth'
 import {
