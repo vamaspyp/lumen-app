@@ -1,6 +1,8 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient, type Session, type SupabaseClient, type User } from '@supabase/supabase-js'
 
 export type GreenfieldSupabase = SupabaseClient
+export type GreenfieldSession = Session
+export type GreenfieldUser = User
 
 let singleton: GreenfieldSupabase | null = null
 
