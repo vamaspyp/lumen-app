@@ -1,10 +1,17 @@
 import { expect, test } from '@playwright/test'
 
-test('S0 greenfield shell is the active runtime', async ({ page }) => {
+test('S1 Home exposes free expression before progressive authentication', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Foundation Greenfield' })).toBeVisible()
-  await expect(page.getByText('Modular monolith · V40')).toBeVisible()
-  await expect(page.getByText('M5')).toBeVisible()
-  await expect(page.getByText('Sanctuary')).toBeVisible()
-  await expect(page.getByText('S0 no implementa todavía acompañamiento')).toBeVisible()
+
+  await expect(page.getByRole('heading', { name: 'Estoy acá.' })).toBeVisible()
+  await expect(page.getByLabel('Lo que te está pasando')).toBeVisible()
+  await expect(page.getByText('No hace falta elegir una categoría.')).toBeVisible()
+
+  await page.getByLabel('Lo que te está pasando').fill('Tengo demasiadas cosas en la cabeza y no sé por dónde empezar.')
+  await page.getByRole('button', { name: 'Ver qué podría ayudarme' }).click()
+
+  await expect(page.getByRole('heading', { name: 'Antes de seguir' })).toBeVisible()
+  await expect(page.getByText('sin mezclar vidas')).toBeVisible()
+  await expect(page.getByLabel('Tu correo')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Ahora no' })).toBeVisible()
 })
