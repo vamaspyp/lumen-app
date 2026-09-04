@@ -44,7 +44,7 @@ function bootstrapState() {
 }
 
 function health() {
-  return { state: 'operational', slices: { s0: 'closed', s1: 'closed', s2: 'closed', s3: 'closed', s4: 'closed', s5: 'closed', s6: 'closed', s7: 'integrating' }, source: { active_possibilities: 16, coverage_cells: 28, semantic_types: 5 }, evolution: { source_policy_version: 1 }, operations: { providers_ready: 2 }, prelaunch_reset_required: true }
+  return { state: 'operational', release_contract: 'embryo.v0.4', slices: { s0: 'closed', s1: 'closed', s2: 'closed', s3: 'closed', s4: 'closed', s5: 'closed', s6: 'closed', s7: 'closed' }, source: { active_possibilities: 16, coverage_cells: 28, semantic_types: 5 }, evolution: { source_policy_version: 1 }, operations: { providers_ready: 0 }, prelaunch_reset_required: true }
 }
 
 async function fulfillJson(route: Route, body: unknown) {
@@ -87,7 +87,7 @@ test('public Fuente is explorable without identity and exposes provenance', asyn
   const calls: string[] = []
   await installEmbryoRpcMocks(page, calls)
   await page.goto('/')
-  await page.getByRole('button', { name: 'Fuente' }).click()
+  await page.getByRole('button', { name: 'Fuente', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Algo del patrimonio humano, cuando haga falta.' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'En tiempos de estrés, haz lo que importa' })).toBeVisible()
   await expect(page.getByText('Origen: World Health Organization')).toBeVisible()
@@ -107,7 +107,7 @@ test('authenticated embryo exposes the five canonical living spaces', async ({ p
   await expect(page.getByRole('heading', { name: 'Dirección sin convertir la vida en un plan.' })).toBeVisible()
   await expect(page.getByLabel('Un Faro que hoy te importe')).toBeVisible()
 
-  await page.getByRole('button', { name: 'Fuente' }).click()
+  await page.getByRole('button', { name: 'Fuente', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Algo del patrimonio humano, cuando haga falta.' })).toBeVisible()
 
   await page.getByRole('button', { name: 'Santuario' }).click()
@@ -117,6 +117,7 @@ test('authenticated embryo exposes the five canonical living spaces', async ({ p
   await page.getByRole('button', { name: 'Tejido' }).click()
   await expect(page.getByRole('heading', { name: 'La vida también puede circular entre personas.' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Crear un Círculo' })).toBeVisible()
+  await expect(page.getByText('Todavía no pertenecés a ningún Círculo. Tejido puede empezar pequeño.')).toBeVisible()
 
   expect(calls).toContain('lumen_bootstrap_person')
   expect(calls).toContain('lumen_s2_snapshot')
