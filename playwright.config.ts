@@ -17,7 +17,8 @@ export default defineConfig({
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
   ],
   webServer: {
-    command: `npm run dev -- --port ${PORT} --strictPort`,
+    // verify builds immediately before E2E; test the deployable artifact, not Vite dev.
+    command: `npm run preview -- --port ${PORT} --strictPort`,
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,
