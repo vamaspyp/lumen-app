@@ -18,12 +18,23 @@ export async function getAuthSnapshot(): Promise<AuthSnapshot> {
   return { session: data.session, user: data.session?.user ?? null }
 }
 
+function canonicalAuthRedirect(candidate?: string): string | undefined {
+  const value = candidate?.trim()
+  if (!value) return undefined
+
+  const url = new URL(value)
+  url.pathname = '/'
+  url.search = ''
+  url.hash = ''
+  return url.toString()
+}
+
 export async function requestMagicLink(email: string, redirectTo?: string): Promise<void> {
   const normalized = email.trim().toLowerCase()
   if (!normalized || !normalized.includes('@')) throw new Error('A valid email is required')
 
-  const configuredRedirect = import.meta.env.VITE_LUMEN_AUTH_REDIRECT_URL?.trim()
-  const effectiveRedirect = configuredRedirect || redirectTo
+  const configuredRedirect = import.meta.env.VITE_LUMEN_AUTH_REDIRECT_URL
+  const effectiveRedirect = canonicalAuthRedirect(configuredRedirect || redirectTo)
   const traceId = newTraceId()
   const supabase = getGreenfieldSupabase()
   const { error } = await supabase.auth.signInWithOtp({
