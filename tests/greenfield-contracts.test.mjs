@@ -26,6 +26,14 @@ test('Supabase SDK is confined to vendor adapter', async () => {
   }
 })
 
+test('greenfield Supabase config is namespaced away from legacy variables', async () => {
+  const source = await readFile(join(GREENFIELD, 'adapters', 'supabase', 'client.ts'), 'utf8')
+  assert.match(source, /VITE_LUMEN_SUPABASE_URL/)
+  assert.match(source, /VITE_LUMEN_SUPABASE_PUBLISHABLE_KEY/)
+  assert.doesNotMatch(source, /env\('VITE_SUPABASE_URL'\)/)
+  assert.doesNotMatch(source, /env\('VITE_SUPABASE_(?:ANON_KEY|PUBLISHABLE_KEY)'\)/)
+})
+
 test('locale and surface contracts keep semantic identity independent from display copy', async () => {
   const source = await readFile(join(GREENFIELD, 'kernel', 'i18n.ts'), 'utf8')
   for (const token of ['LocaleContext', 'SurfaceKind', 'SemanticAction']) assert.match(source, new RegExp(token))
