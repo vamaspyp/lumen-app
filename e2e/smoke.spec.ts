@@ -3,6 +3,7 @@ import { expect, test, type Page, type Route } from '@playwright/test'
 const PROJECT_REF = 'vbuixagaguasejputubp'
 const SUPABASE_URL = `https://${PROJECT_REF}.supabase.co`
 const STORAGE_KEY = `sb-${PROJECT_REF}-auth-token`
+const EMBRYO_CALLBACK = 'https://lumen-app-git-greenfield-v04-embryo-vamaspyps-projects.vercel.app'
 
 async function installSyntheticSession(page: Page) {
   const expiresAt = Math.floor(Date.now() / 1000) + 3600
@@ -81,6 +82,43 @@ test('Home exposes free expression before progressive authentication', async ({ 
   await expect(page.getByRole('heading', { name: 'Antes de seguir' })).toBeVisible()
   await expect(page.getByText('sin mezclar vidas')).toBeVisible()
   await expect(page.getByLabel('Tu correo')).toBeVisible()
+})
+
+test('declining identity exits the gate into public Fuente instead of looping', async ({ page }) => {
+  const calls: string[] = []
+  await installEmbryoRpcMocks(page, calls)
+  await page.goto('/')
+  await page.getByLabel('Lo que te está pasando').fill('Quiero ordenar una decisión.')
+  await page.getByRole('button', { name: 'Ver qué podría ayudarme' }).click()
+  await page.getByRole('button', { name: 'Ahora no · explorar sin entrar' }).click()
+  await expect(page.getByRole('heading', { name: 'Algo del patrimonio humano, cuando haga falta.' })).toBeVisible()
+  await page.getByRole('button', { name: 'Ahora', exact: true }).click()
+  await expect(page.getByLabel('Lo que te está pasando')).toHaveValue('')
+})
+
+test('magic-link request uses the stable embryo callback rather than an ephemeral preview origin', async ({ page }) => {
+  let redirectTo = ''
+  await page.route(`${SUPABASE_URL}/auth/v1/otp**`, async (route) => {
+    const url = new URL(route.request().url())
+    redirectTo = url.searchParams.get('redirect_to') ?? ''
+    await fulfillJson(route, {})
+  })
+  await page.goto('/')
+  await page.getByLabel('Lo que te está pasando').fill('Necesito una pausa.')
+  await page.getByRole('button', { name: 'Ver qué podría ayudarme' }).click()
+  await page.getByLabel('Tu correo').fill('smoke@example.invalid')
+  await page.getByRole('button', { name: 'Enviarme un enlace' }).click()
+  await expect(page.getByText('Te envié un enlace de acceso.')).toBeVisible()
+  expect(redirectTo).toBe(EMBRYO_CALLBACK)
+})
+
+test('private gates remain semantically distinct before authentication', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Santuario' }).click()
+  await expect(page.getByRole('heading', { name: 'Santuario necesita saber que sos vos.' })).toBeVisible()
+  await page.getByRole('button', { name: 'Tejido' }).click()
+  await expect(page.getByRole('heading', { name: 'Tejido necesita saber que sos vos.' })).toBeVisible()
+  await expect(page.getByText('Los Círculos son privados y por invitación.')).toBeVisible()
 })
 
 test('public Fuente is explorable without identity and exposes provenance', async ({ page }) => {
