@@ -18,3 +18,6 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run verify
+      - name: Certify live greenfield backend
+        if: github.ref == 'refs/heads/greenfield-v04-s0'
+        run: npm run test:live
