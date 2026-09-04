@@ -32,7 +32,6 @@ import {
   type ProactivitySnapshot,
   type SanctuaryEntry,
   type SourceItem,
-  type Trajectory,
 } from './greenfield/application/embryo'
 import {
   accompanyMoment,
