@@ -42,8 +42,8 @@ assert.deepEqual(embryo?.slices, {
   s0: 'closed', s1: 'closed', s2: 'closed', s3: 'closed',
   s4: 'closed', s5: 'closed', s6: 'closed', s7: 'closed',
 })
-assert.ok(embryo?.source?.active_possibilities >= 60, 'A37 Source must preserve at least 60 active possibilities')
-assert.ok(embryo?.source?.coverage_cells >= 100, 'A37 Source must preserve broad Spanish coverage')
+assert.ok(embryo?.source?.active_possibilities >= 60, 'A37/A38 Source must preserve at least 60 active possibilities')
+assert.ok(embryo?.source?.coverage_cells >= 100, 'A37/A38 Source must preserve broad Spanish coverage')
 assert.ok(embryo?.source?.semantic_types >= 4, 'Source must expose several semantic help types')
 assert.equal(embryo?.prelaunch_reset_required, true, 'Synthetic construction data must still be reset before real users')
 
@@ -69,19 +69,24 @@ assert.ok(providers.size >= 5, `Expected diverse Source provenance, got ${provid
 assert.ok(helpTypes.size >= 4, `Expected several semantic help types, got ${helpTypes.size}`)
 assert.ok(source.some((item) => typeof item?.content?.external_url === 'string'), 'Source must include at least one traceable external resource')
 
-for (const need of ['grief', 'sleep', 'anxiety', 'relationship_repair', 'self_compassion', 'financial_calm', 'caregiving']) {
+const experientialNeeds = [
+  'grief', 'sleep', 'anxiety', 'relationship_repair', 'boundaries', 'emotion_regulation',
+  'self_compassion', 'confidence', 'habit', 'work_stress', 'financial_calm', 'caregiving',
+  'change_transition', 'energy', 'focus', 'meaning', 'connection', 'agency', 'clarity', 'pause',
+]
+for (const need of experientialNeeds) {
   const { data, error } = await supabase.rpc('lumen_source_discover', {
     p_need_key: need,
     p_help_type: null,
     p_locale: 'es-AR',
     p_limit: 10,
   })
-  assert.equal(error, null, `A37 Source discovery failed for ${need}: ${error?.message ?? 'unknown'}`)
-  assert.ok(Array.isArray(data) && data.length >= 1, `A37 must keep Spanish coverage for ${need}`)
+  assert.equal(error, null, `A38 Source discovery failed for ${need}: ${error?.message ?? 'unknown'}`)
+  assert.ok(Array.isArray(data) && data.length >= 1, `A38 must keep Spanish coverage for ${need}`)
 }
 
 const { data: privateData, error: privateError } = await supabase.rpc('lumen_s2_snapshot')
 assert.equal(privateData, null, 'Anonymous callers must never receive personal continuity data')
 assert.ok(privateError, 'Anonymous personal RPC must be rejected')
 
-console.log(`Embryo live integration PASS: health=${embryo.state}; source-active=${embryo.source.active_possibilities}; coverage=${embryo.source.coverage_cells}; capped-discovery=${source.length}; providers=${providers.size}; types=${helpTypes.size}; anon-personal=blocked`)
+console.log(`Embryo live integration PASS: health=${embryo.state}; source-active=${embryo.source.active_possibilities}; coverage=${embryo.source.coverage_cells}; experiential-needs=${experientialNeeds.length}; capped-discovery=${source.length}; providers=${providers.size}; types=${helpTypes.size}; anon-personal=blocked`)
