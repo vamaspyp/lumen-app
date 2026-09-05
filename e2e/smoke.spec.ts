@@ -3,7 +3,7 @@ import { expect, test, type Page, type Route } from '@playwright/test'
 const PROJECT_REF = 'vbuixagaguasejputubp'
 const SUPABASE_URL = `https://${PROJECT_REF}.supabase.co`
 const STORAGE_KEY = `sb-${PROJECT_REF}-auth-token`
-const EMBRYO_CALLBACK = 'https://lumen-app-git-greenfield-v04-embryo-vamaspyps-projects.vercel.app'
+const EMBRYO_CALLBACK = 'https://lumen-app-git-greenfield-v04-embryo-vamaspyps-projects.vercel.app/'
 
 async function installSyntheticSession(page: Page) {
   const expiresAt = Math.floor(Date.now() / 1000) + 3600
@@ -96,7 +96,7 @@ test('declining identity exits the gate into public Fuente instead of looping', 
   await expect(page.getByLabel('Lo que te está pasando')).toHaveValue('')
 })
 
-test('magic-link request uses the stable embryo callback rather than an ephemeral preview origin', async ({ page }) => {
+test('magic-link request uses the canonical stable embryo callback rather than an ephemeral preview origin', async ({ page }) => {
   let redirectTo = ''
   await page.route(`${SUPABASE_URL}/auth/v1/otp**`, async (route) => {
     const url = new URL(route.request().url())
