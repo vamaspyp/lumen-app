@@ -22,9 +22,7 @@ const key = env.VITE_LUMEN_SUPABASE_PUBLISHABLE_KEY
 assert.match(url ?? '', /^https:\/\/vbuixagaguasejputubp\.supabase\.co$/)
 assert.match(key ?? '', /^sb_publishable_/)
 
-const authSettings = await fetch(`${url}/auth/v1/settings`, {
-  headers: { apikey: key },
-})
+const authSettings = await fetch(`${url}/auth/v1/settings`, { headers: { apikey: key } })
 assert.equal(authSettings.status, 200, 'Supabase Auth settings endpoint must be reachable with publishable key')
 
 const supabase = createClient(url, key, {
@@ -44,8 +42,8 @@ assert.deepEqual(embryo?.slices, {
   s0: 'closed', s1: 'closed', s2: 'closed', s3: 'closed',
   s4: 'closed', s5: 'closed', s6: 'closed', s7: 'closed',
 })
-assert.ok(embryo?.source?.active_possibilities >= 16, 'Source must expose at least 16 active possibilities')
-assert.ok(embryo?.source?.coverage_cells >= 18, 'Source coverage must remain above the embryo floor')
+assert.ok(embryo?.source?.active_possibilities >= 60, 'A37 Source must preserve at least 60 active possibilities')
+assert.ok(embryo?.source?.coverage_cells >= 100, 'A37 Source must preserve broad Spanish coverage')
 assert.ok(embryo?.source?.semantic_types >= 4, 'Source must expose several semantic help types')
 assert.equal(embryo?.prelaunch_reset_required, true, 'Synthetic construction data must still be reset before real users')
 
@@ -57,8 +55,7 @@ const { data: source, error: sourceError } = await supabase.rpc('lumen_source_di
 })
 assert.equal(sourceError, null, `Public Source discovery failed: ${sourceError?.message ?? 'unknown'}`)
 assert.ok(Array.isArray(source), 'Source discovery must return an array')
-assert.ok(source.length >= 16, `Expected at least 16 discoverable possibilities, got ${source.length}`)
-assert.ok(source.length <= 50, 'Public Source discovery must enforce its hard result cap')
+assert.equal(source.length, 50, 'Broad discovery should reach the public hard cap after A37')
 
 const allowedSourceKeys = new Set(['help_id', 'canonical_code', 'help_type', 'lifecycle', 'risk_class', 'evidence_class', 'title', 'summary', 'content', 'duration_minutes', 'energy', 'provider', 'needs', 'localization_provenance'])
 for (const item of source) {
@@ -68,12 +65,23 @@ for (const item of source) {
 
 const providers = new Set(source.map((item) => item?.provider?.name).filter(Boolean))
 const helpTypes = new Set(source.map((item) => item?.help_type).filter(Boolean))
-assert.ok(providers.size >= 4, `Expected diverse Source provenance, got ${providers.size} providers`)
+assert.ok(providers.size >= 5, `Expected diverse Source provenance, got ${providers.size} providers in capped discovery`)
 assert.ok(helpTypes.size >= 4, `Expected several semantic help types, got ${helpTypes.size}`)
 assert.ok(source.some((item) => typeof item?.content?.external_url === 'string'), 'Source must include at least one traceable external resource')
+
+for (const need of ['grief', 'sleep', 'anxiety', 'relationship_repair', 'self_compassion', 'financial_calm', 'caregiving']) {
+  const { data, error } = await supabase.rpc('lumen_source_discover', {
+    p_need_key: need,
+    p_help_type: null,
+    p_locale: 'es-AR',
+    p_limit: 10,
+  })
+  assert.equal(error, null, `A37 Source discovery failed for ${need}: ${error?.message ?? 'unknown'}`)
+  assert.ok(Array.isArray(data) && data.length >= 1, `A37 must keep Spanish coverage for ${need}`)
+}
 
 const { data: privateData, error: privateError } = await supabase.rpc('lumen_s2_snapshot')
 assert.equal(privateData, null, 'Anonymous callers must never receive personal continuity data')
 assert.ok(privateError, 'Anonymous personal RPC must be rejected')
 
-console.log(`Embryo live integration PASS: health=${embryo.state}; source=${source.length}; providers=${providers.size}; types=${helpTypes.size}; anon-personal=blocked`)
+console.log(`Embryo live integration PASS: health=${embryo.state}; source-active=${embryo.source.active_possibilities}; coverage=${embryo.source.coverage_cells}; capped-discovery=${source.length}; providers=${providers.size}; types=${helpTypes.size}; anon-personal=blocked`)
