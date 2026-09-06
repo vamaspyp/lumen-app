@@ -10,6 +10,7 @@ const fail = (message) => {
 
 const context = json('governance/conduction-context.json');
 const snapshot = json('governance/pov-snapshot.json');
+const integrity = json('governance/canonical-integrity-contracts.json');
 const gate = read('governance/CONDUCTION_GATE.md');
 
 if (context.fail_closed !== true) fail('context must be fail-closed');
@@ -51,6 +52,48 @@ for (const path of ['AGENTS.md', 'CLAUDE.md', '.github/copilot-instructions.md']
   if (!/FAIL CLOSED/i.test(text)) fail(`${path} does not declare fail-closed behavior`);
 }
 
+// A44: accumulated no-loss gate. Local ACTO completion is never enough if a
+// birth-critical canonical contract remains unresolved. During the certification
+// ACTO itself, unresolved contracts are allowed so they can be repaired or
+// escalated. Every other ACTO fails closed until the certification is clean.
+if (integrity.scope !== 'embryo_birth') fail('canonical integrity scope must be embryo_birth');
+if (!Array.isArray(integrity.authority_set) || integrity.authority_set.length === 0) fail('canonical integrity authority_set missing');
+for (const authorityId of integrity.authority_set) {
+  if (!activeAuthorities.has(authorityId)) fail(`canonical integrity authority ${authorityId} is not VIGENTE`);
+}
+
+const allowedContractStates = new Set([
+  'CONFORME',
+  'EXPRESION_EMBRIONARIA_ACEPTABLE',
+  'GAP_REAL',
+  'DECISION_DE_AUTORIDAD_PENDIENTE',
+]);
+for (const contract of integrity.contracts ?? []) {
+  if (!contract.id) fail('canonical integrity contract without id');
+  if (!allowedContractStates.has(contract.status)) fail(`canonical integrity contract ${contract.id} has invalid status ${contract.status}`);
+  if (!Array.isArray(contract.authority) || contract.authority.length === 0) fail(`canonical integrity contract ${contract.id} has no authority`);
+  for (const authorityId of contract.authority) {
+    if (!activeAuthorities.has(authorityId)) fail(`contract ${contract.id} cites non-vigente authority ${authorityId}`);
+  }
+}
+
+const blockingContracts = (integrity.contracts ?? []).filter(
+  (contract) => contract.birth_required === true &&
+    ['GAP_REAL', 'DECISION_DE_AUTORIDAD_PENDIENTE'].includes(contract.status)
+);
+const certificationAct = String(integrity.certification_act ?? '');
+const currentAct = String(context.act?.id ?? '');
+if (!certificationAct) fail('canonical integrity certification_act missing');
+if (blockingContracts.length > 0 && currentAct !== certificationAct) {
+  fail(`birth-critical canonical integrity blockers remain: ${blockingContracts.map((c) => c.id).join(', ')}`);
+}
+if (integrity.certification_status === 'CERTIFIED' && blockingContracts.length > 0) {
+  fail('canonical integrity cannot be CERTIFIED while birth-critical blockers remain');
+}
+if (currentAct !== certificationAct && integrity.certification_status !== 'CERTIFIED') {
+  fail(`canonical integrity must be CERTIFIED before leaving ${certificationAct}`);
+}
+
 if (process.env.GITHUB_EVENT_NAME === 'push') {
   const message = execFileSync('git', ['log', '-1', '--pretty=%B'], { encoding: 'utf8' });
   const actId = String(context.act?.id ?? '').toUpperCase();
@@ -59,4 +102,4 @@ if (process.env.GITHUB_EVENT_NAME === 'push') {
   }
 }
 
-console.log(`CONDUCTION_GATE_PASS focus=${context.focus.id} act=${context.act.id} authorities=${[...activeAuthorities].join(',')} snapshot_age_h=${ageHours.toFixed(2)}`);
+console.log(`CONDUCTION_GATE_PASS focus=${context.focus.id} act=${context.act.id} authorities=${[...activeAuthorities].join(',')} integrity_blockers=${blockingContracts.length} snapshot_age_h=${ageHours.toFixed(2)}`);
