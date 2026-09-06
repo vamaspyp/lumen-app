@@ -4,8 +4,8 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "modified_time": "2026-09-06T01:01:51.983Z",
-    "verified_at": "2026-09-05T22:08:00-03:00",
+    "modified_time": "2026-09-06T01:23:17.419Z",
+    "verified_at": "2026-09-05T22:23:20-03:00",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {
@@ -16,7 +16,7 @@
   "act": {
     "id": "A43",
     "name": "Conduction Gate · ejecución IA obligatoriamente gobernada",
-    "status": "BLOQUEADO",
+    "status": "EN CURSO",
     "purpose": "Convertir el Sistema de Conducción en puerta operativa fail-closed para cualquier IA que analice o ejecute cambios materiales sobre VA+LUMEN, de modo que ningún trabajo oficial pueda avanzar sin FOCO, ACTO, autoridad vigente y DoD resueltos.",
     "dod": "Gate canónico versionado y referenciado por agentes; contexto de conducción machine-readable con FOCO/ACTO/autoridades/DoD; validación automática fail-closed en repo/CI; instrucciones de bootstrap para agentes comunes sin duplicar doctrina; toda mutación oficial exige contexto válido; desvíos detectables y bloqueantes; evidencia de limitaciones técnicas restantes; CI PASS y activo operacional registrado."
   },
@@ -35,6 +35,7 @@
     "source_is_private_pov": true,
     "historical_sources_are_non_authoritative": true,
     "implementation_is_not_authority": true,
-    "fail_closed": true
+    "fail_closed": true,
+    "snapshot_max_age_hours": 72
   }
 }
