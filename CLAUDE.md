@@ -2,28 +2,30 @@
 
 This repository branch is the active greenfield embryo. Legacy code, data models, documents and compatibility constraints are NOT authority and must not be reintroduced.
 
-## Authority order
-1. Vision/Mission and Modelo C V0.4 (V37)
-2. Especificación Técnico-Funcional (V39)
-3. Arquitectura Greenfield (V40)
-4. Constitución Operativa y Guardrails (V41)
-5. Diseño Canónico de Experiencia y Comportamiento (V43)
-6. Current POV / Sistema de Conducción for what to execute now
+## Mandatory bootstrap
 
-Agents must read the relevant current authorities in Google Drive before material changes. This file is a pointer and enforcement summary, not a replacement for V41/V43.
+Before any material analysis, design, recommendation or mutation:
+
+1. Read `governance/CONDUCTION_GATE.md`.
+2. Resolve the current POV / Sistema de Conducción first: FOCO, ACTO/DoD and applicable authorities in ACTIVOS.
+3. Verify `governance/conduction-context.json` matches that real ACTO.
+4. Inspect current repo/DB/infra reality before changing it.
+5. FAIL CLOSED if authority, ACTO, contradictions, permissions or technical reality cannot be resolved.
+
+Memory, chat history, historical/SUPERADO documents and current implementation are never substitutes for authority resolution. The implementation is reality to contrast, not authority by itself.
 
 ## Non-negotiable execution invariants
+
+- V41 and V42 apply through the current POV; do not duplicate or reinterpret their doctrine here.
 - Mission before feature, growth or technical convenience.
 - Person sovereignty, consent, privacy, autonomy and NO_MATCH before invented certainty.
-- Greenfield means zero business dependency on legacy: no imports, FKs, views, functions, triggers, contracts or runtime coupling.
-- Domain/application code is vendor-neutral. Supabase, AI providers and surfaces live behind adapters.
-- Semantic identity is independent of display language; culture != language; web != LUMEN.
-- LUMI is relational presence, not omnipresent UI. Surface components render semantic contracts.
-- Every meaningful interaction has an explicit hypothesis of value and returns evidence when appropriate.
-- Learning/evolution is active from first real life: evidence -> versioned claim/rule -> change/rollback -> new evidence.
-- Event Ledger preserves irrecoverable decision context without becoming a dump of intimate data.
+- Greenfield means zero business dependency on legacy.
+- Domain/application code remains vendor-neutral; providers and surfaces stay behind adapters.
+- Semantic identity remains independent of display language/culture/surface.
 - Sensitive operations are least-privilege/server-only; user-owned rows use RLS.
-- No microservices or infrastructure complexity without evidence that the current modular monolith boundary is insufficient.
+- No infrastructure complexity without evidence.
+- Never claim execution, state, permissions or results that were not verified.
 
-## Execution discipline
-Before closing an ACTO: identify applicable V41 guardrails, run tests/security checks, verify Preview/real state, record evidence, and update the POV. Never claim a fact that was not checked in the real repo/DB/deployment.
+## Closure
+
+Before closing an ACTO, satisfy its DoD, applicable V41/V42 guardrails, tests/security/live checks and record evidence back in the POV. A green build alone never closes an ACTO.
