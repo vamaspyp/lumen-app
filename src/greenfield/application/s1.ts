@@ -12,6 +12,7 @@ export type HelpPossibility = {
   duration_minutes: number | null
   energy: string | null
   detail: Record<string, unknown>
+  from_own_repertoire?: boolean
 }
 
 export type SemanticBlock = Record<string, unknown> & {
@@ -42,6 +43,11 @@ export type S1Scene = {
     intent_key?: string | null
     confidence?: number | null
     uncertainty_key?: string | null
+  }
+  continuity?: {
+    memory_used?: boolean
+    own_repertoire_reused?: boolean
+    active_trajectory_count?: number
   }
 }
 
