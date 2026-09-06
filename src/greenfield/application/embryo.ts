@@ -39,6 +39,15 @@ export type SanctuaryEntry = Readonly<{
   content: string
   source_help_id: string | null
   created_at: string
+  updated_at?: string
+}>
+
+export type SanctuaryExport = Readonly<{
+  export_version: string
+  generated_at: string
+  sanctuary_entries: Array<Record<string, unknown>>
+  trajectories: Array<Record<string, unknown>>
+  personal_repertoire: Array<Record<string, unknown>>
 }>
 
 export type SourceItem = Readonly<{
@@ -104,6 +113,11 @@ export type ProactivitySnapshot = Readonly<{
 export type EmbryoHealth = Readonly<{
   state: 'forming' | 'operational'
   slices: Record<string, string>
+  canonical_integrity?: {
+    status: 'uncertified' | 'certified' | string
+    version: number | null
+    authority_set: string[]
+  }
   source: {
     active_possibilities: number
     coverage_cells: number
@@ -145,6 +159,19 @@ export function saveSanctuary(entryKind: SanctuaryEntry['entry_kind'], title: st
     p_source_help_id: sourceHelpId ?? null,
     p_trace_id: newTraceId(),
   })
+}
+
+export function updateSanctuary(entryId: string, title: string, content: string) {
+  return rpc<{ entry_id: string; updated: boolean }>('lumen_s2_update_sanctuary', {
+    p_entry_id: entryId,
+    p_title: title || null,
+    p_content: content,
+    p_trace_id: newTraceId(),
+  })
+}
+
+export function exportSanctuary(): Promise<SanctuaryExport> {
+  return rpc('lumen_s2_export_sanctuary')
 }
 
 export function deleteSanctuary(entryId: string) {
