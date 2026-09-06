@@ -2,12 +2,26 @@ name: CI
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, greenfield-v04-embryo]
   push:
     branches: [main, greenfield-v04-s0, greenfield-v04-s1, greenfield-v04-embryo]
 
 jobs:
+  conduction-gate:
+    name: Conduction Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify live-POV attestation and governed execution context
+        run: node scripts/check-conduction-gate.mjs
+
   verify:
+    needs: conduction-gate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
