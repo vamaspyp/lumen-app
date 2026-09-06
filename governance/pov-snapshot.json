@@ -4,8 +4,8 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "modified_time": "2026-09-06T01:23:17.419Z",
-    "verified_at": "2026-09-05T22:23:20-03:00",
+    "modified_time": "2026-09-06T18:11:14.154Z",
+    "verified_at": "2026-09-06T15:12:00-03:00",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {
@@ -14,11 +14,11 @@
     "status": "ACTIVO"
   },
   "act": {
-    "id": "A43",
-    "name": "Conduction Gate · ejecución IA obligatoriamente gobernada",
+    "id": "A44",
+    "name": "Certificación transversal de integridad canónica del Embrión",
     "status": "EN CURSO",
-    "purpose": "Convertir el Sistema de Conducción en puerta operativa fail-closed para cualquier IA que analice o ejecute cambios materiales sobre VA+LUMEN, de modo que ningún trabajo oficial pueda avanzar sin FOCO, ACTO, autoridad vigente y DoD resueltos.",
-    "dod": "Gate canónico versionado y referenciado por agentes; contexto de conducción machine-readable con FOCO/ACTO/autoridades/DoD; validación automática fail-closed en repo/CI; instrucciones de bootstrap para agentes comunes sin duplicar doctrina; toda mutación oficial exige contexto válido; desvíos detectables y bloqueantes; evidencia de limitaciones técnicas restantes; CI PASS y activo operacional registrado."
+    "purpose": "Certificar que el organismo materializado representa y ejecuta sin pérdida material las autoridades vigentes V37/V39/V40/V41/V43 antes de primeras vidas reales, y corregir el mecanismo de cierre que permitió conformidad local sin garantizar conformidad acumulada.",
+    "dod": "Existe matriz exhaustiva contrato canónico→datos→backend→experiencia→evidencia/tests sobre la realidad live; cada contrato queda CONFORME / EXPRESIÓN EMBRIONARIA ACEPTABLE / GAP REAL / DECISIÓN DE AUTORIDAD PENDIENTE con fundamento y evidencia; todo GAP REAL que afecte nacimiento se corrige y deja regresión o se escala a decisión humana explícita; se verifica especialmente representación de Vida/Momento/Trayectoria, evidencia irrecuperable, Motor↔continuidad, Santuario, Fuente, Tejido, Knowledge/Evolution, safety/privacy y experiencia V43; el Sistema incorpora gate de no-pérdida acumulada para que ningún ACTO cierre sólo por DoD local cuando degrada contratos superiores; CI/live PASS; A40 sólo retoma después del dictamen."
   },
   "active_authorities": [
     {"id":"V3","name":"Sistema de Conducción","state":"VIGENTE"},
@@ -29,7 +29,7 @@
     {"id":"V42","name":"Ficha Transversal · Guardrails Obligatorios para Todo Agente · V1.1","state":"VIGENTE"},
     {"id":"V43","name":"Diseño Canónico de Experiencia y Comportamiento del Embrión V1.0","state":"VIGENTE"},
     {"id":"V44","name":"Runtime Greenfield S0","state":"VIGENTE"},
-    {"id":"V45","name":"Conduction Gate v0.1","state":"VIGENTE"}
+    {"id":"V45","name":"Conduction Gate v0.2","state":"VIGENTE"}
   ],
   "integrity": {
     "source_is_private_pov": true,
