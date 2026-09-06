@@ -134,10 +134,9 @@
     {
       "id": "C18_ACCUMULATED_NO_LOSS_GATE",
       "birth_required": true,
-      "status": "GAP_REAL",
+      "status": "CONFORME",
       "authority": ["V41", "V42"],
-      "evidence": ["A28/A30 local DoDs closed while superior contracts remained partially unverified", "A44 manifest created"],
-      "gap": "Conduction Gate todavía debe incorporar este manifest como bloqueo acumulado, no sólo validar FOCO/ACTO/autoridad."
+      "evidence": ["A28/A30 local DoDs exposed the original failure mode", "governance/canonical-integrity-contracts.json", "scripts/check-conduction-gate.mjs enforces birth-critical blockers across ACTOS and allows remediation only inside A44"]
     }
   ]
 }
