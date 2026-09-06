@@ -11,6 +11,7 @@ import {
   createTrajectory,
   deleteSanctuary,
   discoverSource,
+  exportSanctuary,
   getContinuitySnapshot,
   getEmbryoHealth,
   getProactivitySnapshot,
@@ -25,6 +26,7 @@ import {
   setMemory,
   setProactivity,
   shareHelp,
+  updateSanctuary,
   updateTrajectory,
   type Circle,
   type ContinuitySnapshot,
@@ -311,6 +313,9 @@ function SanctuarySpace() {
   const [entries, setEntries] = useState<SanctuaryEntry[]>([])
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [editId, setEditId] = useState<string | null>(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editContent, setEditContent] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -341,6 +346,43 @@ function SanctuarySpace() {
     })
   }
 
+  const startEdit = (entry: SanctuaryEntry) => {
+    setEditId(entry.entry_id)
+    setEditTitle(entry.title ?? '')
+    setEditContent(entry.content)
+  }
+
+  const saveEdit = () => {
+    if (!editId || !editContent.trim()) return
+    void act(async () => {
+      await updateSanctuary(editId, editTitle.trim(), editContent.trim())
+      setEditId(null)
+      setEditTitle('')
+      setEditContent('')
+    })
+  }
+
+  const downloadExport = async () => {
+    setBusy(true)
+    setError('')
+    try {
+      const payload = await exportSanctuary()
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = `lumen-santuario-${new Date().toISOString().slice(0, 10)}.json`
+      document.body.appendChild(anchor)
+      anchor.click()
+      anchor.remove()
+      URL.revokeObjectURL(url)
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'No pude preparar tu exportación.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <section className="space-scene">
       <p className="presence-label">SANTUARIO</p>
@@ -349,7 +391,10 @@ function SanctuarySpace() {
 
       <div className="consent-strip">
         <span>{snapshot?.memory_allowed ? 'Memoria del Santuario permitida' : 'Guardar nuevas cosas está apagado'}</span>
-        <button className="secondary-action" type="button" disabled={busy} onClick={() => void act(() => setMemory(!snapshot?.memory_allowed))}>{snapshot?.memory_allowed ? 'Dejar de guardar' : 'Permitir guardar'}</button>
+        <div className="small-actions">
+          <button className="secondary-action" type="button" disabled={busy} onClick={() => void act(() => setMemory(!snapshot?.memory_allowed))}>{snapshot?.memory_allowed ? 'Dejar de guardar' : 'Permitir guardar'}</button>
+          <button className="text-action" type="button" disabled={busy} onClick={() => void downloadExport()}>Exportar mi Santuario</button>
+        </div>
       </div>
 
       {snapshot?.memory_allowed && (
@@ -367,9 +412,27 @@ function SanctuarySpace() {
         {entries.map((entry) => (
           <article className="sanctuary-entry" key={entry.entry_id}>
             <div className="card-kicker">{entry.entry_kind} · {new Date(entry.created_at).toLocaleDateString()}</div>
-            {entry.title && <h2>{entry.title}</h2>}
-            <p>{entry.content}</p>
-            <button className="text-action" type="button" onClick={() => void act(() => deleteSanctuary(entry.entry_id))}>Borrar definitivamente</button>
+            {editId === entry.entry_id ? (
+              <div className="edit-block">
+                <label htmlFor={`sanctuary-edit-title-${entry.entry_id}`}>Título opcional</label>
+                <input id={`sanctuary-edit-title-${entry.entry_id}`} value={editTitle} onChange={(event) => setEditTitle(event.target.value)} maxLength={160} />
+                <label htmlFor={`sanctuary-edit-content-${entry.entry_id}`}>Tu texto</label>
+                <textarea id={`sanctuary-edit-content-${entry.entry_id}`} value={editContent} onChange={(event) => setEditContent(event.target.value)} maxLength={4000} rows={4} />
+                <div className="small-actions">
+                  <button className="primary-action" type="button" disabled={busy || !editContent.trim()} onClick={saveEdit}>Guardar cambios</button>
+                  <button className="text-action" type="button" onClick={() => setEditId(null)}>Cancelar</button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {entry.title && <h2>{entry.title}</h2>}
+                <p>{entry.content}</p>
+                <div className="small-actions">
+                  <button className="text-action" type="button" onClick={() => startEdit(entry)}>Editar</button>
+                  <button className="text-action" type="button" onClick={() => void act(() => deleteSanctuary(entry.entry_id))}>Borrar definitivamente</button>
+                </div>
+              </>
+            )}
           </article>
         ))}
         {!busy && entries.length === 0 && <p className="empty-note">Todavía no guardaste nada. No hace falta llenar este espacio.</p>}
@@ -660,6 +723,7 @@ function App() {
                 <article className="help-card">
                   <div className="help-meta"><span>{primaryHelp.help_type.replace('_', ' ')}</span>{primaryHelp.duration_minutes && <span>{primaryHelp.duration_minutes} min</span>}</div>
                   <h2>{primaryHelp.title}</h2><p>{primaryHelp.summary}</p>
+                  {primaryHelp.from_own_repertoire && <p className="space-note">Esto ya había quedado en tu repertorio porque te había servido. Podés volver a usarlo o rechazarlo igual.</p>}
                   <div className="choice-row"><button className="primary-action" type="button" onClick={() => void chooseHelp('selected')} disabled={busy}>Quiero probarlo</button><button className="secondary-action" type="button" onClick={() => void chooseHelp('rejected')} disabled={busy}>No es esto</button></div>
                 </article>
               )}
