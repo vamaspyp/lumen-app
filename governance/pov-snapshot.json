@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "source": {
+    "system_id": "V3",
+    "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
+    "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
+    "modified_time": "2026-09-06T01:01:51.983Z",
+    "verified_at": "2026-09-05T22:08:00-03:00",
+    "verified_by": "conductor_agent_with_google_drive_read"
+  },
+  "focus": {
+    "id": "F6",
+    "name": "Nacimiento del Embrión y primeras vidas reales",
+    "status": "ACTIVO"
+  },
+  "act": {
+    "id": "A43",
+    "name": "Conduction Gate · ejecución IA obligatoriamente gobernada",
+    "status": "BLOQUEADO",
+    "purpose": "Convertir el Sistema de Conducción en puerta operativa fail-closed para cualquier IA que analice o ejecute cambios materiales sobre VA+LUMEN, de modo que ningún trabajo oficial pueda avanzar sin FOCO, ACTO, autoridad vigente y DoD resueltos.",
+    "dod": "Gate canónico versionado y referenciado por agentes; contexto de conducción machine-readable con FOCO/ACTO/autoridades/DoD; validación automática fail-closed en repo/CI; instrucciones de bootstrap para agentes comunes sin duplicar doctrina; toda mutación oficial exige contexto válido; desvíos detectables y bloqueantes; evidencia de limitaciones técnicas restantes; CI PASS y activo operacional registrado."
+  },
+  "active_authorities": [
+    {"id":"V3","name":"Sistema de Conducción","state":"VIGENTE"},
+    {"id":"V37","name":"Modelo C V0.4 · Integridad Fundacional","state":"VIGENTE"},
+    {"id":"V39","name":"Especificación Técnico-Funcional del Embrión V0.1","state":"VIGENTE"},
+    {"id":"V40","name":"Arquitectura Greenfield del Embrión V0.1","state":"VIGENTE"},
+    {"id":"V41","name":"Constitución Operativa y Guardrails Transversales V1.0","state":"VIGENTE"},
+    {"id":"V42","name":"Ficha Transversal · Guardrails Obligatorios para Todo Agente · V1.1","state":"VIGENTE"},
+    {"id":"V43","name":"Diseño Canónico de Experiencia y Comportamiento del Embrión V1.0","state":"VIGENTE"},
+    {"id":"V44","name":"Runtime Greenfield S0","state":"VIGENTE"},
+    {"id":"V45","name":"Conduction Gate v0.1","state":"VIGENTE"}
+  ],
+  "integrity": {
+    "source_is_private_pov": true,
+    "historical_sources_are_non_authoritative": true,
+    "implementation_is_not_authority": true,
+    "fail_closed": true
+  }
+}
