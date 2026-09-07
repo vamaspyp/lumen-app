@@ -49,6 +49,11 @@ export type S1Scene = {
     own_repertoire_reused?: boolean
     active_trajectory_count?: number
   }
+  privacy?: {
+    original_retention?: 'private_ref' | string
+    retention_policy?: string
+    shared_learning?: boolean
+  }
 }
 
 export type SelectionResult = {
@@ -79,7 +84,7 @@ export async function accompanyMoment(
   locale = 'es-AR',
   language = 'es',
 ): Promise<S1Scene> {
-  const { data, error } = await getGreenfieldSupabase().rpc('lumen_s1_accompany_moment', {
+  const { data, error } = await getGreenfieldSupabase().rpc('lumen_s1_accompany_moment_v3', {
     p_expression: expression,
     p_locale: locale,
     p_language: language,
