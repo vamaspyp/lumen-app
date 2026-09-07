@@ -44,9 +44,9 @@ assert.deepEqual(embryo?.canonical_integrity, {
   authority_set: ['V37', 'V39', 'V40', 'V41', 'V43'],
 }, 'Public health must expose only the narrow canonical certification projection')
 assert.deepEqual(embryo?.slices, {
-  s0: 'closed', s1: 'closed', s2: 'closed', s3: 'closed',
-  s4: 'closed', s5: 'closed', s6: 'closed', s7: 'closed',
-})
+  s0: 'implemented', s1: 'implemented', s2: 'implemented', s3: 'implemented',
+  s4: 'implemented', s5: 'implemented', s6: 'implemented', s7: 'implemented',
+}, 'Public health reports implementation state; ACTO closure state remains governed by the POV')
 assert.ok(embryo?.source?.active_possibilities >= 60, 'A37/A38 Source must preserve at least 60 active possibilities')
 assert.ok(embryo?.source?.coverage_cells >= 100, 'A37/A38 Source must preserve broad Spanish coverage')
 assert.ok(embryo?.source?.semantic_types >= 4, 'Source must expose several semantic help types')
