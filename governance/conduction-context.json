@@ -10,8 +10,8 @@
     "name": "Nacimiento del Embrión y primeras vidas reales"
   },
   "act": {
-    "id": "A40",
-    "name": "Primeras 3–5 vidas reales",
+    "id": "A46",
+    "name": "Certificación final de exposición real · Organismo + Experiencia + Fuente",
     "status": "EN CURSO"
   },
   "authorities": [
@@ -34,5 +34,5 @@
     "CIERRE"
   ],
   "fail_closed": true,
-  "updated_at": "2026-09-07T11:58:00-03:00"
+  "updated_at": "2026-09-07T16:06:00-03:00"
 }
