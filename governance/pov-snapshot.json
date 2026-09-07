@@ -5,7 +5,7 @@
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
     "modified_time": "2026-09-07T14:02:20.228Z",
-    "verified_at": "2026-09-07T11:58:00-03:00",
+    "verified_at": "2026-09-07T16:06:00-03:00",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {
@@ -14,11 +14,11 @@
     "status": "ACTIVO"
   },
   "act": {
-    "id": "A40",
-    "name": "Primeras 3–5 vidas reales",
+    "id": "A46",
+    "name": "Certificación final de exposición real · Organismo + Experiencia + Fuente",
     "status": "EN CURSO",
-    "purpose": "Poner el embrión frente a 3–5 personas reales de confianza para validar comprensión, pertinencia, utilidad y sensación de compañía, recogiendo sólo señales de producto y sin sobreajustar por casos aislados.",
-    "dod": "Preflight real-user completo; 3–5 participantes con consentimiento experimental; recorridos libres no guiados; cuatro preguntas experienciales posteriores; señales clasificadas sin almacenar intimidad externa; bugs bloqueantes corregidos con regresión; patrones consolidados antes de afinar; decisión explícita de siguiente exposición."
+    "purpose": "Certificar y corregir sólo gaps reales de nacimiento antes de primeras vidas: organismo funcional completo, experiencia V43 y Fuente Viva con cobertura digna, diversidad tipada, procedencia y presentación material visible.",
+    "dod": "Realidad actual contrastada contra V37/V39/V43; mínimos experienciales E0–E10 PASS o gap explícito corregido; Fuente activa auditada contra sobre común V39 (identidad/version, tipo, autor/provider/procedencia, derechos, hipótesis, contexto, acceso, riesgo, evidencia, conflictos, lifecycle); Sobre de Cobertura explícito y honesto con CUBIERTA/PARCIAL/RESTRINGIDA/NO_CUBIERTA; portfolio no reducido a microprácticas y con varios tipos semánticos reales según V43; ficha Fuente muestra qué es/para qué/formato-tiempo/acceso/procedencia/riesgo-costo relevante con evidencia por progressive disclosure; matching/NO_MATCH/safety preservados; sin inflar catálogo por cantidad; regresiones permanentes; CI/live PASS; dictamen GO/NO-GO para A40."
   },
   "active_authorities": [
     {"id":"V3","name":"Sistema de Conducción","state":"VIGENTE"},
