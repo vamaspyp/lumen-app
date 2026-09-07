@@ -55,7 +55,21 @@ Para cada raíz incorporada se exige, según materialidad:
 - sensibilidad frente a sacralidad, apropiación cultural, extractivismo y uso comercial;
 - posibilidad de coexistir con perspectivas distintas o contradictorias sin que LUMEN arbitre una metafísica como verdad.
 
-## 4. Matriz mínima de diversidad para el Embrión
+## 4. Integridad del saber · no adulteración
+
+Fuente **integra los saberes haciéndolos convivir, no fusionándolos**. Cuando una raíz es sagrada, filosófica, cultural, científica o experiencial, LUMEN debe preservar su identidad antes que forzar una síntesis elegante.
+
+Principios permanentes:
+1. **Identidad intacta.** Cada saber conserva su raíz, contexto, lenguaje conceptual, autoría/tradición y límites relevantes.
+2. **Procedencia visible.** La persona puede distinguir qué pertenece a la fuente original y qué es selección, traducción, contextualización o curaduría de LUMEN.
+3. **No adulteración.** LUMEN no reescribe una tradición hasta convertirla en otra cosa, no fabrica citas, no atribuye consensos inexistentes y no presenta una síntesis propia como si fuera enseñanza original.
+4. **Convivencia plural.** Varias perspectivas pueden iluminar una misma situación sin que LUMEN afirme que “en el fondo dicen lo mismo”. Las convergencias y desacuerdos se preservan cuando son materiales.
+5. **No apropiación.** LUMEN no absorbe una raíz dentro de una marca genérica de “sabiduría LUMEN”; reconoce autores, comunidades, corpus, derechos y custodios cuando corresponda.
+6. **No reinterpretación invasiva de saber sagrado.** Cuando el material tenga carácter sagrado o ritual para una comunidad, se prioriza referencia fiel, contexto y, cuando corresponda, vínculo a custodios o fuentes legítimas antes que adaptación creativa.
+
+**Regla práctica de publicación:** toda pieza basada en una raíz identificable debe declarar explícitamente una de estas relaciones: `original`, `traducción`, `selección`, `comentario`, `contextualización`, `adaptación práctica`, `síntesis comparativa` o `inspirada por`. Ninguna relación puede ocultarse bajo “curado por LUMEN”.
+
+## 5. Matriz mínima de diversidad para el Embrión
 
 Antes de primeras vidas, A46 no exige “todas las tradiciones del mundo” ni cobertura universal. Sí exige una **semilla deliberadamente plural** suficiente para demostrar que la arquitectura y la experiencia pueden sostener diversidad real.
 
@@ -71,10 +85,10 @@ El portafolio Gold inicial debería demostrar, al menos:
 
 Esto es un piso de demostración, no una cuota permanente.
 
-## 5. Norte de largo plazo
+## 6. Norte de largo plazo
 
 Fuente+ debe aspirar a convertirse en una **puerta plural hacia lo mejor que la humanidad ha descubierto, practicado, creado y transmitido para acompañar la vida**, sin homogeneizarlo.
 
 No busca absorber todo conocimiento ni convertirlo todo en “contenido LUMEN”. Busca conectar cada vida con la posibilidad más pertinente —un texto, una práctica, una canción, una persona, una terapia, un ritual, un servicio, un retiro, un lugar, una comunidad o una composición— conservando procedencia, dignidad, competencia, libertad y capacidad de aprendizaje.
 
-**Regla de no pérdida:** ninguna evolución futura puede confundir diversidad de formatos con diversidad de raíces, ni reducir Fuente a una monocultura de contenido propio, psicología popular, bienestar digital o una única tradición sin decisión explícita de autoridad y evidencia que lo justifique.
+**Regla de no pérdida:** ninguna evolución futura puede confundir diversidad de formatos con diversidad de raíces, reducir Fuente a una monocultura de contenido propio, psicología popular, bienestar digital o una única tradición, ni mezclar/adulterar raíces para producir una síntesis cómoda sin decisión explícita de autoridad y evidencia que lo justifique.
