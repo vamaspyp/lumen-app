@@ -3,7 +3,14 @@
   "scope": "embryo_birth",
   "authority_set": ["V37", "V39", "V40", "V41", "V43"],
   "certification_act": "A44",
-  "certification_status": "READY_FOR_FINAL_CHECK",
+  "certification_status": "CERTIFIED",
+  "certified_at": "2026-09-07",
+  "certification_evidence": [
+    "PR #4",
+    "CI run 97 pre-certification: Conduction Gate + production audit + architecture/unit 32/32 + lint + build + Playwright 7/7 PASS",
+    "live A44 transactional checks PASS",
+    "gf_private.runtime_policies canonical_integrity v1"
+  ],
   "contracts": [
     {
       "id": "C01_AUTHORITY_PRECEDENCE",
