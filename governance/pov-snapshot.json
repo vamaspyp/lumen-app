@@ -4,8 +4,8 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "modified_time": "2026-09-06T18:11:14.154Z",
-    "verified_at": "2026-09-06T15:12:00-03:00",
+    "modified_time": "2026-09-07T14:02:20.228Z",
+    "verified_at": "2026-09-07T11:58:00-03:00",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {
@@ -14,11 +14,11 @@
     "status": "ACTIVO"
   },
   "act": {
-    "id": "A44",
-    "name": "Certificación transversal de integridad canónica del Embrión",
+    "id": "A40",
+    "name": "Primeras 3–5 vidas reales",
     "status": "EN CURSO",
-    "purpose": "Certificar que el organismo materializado representa y ejecuta sin pérdida material las autoridades vigentes V37/V39/V40/V41/V43 antes de primeras vidas reales, y corregir el mecanismo de cierre que permitió conformidad local sin garantizar conformidad acumulada.",
-    "dod": "Existe matriz exhaustiva contrato canónico→datos→backend→experiencia→evidencia/tests sobre la realidad live; cada contrato queda CONFORME / EXPRESIÓN EMBRIONARIA ACEPTABLE / GAP REAL / DECISIÓN DE AUTORIDAD PENDIENTE con fundamento y evidencia; todo GAP REAL que afecte nacimiento se corrige y deja regresión o se escala a decisión humana explícita; se verifica especialmente representación de Vida/Momento/Trayectoria, evidencia irrecuperable, Motor↔continuidad, Santuario, Fuente, Tejido, Knowledge/Evolution, safety/privacy y experiencia V43; el Sistema incorpora gate de no-pérdida acumulada para que ningún ACTO cierre sólo por DoD local cuando degrada contratos superiores; CI/live PASS; A40 sólo retoma después del dictamen."
+    "purpose": "Poner el embrión frente a 3–5 personas reales de confianza para validar comprensión, pertinencia, utilidad y sensación de compañía, recogiendo sólo señales de producto y sin sobreajustar por casos aislados.",
+    "dod": "Preflight real-user completo; 3–5 participantes con consentimiento experimental; recorridos libres no guiados; cuatro preguntas experienciales posteriores; señales clasificadas sin almacenar intimidad externa; bugs bloqueantes corregidos con regresión; patrones consolidados antes de afinar; decisión explícita de siguiente exposición."
   },
   "active_authorities": [
     {"id":"V3","name":"Sistema de Conducción","state":"VIGENTE"},
