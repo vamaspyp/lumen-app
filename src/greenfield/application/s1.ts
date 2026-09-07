@@ -12,6 +12,7 @@ export type HelpPossibility = {
   duration_minutes: number | null
   energy: string | null
   detail: Record<string, unknown>
+  from_own_repertoire?: boolean
 }
 
 export type SemanticBlock = Record<string, unknown> & {
@@ -43,6 +44,16 @@ export type S1Scene = {
     confidence?: number | null
     uncertainty_key?: string | null
   }
+  continuity?: {
+    memory_used?: boolean
+    own_repertoire_reused?: boolean
+    active_trajectory_count?: number
+  }
+  privacy?: {
+    original_retention?: 'private_ref' | string
+    retention_policy?: string
+    shared_learning?: boolean
+  }
 }
 
 export type SelectionResult = {
@@ -73,7 +84,7 @@ export async function accompanyMoment(
   locale = 'es-AR',
   language = 'es',
 ): Promise<S1Scene> {
-  const { data, error } = await getGreenfieldSupabase().rpc('lumen_s1_accompany_moment', {
+  const { data, error } = await getGreenfieldSupabase().rpc('lumen_s1_accompany_moment_v3', {
     p_expression: expression,
     p_locale: locale,
     p_language: language,

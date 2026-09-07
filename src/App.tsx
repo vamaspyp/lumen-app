@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import './App.css'
 import { getAuthSnapshot, requestMagicLink, signOut } from './greenfield/application/auth'
 import { bootstrapPerson } from './greenfield/application/consent'
+import { deleteMomentOriginals, exportMomentOriginals } from './greenfield/application/privacy'
 import {
   addPathItem,
   cancelFollowup,
@@ -11,6 +12,7 @@ import {
   createTrajectory,
   deleteSanctuary,
   discoverSource,
+  exportSanctuary,
   getContinuitySnapshot,
   getEmbryoHealth,
   getProactivitySnapshot,
@@ -25,6 +27,7 @@ import {
   setMemory,
   setProactivity,
   shareHelp,
+  updateSanctuary,
   updateTrajectory,
   type Circle,
   type ContinuitySnapshot,
@@ -71,6 +74,18 @@ function humanReason(reason: string) {
   if (reason === 'practice_return') return 'Volver a una práctica'
   if (reason === 'circle_return') return 'Volver a un Círculo'
   return 'Una vuelta que elegiste'
+}
+
+function downloadJson(payload: unknown, filename: string) {
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = filename
+  document.body.appendChild(anchor)
+  anchor.click()
+  anchor.remove()
+  URL.revokeObjectURL(url)
 }
 
 function HelpContent({ help }: { help: HelpPossibility }) {
@@ -311,6 +326,10 @@ function SanctuarySpace() {
   const [entries, setEntries] = useState<SanctuaryEntry[]>([])
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [editId, setEditId] = useState<string | null>(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editContent, setEditContent] = useState('')
+  const [privacyMessage, setPrivacyMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -341,6 +360,65 @@ function SanctuarySpace() {
     })
   }
 
+  const startEdit = (entry: SanctuaryEntry) => {
+    setEditId(entry.entry_id)
+    setEditTitle(entry.title ?? '')
+    setEditContent(entry.content)
+  }
+
+  const saveEdit = () => {
+    if (!editId || !editContent.trim()) return
+    void act(async () => {
+      await updateSanctuary(editId, editTitle.trim(), editContent.trim())
+      setEditId(null)
+      setEditTitle('')
+      setEditContent('')
+    })
+  }
+
+  const downloadExport = async () => {
+    setBusy(true)
+    setError('')
+    try {
+      const payload = await exportSanctuary()
+      downloadJson(payload, `lumen-santuario-${new Date().toISOString().slice(0, 10)}.json`)
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'No pude preparar tu exportación.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const downloadOriginals = async () => {
+    setBusy(true)
+    setError('')
+    setPrivacyMessage('')
+    try {
+      const payload = await exportMomentOriginals()
+      downloadJson(payload, `lumen-momentos-originales-${new Date().toISOString().slice(0, 10)}.json`)
+      setPrivacyMessage('Preparé una copia de tus expresiones originales y sus interpretaciones vinculadas.')
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'No pude preparar tus expresiones originales.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const deleteOriginals = async () => {
+    if (!window.confirm('¿Borrar definitivamente tus expresiones originales? Las interpretaciones y señales minimizadas pueden seguir existiendo, pero el texto crudo ya no podrá recuperarse ni reclasificarse.')) return
+    setBusy(true)
+    setError('')
+    setPrivacyMessage('')
+    try {
+      const result = await deleteMomentOriginals()
+      setPrivacyMessage(`Borradas ${result.deleted_count} expresiones originales. Esta acción no puede deshacerse.`)
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'No pude borrar tus expresiones originales.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <section className="space-scene">
       <p className="presence-label">SANTUARIO</p>
@@ -349,8 +427,20 @@ function SanctuarySpace() {
 
       <div className="consent-strip">
         <span>{snapshot?.memory_allowed ? 'Memoria del Santuario permitida' : 'Guardar nuevas cosas está apagado'}</span>
-        <button className="secondary-action" type="button" disabled={busy} onClick={() => void act(() => setMemory(!snapshot?.memory_allowed))}>{snapshot?.memory_allowed ? 'Dejar de guardar' : 'Permitir guardar'}</button>
+        <div className="small-actions">
+          <button className="secondary-action" type="button" disabled={busy} onClick={() => void act(() => setMemory(!snapshot?.memory_allowed))}>{snapshot?.memory_allowed ? 'Dejar de guardar' : 'Permitir guardar'}</button>
+          <button className="text-action" type="button" disabled={busy} onClick={() => void downloadExport()}>Exportar mi Santuario</button>
+        </div>
       </div>
+
+      <div className="consent-strip">
+        <span>Tus expresiones originales de Ahora se conservan en privado para que LUMEN pueda reinterpretarlas mejor cuando aprenda. No pasan al Ledger ni al aprendizaje compartido por defecto.</span>
+        <div className="small-actions">
+          <button className="text-action" type="button" disabled={busy} onClick={() => void downloadOriginals()}>Exportar expresiones originales</button>
+          <button className="text-action" type="button" disabled={busy} onClick={() => void deleteOriginals()}>Borrar expresiones originales</button>
+        </div>
+      </div>
+      {privacyMessage && <p className="success-note">{privacyMessage}</p>}
 
       {snapshot?.memory_allowed && (
         <form className="sanctuary-form" onSubmit={onSave}>
@@ -367,9 +457,27 @@ function SanctuarySpace() {
         {entries.map((entry) => (
           <article className="sanctuary-entry" key={entry.entry_id}>
             <div className="card-kicker">{entry.entry_kind} · {new Date(entry.created_at).toLocaleDateString()}</div>
-            {entry.title && <h2>{entry.title}</h2>}
-            <p>{entry.content}</p>
-            <button className="text-action" type="button" onClick={() => void act(() => deleteSanctuary(entry.entry_id))}>Borrar definitivamente</button>
+            {editId === entry.entry_id ? (
+              <div className="edit-block">
+                <label htmlFor={`sanctuary-edit-title-${entry.entry_id}`}>Título opcional</label>
+                <input id={`sanctuary-edit-title-${entry.entry_id}`} value={editTitle} onChange={(event) => setEditTitle(event.target.value)} maxLength={160} />
+                <label htmlFor={`sanctuary-edit-content-${entry.entry_id}`}>Tu texto</label>
+                <textarea id={`sanctuary-edit-content-${entry.entry_id}`} value={editContent} onChange={(event) => setEditContent(event.target.value)} maxLength={4000} rows={4} />
+                <div className="small-actions">
+                  <button className="primary-action" type="button" disabled={busy || !editContent.trim()} onClick={saveEdit}>Guardar cambios</button>
+                  <button className="text-action" type="button" onClick={() => setEditId(null)}>Cancelar</button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {entry.title && <h2>{entry.title}</h2>}
+                <p>{entry.content}</p>
+                <div className="small-actions">
+                  <button className="text-action" type="button" onClick={() => startEdit(entry)}>Editar</button>
+                  <button className="text-action" type="button" onClick={() => void act(() => deleteSanctuary(entry.entry_id))}>Borrar definitivamente</button>
+                </div>
+              </>
+            )}
           </article>
         ))}
         {!busy && entries.length === 0 && <p className="empty-note">Todavía no guardaste nada. No hace falta llenar este espacio.</p>}
@@ -632,7 +740,7 @@ function App() {
                 <textarea id="moment-expression" value={expression} onChange={(event) => setExpression(event.target.value)} rows={5} maxLength={4000} placeholder="Por ejemplo: tengo demasiadas cosas en la cabeza y no sé por dónde empezar…" disabled={busy || stage === 'auth'} />
                 {stage === 'home' && <button className="primary-action" type="submit" disabled={busy || !expression.trim()}>{busy ? 'Un momento…' : 'Ver qué podría ayudarme'}</button>}
               </form>
-              {stage === 'home' && <><p className="privacy-note">Tu expresión se usa para este Momento. El backend conserva su longitud y la interpretación necesaria, no el texto original.</p><button className="text-action centered" type="button" onClick={() => openSpace('fuente')}>O explorar Fuente sin contar nada</button></>}
+              {stage === 'home' && <><p className="privacy-note">Tu expresión original se conserva de forma privada junto a su interpretación para que LUMEN pueda aprender y volver a comprenderla mejor. No se copia al Ledger ni se usa como aprendizaje compartido sin tu permiso. Podés exportarla o borrarla desde Santuario.</p><button className="text-action centered" type="button" onClick={() => openSpace('fuente')}>O explorar Fuente sin contar nada</button></>}
 
               {stage === 'auth' && (
                 <div className="auth-panel">
@@ -660,6 +768,7 @@ function App() {
                 <article className="help-card">
                   <div className="help-meta"><span>{primaryHelp.help_type.replace('_', ' ')}</span>{primaryHelp.duration_minutes && <span>{primaryHelp.duration_minutes} min</span>}</div>
                   <h2>{primaryHelp.title}</h2><p>{primaryHelp.summary}</p>
+                  {primaryHelp.from_own_repertoire && <p className="space-note">Esto ya había quedado en tu repertorio porque te había servido. Podés volver a usarlo o rechazarlo igual.</p>}
                   <div className="choice-row"><button className="primary-action" type="button" onClick={() => void chooseHelp('selected')} disabled={busy}>Quiero probarlo</button><button className="secondary-action" type="button" onClick={() => void chooseHelp('rejected')} disabled={busy}>No es esto</button></div>
                 </article>
               )}

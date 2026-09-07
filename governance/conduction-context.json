@@ -10,14 +10,17 @@
     "name": "Nacimiento del Embrión y primeras vidas reales"
   },
   "act": {
-    "id": "A43",
-    "name": "Conduction Gate · ejecución IA obligatoriamente gobernada",
+    "id": "A44",
+    "name": "Certificación transversal de integridad canónica del Embrión",
     "status": "EN CURSO"
   },
   "authorities": [
+    {"id": "V37", "role": "autoridad_conceptual"},
+    {"id": "V39", "role": "autoridad_funcional"},
+    {"id": "V40", "role": "autoridad_tecnica"},
     {"id": "V41", "role": "autoridad_transversal"},
     {"id": "V42", "version": "1.1", "role": "gobierno_de_agentes"},
-    {"id": "V40", "role": "autoridad_tecnica"}
+    {"id": "V43", "role": "autoridad_experiencial"}
   ],
   "required_sequence": [
     "POV_ACTIVOS",
@@ -30,5 +33,5 @@
     "CIERRE"
   ],
   "fail_closed": true,
-  "updated_at": "2026-09-05T21:45:00-03:00"
+  "updated_at": "2026-09-06T15:12:00-03:00"
 }

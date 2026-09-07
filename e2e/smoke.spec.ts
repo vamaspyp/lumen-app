@@ -18,7 +18,7 @@ async function installSyntheticSession(page: Page) {
 
 function helpScene() {
   return {
-    scene_id: 'moment.help', scene_version: 's1.v1', presence_mode: 'P2', human_intent: 'move_forward',
+    scene_id: 'moment.help', scene_version: 's1.v3', presence_mode: 'P2', human_intent: 'move_forward',
     episode_id: '30000000-0000-0000-0000-000000000101', moment_id: '40000000-0000-0000-0000-000000000101', decision_run_id: '50000000-0000-0000-0000-000000000101', trace_id: '60000000-0000-0000-0000-000000000101',
     semantic_blocks: [
       { type: 'lumi_line', semantic_key: 'help.offer_humble' },
@@ -26,6 +26,7 @@ function helpScene() {
     ],
     available_actions: [{ id: 'try_primary', intent: 'select_help', payload: { help_id: '70000000-0000-0000-0000-000000000101' } }, { id: 'not_this', intent: 'reject_help' }],
     safety: { state: 'clear' }, coverage: { state: 'covered' }, interpretation: { intent_key: 'move_forward', confidence: 0.8, uncertainty_key: null },
+    privacy: { original_retention: 'private_ref', retention_policy: 'private_reclassifiable.v1', shared_learning: false },
   }
 }
 
@@ -63,7 +64,7 @@ async function installEmbryoRpcMocks(page: Page, calls: string[]) {
     if (name === 'lumen_s2_list_sanctuary') return fulfillJson(route, [])
     if (name === 'lumen_s5_snapshot') return fulfillJson(route, [])
     if (name === 'lumen_s6_snapshot') return fulfillJson(route, { proactive_allowed: false, settings: { quiet_start_hour: 22, quiet_end_hour: 8, timezone: 'America/Argentina/Buenos_Aires', custody_blocked: false }, followups: [] })
-    if (name === 'lumen_s1_accompany_moment') return fulfillJson(route, helpScene())
+    if (name === 'lumen_s1_accompany_moment_v3') return fulfillJson(route, helpScene())
     if (name === 'lumen_s1_select_help') return fulfillJson(route, { episode_id: helpScene().episode_id, action: 'selected', help: (helpScene().semantic_blocks[1] as { primary: Record<string, unknown> }).primary, trace_id: '60000000-0000-0000-0000-000000000102' })
     if (name === 'lumen_s1_record_outcome') return fulfillJson(route, { episode_id: helpScene().episode_id, effect: 'helped', applied: true, trace_id: '60000000-0000-0000-0000-000000000103', semantic_key: 'outcome.thank_and_release' })
     if (name === 'lumen_s2_add_repertoire') return fulfillJson(route, { repertoire_id: '91000000-0000-0000-0000-000000000101', help_id: '70000000-0000-0000-0000-000000000101' })
@@ -181,6 +182,6 @@ test('Preview completes Momento → Ayuda → Retorno → Repertorio', async ({ 
   await page.getByRole('button', { name: /Guardar “Un paso más pequeño” en mi repertorio/ }).click()
   await expect(page.getByText('Quedó en tu repertorio.')).toBeVisible()
 
-  expect(calls.filter((name) => name.startsWith('lumen_s1_'))).toEqual(['lumen_s1_accompany_moment', 'lumen_s1_select_help', 'lumen_s1_record_outcome'])
+  expect(calls.filter((name) => name.startsWith('lumen_s1_'))).toEqual(['lumen_s1_accompany_moment_v3', 'lumen_s1_select_help', 'lumen_s1_record_outcome'])
   expect(calls).toContain('lumen_s2_add_repertoire')
 })
