@@ -37,7 +37,12 @@ const { data: embryo, error: embryoError } = await supabase.rpc('lumen_embryo_he
 assert.equal(embryoError, null, `Embryo health RPC failed: ${embryoError?.message ?? 'unknown'}`)
 assert.equal(embryo?.state, 'operational')
 assert.equal(embryo?.release_contract, 'embryo.v0.4')
-assert.deepEqual(Object.keys(embryo ?? {}).sort(), ['evolution', 'operations', 'prelaunch_reset_required', 'release_contract', 'slices', 'source', 'state'].sort(), 'Public health must remain a narrow operational projection')
+assert.deepEqual(Object.keys(embryo ?? {}).sort(), ['canonical_integrity', 'evolution', 'operations', 'prelaunch_reset_required', 'release_contract', 'slices', 'source', 'state'].sort(), 'Public health must remain a narrow operational projection')
+assert.deepEqual(embryo?.canonical_integrity, {
+  status: 'certified',
+  version: 1,
+  authority_set: ['V37', 'V39', 'V40', 'V41', 'V43'],
+}, 'Public health must expose only the narrow canonical certification projection')
 assert.deepEqual(embryo?.slices, {
   s0: 'closed', s1: 'closed', s2: 'closed', s3: 'closed',
   s4: 'closed', s5: 'closed', s6: 'closed', s7: 'closed',
@@ -89,4 +94,4 @@ const { data: privateData, error: privateError } = await supabase.rpc('lumen_s2_
 assert.equal(privateData, null, 'Anonymous callers must never receive personal continuity data')
 assert.ok(privateError, 'Anonymous personal RPC must be rejected')
 
-console.log(`Embryo live integration PASS: health=${embryo.state}; source-active=${embryo.source.active_possibilities}; coverage=${embryo.source.coverage_cells}; experiential-needs=${experientialNeeds.length}; capped-discovery=${source.length}; providers=${providers.size}; types=${helpTypes.size}; anon-personal=blocked`)
+console.log(`Embryo live integration PASS: health=${embryo.state}; canonical=${embryo.canonical_integrity.status}; source-active=${embryo.source.active_possibilities}; coverage=${embryo.source.coverage_cells}; experiential-needs=${experientialNeeds.length}; capped-discovery=${source.length}; providers=${providers.size}; types=${helpTypes.size}; anon-personal=blocked`)
