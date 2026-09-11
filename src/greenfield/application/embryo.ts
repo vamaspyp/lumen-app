@@ -68,8 +68,17 @@ export type SourceItem = Readonly<{
     provenance?: Record<string, unknown>
     rights?: Record<string, unknown>
   }
-  needs: string[]
+  areas: string[]
+  capacities: string[]
+  taxonomy_version: string
   localization_provenance?: Record<string, unknown>
+}>
+
+export type TaxonomyTerm = Readonly<{ key: string; label: string }>
+export type SourceTaxonomy = Readonly<{
+  taxonomy_version: string
+  areas: TaxonomyTerm[]
+  capacities: TaxonomyTerm[]
 }>
 
 export type CircleContribution = Readonly<{
@@ -112,6 +121,7 @@ export type ProactivitySnapshot = Readonly<{
 
 export type EmbryoHealth = Readonly<{
   state: 'forming' | 'operational'
+  release_contract?: string
   slices: Record<string, string>
   canonical_integrity?: {
     status: 'uncertified' | 'certified' | string
@@ -120,8 +130,10 @@ export type EmbryoHealth = Readonly<{
   }
   source: {
     active_possibilities: number
-    coverage_cells: number
+    applicability_relations: number
     semantic_types: number
+    taxonomy_version: string
+    coverage_contract: string
   }
   evolution: { source_policy_version: number }
   operations: { providers_ready: number }
@@ -204,9 +216,20 @@ export function addPathItem(trajectoryId: string, helpId: string | null, label: 
   })
 }
 
-export function discoverSource(needKey?: string | null, helpType?: string | null, locale = 'es-AR', limit = 40): Promise<SourceItem[]> {
+export function getSourceTaxonomy(): Promise<SourceTaxonomy> {
+  return rpc('lumen_source_taxonomy')
+}
+
+export function discoverSource(
+  areaKey?: string | null,
+  capacityKey?: string | null,
+  helpType?: string | null,
+  locale = 'es-AR',
+  limit = 40,
+): Promise<SourceItem[]> {
   return rpc('lumen_source_discover', {
-    p_need_key: needKey ?? null,
+    p_area_key: areaKey ?? null,
+    p_capacity_key: capacityKey ?? null,
     p_help_type: helpType ?? null,
     p_locale: locale,
     p_limit: limit,
