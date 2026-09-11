@@ -35,7 +35,7 @@
     "EVIDENCIA",
     "CIERRE"
   ],
-  "construction_rule": "A54 audits bidirectionally V48/V49↔runtime. Fix only unequivocal implementation defects; authority conflicts or undetermined structural decisions fail closed. Zero material gaps and zero unjustified residues are required for closure.",
+  "construction_rule": "A54 audits bidirectionally V48/V49↔runtime and inherits the clean-runtime rule: el runtime preserva lo correcto, ajusta sólo cuando el cambio es local y limpio, y reemplaza lo que exigiría deuda conceptual. Bridges permanentes, aliases legacy y capas paralelas siguen prohibidos. Fix only unequivocal implementation defects; authority conflicts or undetermined structural decisions fail closed. Zero material gaps and zero unjustified residues are required for closure.",
   "fail_closed": true,
-  "updated_at": "2026-09-11T17:41:00-03:00"
+  "updated_at": "2026-09-11T18:12:00-03:00"
 }
