@@ -13,6 +13,7 @@ export type HelpPossibility = {
   energy: string | null
   detail: Record<string, unknown>
   from_own_repertoire?: boolean
+  applicability_confidence?: number
 }
 
 export type SemanticBlock = Record<string, unknown> & {
@@ -41,6 +42,8 @@ export type S1Scene = {
   coverage?: { state?: string; reason?: string }
   interpretation?: {
     intent_key?: string | null
+    area_keys?: string[]
+    capacity_keys?: string[]
     confidence?: number | null
     uncertainty_key?: string | null
   }
@@ -48,6 +51,12 @@ export type S1Scene = {
     memory_used?: boolean
     own_repertoire_reused?: boolean
     active_trajectory_count?: number
+  }
+  delivery?: {
+    pattern?: 'prepare_possibility_integrate' | string
+    optional?: boolean
+    prepare_semantic_key?: string
+    integrate_semantic_key?: string
   }
   privacy?: {
     original_retention?: 'private_ref' | string
@@ -84,7 +93,7 @@ export async function accompanyMoment(
   locale = 'es-AR',
   language = 'es',
 ): Promise<S1Scene> {
-  const { data, error } = await getGreenfieldSupabase().rpc('lumen_s1_accompany_moment_v3', {
+  const { data, error } = await getGreenfieldSupabase().rpc('lumen_s1_accompany_moment_v4', {
     p_expression: expression,
     p_locale: locale,
     p_language: language,
