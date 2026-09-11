@@ -3,12 +3,15 @@
   "scope": "embryo_birth",
   "authority_set": ["V46", "V48", "V49", "V40", "V41", "V43"],
   "certification_act": "A51",
-  "certification_status": "IN_PROGRESS",
+  "certification_status": "CERTIFIED",
   "certification_evidence": [
     "V49 clean-room target precedes runtime diff",
     "greenfield-v49-clean based on complete greenfield-v04-embryo",
     "Supabase dedicated project vbuixagaguasejputubp",
-    "A51 V49 schema/runtime convergence migrations applied live"
+    "A51 V49 schema/runtime convergence migrations applied live",
+    "CI run 126 PASS: Conduction Gate + 33/33 unit + lint + build + Playwright 7/7 + live backend",
+    "canonical_integrity policy v4 ACTIVE/CERTIFIED under A51",
+    "live: legacy tables 0; v47/v3/v4 routines 0; 60 active possibilities; 98 applicability relations; 0 outcomes without selection"
   ],
   "contracts": [
     {
