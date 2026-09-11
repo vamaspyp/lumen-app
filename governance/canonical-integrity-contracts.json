@@ -1,147 +1,141 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "2.0",
   "scope": "embryo_birth",
-  "authority_set": ["V37", "V39", "V40", "V41", "V43"],
-  "certification_act": "A44",
-  "certification_status": "CERTIFIED",
-  "certified_at": "2026-09-07",
+  "authority_set": ["V46", "V48", "V49", "V40", "V41", "V43"],
+  "certification_act": "A51",
+  "certification_status": "IN_PROGRESS",
   "certification_evidence": [
-    "PR #4",
-    "CI run 97 pre-certification: Conduction Gate + production audit + architecture/unit 32/32 + lint + build + Playwright 7/7 PASS",
-    "live A44 transactional checks PASS",
-    "gf_private.runtime_policies canonical_integrity v1"
+    "V49 clean-room target precedes runtime diff",
+    "greenfield-v49-clean based on complete greenfield-v04-embryo",
+    "Supabase dedicated project vbuixagaguasejputubp",
+    "A51 V49 schema/runtime convergence migrations applied live"
   ],
   "contracts": [
     {
       "id": "C01_AUTHORITY_PRECEDENCE",
       "birth_required": true,
       "status": "CONFORME",
-      "authority": ["V41", "V42", "V43"],
-      "evidence": ["governance/conduction-context.json", "governance/pov-snapshot.json", "A41 CANCELADO", "A42 CERRADO"]
+      "authority": ["V46", "V48", "V49", "V41"],
+      "evidence": ["governance/conduction-context.json", "governance/pov-snapshot.json", "V37/V39/V47 explicitly superseded"]
     },
     {
       "id": "C02_GREENFIELD_INDEPENDENCE",
       "birth_required": true,
       "status": "CONFORME",
-      "authority": ["V40", "V41"],
-      "evidence": ["gf_core/gf_private/gf_ledger", "src/greenfield", "S0 cross-user/legacy-independence evidence"]
+      "authority": ["V40", "V41", "V49"],
+      "evidence": ["dedicated Supabase project", "gf_core/gf_private/gf_ledger", "src/greenfield", "greenfield-v49-clean"]
     },
     {
       "id": "C03_LIFE_MOMENT_TRAJECTORY",
       "birth_required": true,
       "status": "EXPRESION_EMBRIONARIA_ACEPTABLE",
-      "authority": ["V37", "V39", "V40", "V43"],
-      "evidence": ["gf_core.moments", "gf_core.moment_interpretations", "gf_core.inferences", "gf_core.trajectories", "gf_core.paths", "gf_core.path_items", "UI Ahora/Trayectoria"],
-      "limitation": "El nacimiento conserva hogares abiertos para territorio/contexto, valores, capacidades, palancas y otras inferencias con procedencia/confianza/vigencia, pero no fija taxonomías ni construye todavía un Mapa Vital maduro. Estados longitudinales ricos pueden refinarse por evidencia sin reconstruir LIFE."
+      "authority": ["V46", "V48", "V49"],
+      "evidence": ["moments", "moment_interpretations Area/Capacity", "inferences", "trajectories", "paths", "path_items"]
     },
     {
       "id": "C04_ORIGINAL_EXPRESSION_RECLASSIFIABLE",
       "birth_required": true,
       "status": "CONFORME",
-      "authority": ["V37", "V39", "V40", "V41", "V43"],
-      "evidence": ["gf_private.moment_originals", "lumen_s1_accompany_moment_v3", "moments.original_retention=private_ref", "rules.v3 interpretation linked", "self export/delete RPCs", "UI truthful custody copy + sovereignty controls", "A44 live transactional PASS: exact original retained/exportable, shared_learning_default=false, raw text absent from Ledger"]
+      "authority": ["V46", "V48", "V49", "V41"],
+      "evidence": ["gf_private.moment_originals", "single lumen_s1_accompany_moment", "private_ref", "export/delete RPCs", "raw text absent from Ledger"]
     },
     {
-      "id": "C05_MOTOR_SAFETY_COVERAGE_NOMATCH",
+      "id": "C05_ORIENTATION_AREA_CAPACITY",
       "birth_required": true,
       "status": "CONFORME",
-      "authority": ["V39", "V41", "V43"],
-      "evidence": ["lumen_s1_accompany_moment_v3 → certified S1 flow", "decision_runs/candidates/exposures", "no_match_events", "safety referral scene"]
+      "authority": ["V46", "V48", "V49"],
+      "evidence": ["life-taxonomy.v1", "area_terms", "capacity_terms", "moment_interpretations.area_keys/capacity_keys", "intent_key/need_keys removed"]
     },
     {
-      "id": "C06_MOTOR_CONTINUITY_REPERTOIRE",
+      "id": "C06_SOURCE_APPLICABILITY_COVERAGE",
+      "birth_required": true,
+      "status": "CONFORME",
+      "authority": ["V46", "V48", "V49"],
+      "evidence": ["help_applicability", "Coverage evaluated by coverage.eval.v1", "coverage_cells removed", "Source discovery Area/Capacity"]
+    },
+    {
+      "id": "C07_MOTOR_SAFETY_NOMATCH",
+      "birth_required": true,
+      "status": "CONFORME",
+      "authority": ["V48", "V49", "V41", "V43"],
+      "evidence": ["single S1 flow", "decision_runs/candidates/exposures", "no_match_events", "safety referral scene", "deterministic gates"]
+    },
+    {
+      "id": "C08_SELECTION_DELIVERY_OUTCOME",
+      "birth_required": true,
+      "status": "CONFORME",
+      "authority": ["V48", "V49", "V43"],
+      "evidence": ["help_selections decision_run_id/help_version_id", "delivery.pattern=prepare_possibility_integrate", "outcomes_feedback.selection_id", "exact version attribution"]
+    },
+    {
+      "id": "C09_MOTOR_CONTINUITY_REPERTOIRE",
       "birth_required": true,
       "status": "EXPRESION_EMBRIONARIA_ACEPTABLE",
-      "authority": ["V37", "V39", "V41", "V43"],
-      "evidence": ["decision.v3", "decision_runs.continuity_context", "active_trajectory_ids", "own_repertoire_relevant", "A44 transactional live test: own_repertoire_reused=true with novel alternative"],
-      "limitation": "La memoria autorizada y el repertorio propio ya modifican la decisión; Trayectoria entra hoy como contexto explícito y Camino/repertorio elegidos, pero el significado libre del Faro no se usa todavía como prior automático. Se difiere deliberadamente hasta evidencia real para no imponer una ontología ni reducir el Momento a continuidad."
+      "authority": ["V46", "V48", "V49"],
+      "evidence": ["decision_runs.continuity_context", "trajectories", "personal_repertoire", "repertoire can rank ahead of novelty"]
     },
     {
-      "id": "C07_SOURCE_TYPED_PROVENANCE_LIFECYCLE",
+      "id": "C10_SANCTUARY_SOVEREIGN_MEMORY",
       "birth_required": true,
       "status": "CONFORME",
-      "authority": ["V37", "V39", "V40", "V41"],
-      "evidence": ["60 active possibilities", "108 coverage cells", "5 semantic types", "providers/provenance/rights/risk/evidence/accessibility complete", "S3 intake/lifecycle"]
+      "authority": ["V46", "V48", "V49", "V41", "V43"],
+      "evidence": ["gf_private.sanctuary_entries", "save/list/update/delete/export", "sanctuary_private_stub removed", "memory consent separated"]
     },
     {
-      "id": "C08_SANCTUARY_SOVEREIGN_MEMORY",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V39", "V41", "V43"],
-      "evidence": ["private sanctuary entries", "save/list/update/delete/export", "visible Editar/Borrar/Exportar controls", "A44 transactional backend PASS"]
-    },
-    {
-      "id": "C09_CULTIVATION_OWN_REPERTOIRE",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V37", "V39", "V41", "V43"],
-      "evidence": ["personal_repertoire", "helped outcome prerequisite", "Path reuse", "decision.v3 repertoire preference", "visible explanation when own repertoire is reused"]
-    },
-    {
-      "id": "C10_TISSUE_VALUE_CIRCULATION",
+      "id": "C11_TISSUE_VALUE_CIRCULATION",
       "birth_required": true,
       "status": "EXPRESION_EMBRIONARIA_ACEPTABLE",
-      "authority": ["V37", "V39", "V41", "V43"],
-      "evidence": ["private invite-only Circle", "membership consent", "share Source help", "report/leave", "no feed/likes/followers/ranking"],
-      "limitation": "Ritmo/duración/facilitación detallados quedan humanos/híbridos para el piloto; no se canoniza una red social madura."
+      "authority": ["V46", "V48", "V49", "V43"],
+      "evidence": ["interaction_spaces", "memberships", "private invites", "contributions", "reports", "no feed/likes/followers/ranking"]
     },
     {
-      "id": "C11_KNOWLEDGE_EVIDENCE_EVOLUTION",
+      "id": "C12_KNOWLEDGE_EVIDENCE_EVOLUTION",
       "birth_required": true,
       "status": "CONFORME",
-      "authority": ["V37", "V39", "V40", "V41"],
-      "evidence": ["evidence_units", "knowledge_claims with E0-E5/uncertainty/contradictions/provenance/validity", "policy_versions", "change_executions", "rollback_records", "A44 evidence.v2 decision context"]
+      "authority": ["V46", "V48", "V49", "V41"],
+      "evidence": ["evidence_units", "knowledge_claims", "policy_versions", "change_executions", "rollback_records", "evidence.v49.1"]
     },
     {
-      "id": "C12_LEDGER_IRRECOVERABLE_DECISION_DATA",
+      "id": "C13_LEDGER_IRRECOVERABLE_DECISION_DATA",
       "birth_required": true,
       "status": "CONFORME",
-      "authority": ["V39", "V40", "V41"],
-      "evidence": ["append-only domain_events", "decision/exposure/selection/outcome/no_match versions", "evidence.v2 decision context", "MomentOriginalPreserved references private original without raw text", "original + interpretation remain reclassifiable outside Ledger"]
+      "authority": ["V46", "V49", "V41"],
+      "evidence": ["append-only domain_events", "selection/help_version/decision trace", "Area/Capacity interpretation versions", "outbox"]
     },
     {
-      "id": "C13_PRIVACY_CONSENT_ISOLATION",
+      "id": "C14_PRIVACY_CONSENT_ISOLATION",
       "birth_required": true,
       "status": "CONFORME",
-      "authority": ["V39", "V40", "V41", "V43"],
-      "evidence": ["RLS ownership", "gf_private raw originals/Sanctuary", "memory/evidence/proactivity consent separated", "cross-user tests", "no intimate text in Ledger", "original export/delete sovereignty"]
+      "authority": ["V48", "V49", "V41", "V43"],
+      "evidence": ["RLS ownership", "private originals/Sanctuary", "memory/evidence/proactivity consent separated", "authenticated-only sensitive RPCs"]
     },
     {
-      "id": "C14_PROACTIVITY_CONSENTED",
+      "id": "C15_PROACTIVITY_CONSENTED",
       "birth_required": true,
       "status": "CONFORME",
-      "authority": ["V37", "V39", "V41", "V43"],
-      "evidence": ["followups", "explicit opt-in/off", "quiet hours", "custody block", "cancel", "in-app reason"]
+      "authority": ["V46", "V48", "V49", "V43"],
+      "evidence": ["followups", "explicit opt-in/off", "quiet hours", "custody block", "cancel"]
     },
     {
-      "id": "C15_EXPERIENCE_V43",
+      "id": "C16_EXPERIENCE_V43",
       "birth_required": true,
       "status": "EXPRESION_EMBRIONARIA_ACEPTABLE",
-      "authority": ["V43"],
-      "evidence": ["Ahora", "Trayectoria", "Fuente", "Santuario", "Tejido", "free expression", "P0-P4 scene semantics", "NO_MATCH/safety", "truthful original-expression privacy copy", "visible Sanctuary/original-memory sovereignty"],
-      "limitation": "Forma exacta, copy, motion/audio y navegación continúan como hipótesis a validar con primeras vidas; ningún faltante actual elimina una función vital."
+      "authority": ["V43", "V48", "V49"],
+      "evidence": ["Ahora", "Trayectoria", "Fuente", "Santuario", "Tejido", "P0-P4 semantics", "NO_MATCH/safety", "Prepare→Possibility→Integrate semantic delivery"]
     },
     {
-      "id": "C16_MULTILINGUAL_MULTICULTURAL_MULTISURFACE",
+      "id": "C17_MULTILINGUAL_MULTICULTURAL_MULTISURFACE",
       "birth_required": true,
       "status": "EXPRESION_EMBRIONARIA_ACEPTABLE",
-      "authority": ["V41", "V43"],
-      "evidence": ["locale/language persisted", "help localizations", "semantic scene/action IDs", "kernel i18n contract"],
-      "limitation": "Primera experiencia visible sigue en español y web; nacimiento exige estructura extensible, no superficies maduras."
+      "authority": ["V41", "V43", "V49"],
+      "evidence": ["locale/language persisted", "help localizations", "semantic scene/action IDs", "life taxonomy versioned as data"]
     },
     {
-      "id": "C17_OPERATIONS_CUSTODY",
+      "id": "C18_NO_FRANKENSTEIN_EVOLUTION",
       "birth_required": true,
       "status": "CONFORME",
-      "authority": ["V40", "V41"],
-      "evidence": ["job_runs", "cost_events", "provider_runtime_status", "safety_incidents", "custody gates", "prelaunch reset defined"]
-    },
-    {
-      "id": "C18_ACCUMULATED_NO_LOSS_GATE",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V41", "V42"],
-      "evidence": ["A28/A30 local DoDs exposed the original failure mode", "governance/canonical-integrity-contracts.json", "scripts/check-conduction-gate.mjs blocks birth-critical GAP_REAL/DECISION_DE_AUTORIDAD_PENDIENTE outside A44 and requires CERTIFIED before leaving A44", "regression tests"]
+      "authority": ["V46", "V48", "V49", "V41"],
+      "evidence": ["one current S1 RPC", "v47_orientation_bridge removed", "versioned S1 RPC chain removed", "coverage_cells removed", "sanctuary stub removed", "V49 PRESERVAR/AJUSTAR/REEMPLAZAR rule"]
     }
   ]
 }
