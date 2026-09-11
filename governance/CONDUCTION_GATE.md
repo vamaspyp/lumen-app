@@ -1,7 +1,7 @@
 # VA+LUMEN · Conduction Gate
 
 Estado: ACTIVO
-Autoridad: deriva de V41 + V42 V1.1 + Sistema de Conducción/POV. Este archivo NO crea doctrina paralela.
+Autoridad: deriva de V41 + V42 V1.2 + Sistema de Conducción/POV. Este archivo NO crea doctrina paralela.
 
 ## Regla
 
