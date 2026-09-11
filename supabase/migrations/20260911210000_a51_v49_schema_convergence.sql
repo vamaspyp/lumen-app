@@ -235,17 +235,20 @@ alter table gf_core.help_selections
   add column if not exists decision_run_id uuid,
   add column if not exists help_version_id uuid;
 
+with ranked as (
+  select hs.selection_id,ce.decision_run_id,ce.help_version_id,
+         row_number() over(partition by hs.selection_id order by ce.created_at desc) as rn
+  from gf_core.help_selections hs
+  join gf_core.decision_runs dr on dr.episode_id=hs.episode_id and dr.person_id=hs.person_id
+  join gf_core.candidate_exposures ce on ce.decision_run_id=dr.decision_run_id and ce.person_id=hs.person_id and ce.help_id=hs.help_id
+), picked as (
+  select selection_id,decision_run_id,help_version_id from ranked where rn=1
+)
 update gf_core.help_selections hs
-set decision_run_id=x.decision_run_id,
-    help_version_id=x.help_version_id
-from lateral (
-  select ce.decision_run_id,ce.help_version_id
-  from gf_core.candidate_exposures ce
-  join gf_core.decision_runs dr on dr.decision_run_id=ce.decision_run_id
-  where dr.episode_id=hs.episode_id and ce.person_id=hs.person_id and ce.help_id=hs.help_id
-  order by ce.created_at desc limit 1
-) x
-where hs.decision_run_id is null or hs.help_version_id is null;
+set decision_run_id=picked.decision_run_id,
+    help_version_id=picked.help_version_id
+from picked
+where hs.selection_id=picked.selection_id and (hs.decision_run_id is null or hs.help_version_id is null);
 
 do $$
 begin
@@ -272,15 +275,18 @@ create unique index if not exists help_selections_one_selected_per_episode_idx
 
 alter table gf_core.outcomes_feedback add column if not exists selection_id uuid;
 
+with ranked as (
+  select o.outcome_id,hs.selection_id,
+         row_number() over(partition by o.outcome_id order by hs.created_at desc) as rn
+  from gf_core.outcomes_feedback o
+  join gf_core.help_selections hs on hs.episode_id=o.episode_id and hs.person_id=o.person_id and hs.help_id=o.help_id and hs.action='selected'
+), picked as (
+  select outcome_id,selection_id from ranked where rn=1
+)
 update gf_core.outcomes_feedback o
-set selection_id=x.selection_id
-from lateral (
-  select hs.selection_id
-  from gf_core.help_selections hs
-  where hs.episode_id=o.episode_id and hs.person_id=o.person_id and hs.help_id=o.help_id and hs.action='selected'
-  order by hs.created_at desc limit 1
-) x
-where o.selection_id is null;
+set selection_id=picked.selection_id
+from picked
+where o.outcome_id=picked.outcome_id and o.selection_id is null;
 
 do $$
 begin
