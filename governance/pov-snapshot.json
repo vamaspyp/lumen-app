@@ -4,8 +4,8 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "modified_time": "2026-09-07T14:02:20.228Z",
-    "verified_at": "2026-09-07T11:58:00-03:00",
+    "modified_time": "2026-09-11",
+    "verified_at": "2026-09-11T15:20:00-03:00",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {
@@ -14,19 +14,19 @@
     "status": "ACTIVO"
   },
   "act": {
-    "id": "A40",
-    "name": "Primeras 3–5 vidas reales",
+    "id": "A51",
+    "name": "Materializar delta V46/V47 · aplicabilidad + entrega situada",
     "status": "EN CURSO",
-    "purpose": "Poner el embrión frente a 3–5 personas reales de confianza para validar comprensión, pertinencia, utilidad y sensación de compañía, recogiendo sólo señales de producto y sin sobreajustar por casos aislados.",
-    "dod": "Preflight real-user completo; 3–5 participantes con consentimiento experimental; recorridos libres no guiados; cuatro preguntas experienciales posteriores; señales clasificadas sin almacenar intimidad externa; bugs bloqueantes corregidos con regresión; patrones consolidados antes de afinar; decisión explícita de siguiente exposición."
+    "purpose": "Alinear el runtime existente al nuevo núcleo transferible sin reescribir módulos correctos: introducir Área×Capacidad en Fuente/matching/aprendizaje y hacer posible Preparar→Posibilidad→Integrar.",
+    "dod": "Runtime incorpora taxonomías versionadas mínimas de Áreas/Capacidades + relación HelpPossibility×Area×Capacity versionada/evidenciada; decision/coverage usa esa aplicabilidad y Condiciones de Realización preservando safety→coverage→pertinencia→realización→ajuste→ranking; intent/need queda sólo como bridge interpretativo transitorio; outcome/evidence puede actualizar aplicabilidad; entrega soporta Prepare/Integrate sin nuevas entidades; migraciones reversibles + regresiones + CI/live PASS; ningún módulo sin delta demostrado se modifica."
   },
   "active_authorities": [
     {"id":"V3","name":"Sistema de Conducción","state":"VIGENTE"},
-    {"id":"V37","name":"Modelo C V0.4 · Integridad Fundacional","state":"VIGENTE"},
-    {"id":"V39","name":"Especificación Técnico-Funcional del Embrión V0.1","state":"VIGENTE"},
+    {"id":"V46","name":"Modelo Canónico Integral Definitivo V1.0","state":"VIGENTE"},
+    {"id":"V47","name":"Especificación Técnico-Funcional del Embrión V1.0","state":"VIGENTE"},
     {"id":"V40","name":"Arquitectura Greenfield del Embrión V0.1","state":"VIGENTE"},
     {"id":"V41","name":"Constitución Operativa y Guardrails Transversales V1.0","state":"VIGENTE"},
-    {"id":"V42","name":"Ficha Transversal · Guardrails Obligatorios para Todo Agente · V1.1","state":"VIGENTE"},
+    {"id":"V42","name":"Ficha Transversal · Guardrails Obligatorios para Todo Agente · V1.2","state":"VIGENTE"},
     {"id":"V43","name":"Diseño Canónico de Experiencia y Comportamiento del Embrión V1.0","state":"VIGENTE"},
     {"id":"V44","name":"Runtime Greenfield S0","state":"VIGENTE"},
     {"id":"V45","name":"Conduction Gate v0.2","state":"VIGENTE"}
