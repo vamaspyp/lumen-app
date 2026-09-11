@@ -20,130 +20,60 @@ create table if not exists gf_core.capacity_terms (
 );
 
 insert into gf_core.area_terms(taxonomy_version,area_key,display_name,status) values
-('life-taxonomy.v1','economy','Economía','active'),
-('life-taxonomy.v1','family_care','Familia y cuidado','active'),
-('life-taxonomy.v1','general_life','Vida cotidiana','active'),
-('life-taxonomy.v1','learning_growth','Aprendizaje y crecimiento','active'),
-('life-taxonomy.v1','meaning_spirituality','Sentido y espiritualidad','active'),
-('life-taxonomy.v1','relationships','Vínculos','active'),
-('life-taxonomy.v1','wellbeing','Bienestar y salud cotidiana','active'),
-('life-taxonomy.v1','work','Trabajo','active')
+('life-taxonomy.v1','economy','Economía','active'),('life-taxonomy.v1','family_care','Familia y cuidado','active'),
+('life-taxonomy.v1','general_life','Vida cotidiana','active'),('life-taxonomy.v1','learning_growth','Aprendizaje y crecimiento','active'),
+('life-taxonomy.v1','meaning_spirituality','Sentido y espiritualidad','active'),('life-taxonomy.v1','relationships','Vínculos','active'),
+('life-taxonomy.v1','wellbeing','Bienestar y salud cotidiana','active'),('life-taxonomy.v1','work','Trabajo','active')
 on conflict (taxonomy_version,area_key) do update set display_name=excluded.display_name,status=excluded.status;
 
 insert into gf_core.capacity_terms(taxonomy_version,capacity_key,display_name,status) values
-('life-taxonomy.v1','adaptation','Adaptación','active'),
-('life-taxonomy.v1','agency','Agencia','active'),
-('life-taxonomy.v1','appreciation','Apreciación','active'),
-('life-taxonomy.v1','attention','Atención','active'),
-('life-taxonomy.v1','connection','Conexión','active'),
-('life-taxonomy.v1','discernment','Discernimiento','active'),
-('life-taxonomy.v1','integration','Integración','active'),
-('life-taxonomy.v1','meaning','Sentido','active'),
-('life-taxonomy.v1','regulation','Regulación','active'),
-('life-taxonomy.v1','self_compassion','Autocompasión','active')
+('life-taxonomy.v1','adaptation','Adaptación','active'),('life-taxonomy.v1','agency','Agencia','active'),
+('life-taxonomy.v1','appreciation','Apreciación','active'),('life-taxonomy.v1','attention','Atención','active'),
+('life-taxonomy.v1','connection','Conexión','active'),('life-taxonomy.v1','discernment','Discernimiento','active'),
+('life-taxonomy.v1','integration','Integración','active'),('life-taxonomy.v1','meaning','Sentido','active'),
+('life-taxonomy.v1','regulation','Regulación','active'),('life-taxonomy.v1','self_compassion','Autocompasión','active')
 on conflict (taxonomy_version,capacity_key) do update set display_name=excluded.display_name,status=excluded.status;
+
+-- Temporary migration-only vocabulary bridge. It is removed at the end of this migration.
+create or replace function gf_core.a51_map_need_area(p_need text) returns text language sql immutable set search_path='' as $$
+select case p_need
+  when 'financial_calm' then 'economy' when 'caregiving' then 'family_care' when 'focus' then 'learning_growth'
+  when 'meaning' then 'meaning_spirituality' when 'boundaries' then 'relationships' when 'connection' then 'relationships'
+  when 'grief' then 'relationships' when 'relationship_repair' then 'relationships' when 'work_stress' then 'work'
+  when 'anxiety' then 'wellbeing' when 'emotion_regulation' then 'wellbeing' when 'energy' then 'wellbeing'
+  when 'pause' then 'wellbeing' when 'self_compassion' then 'wellbeing' when 'sleep' then 'wellbeing'
+  else 'general_life' end $$;
+
+create or replace function gf_core.a51_map_need_capacity(p_need text) returns text language sql immutable set search_path='' as $$
+select case p_need
+  when 'agency' then 'agency' when 'anxiety' then 'regulation' when 'appreciation' then 'appreciation'
+  when 'boundaries' then 'agency' when 'caregiving' then 'self_compassion' when 'change_transition' then 'adaptation'
+  when 'clarity' then 'discernment' when 'confidence' then 'agency' when 'connection' then 'connection'
+  when 'emotion_regulation' then 'regulation' when 'energy' then 'agency' when 'financial_calm' then 'discernment'
+  when 'focus' then 'attention' when 'grief' then 'integration' when 'habit' then 'agency' when 'meaning' then 'meaning'
+  when 'pause' then 'regulation' when 'relationship_repair' then 'connection' when 'self_compassion' then 'self_compassion'
+  when 'sleep' then 'regulation' when 'work_stress' then 'regulation' when 'human_support' then 'connection'
+  else 'discernment' end $$;
 
 alter table gf_core.moment_interpretations
   add column if not exists taxonomy_version text,
   add column if not exists area_keys text[] not null default '{}',
   add column if not exists capacity_keys text[] not null default '{}';
 
--- Reclassify existing synthetic interpretations into the durable Area/Capacity vocabulary.
 with mapped as (
   select mi.interpretation_id,
-         array_agg(distinct case n
-           when 'financial_calm' then 'economy'
-           when 'caregiving' then 'family_care'
-           when 'focus' then 'learning_growth'
-           when 'meaning' then 'meaning_spirituality'
-           when 'boundaries' then 'relationships'
-           when 'connection' then 'relationships'
-           when 'grief' then 'relationships'
-           when 'relationship_repair' then 'relationships'
-           when 'work_stress' then 'work'
-           when 'anxiety' then 'wellbeing'
-           when 'emotion_regulation' then 'wellbeing'
-           when 'energy' then 'wellbeing'
-           when 'pause' then 'wellbeing'
-           when 'self_compassion' then 'wellbeing'
-           when 'sleep' then 'wellbeing'
-           else 'general_life' end order by case n
-           when 'financial_calm' then 'economy'
-           when 'caregiving' then 'family_care'
-           when 'focus' then 'learning_growth'
-           when 'meaning' then 'meaning_spirituality'
-           when 'boundaries' then 'relationships'
-           when 'connection' then 'relationships'
-           when 'grief' then 'relationships'
-           when 'relationship_repair' then 'relationships'
-           when 'work_stress' then 'work'
-           when 'anxiety' then 'wellbeing'
-           when 'emotion_regulation' then 'wellbeing'
-           when 'energy' then 'wellbeing'
-           when 'pause' then 'wellbeing'
-           when 'self_compassion' then 'wellbeing'
-           when 'sleep' then 'wellbeing'
-           else 'general_life' end) as areas,
-         array_agg(distinct case n
-           when 'agency' then 'agency'
-           when 'anxiety' then 'regulation'
-           when 'appreciation' then 'appreciation'
-           when 'boundaries' then 'agency'
-           when 'caregiving' then 'self_compassion'
-           when 'change_transition' then 'adaptation'
-           when 'clarity' then 'discernment'
-           when 'confidence' then 'agency'
-           when 'connection' then 'connection'
-           when 'emotion_regulation' then 'regulation'
-           when 'energy' then 'agency'
-           when 'financial_calm' then 'discernment'
-           when 'focus' then 'attention'
-           when 'grief' then 'integration'
-           when 'habit' then 'agency'
-           when 'meaning' then 'meaning'
-           when 'pause' then 'regulation'
-           when 'relationship_repair' then 'connection'
-           when 'self_compassion' then 'self_compassion'
-           when 'sleep' then 'regulation'
-           when 'work_stress' then 'regulation'
-           when 'human_support' then 'connection'
-           else 'discernment' end order by case n
-           when 'agency' then 'agency'
-           when 'anxiety' then 'regulation'
-           when 'appreciation' then 'appreciation'
-           when 'boundaries' then 'agency'
-           when 'caregiving' then 'self_compassion'
-           when 'change_transition' then 'adaptation'
-           when 'clarity' then 'discernment'
-           when 'confidence' then 'agency'
-           when 'connection' then 'connection'
-           when 'emotion_regulation' then 'regulation'
-           when 'energy' then 'agency'
-           when 'financial_calm' then 'discernment'
-           when 'focus' then 'attention'
-           when 'grief' then 'integration'
-           when 'habit' then 'agency'
-           when 'meaning' then 'meaning'
-           when 'pause' then 'regulation'
-           when 'relationship_repair' then 'connection'
-           when 'self_compassion' then 'self_compassion'
-           when 'sleep' then 'regulation'
-           when 'work_stress' then 'regulation'
-           when 'human_support' then 'connection'
-           else 'discernment' end) as capacities
+         array_agg(distinct gf_core.a51_map_need_area(n) order by gf_core.a51_map_need_area(n)) as areas,
+         array_agg(distinct gf_core.a51_map_need_capacity(n) order by gf_core.a51_map_need_capacity(n)) as capacities
   from gf_core.moment_interpretations mi
   cross join lateral unnest(coalesce(mi.need_keys,'{}'::text[])) n
   group by mi.interpretation_id
 )
 update gf_core.moment_interpretations mi
-set taxonomy_version='life-taxonomy.v1',
-    area_keys=case when cardinality(mi.area_keys)>0 then mi.area_keys else mapped.areas end,
+set area_keys=case when cardinality(mi.area_keys)>0 then mi.area_keys else mapped.areas end,
     capacity_keys=case when cardinality(mi.capacity_keys)>0 then mi.capacity_keys else mapped.capacities end
 from mapped where mapped.interpretation_id=mi.interpretation_id;
 
-update gf_core.moment_interpretations
-set taxonomy_version='life-taxonomy.v1'
-where taxonomy_version is distinct from 'life-taxonomy.v1';
+update gf_core.moment_interpretations set taxonomy_version='life-taxonomy.v1';
 
 create table if not exists gf_core.help_applicability (
   applicability_id uuid primary key default gen_random_uuid(),
@@ -168,72 +98,39 @@ alter table gf_core.help_applicability enable row level security;
 create index if not exists help_applicability_lookup_idx on gf_core.help_applicability(taxonomy_version,area_key,capacity_key,state,priority_hint);
 create index if not exists help_applicability_help_version_idx on gf_core.help_applicability(help_version_id);
 
--- Seed the clean applicability relation from the previous synthetic coverage catalogue.
-insert into gf_core.help_applicability(
-  help_version_id,taxonomy_version,area_key,capacity_key,state,priority_hint,applicability_confidence,provenance
+with normalized as (
+  select hv.help_version_id,
+         gf_core.a51_map_need_area(cc.need_key) as area_key,
+         gf_core.a51_map_need_capacity(cc.need_key) as capacity_key,
+         cc.need_key,
+         cc.priority_hint,
+         case cc.status when 'covered' then 3 when 'partial' then 2 else 1 end as state_rank
+  from gf_core.coverage_cells cc
+  join gf_core.help_possibilities hp on hp.help_id=cc.help_id
+  join gf_core.help_versions hv on hv.help_id=hp.help_id and hv.version=hp.current_version
+  where cc.status <> 'not_covered'
+), collapsed as (
+  select help_version_id,area_key,capacity_key,
+         min(priority_hint)::smallint as priority_hint,
+         max(state_rank) as state_rank,
+         jsonb_agg(distinct need_key) as legacy_need_keys
+  from normalized
+  group by help_version_id,area_key,capacity_key
 )
-select distinct hv.help_version_id,
-       'life-taxonomy.v1',
-       case cc.need_key
-         when 'financial_calm' then 'economy'
-         when 'caregiving' then 'family_care'
-         when 'focus' then 'learning_growth'
-         when 'meaning' then 'meaning_spirituality'
-         when 'boundaries' then 'relationships'
-         when 'connection' then 'relationships'
-         when 'grief' then 'relationships'
-         when 'relationship_repair' then 'relationships'
-         when 'work_stress' then 'work'
-         when 'anxiety' then 'wellbeing'
-         when 'emotion_regulation' then 'wellbeing'
-         when 'energy' then 'wellbeing'
-         when 'pause' then 'wellbeing'
-         when 'self_compassion' then 'wellbeing'
-         when 'sleep' then 'wellbeing'
-         else 'general_life' end,
-       case cc.need_key
-         when 'agency' then 'agency'
-         when 'anxiety' then 'regulation'
-         when 'appreciation' then 'appreciation'
-         when 'boundaries' then 'agency'
-         when 'caregiving' then 'self_compassion'
-         when 'change_transition' then 'adaptation'
-         when 'clarity' then 'discernment'
-         when 'confidence' then 'agency'
-         when 'connection' then 'connection'
-         when 'emotion_regulation' then 'regulation'
-         when 'energy' then 'agency'
-         when 'financial_calm' then 'discernment'
-         when 'focus' then 'attention'
-         when 'grief' then 'integration'
-         when 'habit' then 'agency'
-         when 'meaning' then 'meaning'
-         when 'pause' then 'regulation'
-         when 'relationship_repair' then 'connection'
-         when 'self_compassion' then 'self_compassion'
-         when 'sleep' then 'regulation'
-         when 'work_stress' then 'regulation'
-         when 'human_support' then 'connection'
-         else 'discernment' end,
-       case cc.status when 'covered' then 'applicable' when 'partial' then 'partial' else 'restricted' end,
-       cc.priority_hint,
-       case cc.status when 'covered' then 0.700 when 'partial' then 0.500 else 0.300 end,
-       jsonb_build_object('source','coverage_cells_migration','legacy_need_key',cc.need_key)
-from gf_core.coverage_cells cc
-join gf_core.help_possibilities hp on hp.help_id=cc.help_id
-join gf_core.help_versions hv on hv.help_id=hp.help_id and hv.version=hp.current_version
-where cc.status <> 'not_covered'
+insert into gf_core.help_applicability(help_version_id,taxonomy_version,area_key,capacity_key,state,priority_hint,applicability_confidence,provenance)
+select help_version_id,'life-taxonomy.v1',area_key,capacity_key,
+       case state_rank when 3 then 'applicable' when 2 then 'partial' else 'restricted' end,
+       priority_hint,
+       case state_rank when 3 then 0.700 when 2 then 0.500 else 0.300 end,
+       jsonb_build_object('source','coverage_cells_migration','legacy_need_keys',legacy_need_keys)
+from collapsed
 on conflict (help_version_id,taxonomy_version,area_key,capacity_key) do update
-set state=excluded.state,
-    priority_hint=least(gf_core.help_applicability.priority_hint,excluded.priority_hint),
+set state=excluded.state,priority_hint=least(gf_core.help_applicability.priority_hint,excluded.priority_hint),
     applicability_confidence=greatest(gf_core.help_applicability.applicability_confidence,excluded.applicability_confidence),
-    provenance=gf_core.help_applicability.provenance || excluded.provenance,
-    updated_at=now();
+    provenance=gf_core.help_applicability.provenance || excluded.provenance,updated_at=now();
 
--- Selection becomes the immutable link between a decision, an exact help version and an outcome.
-alter table gf_core.help_selections
-  add column if not exists decision_run_id uuid,
-  add column if not exists help_version_id uuid;
+alter table gf_core.help_selections add column if not exists decision_run_id uuid;
+alter table gf_core.help_selections add column if not exists help_version_id uuid;
 
 with ranked as (
   select hs.selection_id,ce.decision_run_id,ce.help_version_id,
@@ -241,17 +138,11 @@ with ranked as (
   from gf_core.help_selections hs
   join gf_core.decision_runs dr on dr.episode_id=hs.episode_id and dr.person_id=hs.person_id
   join gf_core.candidate_exposures ce on ce.decision_run_id=dr.decision_run_id and ce.person_id=hs.person_id and ce.help_id=hs.help_id
-), picked as (
-  select selection_id,decision_run_id,help_version_id from ranked where rn=1
-)
-update gf_core.help_selections hs
-set decision_run_id=picked.decision_run_id,
-    help_version_id=picked.help_version_id
-from picked
-where hs.selection_id=picked.selection_id and (hs.decision_run_id is null or hs.help_version_id is null);
+), picked as (select selection_id,decision_run_id,help_version_id from ranked where rn=1)
+update gf_core.help_selections hs set decision_run_id=p.decision_run_id,help_version_id=p.help_version_id
+from picked p where hs.selection_id=p.selection_id and (hs.decision_run_id is null or hs.help_version_id is null);
 
-do $$
-begin
+do $$ begin
   if exists(select 1 from gf_core.help_selections where decision_run_id is null or help_version_id is null) then
     raise exception 'A51 cannot trace all existing selections to decision/help version';
   end if;
@@ -260,8 +151,7 @@ end $$;
 alter table gf_core.help_selections alter column decision_run_id set not null;
 alter table gf_core.help_selections alter column help_version_id set not null;
 
-do $$
-begin
+do $$ begin
   if not exists(select 1 from pg_constraint where conname='help_selections_decision_run_id_fkey' and conrelid='gf_core.help_selections'::regclass) then
     alter table gf_core.help_selections add constraint help_selections_decision_run_id_fkey foreign key(decision_run_id) references gf_core.decision_runs(decision_run_id);
   end if;
@@ -270,38 +160,29 @@ begin
   end if;
 end $$;
 
-create unique index if not exists help_selections_one_selected_per_episode_idx
-  on gf_core.help_selections(episode_id,person_id) where action='selected';
+create unique index if not exists help_selections_one_selected_per_episode_idx on gf_core.help_selections(episode_id,person_id) where action='selected';
 
 alter table gf_core.outcomes_feedback add column if not exists selection_id uuid;
-
 with ranked as (
-  select o.outcome_id,hs.selection_id,
-         row_number() over(partition by o.outcome_id order by hs.created_at desc) as rn
+  select o.outcome_id,hs.selection_id,row_number() over(partition by o.outcome_id order by hs.created_at desc) as rn
   from gf_core.outcomes_feedback o
   join gf_core.help_selections hs on hs.episode_id=o.episode_id and hs.person_id=o.person_id and hs.help_id=o.help_id and hs.action='selected'
-), picked as (
-  select outcome_id,selection_id from ranked where rn=1
-)
-update gf_core.outcomes_feedback o
-set selection_id=picked.selection_id
-from picked
-where o.outcome_id=picked.outcome_id and o.selection_id is null;
+), picked as (select outcome_id,selection_id from ranked where rn=1)
+update gf_core.outcomes_feedback o set selection_id=p.selection_id from picked p where o.outcome_id=p.outcome_id and o.selection_id is null;
 
-do $$
-begin
+do $$ begin
   if exists(select 1 from gf_core.outcomes_feedback where selection_id is null) then
     raise exception 'A51 cannot trace all existing outcomes to a selection';
   end if;
 end $$;
 
 alter table gf_core.outcomes_feedback alter column selection_id set not null;
-
-do $$
-begin
+do $$ begin
   if not exists(select 1 from pg_constraint where conname='outcomes_feedback_selection_id_fkey' and conrelid='gf_core.outcomes_feedback'::regclass) then
     alter table gf_core.outcomes_feedback add constraint outcomes_feedback_selection_id_fkey foreign key(selection_id) references gf_core.help_selections(selection_id);
   end if;
 end $$;
-
 create unique index if not exists outcomes_feedback_one_per_selection_idx on gf_core.outcomes_feedback(selection_id);
+
+drop function if exists gf_core.a51_map_need_area(text);
+drop function if exists gf_core.a51_map_need_capacity(text);
