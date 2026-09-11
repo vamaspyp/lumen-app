@@ -1,41 +1,22 @@
 {
   "schema_version": "1.1",
-  "system": {
-    "id": "V3",
-    "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
-    "role": "POV"
-  },
-  "focus": {
-    "id": "F6",
-    "name": "Nacimiento del Embrión y primeras vidas reales"
-  },
-  "act": {
-    "id": "A54",
-    "name": "Certificación Integral de Conformidad del Embrión",
-    "status": "EN CURSO"
-  },
+  "system": {"id":"V3","spreadsheet_id":"1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM","role":"POV"},
+  "focus": {"id":"F6","name":"Nacimiento del Embrión y primeras vidas reales"},
+  "act": {"id":"A56","name":"Prueba de Nacimiento y Conducción del Embrión","status":"EN CURSO"},
   "authorities": [
-    {"id": "V46", "role": "autoridad_conceptual_integral"},
-    {"id": "V48", "role": "autoridad_funcional"},
-    {"id": "V49", "role": "autoridad_tecnico_funcional"},
-    {"id": "V40", "role": "autoridad_tecnica_complementaria"},
-    {"id": "V41", "role": "autoridad_transversal"},
-    {"id": "V42", "version": "1.2", "role": "gobierno_de_agentes"},
-    {"id": "V43", "role": "autoridad_experiencial"},
-    {"id": "V44", "role": "runtime_greenfield"},
-    {"id": "V45", "version": "0.2", "role": "infraestructura_de_gobierno"}
+    {"id":"V46","role":"autoridad_conceptual_integral"},
+    {"id":"V48","role":"autoridad_funcional"},
+    {"id":"V49","role":"autoridad_tecnico_funcional"},
+    {"id":"V40","role":"autoridad_tecnica_complementaria"},
+    {"id":"V41","role":"autoridad_transversal"},
+    {"id":"V42","version":"1.2","role":"gobierno_de_agentes"},
+    {"id":"V43","role":"autoridad_experiencial"},
+    {"id":"V44","role":"runtime_greenfield"},
+    {"id":"V45","version":"0.2","role":"infraestructura_de_gobierno"},
+    {"id":"V50","role":"activo_tecnico_descriptivo_as_built"}
   ],
-  "required_sequence": [
-    "POV_ACTIVOS",
-    "FOCO",
-    "ACTO_DOD",
-    "AUTORIDAD_VIGENTE",
-    "REALIDAD_TECNICA",
-    "EJECUCION",
-    "EVIDENCIA",
-    "CIERRE"
-  ],
-  "construction_rule": "A54 audits bidirectionally V48/V49↔runtime and inherits the clean-runtime rule: el runtime preserva lo correcto, ajusta sólo cuando el cambio es local y limpio, y reemplaza lo que exigiría deuda conceptual. Bridges permanentes, aliases legacy y capas paralelas siguen prohibidos. Fix only unequivocal implementation defects; authority conflicts or undetermined structural decisions fail closed. Zero material gaps and zero unjustified residues are required for closure.",
-  "fail_closed": true,
-  "updated_at": "2026-09-11T18:12:00-03:00"
+  "required_sequence":["POV_ACTIVOS","FOCO","ACTO_DOD","AUTORIDAD_VIGENTE","REALIDAD_TECNICA","EJECUCION","EVIDENCIA","CIERRE"],
+  "construction_rule":"A56 prueba nacimiento sin perfeccionismo: el runtime preserva lo certificado, ajusta sólo un fallo vital inequívoco y reemplaza únicamente lo que la autoridad vigente haga incompatible. Bridges permanentes, aliases legacy y capas paralelas siguen prohibidos. Cobertura o madurez autorizada no bloquean nacimiento y pasan a A46/evolución posterior.",
+  "fail_closed":true,
+  "updated_at":"2026-09-11T18:35:00-03:00"
 }
