@@ -6,6 +6,7 @@ const read = (path) => fs.readFileSync(path, 'utf8')
 const migration = read('supabase/migrations/20260911153000_a51_v47_applicability_delta.sql')
 const lock = read('supabase/migrations/20260911153200_a51_lock_internal_core.sql')
 const epistemic = read('supabase/migrations/20260911153500_a51_v47_epistemic_names.sql')
+const ranking = read('supabase/migrations/20260911154000_a51_relevance_before_repertoire.sql')
 const client = read('src/greenfield/application/s1.ts')
 const manifest = JSON.parse(read('governance/canonical-integrity-contracts.json'))
 
@@ -26,6 +27,11 @@ test('legacy intent/need remains a bridge, not the primary decision contract', (
   assert.match(migration, /area_capacity_applicability_match/i)
   assert.match(migration, /legacy_intent_key/i)
   assert.match(migration, /legacy_need_keys/i)
+})
+
+test('relevance outranks own repertoire; continuity only refines a relevant set', () => {
+  assert.match(ranking, /order by applicability_rank,intent_rank,repertoire_rank,status_rank,priority_hint,canonical_code limit 2/i)
+  assert.match(ranking, /order by repertoire_rank,applicability_rank,intent_rank,status_rank,priority_hint,canonical_code limit 2/i)
 })
 
 test('delivery is a pattern, not a new entity', () => {
