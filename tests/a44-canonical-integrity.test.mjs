@@ -6,8 +6,9 @@ const read = (path) => fs.readFileSync(path, 'utf8')
 const manifest = JSON.parse(read('governance/canonical-integrity-contracts.json'))
 const gate = read('scripts/check-conduction-gate.mjs')
 const s1Client = read('src/greenfield/application/s1.ts')
-const originalMigration = read('supabase/migrations/20260907123000_a44_preserve_original_expression.sql')
-const lifeInferenceMigration = read('supabase/migrations/20260907131500_a44_life_inferences_envelope.sql')
+const embryoClient = read('src/greenfield/application/embryo.ts')
+const schemaMigration = read('supabase/migrations/20260911210000_a51_v49_schema_convergence.sql')
+const runtimeMigration = read('supabase/migrations/20260911210100_a51_v49_runtime_contracts.sql')
 
 const allowed = new Set([
   'CONFORME',
@@ -15,17 +16,12 @@ const allowed = new Set([
   'GAP_REAL',
   'DECISION_DE_AUTORIDAD_PENDIENTE',
 ])
+const allowedCertificationStates = new Set(['IN_PROGRESS', 'READY_FOR_FINAL_CHECK', 'CERTIFIED'])
 
-const allowedCertificationStates = new Set([
-  'IN_PROGRESS',
-  'READY_FOR_FINAL_CHECK',
-  'CERTIFIED',
-])
-
-test('A44 canonical integrity manifest is structured and birth-scoped', () => {
+test('canonical integrity manifest is structured, current and birth-scoped', () => {
   assert.equal(manifest.scope, 'embryo_birth')
-  assert.equal(manifest.certification_act, 'A44')
-  assert.deepEqual(manifest.authority_set, ['V37', 'V39', 'V40', 'V41', 'V43'])
+  assert.equal(manifest.certification_act, 'A51')
+  assert.deepEqual(manifest.authority_set, ['V46', 'V48', 'V49', 'V40', 'V41', 'V43'])
   assert.ok(allowedCertificationStates.has(manifest.certification_status))
   assert.ok(Array.isArray(manifest.contracts))
   assert.ok(manifest.contracts.length >= 18)
@@ -39,10 +35,13 @@ test('A44 canonical integrity manifest is structured and birth-scoped', () => {
     assert.ok(allowed.has(contract.status), `invalid status for ${contract.id}`)
     assert.ok(Array.isArray(contract.authority) && contract.authority.length > 0)
     assert.ok(Array.isArray(contract.evidence) && contract.evidence.length > 0)
+    assert.equal(contract.authority.includes('V37'), false)
+    assert.equal(contract.authority.includes('V39'), false)
+    assert.equal(contract.authority.includes('V47'), false)
   }
 })
 
-test('Conduction Gate enforces accumulated no-loss integrity', () => {
+test('Conduction Gate still enforces accumulated no-loss integrity', () => {
   assert.match(gate, /canonical-integrity-contracts\.json/)
   assert.match(gate, /blockingContracts/)
   assert.match(gate, /birth-critical canonical integrity blockers remain/)
@@ -50,34 +49,39 @@ test('Conduction Gate enforces accumulated no-loss integrity', () => {
   assert.match(gate, /currentAct !== certificationAct/)
 })
 
-test('A44 certification state cannot hide birth-critical blockers', () => {
+test('certification state cannot hide birth-critical blockers', () => {
   const blockers = manifest.contracts.filter((contract) =>
     contract.birth_required === true &&
     ['GAP_REAL', 'DECISION_DE_AUTORIDAD_PENDIENTE'].includes(contract.status)
   )
-
-  if (manifest.certification_status === 'CERTIFIED') {
-    assert.equal(blockers.length, 0)
-  }
-  if (manifest.certification_status === 'READY_FOR_FINAL_CHECK') {
+  if (['CERTIFIED', 'READY_FOR_FINAL_CHECK'].includes(manifest.certification_status)) {
     assert.equal(blockers.length, 0)
   }
 })
 
-test('A44 restored original-expression custody is the only S1 client entrypoint', () => {
-  assert.match(s1Client, /lumen_s1_accompany_moment_v3/)
-  assert.doesNotMatch(s1Client, /\.rpc\('lumen_s1_accompany_moment'/)
-  assert.match(originalMigration, /gf_private\.moment_originals/)
-  assert.match(originalMigration, /original_retention='private_ref'/)
-  assert.match(originalMigration, /shared_learning[^\n]*false/i)
-  assert.match(originalMigration, /revoke execute on function public\.lumen_s1_accompany_moment\(/i)
+test('S1 has one current public accompaniment contract and no V47 client bridge', () => {
+  assert.match(s1Client, /\.rpc\('lumen_s1_accompany_moment'/)
+  assert.doesNotMatch(s1Client, /lumen_s1_accompany_moment_v\d|v47_core|intent_key|need_keys/)
+  assert.match(s1Client, /taxonomy_version/)
+  assert.match(s1Client, /area_keys/)
+  assert.match(s1Client, /capacity_keys/)
+  assert.match(runtimeMigration, /drop function if exists public\.lumen_s1_accompany_moment_v3/i)
+  assert.match(runtimeMigration, /drop function if exists gf_core\.v47_orientation_bridge/i)
 })
 
-test('A44 LIFE keeps an open versionable inference envelope instead of a rigid taxonomy', () => {
-  assert.match(lifeInferenceMigration, /create table if not exists gf_core\.inferences/i)
-  assert.match(lifeInferenceMigration, /inference_kind/i)
-  assert.match(lifeInferenceMigration, /confidence/i)
-  assert.match(lifeInferenceMigration, /valid_from/i)
-  assert.match(lifeInferenceMigration, /valid_to/i)
-  assert.match(lifeInferenceMigration, /provenance/i)
+test('V49 separates applicability from coverage instead of renaming legacy', () => {
+  assert.match(schemaMigration, /create table if not exists gf_core\.help_applicability/i)
+  assert.match(runtimeMigration, /coverage\.eval\.v1/)
+  assert.match(runtimeMigration, /drop table if exists gf_core\.coverage_cells/i)
+  assert.match(embryoClient, /p_area_key/)
+  assert.match(embryoClient, /p_capacity_key/)
+  assert.doesNotMatch(embryoClient, /p_need_key|coverage_cells/)
+})
+
+test('outcome attribution follows selection and exact help version', () => {
+  assert.match(schemaMigration, /help_selections[\s\S]*decision_run_id/i)
+  assert.match(schemaMigration, /help_selections[\s\S]*help_version_id/i)
+  assert.match(schemaMigration, /outcomes_feedback[\s\S]*selection_id/i)
+  assert.match(runtimeMigration, /evidence\.v49\.1/)
+  assert.match(s1Client, /recordOutcome\([\s\S]*episodeId[\s\S]*effect/)
 })
