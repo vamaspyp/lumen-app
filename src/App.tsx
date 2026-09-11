@@ -16,6 +16,7 @@ import {
   getContinuitySnapshot,
   getEmbryoHealth,
   getProactivitySnapshot,
+  getSourceTaxonomy,
   getTissueSnapshot,
   integrateHelp,
   joinCircle,
@@ -35,6 +36,7 @@ import {
   type ProactivitySnapshot,
   type SanctuaryEntry,
   type SourceItem,
+  type SourceTaxonomy,
 } from './greenfield/application/embryo'
 import {
   accompanyMoment,
@@ -118,7 +120,9 @@ function PrivateGate({ spaceName, copy, onGoNow }: { spaceName: string; copy: st
 function SourceSpace() {
   const [items, setItems] = useState<SourceItem[]>([])
   const [health, setHealth] = useState<EmbryoHealth | null>(null)
-  const [need, setNeed] = useState('')
+  const [taxonomy, setTaxonomy] = useState<SourceTaxonomy | null>(null)
+  const [area, setArea] = useState('')
+  const [capacity, setCapacity] = useState('')
   const [type, setType] = useState('')
   const [busy, setBusy] = useState(true)
   const [error, setError] = useState('')
@@ -127,31 +131,37 @@ function SourceSpace() {
     setBusy(true)
     setError('')
     const locale = navigator.language || 'es-AR'
-    Promise.all([discoverSource(need || null, type || null, locale, 40), getEmbryoHealth()])
-      .then(([nextItems, nextHealth]) => {
+    Promise.all([
+      discoverSource(area || null, capacity || null, type || null, locale, 40),
+      getSourceTaxonomy(),
+      getEmbryoHealth(),
+    ])
+      .then(([nextItems, nextTaxonomy, nextHealth]) => {
         setItems(nextItems)
+        setTaxonomy(nextTaxonomy)
         setHealth(nextHealth)
       })
       .catch((cause) => setError(cause instanceof Error ? cause.message : 'No pude abrir Fuente.'))
       .finally(() => setBusy(false))
-  }, [need, type])
+  }, [area, capacity, type])
 
   return (
     <section className="space-scene source-space">
       <p className="presence-label">FUENTE</p>
       <h1>Algo del patrimonio humano, cuando haga falta.</h1>
-      <p className="lumi-line">No es un feed. Podés explorar por lo que querés cuidar y por la forma de ayuda que hoy te resulte posible.</p>
+      <p className="lumi-line">No es un feed. Podés explorar por el ámbito de vida, la capacidad que querés cultivar o recuperar y la forma de ayuda que hoy te resulte posible.</p>
 
       <div className="filter-bar" aria-label="Filtros de Fuente">
-        <label>Necesidad
-          <select value={need} onChange={(event) => setNeed(event.target.value)}>
+        <label>Área
+          <select value={area} onChange={(event) => setArea(event.target.value)}>
             <option value="">Todas</option>
-            <option value="pause">Pausa</option>
-            <option value="clarity">Claridad</option>
-            <option value="agency">Acción</option>
-            <option value="meaning">Sentido</option>
-            <option value="connection">Conexión</option>
-            <option value="appreciation">Apreciación</option>
+            {taxonomy?.areas.map((term) => <option key={term.key} value={term.key}>{term.label}</option>)}
+          </select>
+        </label>
+        <label>Capacidad
+          <select value={capacity} onChange={(event) => setCapacity(event.target.value)}>
+            <option value="">Todas</option>
+            {taxonomy?.capacities.map((term) => <option key={term.key} value={term.key}>{term.label}</option>)}
           </select>
         </label>
         <label>Forma
@@ -166,7 +176,7 @@ function SourceSpace() {
         </label>
       </div>
 
-      {health && <p className="space-note">{health.source.active_possibilities} posibilidades activas limitadas · {health.source.semantic_types} formas semánticas · cobertura todavía en aprendizaje.</p>}
+      {health && <p className="space-note">{health.source.active_possibilities} posibilidades activas limitadas · {health.source.applicability_relations} relaciones de aplicabilidad · {health.source.semantic_types} formas semánticas · cobertura todavía en aprendizaje.</p>}
       {busy && <p className="lumi-line">Abriendo Fuente…</p>}
       {error && <p className="error-note" role="alert">{error}</p>}
       {!busy && !error && items.length === 0 && <p className="empty-note">No encontré algo suficientemente pertinente con estos filtros.</p>}
@@ -498,7 +508,7 @@ function TissueSpace() {
   const [error, setError] = useState('')
 
   const refresh = async () => {
-    const [nextCircles, nextSource] = await Promise.all([getTissueSnapshot(), discoverSource(null, null, navigator.language || 'es-AR', 20)])
+    const [nextCircles, nextSource] = await Promise.all([getTissueSnapshot(), discoverSource(null, null, null, navigator.language || 'es-AR', 20)])
     setCircles(nextCircles)
     setSource(nextSource)
   }
@@ -678,11 +688,11 @@ function App() {
   }
 
   const finishOutcome = async (effect: OutcomeEffect) => {
-    if (!scene?.episode_id || !selectedHelp?.help_id) return
+    if (!scene?.episode_id || !selectedHelp) return
     setBusy(true)
     setError('')
     try {
-      await recordOutcome(scene.episode_id, selectedHelp.help_id, effect)
+      await recordOutcome(scene.episode_id, effect)
       setLastOutcome(effect)
       setClosingMessage('Gracias. Con esto alcanza por ahora.')
       setStage('closed')
