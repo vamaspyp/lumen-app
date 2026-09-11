@@ -10,16 +10,16 @@
     "name": "Nacimiento del Embrión y primeras vidas reales"
   },
   "act": {
-    "id": "A40",
-    "name": "Primeras 3–5 vidas reales",
+    "id": "A51",
+    "name": "Materializar delta V46/V47 · aplicabilidad + entrega situada",
     "status": "EN CURSO"
   },
   "authorities": [
-    {"id": "V37", "role": "autoridad_conceptual"},
-    {"id": "V39", "role": "autoridad_funcional"},
+    {"id": "V46", "role": "autoridad_conceptual"},
+    {"id": "V47", "role": "autoridad_funcional"},
     {"id": "V40", "role": "autoridad_tecnica"},
     {"id": "V41", "role": "autoridad_transversal"},
-    {"id": "V42", "version": "1.1", "role": "gobierno_de_agentes"},
+    {"id": "V42", "version": "1.2", "role": "gobierno_de_agentes"},
     {"id": "V43", "role": "autoridad_experiencial"},
     {"id": "V45", "version": "0.2", "role": "infraestructura_de_gobierno"}
   ],
@@ -34,5 +34,5 @@
     "CIERRE"
   ],
   "fail_closed": true,
-  "updated_at": "2026-09-07T11:58:00-03:00"
+  "updated_at": "2026-09-11T15:20:00-03:00"
 }
