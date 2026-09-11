@@ -4,16 +4,16 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "verified_at": "2026-09-11T17:00:00-03:00",
+    "verified_at": "2026-09-11T17:41:00-03:00",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {"id": "F6", "name": "Nacimiento del Embrión y primeras vidas reales", "status": "ACTIVO"},
   "act": {
-    "id": "A51",
-    "name": "Materializar deltas de especificación sobre runtime greenfield",
+    "id": "A54",
+    "name": "Certificación Integral de Conformidad del Embrión",
     "status": "EN CURSO",
-    "purpose": "Alinear el Embrión real con V46/V48/V49 mediante un diff target↔runtime, preservando sólo lo que coincide limpiamente y reemplazando semántica transitoria sin legacy ni capas paralelas.",
-    "dod": "Sólo los deltas confirmados por V49 se materializan y verifican; Posibilidad×Área×Capacidad, selección→acompañamiento, outcome/evidence y autoridad quedan coherentes; no se crean entidades paralelas; pruebas de no-regresión, cross-user, NO_MATCH, safety e independencia legacy PASS; CI/live PASS."
+    "purpose": "Demostrar bidireccionalmente que el Embrión construido representa íntegramente V48/V49 y que no contiene gaps materiales, desvíos, excesos ni residuos arquitectónicos injustificados antes de certificar exposición real.",
+    "dod": "Existe matriz exhaustiva V48/V49→runtime y runtime→V48/V49; cada función/contrato y cada componente material quedan CONFORME / GAP / EXCESO / DESVÍO con evidencia; todo GAP/DESVÍO/EXCESO material se corrige o escala si requiere decisión humana; se verifican función, datos, backend, experiencia, privacidad, safety, missingness, Fuente, Tejido, continuidad, Knowledge/Evolution, Ledger, independencia legacy y no-Frankenstein; 0 gaps materiales conocidos y 0 residuos injustificados al cierre; CI/live PASS; queda base verificable para Especificación As-Built y A46."
   },
   "active_authorities": [
     {"id":"V3","name":"Sistema de Conducción","state":"VIGENTE"},
@@ -34,6 +34,7 @@
     "implementation_is_not_authority": true,
     "target_precedes_runtime_diff": true,
     "permanent_bridges_forbidden": true,
+    "bidirectional_conformity_required": true,
     "fail_closed": true,
     "snapshot_max_age_hours": 72
   }

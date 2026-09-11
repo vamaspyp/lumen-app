@@ -117,13 +117,16 @@ function PrivateGate({ spaceName, copy, onGoNow }: { spaceName: string; copy: st
   )
 }
 
-function SourceSpace() {
+function SourceSpace({ authenticated, onRequestIdentity }: { authenticated: boolean; onRequestIdentity: () => void }) {
   const [items, setItems] = useState<SourceItem[]>([])
   const [health, setHealth] = useState<EmbryoHealth | null>(null)
   const [taxonomy, setTaxonomy] = useState<SourceTaxonomy | null>(null)
   const [area, setArea] = useState('')
   const [capacity, setCapacity] = useState('')
   const [type, setType] = useState('')
+  const [memoryAllowed, setMemoryAllowed] = useState(false)
+  const [savedHelpIds, setSavedHelpIds] = useState<Set<string>>(() => new Set())
+  const [saveMessage, setSaveMessage] = useState('')
   const [busy, setBusy] = useState(true)
   const [error, setError] = useState('')
 
@@ -135,15 +138,40 @@ function SourceSpace() {
       discoverSource(area || null, capacity || null, type || null, locale, 40),
       getSourceTaxonomy(),
       getEmbryoHealth(),
+      authenticated ? getContinuitySnapshot() : Promise.resolve(null),
     ])
-      .then(([nextItems, nextTaxonomy, nextHealth]) => {
+      .then(([nextItems, nextTaxonomy, nextHealth, continuity]) => {
         setItems(nextItems)
         setTaxonomy(nextTaxonomy)
         setHealth(nextHealth)
+        setMemoryAllowed(Boolean(continuity?.memory_allowed))
       })
       .catch((cause) => setError(cause instanceof Error ? cause.message : 'No pude abrir Fuente.'))
       .finally(() => setBusy(false))
-  }, [area, capacity, type])
+  }, [area, capacity, type, authenticated])
+
+  const saveForLater = async (item: SourceItem) => {
+    if (!authenticated) {
+      onRequestIdentity()
+      return
+    }
+    setBusy(true)
+    setError('')
+    setSaveMessage('')
+    try {
+      if (!memoryAllowed) {
+        await setMemory(true)
+        setMemoryAllowed(true)
+      }
+      await saveSanctuary('treasure', item.title, item.summary, item.help_id)
+      setSavedHelpIds((current) => new Set(current).add(item.help_id))
+      setSaveMessage(`Guardé “${item.title}” en tu Santuario para que puedas volver. Esto no lo convierte en parte de tu repertorio.`)
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'No pude guardar esta posibilidad.')
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
     <section className="space-scene source-space">
@@ -177,6 +205,7 @@ function SourceSpace() {
       </div>
 
       {health && <p className="space-note">{health.source.active_possibilities} posibilidades activas limitadas · {health.source.applicability_relations} relaciones de aplicabilidad · {health.source.semantic_types} formas semánticas · cobertura todavía en aprendizaje.</p>}
+      {saveMessage && <p className="success-note">{saveMessage}</p>}
       {busy && <p className="lumi-line">Abriendo Fuente…</p>}
       {error && <p className="error-note" role="alert">{error}</p>}
       {!busy && !error && items.length === 0 && <p className="empty-note">No encontré algo suficientemente pertinente con estos filtros.</p>}
@@ -186,6 +215,7 @@ function SourceSpace() {
           const externalUrl = typeof item.content?.external_url === 'string' ? item.content.external_url : null
           const steps = Array.isArray(item.content?.steps) ? item.content.steps.filter((step): step is string => typeof step === 'string') : []
           const prompt = typeof item.content?.prompt === 'string' ? item.content.prompt : null
+          const saved = savedHelpIds.has(item.help_id)
           return (
             <article className="source-card" key={item.help_id}>
               <div className="help-meta">
@@ -198,7 +228,12 @@ function SourceSpace() {
               {steps.length > 0 && <ol className="mini-steps">{steps.map((step) => <li key={step}>{step}</li>)}</ol>}
               {prompt && <p className="mini-prompt">{prompt}</p>}
               <p className="provenance-line">Origen: {item.provider.name}</p>
-              {externalUrl && <a className="secondary-link" href={externalUrl} target="_blank" rel="noreferrer">Abrir recurso original</a>}
+              <div className="small-actions">
+                {externalUrl && <a className="secondary-link" href={externalUrl} target="_blank" rel="noreferrer">Abrir recurso original</a>}
+                <button className="text-action" type="button" disabled={busy || saved} onClick={() => void saveForLater(item)}>
+                  {saved ? 'Guardado en Santuario' : !authenticated ? 'Entrar para guardar' : memoryAllowed ? 'Guardar para volver' : 'Permitir memoria y guardar'}
+                </button>
+              </div>
             </article>
           )
         })}
@@ -721,6 +756,12 @@ function App() {
     if (next === 'ahora' && stage === 'closed') resetHome()
   }
 
+  const requestIdentityFromSource = () => {
+    setSpace('ahora')
+    setStage('auth')
+    setError('')
+  }
+
   return (
     <main className={`lumen-shell presence-${scene?.presence_mode?.toLowerCase() || 'p3'}`}>
       <header className="quiet-header wide-header">
@@ -731,7 +772,7 @@ function App() {
         {authChecked && authenticated ? <button className="text-action" type="button" onClick={() => void logout()} disabled={busy}>Salir</button> : <span className="header-spacer" />}
       </header>
 
-      {space === 'fuente' && <SourceSpace />}
+      {space === 'fuente' && <SourceSpace authenticated={authenticated} onRequestIdentity={requestIdentityFromSource} />}
       {space === 'trayectoria' && (authenticated ? <TrajectorySpace /> : <PrivateGate spaceName="Trayectoria" copy="Tus Faros, Camino y repertorio necesitan una identidad para no mezclarse con los de otra persona." onGoNow={() => openSpace('ahora')} />)}
       {space === 'santuario' && (authenticated ? <SanctuarySpace /> : <PrivateGate spaceName="Santuario" copy="Lo que guardes acá es íntimo y sólo puede abrirse cuando LUMEN sabe que sos vos." onGoNow={() => openSpace('ahora')} />)}
       {space === 'tejido' && (authenticated ? <TissueSpace /> : <PrivateGate spaceName="Tejido" copy="Los Círculos son privados y por invitación. Para entrar, crear o compartir, LUMEN necesita saber qué persona está participando." onGoNow={() => openSpace('ahora')} />)}

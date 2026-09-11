@@ -11,7 +11,7 @@
     "test:live": "node tests/s0-live-integration.mjs",
     "preview": "vite preview",
     "e2e:smoke": "playwright test",
-    "test:regression": "playwright test e2e/smoke.spec.ts",
+    "test:regression": "playwright test",
     "verify": "npm run test:unit && npm run lint && npm run build && npm run test:regression"
   },
   "dependencies": {
