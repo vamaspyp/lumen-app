@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "system": {
     "id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
@@ -10,17 +10,19 @@
     "name": "Nacimiento del Embrión y primeras vidas reales"
   },
   "act": {
-    "id": "A40",
-    "name": "Primeras 3–5 vidas reales",
+    "id": "A51",
+    "name": "Materializar deltas de especificación sobre runtime greenfield",
     "status": "EN CURSO"
   },
   "authorities": [
-    {"id": "V37", "role": "autoridad_conceptual"},
-    {"id": "V39", "role": "autoridad_funcional"},
-    {"id": "V40", "role": "autoridad_tecnica"},
+    {"id": "V46", "role": "autoridad_conceptual_integral"},
+    {"id": "V48", "role": "autoridad_funcional"},
+    {"id": "V49", "role": "autoridad_tecnico_funcional"},
+    {"id": "V40", "role": "autoridad_tecnica_complementaria"},
     {"id": "V41", "role": "autoridad_transversal"},
-    {"id": "V42", "version": "1.1", "role": "gobierno_de_agentes"},
+    {"id": "V42", "version": "1.2", "role": "gobierno_de_agentes"},
     {"id": "V43", "role": "autoridad_experiencial"},
+    {"id": "V44", "role": "runtime_greenfield"},
     {"id": "V45", "version": "0.2", "role": "infraestructura_de_gobierno"}
   ],
   "required_sequence": [
@@ -33,6 +35,7 @@
     "EVIDENCIA",
     "CIERRE"
   ],
+  "construction_rule": "V49 define target; runtime se preserva, ajusta o reemplaza por mérito actual. Prohibidos bridges permanentes, aliases legacy y capas paralelas.",
   "fail_closed": true,
-  "updated_at": "2026-09-07T11:58:00-03:00"
+  "updated_at": "2026-09-11T17:00:00-03:00"
 }

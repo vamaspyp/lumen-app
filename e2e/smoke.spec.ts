@@ -18,14 +18,16 @@ async function installSyntheticSession(page: Page) {
 
 function helpScene() {
   return {
-    scene_id: 'moment.help', scene_version: 's1.v3', presence_mode: 'P2', human_intent: 'move_forward',
+    scene_id: 'moment.help', scene_version: 's1.v49', presence_mode: 'P2',
     episode_id: '30000000-0000-0000-0000-000000000101', moment_id: '40000000-0000-0000-0000-000000000101', decision_run_id: '50000000-0000-0000-0000-000000000101', trace_id: '60000000-0000-0000-0000-000000000101',
     semantic_blocks: [
       { type: 'lumi_line', semantic_key: 'help.offer_humble' },
-      { type: 'help_preview', primary: { help_id: '70000000-0000-0000-0000-000000000101', help_version_id: '80000000-0000-0000-0000-000000000101', help_type: 'practice', title: 'Un paso más pequeño', summary: 'Convertir algo trabado en una acción que sí pueda empezar.', content: { intro: 'No hace falta resolver todo. Busquemos el próximo gesto posible.', steps: ['Nombrá lo que querés mover.', 'Reducilo hasta una acción de menos de diez minutos.', 'Elegí: hacerlo ahora o dejar definido cuándo.'] }, duration_minutes: 3, energy: 'low', detail: {} }, alternative: null },
+      { type: 'help_preview', primary: { help_id: '70000000-0000-0000-0000-000000000101', help_version_id: '80000000-0000-0000-0000-000000000101', help_type: 'practice', title: 'Un paso más pequeño', summary: 'Convertir algo trabado en una acción que sí pueda empezar.', content: { intro: 'No hace falta resolver todo. Busquemos el próximo paso posible.', steps: ['Nombrá lo que querés mover.', 'Reducilo hasta una acción de menos de diez minutos.', 'Elegí: hacerlo ahora o dejar definido cuándo.'] }, duration_minutes: 3, energy: 'low', detail: {}, applicability_confidence: 0.82 }, alternative: null },
     ],
     available_actions: [{ id: 'try_primary', intent: 'select_help', payload: { help_id: '70000000-0000-0000-0000-000000000101' } }, { id: 'not_this', intent: 'reject_help' }],
-    safety: { state: 'clear' }, coverage: { state: 'covered' }, interpretation: { intent_key: 'move_forward', confidence: 0.8, uncertainty_key: null },
+    safety: { state: 'clear' }, coverage: { state: 'covered', reason: 'applicable_source_available' },
+    interpretation: { taxonomy_version: 'life-taxonomy.v1', area_keys: ['general_life'], capacity_keys: ['agency'], confidence: 0.82, uncertainty_key: null },
+    delivery: { pattern: 'prepare_possibility_integrate', optional: true, prepare_semantic_key: 'delivery.prepare', integrate_semantic_key: 'delivery.integrate' },
     privacy: { original_retention: 'private_ref', retention_policy: 'private_reclassifiable.v1', shared_learning: false },
   }
 }
@@ -33,20 +35,40 @@ function helpScene() {
 const sourceItems = [
   {
     help_id: '71000000-0000-0000-0000-000000000001', canonical_code: 'who_doing_what_matters_es', help_type: 'external_resource', lifecycle: 'active_limited', risk_class: 'low', evidence_class: 'institutional_guidance',
-    title: 'En tiempos de estrés, haz lo que importa', summary: 'Guía ilustrada de la OMS con habilidades prácticas para atravesar estrés y adversidad.', content: { external_url: 'https://www.who.int/es/publications/b/53604' }, duration_minutes: 10, energy: 'low', provider: { name: 'World Health Organization', kind: 'institution' }, needs: ['pause', 'clarity', 'agency'],
+    title: 'En tiempos de estrés, haz lo que importa', summary: 'Guía ilustrada de la OMS con habilidades prácticas para atravesar estrés y adversidad.', content: { external_url: 'https://www.who.int/es/publications/b/53604' }, duration_minutes: 10, energy: 'low', provider: { name: 'World Health Organization', kind: 'institution' }, areas: ['wellbeing'], capacities: ['regulation'], taxonomy_version: 'life-taxonomy.v1',
   },
   {
     help_id: '71000000-0000-0000-0000-000000000002', canonical_code: 'pause_quiet_2m', help_type: 'practice', lifecycle: 'active_limited', risk_class: 'low', evidence_class: 'practice_based',
-    title: 'Dos minutos de pausa', summary: 'Bajar un poco el ruido antes de decidir qué sigue.', content: { steps: ['Apoyate como estés cómodo.'] }, duration_minutes: 2, energy: 'very_low', provider: { name: 'VA+LUMEN · Curaduría inicial', kind: 'internal_curated' }, needs: ['pause'],
+    title: 'Dos minutos de pausa', summary: 'Bajar un poco el ruido antes de decidir qué sigue.', content: { steps: ['Apoyate como estés cómodo.'] }, duration_minutes: 2, energy: 'very_low', provider: { name: 'VA+LUMEN · Curaduría inicial', kind: 'internal_curated' }, areas: ['wellbeing'], capacities: ['regulation'], taxonomy_version: 'life-taxonomy.v1',
   },
 ]
+
+const sourceTaxonomy = {
+  taxonomy_version: 'life-taxonomy.v1',
+  areas: [
+    { key: 'general_life', label: 'Vida cotidiana' },
+    { key: 'wellbeing', label: 'Bienestar y salud cotidiana' },
+    { key: 'relationships', label: 'Vínculos' },
+  ],
+  capacities: [
+    { key: 'agency', label: 'Agencia' },
+    { key: 'regulation', label: 'Regulación' },
+    { key: 'discernment', label: 'Discernimiento' },
+  ],
+}
 
 function bootstrapState() {
   return { person_id: '90000000-0000-0000-0000-000000000101', preferences: { proactive_allowed: false, memory_allowed: false, evidence_use_allowed: false, sharing_allowed: false, revision: 1 } }
 }
 
 function health() {
-  return { state: 'operational', release_contract: 'embryo.v0.4', slices: { s0: 'closed', s1: 'closed', s2: 'closed', s3: 'closed', s4: 'closed', s5: 'closed', s6: 'closed', s7: 'closed' }, source: { active_possibilities: 16, coverage_cells: 28, semantic_types: 5 }, evolution: { source_policy_version: 1 }, operations: { providers_ready: 0 }, prelaunch_reset_required: true }
+  return {
+    state: 'forming', release_contract: 'embryo.v49.1',
+    slices: { s0: 'implemented', s1: 'implemented', s2: 'implemented', s3: 'implemented', s4: 'implemented', s5: 'implemented', s6: 'implemented', s7: 'implemented' },
+    source: { active_possibilities: 60, applicability_relations: 98, semantic_types: 5, taxonomy_version: 'life-taxonomy.v1', coverage_contract: 'coverage.eval.v1' },
+    evolution: { source_policy_version: 1 }, operations: { providers_ready: 0 }, prelaunch_reset_required: true,
+    canonical_integrity: { status: 'reconciling', version: 3, authority_set: ['V46', 'V48', 'V49', 'V40', 'V41', 'V43'] },
+  }
 }
 
 async function fulfillJson(route: Route, body: unknown) {
@@ -58,15 +80,16 @@ async function installEmbryoRpcMocks(page: Page, calls: string[]) {
     const name = route.request().url().split('/').pop() || ''
     calls.push(name)
     if (name === 'lumen_bootstrap_person') return fulfillJson(route, bootstrapState())
+    if (name === 'lumen_source_taxonomy') return fulfillJson(route, sourceTaxonomy)
     if (name === 'lumen_source_discover') return fulfillJson(route, sourceItems)
     if (name === 'lumen_embryo_health') return fulfillJson(route, health())
     if (name === 'lumen_s2_snapshot') return fulfillJson(route, { memory_allowed: false, trajectories: [], repertoire: [], sanctuary_count: 0 })
     if (name === 'lumen_s2_list_sanctuary') return fulfillJson(route, [])
     if (name === 'lumen_s5_snapshot') return fulfillJson(route, [])
     if (name === 'lumen_s6_snapshot') return fulfillJson(route, { proactive_allowed: false, settings: { quiet_start_hour: 22, quiet_end_hour: 8, timezone: 'America/Argentina/Buenos_Aires', custody_blocked: false }, followups: [] })
-    if (name === 'lumen_s1_accompany_moment_v3') return fulfillJson(route, helpScene())
-    if (name === 'lumen_s1_select_help') return fulfillJson(route, { episode_id: helpScene().episode_id, action: 'selected', help: (helpScene().semantic_blocks[1] as { primary: Record<string, unknown> }).primary, trace_id: '60000000-0000-0000-0000-000000000102' })
-    if (name === 'lumen_s1_record_outcome') return fulfillJson(route, { episode_id: helpScene().episode_id, effect: 'helped', applied: true, trace_id: '60000000-0000-0000-0000-000000000103', semantic_key: 'outcome.thank_and_release' })
+    if (name === 'lumen_s1_accompany_moment') return fulfillJson(route, helpScene())
+    if (name === 'lumen_s1_select_help') return fulfillJson(route, { selection_id: '92000000-0000-0000-0000-000000000101', episode_id: helpScene().episode_id, action: 'selected', help: (helpScene().semantic_blocks[1] as { primary: Record<string, unknown> }).primary, trace_id: '60000000-0000-0000-0000-000000000102' })
+    if (name === 'lumen_s1_record_outcome') return fulfillJson(route, { selection_id: '92000000-0000-0000-0000-000000000101', episode_id: helpScene().episode_id, effect: 'helped', applied: true, trace_id: '60000000-0000-0000-0000-000000000103', semantic_key: 'outcome.thank_and_release' })
     if (name === 'lumen_s2_add_repertoire') return fulfillJson(route, { repertoire_id: '91000000-0000-0000-0000-000000000101', help_id: '70000000-0000-0000-0000-000000000101' })
     await route.abort()
   })
@@ -130,7 +153,8 @@ test('public Fuente is explorable without identity and exposes provenance', asyn
   await expect(page.getByRole('heading', { name: 'Algo del patrimonio humano, cuando haga falta.' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'En tiempos de estrés, haz lo que importa' })).toBeVisible()
   await expect(page.getByText('Origen: World Health Organization')).toBeVisible()
-  await expect(page.getByText('16 posibilidades activas limitadas')).toBeVisible()
+  await expect(page.getByText('60 posibilidades activas limitadas')).toBeVisible()
+  expect(calls).toContain('lumen_source_taxonomy')
   expect(calls).toContain('lumen_source_discover')
   expect(calls).toContain('lumen_embryo_health')
 })
@@ -182,6 +206,6 @@ test('Preview completes Momento → Ayuda → Retorno → Repertorio', async ({ 
   await page.getByRole('button', { name: /Guardar “Un paso más pequeño” en mi repertorio/ }).click()
   await expect(page.getByText('Quedó en tu repertorio.')).toBeVisible()
 
-  expect(calls.filter((name) => name.startsWith('lumen_s1_'))).toEqual(['lumen_s1_accompany_moment_v3', 'lumen_s1_select_help', 'lumen_s1_record_outcome'])
+  expect(calls.filter((name) => name.startsWith('lumen_s1_'))).toEqual(['lumen_s1_accompany_moment', 'lumen_s1_select_help', 'lumen_s1_record_outcome'])
   expect(calls).toContain('lumen_s2_add_repertoire')
 })

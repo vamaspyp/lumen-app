@@ -5,6 +5,7 @@ export type PresenceMode = 'P0' | 'P1' | 'P2' | 'P3' | 'P4'
 
 export type HelpPossibility = {
   help_id: string
+  help_version_id: string
   help_type: string
   title: string
   summary: string
@@ -13,6 +14,7 @@ export type HelpPossibility = {
   energy: string | null
   detail: Record<string, unknown>
   from_own_repertoire?: boolean
+  applicability_confidence?: number | null
 }
 
 export type SemanticBlock = Record<string, unknown> & {
@@ -30,7 +32,6 @@ export type S1Scene = {
   scene_id: string
   scene_version: string
   presence_mode: PresenceMode
-  human_intent?: string | null
   episode_id?: string
   moment_id?: string
   decision_run_id?: string
@@ -40,7 +41,9 @@ export type S1Scene = {
   safety?: { state?: string }
   coverage?: { state?: string; reason?: string }
   interpretation?: {
-    intent_key?: string | null
+    taxonomy_version?: string
+    area_keys?: string[]
+    capacity_keys?: string[]
     confidence?: number | null
     uncertainty_key?: string | null
   }
@@ -48,6 +51,12 @@ export type S1Scene = {
     memory_used?: boolean
     own_repertoire_reused?: boolean
     active_trajectory_count?: number
+  }
+  delivery?: {
+    pattern?: 'prepare_possibility_integrate' | string
+    optional?: boolean
+    prepare_semantic_key?: string
+    integrate_semantic_key?: string
   }
   privacy?: {
     original_retention?: 'private_ref' | string
@@ -57,6 +66,7 @@ export type S1Scene = {
 }
 
 export type SelectionResult = {
+  selection_id: string
   episode_id: string
   action: 'selected' | 'rejected'
   help: HelpPossibility
@@ -66,6 +76,7 @@ export type SelectionResult = {
 export type OutcomeEffect = 'helped' | 'not_helped' | 'unsure'
 
 export type OutcomeResult = {
+  selection_id: string
   episode_id: string
   effect: OutcomeEffect
   applied: boolean
@@ -84,7 +95,7 @@ export async function accompanyMoment(
   locale = 'es-AR',
   language = 'es',
 ): Promise<S1Scene> {
-  const { data, error } = await getGreenfieldSupabase().rpc('lumen_s1_accompany_moment_v3', {
+  const { data, error } = await getGreenfieldSupabase().rpc('lumen_s1_accompany_moment', {
     p_expression: expression,
     p_locale: locale,
     p_language: language,
@@ -110,12 +121,10 @@ export async function selectHelp(
 
 export async function recordOutcome(
   episodeId: string,
-  helpId: string,
   effect: OutcomeEffect,
 ): Promise<OutcomeResult> {
   const { data, error } = await getGreenfieldSupabase().rpc('lumen_s1_record_outcome', {
     p_episode_id: episodeId,
-    p_help_id: helpId,
     p_effect: effect,
     p_applied: true,
     p_trace_id: newTraceId(),

@@ -8,7 +8,7 @@ const context = JSON.parse(read('governance/conduction-context.json'));
 const snapshot = JSON.parse(read('governance/pov-snapshot.json'));
 
 test('conduction context is explicit and fail-closed', () => {
-  assert.equal(context.schema_version, '1.0');
+  assert.equal(context.schema_version, '1.1');
   assert.equal(context.system?.id, 'V3');
   assert.ok(context.system?.spreadsheet_id);
   assert.match(context.focus?.id ?? '', /^F\d+$/);
@@ -16,8 +16,9 @@ test('conduction context is explicit and fail-closed', () => {
   assert.equal(context.act?.status, 'EN CURSO');
   assert.equal(context.fail_closed, true);
   const authorityIds = new Set((context.authorities ?? []).map((x) => x.id));
-  assert.ok(authorityIds.has('V41'));
-  assert.ok(authorityIds.has('V42'));
+  for (const required of ['V46', 'V48', 'V49', 'V41', 'V42']) assert.ok(authorityIds.has(required));
+  assert.match(context.construction_rule ?? '', /runtime.*preserva.*ajusta.*reemplaza/i);
+  assert.match(context.construction_rule ?? '', /bridges permanentes/i);
   assert.deepEqual(context.required_sequence, [
     'POV_ACTIVOS', 'FOCO', 'ACTO_DOD', 'AUTORIDAD_VIGENTE',
     'REALIDAD_TECNICA', 'EJECUCION', 'EVIDENCIA', 'CIERRE'
@@ -33,6 +34,9 @@ test('POV snapshot and execution context agree', () => {
   assert.equal(snapshot.act?.status, 'EN CURSO');
   assert.ok(snapshot.act?.dod);
   assert.equal(snapshot.integrity?.fail_closed, true);
+  assert.equal(snapshot.integrity?.implementation_is_not_authority, true);
+  assert.equal(snapshot.integrity?.target_precedes_runtime_diff, true);
+  assert.equal(snapshot.integrity?.permanent_bridges_forbidden, true);
   const active = new Set((snapshot.active_authorities ?? []).filter((x) => x.state === 'VIGENTE').map((x) => x.id));
   for (const authority of context.authorities ?? []) assert.ok(active.has(authority.id), `${authority.id} must be VIGENTE in POV snapshot`);
 });
