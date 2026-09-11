@@ -1,0 +1,28 @@
+{
+  "schema_version":"1.0",
+  "act":"A56",
+  "verdict":"GO_PENDING_CI",
+  "basis":["V46","V48","V49","V50","A54"],
+  "birth_critical_checks":{
+    "integral_conformity":"canonical_integrity v5 active/integrally_certified",
+    "source_seed":"60 active possibilities; 78 applicable + 20 partial applicability relations",
+    "outcome_attribution":"0 orphan outcomes",
+    "legacy_independence":"0 coverage_cells; 0 v47/v3/v4 runtime routines",
+    "reversibility":"rollback_policy_execution available and A54 activate→rollback live PASS",
+    "proactivity":"process_due_followups available and consented flow A54 live PASS",
+    "source_autopoiesis":"source_intake available; native/external intake A54 live PASS",
+    "privacy_safety_missingness":"A54 live + regression PASS",
+    "tissue":"private Circle value path A54 live PASS"
+  },
+  "conduction_proof":{
+    "pov_read":"PASS",
+    "focus":"F6",
+    "act_selected":"A56",
+    "authority_resolved_before_execution":true,
+    "execution_without_bypass":true,
+    "evidence_required_before_close":true,
+    "fail_closed":true
+  },
+  "non_blocking_maturity_limits":["broader Source coverage","professional/material/restricted safe routes","multicultural breadth","mature Tissue forms","online POV read hardening in CI"],
+  "closure_rule":"GO only after the branch carrying this live-POV attestation passes Conduction Gate, full regression and live backend certification. No maturity item authorized by V48/V49 may be promoted into a birth blocker without new evidence."
+}
