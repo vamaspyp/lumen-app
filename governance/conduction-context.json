@@ -10,8 +10,8 @@
     "name": "Nacimiento del Embrión y primeras vidas reales"
   },
   "act": {
-    "id": "A51",
-    "name": "Materializar deltas de especificación sobre runtime greenfield",
+    "id": "A54",
+    "name": "Certificación Integral de Conformidad del Embrión",
     "status": "EN CURSO"
   },
   "authorities": [
@@ -35,7 +35,7 @@
     "EVIDENCIA",
     "CIERRE"
   ],
-  "construction_rule": "V49 define target; runtime se preserva, ajusta o reemplaza por mérito actual. Prohibidos bridges permanentes, aliases legacy y capas paralelas.",
+  "construction_rule": "A54 audits bidirectionally V48/V49↔runtime. Fix only unequivocal implementation defects; authority conflicts or undetermined structural decisions fail closed. Zero material gaps and zero unjustified residues are required for closure.",
   "fail_closed": true,
-  "updated_at": "2026-09-11T17:00:00-03:00"
+  "updated_at": "2026-09-11T17:41:00-03:00"
 }
