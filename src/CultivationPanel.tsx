@@ -15,13 +15,14 @@ import {
 
 type Props = Readonly<{ activeTrajectoryId: string | null }>
 
-const MOVE_COPY: Record<Exclude<CultivationMove, 'CONTINUE_PATH'>, string> = {
+const MOVE_COPY: Record<CultivationMove, string> = {
   REUSE_REPERTOIRE: 'Volver a esto',
   REPEAT: 'Repetirlo',
   VARY: 'Probar una variación',
   APPLY_IN_CONTEXT: 'Llevarlo a otra situación',
   REFLECT: 'Mirar qué quedó',
   INTEGRATE: 'Integrarlo un poco más',
+  CONTINUE_PATH: 'Seguir este hilo',
 }
 
 function signalForMove(move: CultivationScene['decision_kind']): LongitudinalSignal {
