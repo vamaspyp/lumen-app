@@ -19,8 +19,8 @@ const env = parseEnv(await readFile('.env.production', 'utf8'))
 const integrity = JSON.parse(await readFile('governance/canonical-integrity-contracts.json', 'utf8'))
 const url = env.VITE_LUMEN_SUPABASE_URL
 const key = env.VITE_LUMEN_SUPABASE_PUBLISHABLE_KEY
-const finalCertification = integrity.certification_status === 'CERTIFIED'
 
+assert.equal(integrity.certification_status, 'CERTIFIED', 'A60 branch must not declare Pauli-ready before V1.1 certification is complete')
 assert.match(url ?? '', /^https:\/\/vbuixagaguasejputubp\.supabase\.co$/)
 assert.match(key ?? '', /^sb_publishable_/)
 
@@ -37,12 +37,12 @@ assert.deepEqual(foundation, { status: 'ok', slice: 'S0', contract_version: 's0.
 
 const { data: embryo, error: embryoError } = await supabase.rpc('lumen_embryo_health')
 assert.equal(embryoError, null, `Embryo health RPC failed: ${embryoError?.message ?? 'unknown'}`)
-assert.equal(embryo?.state, finalCertification ? 'operational' : 'forming')
-assert.equal(embryo?.release_contract, 'embryo.v49.1')
+assert.equal(embryo?.state, 'operational')
+assert.equal(embryo?.release_contract, 'embryo.v53.1')
 assert.deepEqual(Object.keys(embryo ?? {}).sort(), ['canonical_integrity', 'evolution', 'operations', 'prelaunch_reset_required', 'release_contract', 'slices', 'source', 'state'].sort(), 'Public health must remain a narrow operational projection')
-assert.equal(embryo?.canonical_integrity?.status, finalCertification ? 'integrally_certified' : 'reconciling')
-assert.equal(embryo?.canonical_integrity?.version, finalCertification ? 5 : 3)
-assert.deepEqual(embryo?.canonical_integrity?.authority_set, ['V46', 'V48', 'V49', 'V40', 'V41', 'V43'])
+assert.equal(embryo?.canonical_integrity?.status, 'integrally_certified')
+assert.equal(embryo?.canonical_integrity?.version, 7)
+assert.deepEqual(embryo?.canonical_integrity?.authority_set, ['V46', 'V51', 'V52', 'V53', 'V40', 'V41', 'V43'])
 assert.deepEqual(embryo?.slices, {
   s0: 'implemented', s1: 'implemented', s2: 'implemented', s3: 'implemented',
   s4: 'implemented', s5: 'implemented', s6: 'implemented', s7: 'implemented',
@@ -57,9 +57,11 @@ assert.equal(embryo?.prelaunch_reset_required, true, 'Synthetic construction dat
 const { data: taxonomy, error: taxonomyError } = await supabase.rpc('lumen_source_taxonomy')
 assert.equal(taxonomyError, null, `Source taxonomy failed: ${taxonomyError?.message ?? 'unknown'}`)
 assert.equal(taxonomy?.taxonomy_version, 'life-taxonomy.v1')
+assert.equal(taxonomy?.cultivation_vocab_version, 'cultivation.v1')
 assert.ok(Array.isArray(taxonomy?.areas) && taxonomy.areas.length >= 8)
 assert.ok(Array.isArray(taxonomy?.capacities) && taxonomy.capacities.length >= 10)
 assert.ok(Array.isArray(taxonomy?.help_types) && taxonomy.help_types.length >= 10, 'Source taxonomy must expose dynamic semantic forms')
+assert.ok(Array.isArray(taxonomy?.cultivation_roles) && taxonomy.cultivation_roles.length >= 8, 'Source taxonomy must expose the versioned cultivation vocabulary')
 
 const { data: source, error: sourceError } = await supabase.rpc('lumen_source_discover', {
   p_area_key: null,
@@ -120,8 +122,43 @@ for (const [area, capacity, minResults] of representativeApplicability) {
   assert.ok(Array.isArray(data) && data.length >= minResults, `Source must expose at least ${minResults} possibilities for ${area}×${capacity}`)
 }
 
+const seedCapabilities = ['regulation', 'discernment', 'agency', 'connection', 'self_compassion']
+for (const capacity of seedCapabilities) {
+  const { data, error } = await supabase.rpc('lumen_source_constellation', {
+    p_capacity_key: capacity,
+    p_area_key: null,
+    p_context: {},
+    p_locale: 'es-AR',
+    p_limit: 16,
+  })
+  assert.equal(error, null, `Constellation failed for ${capacity}: ${error?.message ?? 'unknown'}`)
+  assert.ok(Array.isArray(data) && data.length >= 4, `Constellation ${capacity} must have real depth`)
+  const types = new Set(data.map((item) => item?.help_type).filter(Boolean))
+  const constellationProviders = new Set(data.map((item) => item?.provider?.name).filter(Boolean))
+  const roles = new Set(data.flatMap((item) => item?.cultivation_roles ?? []))
+  assert.ok(types.size >= 3, `${capacity} must have diverse help types`)
+  assert.ok(constellationProviders.size >= 2, `${capacity} must have diverse provenance`)
+  assert.ok(roles.size >= 4, `${capacity} must have diverse cultivation roles`)
+}
+
+const { data: contextualConstellation, error: contextualError } = await supabase.rpc('lumen_source_constellation', {
+  p_capacity_key: 'regulation',
+  p_area_key: null,
+  p_context: { max_duration_minutes: 8, allowed_energy: ['low', 'very_low'] },
+  p_locale: 'es-AR',
+  p_limit: 16,
+})
+assert.equal(contextualError, null, `Context-aware constellation failed: ${contextualError?.message ?? 'unknown'}`)
+assert.ok(Array.isArray(contextualConstellation) && contextualConstellation.length > 0, 'Realization context must preserve useful options')
+assert.ok(contextualConstellation.every((item) => item.duration_minutes == null || item.duration_minutes <= 8), 'Constellation must honor max duration realization constraint')
+assert.ok(contextualConstellation.every((item) => item.energy == null || ['low', 'very_low'].includes(item.energy)), 'Constellation must honor energy realization constraint')
+
 const { data: privateData, error: privateError } = await supabase.rpc('lumen_s2_snapshot')
 assert.equal(privateData, null, 'Anonymous callers must never receive personal continuity data')
 assert.ok(privateError, 'Anonymous personal RPC must be rejected')
 
-console.log(`Embryo live integration PASS: health=${embryo.state}; canonical=${embryo.canonical_integrity.status}; source-active=${embryo.source.active_possibilities}; applicability=${embryo.source.applicability_relations}; representative-pairs=${representativeApplicability.length}; capped-discovery=${source.length}; providers=${providers.size}; types=${helpTypes.size}; anon-personal=blocked`)
+const { data: cultivationContext, error: cultivationContextError } = await supabase.rpc('lumen_s2_resolve_cultivation_context', { p_capacity_key: 'regulation' })
+assert.equal(cultivationContext, null, 'Anonymous callers must never receive longitudinal cultivation context')
+assert.ok(cultivationContextError, 'Anonymous cultivation context must be rejected')
+
+console.log(`Embryo live integration PASS: health=${embryo.state}; release=${embryo.release_contract}; canonical=${embryo.canonical_integrity.status}/v${embryo.canonical_integrity.version}; source-active=${embryo.source.active_possibilities}; applicability=${embryo.source.applicability_relations}; seed-constellations=${seedCapabilities.length}; capped-discovery=${source.length}; providers=${providers.size}; types=${helpTypes.size}; anon-personal=blocked`)

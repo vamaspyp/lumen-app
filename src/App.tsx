@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import './App.css'
+import CultivationPanel from './CultivationPanel'
 import { getAuthSnapshot, requestMagicLink, signOut } from './greenfield/application/auth'
 import { bootstrapPerson } from './greenfield/application/consent'
 import { deleteMomentOriginals, exportMomentOriginals } from './greenfield/application/privacy'
@@ -68,6 +69,7 @@ function semanticCopy(scene: S1Scene): string {
   if (scene.scene_id === 'moment.clarify') return 'No estoy seguro de haber entendido bien. Contame un poco más, sólo si cambia lo que necesitás ahora.'
   if (scene.scene_id === 'moment.no_match') return 'Para esto no tengo algo suficientemente pertinente. Prefiero decírtelo antes que acercarte una ayuda floja.'
   if (scene.scene_id === 'moment.safety_referral') return 'Esto merece apoyo humano inmediato. LUMEN no debería intentar resolverlo solo desde acá.'
+  if (scene.continuity?.own_repertoire_reused) return 'Esto ya había tenido valor para vos. Antes de sumar algo nuevo, quizá alcance con volver a algo que ya es parte de tu repertorio.'
   return 'Con lo que entendí hasta ahora, esto podría ayudarte. Si no te representa, no hace falta forzarlo.'
 }
 
@@ -187,7 +189,7 @@ function SourceSpace({ authenticated, onRequestIdentity }: { authenticated: bool
           </select>
         </label>
         <label>Capacidad
-          <select value={capacity} onChange={(event) => setCapacity(event.target.value)}>
+          <select value={capacity} onChange={(event) => { setCapacity(event.target.value); setType('') }}>
             <option value="">Todas</option>
             {taxonomy?.capacities.map((term) => <option key={term.key} value={term.key}>{term.label}</option>)}
           </select>
@@ -195,15 +197,12 @@ function SourceSpace({ authenticated, onRequestIdentity }: { authenticated: bool
         <label>Forma
           <select value={type} onChange={(event) => setType(event.target.value)}>
             <option value="">Todas</option>
-            <option value="practice">Práctica</option>
-            <option value="reflection">Reflexión</option>
-            <option value="reading">Lectura</option>
-            <option value="external_resource">Recurso externo</option>
-            <option value="human_action">Acción humana</option>
+            {taxonomy?.help_types?.map((term) => <option key={term.key} value={term.key}>{term.label}</option>)}
           </select>
         </label>
       </div>
 
+      {capacity && !type && <p className="space-note">No estás viendo un programa. Fuente está abriendo distintas maneras de acercarte a esta capacidad —comprender, practicar, aplicar, reflexionar, integrar o conectar— para que puedas encontrar la que tenga sentido ahora.</p>}
       {health && <p className="space-note">{health.source.active_possibilities} posibilidades activas limitadas · {health.source.applicability_relations} relaciones de aplicabilidad · {health.source.semantic_types} formas semánticas · cobertura todavía en aprendizaje.</p>}
       {saveMessage && <p className="success-note">{saveMessage}</p>}
       {busy && <p className="lumi-line">Abriendo Fuente…</p>}
@@ -219,10 +218,11 @@ function SourceSpace({ authenticated, onRequestIdentity }: { authenticated: bool
           return (
             <article className="source-card" key={item.help_id}>
               <div className="help-meta">
-                <span>{item.help_type.replace('_', ' ')}</span>
+                <span>{taxonomy?.help_types?.find((term) => term.key === item.help_type)?.label ?? item.help_type.replace('_', ' ')}</span>
                 {item.duration_minutes && <span>{item.duration_minutes} min</span>}
                 {item.energy && <span>energía {item.energy.replace('_', ' ')}</span>}
               </div>
+              {item.cultivation_roles?.length ? <div className="help-meta">{item.cultivation_roles.map((role) => <span key={role}>{taxonomy?.cultivation_roles?.find((term) => term.key === role)?.label ?? role}</span>)}</div> : null}
               <h2>{item.title}</h2>
               <p>{item.summary}</p>
               {steps.length > 0 && <ol className="mini-steps">{steps.map((step) => <li key={step}>{step}</li>)}</ol>}
@@ -290,7 +290,7 @@ function TrajectorySpace() {
     <section className="space-scene">
       <p className="presence-label">TRAYECTORIA</p>
       <h1>Dirección sin convertir la vida en un plan.</h1>
-      <p className="lumi-line">Un Faro puede cambiar, pausarse o desaparecer. El Camino sólo conserva próximos apoyos que vos decidís sostener.</p>
+      <p className="lumi-line">Un Faro puede cambiar, pausarse o desaparecer. El Camino puede sostener algo que querés cultivar, pero nunca transforma tu vida en una lista de cumplimiento.</p>
 
       <form className="inline-create" onSubmit={onCreateFaro}>
         <label htmlFor="new-faro">Un Faro que hoy te importe</label>
@@ -330,18 +330,7 @@ function TrajectorySpace() {
         ))}
       </div>
 
-      <section className="subspace">
-        <div>
-          <p className="card-kicker">REPERTORIO PROPIO</p>
-          <h2>Lo que ya te ayudó puede volver.</h2>
-        </div>
-        {snapshot?.repertoire.length ? snapshot.repertoire.map((item) => (
-          <article className="repertoire-row" key={item.repertoire_id}>
-            <div><strong>{item.title}</strong><span>{item.summary}</span></div>
-            {activeTrajectory && <button type="button" className="secondary-action" onClick={() => void act(() => addPathItem(activeTrajectory.trajectory_id, item.help_id, item.title))}>Sumar al Camino</button>}
-          </article>
-        )) : <p className="empty-note">Cuando una experiencia realmente te ayude, podés elegir integrarla acá.</p>}
-      </section>
+      <CultivationPanel activeTrajectoryId={activeTrajectory?.trajectory_id ?? null} />
 
       <section className="subspace continuity-panel">
         <div>
@@ -357,7 +346,7 @@ function TrajectorySpace() {
         )}
         {proactivity?.followups.map((followup) => (
           <div className="followup-row" key={followup.followup_id}>
-            <span>{humanReason(followup.reason_code)} · {new Date(followup.due_at).toLocaleString()}</span>
+            <span>{humanReason(followup.reason_code)}{followup.cultivation_move ? ` · ${followup.cultivation_move.toLowerCase().replaceAll('_', ' ')}` : ''} · {new Date(followup.due_at).toLocaleString()}</span>
             <button className="text-action" type="button" onClick={() => void act(() => cancelFollowup(followup.followup_id))}>Cancelar</button>
           </div>
         ))}
@@ -727,9 +716,14 @@ function App() {
     setBusy(true)
     setError('')
     try {
-      await recordOutcome(scene.episode_id, effect)
+      const result = await recordOutcome(scene.episode_id, effect)
       setLastOutcome(effect)
-      setClosingMessage('Gracias. Con esto alcanza por ahora.')
+      if (result.signal_kind === 'REUSED') {
+        setIntegrated(true)
+        setClosingMessage('Volvió a ayudarte. No hace falta agregar algo nuevo.')
+      } else {
+        setClosingMessage('Gracias. Con esto alcanza por ahora.')
+      }
       setStage('closed')
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'No pude registrar el retorno.') }
     finally { setBusy(false) }
@@ -813,14 +807,14 @@ function App() {
           {stage === 'scene' && scene && (
             <>
               <p className="presence-label">LUMI · {scene.presence_mode}</p>
-              <h1>{scene.scene_id === 'moment.help' ? 'Quizá podamos empezar por acá.' : scene.scene_id === 'moment.clarify' ? 'Quiero entender un poco mejor.' : 'Prefiero ser claro con esto.'}</h1>
+              <h1>{scene.scene_id === 'moment.help' ? (primaryHelp?.from_own_repertoire ? 'Tal vez no haga falta algo nuevo.' : 'Quizá podamos empezar por acá.') : scene.scene_id === 'moment.clarify' ? 'Quiero entender un poco mejor.' : 'Prefiero ser claro con esto.'}</h1>
               <p className="lumi-line">{semanticCopy(scene)}</p>
               {scene.scene_id === 'moment.help' && primaryHelp && (
                 <article className="help-card">
                   <div className="help-meta"><span>{primaryHelp.help_type.replace('_', ' ')}</span>{primaryHelp.duration_minutes && <span>{primaryHelp.duration_minutes} min</span>}</div>
                   <h2>{primaryHelp.title}</h2><p>{primaryHelp.summary}</p>
-                  {primaryHelp.from_own_repertoire && <p className="space-note">Esto ya había quedado en tu repertorio porque te había servido. Podés volver a usarlo o rechazarlo igual.</p>}
-                  <div className="choice-row"><button className="primary-action" type="button" onClick={() => void chooseHelp('selected')} disabled={busy}>Quiero probarlo</button><button className="secondary-action" type="button" onClick={() => void chooseHelp('rejected')} disabled={busy}>No es esto</button></div>
+                  {primaryHelp.from_own_repertoire && <p className="space-note">Esto ya había quedado en tu repertorio porque te había servido. Podés volver a usarlo, variarlo más adelante o dejarlo atrás si cambió algo.</p>}
+                  <div className="choice-row"><button className="primary-action" type="button" onClick={() => void chooseHelp('selected')} disabled={busy}>{primaryHelp.from_own_repertoire ? 'Volver a esto' : 'Quiero probarlo'}</button><button className="secondary-action" type="button" onClick={() => void chooseHelp('rejected')} disabled={busy}>No es esto</button></div>
                 </article>
               )}
               {scene.scene_id === 'moment.clarify' && (
@@ -853,8 +847,8 @@ function App() {
             <div className="closed-scene">
               <p className="presence-label">LUMI</p><h1>{closingMessage}</h1><p className="lumi-line">Podés volver a tu vida. Si algo de esto merece continuidad, sólo vos decidís qué conservar.</p>
               {lastOutcome === 'helped' && selectedHelp && !integrated && <button className="secondary-action centered-action" type="button" disabled={busy} onClick={() => void integrateSelectedHelp()}>Guardar “{selectedHelp.title}” en mi repertorio</button>}
-              {integrated && <p className="success-note">Quedó en tu repertorio. Podés encontrarlo en Trayectoria.</p>}
-              <div className="choice-row compact-choice"><button className="primary-action" type="button" onClick={() => resetHome()}>Volver a Ahora</button><button className="secondary-action" type="button" onClick={() => openSpace('santuario')}>Ir a mi Santuario</button></div>
+              {integrated && <p className="success-note">{selectedHelp?.from_own_repertoire ? 'Sigue en tu repertorio. Que vuelva a servir es aprendizaje distinto de haber servido una sola vez.' : 'Quedó en tu repertorio. Podés volver, variarlo o llevarlo a otra situación desde Trayectoria.'}</p>}
+              <div className="choice-row compact-choice"><button className="primary-action" type="button" onClick={() => resetHome()}>Volver a Ahora</button><button className="secondary-action" type="button" onClick={() => openSpace('trayectoria')}>Ir a mi Trayectoria</button></div>
             </div>
           )}
 
