@@ -1,144 +1,39 @@
 {
-  "schema_version": "2.0",
+  "schema_version": "3.0",
   "scope": "embryo_birth",
-  "authority_set": ["V46", "V48", "V49", "V40", "V41", "V43"],
-  "certification_act": "A51",
-  "certification_status": "CERTIFIED",
+  "authority_set": ["V46", "V51", "V52", "V53", "V40", "V41", "V43"],
+  "certification_act": "A60",
+  "certification_status": "RECONCILING",
   "certification_evidence": [
-    "V49 clean-room target precedes runtime diff",
-    "greenfield-v49-clean based on complete greenfield-v04-embryo",
-    "Supabase dedicated project vbuixagaguasejputubp",
-    "A51 V49 schema/runtime convergence migrations applied live",
-    "CI run 126 PASS: Conduction Gate + 33/33 unit + lint + build + Playwright 7/7 + live backend",
-    "canonical_integrity policy v4 ACTIVE/CERTIFIED under A51",
-    "live: legacy tables 0; v47/v3/v4 routines 0; 60 active possibilities; 98 applicability relations; 0 outcomes without selection"
+    "A54/V50 baseline integral certification preserved as inherited evidence",
+    "A56 birth GO preserved as inherited evidence",
+    "V51 scoped canonical precision approved by human authority",
+    "V52 functional derivation completed before technical derivation",
+    "V53 clean-room technical-functional target completed before runtime comparison",
+    "A60 branch greenfield-a60-integration-capacity converging runtime to V53",
+    "Live Source has 72 active possibilities, 109 applicability relations and 10 semantic help types before V1.1 certification",
+    "Final V1.1 certification remains pending CI/live longitudinal proof"
   ],
   "contracts": [
-    {
-      "id": "C01_AUTHORITY_PRECEDENCE",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V46", "V48", "V49", "V41"],
-      "evidence": ["governance/conduction-context.json", "governance/pov-snapshot.json", "V37/V39/V47 explicitly superseded"]
-    },
-    {
-      "id": "C02_GREENFIELD_INDEPENDENCE",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V40", "V41", "V49"],
-      "evidence": ["dedicated Supabase project", "gf_core/gf_private/gf_ledger", "src/greenfield", "greenfield-v49-clean"]
-    },
-    {
-      "id": "C03_LIFE_MOMENT_TRAJECTORY",
-      "birth_required": true,
-      "status": "EXPRESION_EMBRIONARIA_ACEPTABLE",
-      "authority": ["V46", "V48", "V49"],
-      "evidence": ["moments", "moment_interpretations Area/Capacity", "inferences", "trajectories", "paths", "path_items"]
-    },
-    {
-      "id": "C04_ORIGINAL_EXPRESSION_RECLASSIFIABLE",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V46", "V48", "V49", "V41"],
-      "evidence": ["gf_private.moment_originals", "single lumen_s1_accompany_moment", "private_ref", "export/delete RPCs", "raw text absent from Ledger"]
-    },
-    {
-      "id": "C05_ORIENTATION_AREA_CAPACITY",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V46", "V48", "V49"],
-      "evidence": ["life-taxonomy.v1", "area_terms", "capacity_terms", "moment_interpretations.area_keys/capacity_keys", "intent_key/need_keys removed"]
-    },
-    {
-      "id": "C06_SOURCE_APPLICABILITY_COVERAGE",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V46", "V48", "V49"],
-      "evidence": ["help_applicability", "Coverage evaluated by coverage.eval.v1", "coverage_cells removed", "Source discovery Area/Capacity"]
-    },
-    {
-      "id": "C07_MOTOR_SAFETY_NOMATCH",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V48", "V49", "V41", "V43"],
-      "evidence": ["single S1 flow", "decision_runs/candidates/exposures", "no_match_events", "safety referral scene", "deterministic gates"]
-    },
-    {
-      "id": "C08_SELECTION_DELIVERY_OUTCOME",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V48", "V49", "V43"],
-      "evidence": ["help_selections decision_run_id/help_version_id", "delivery.pattern=prepare_possibility_integrate", "outcomes_feedback.selection_id", "exact version attribution"]
-    },
-    {
-      "id": "C09_MOTOR_CONTINUITY_REPERTOIRE",
-      "birth_required": true,
-      "status": "EXPRESION_EMBRIONARIA_ACEPTABLE",
-      "authority": ["V46", "V48", "V49"],
-      "evidence": ["decision_runs.continuity_context", "trajectories", "personal_repertoire", "repertoire can rank ahead of novelty"]
-    },
-    {
-      "id": "C10_SANCTUARY_SOVEREIGN_MEMORY",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V46", "V48", "V49", "V41", "V43"],
-      "evidence": ["gf_private.sanctuary_entries", "save/list/update/delete/export", "sanctuary_private_stub removed", "memory consent separated"]
-    },
-    {
-      "id": "C11_TISSUE_VALUE_CIRCULATION",
-      "birth_required": true,
-      "status": "EXPRESION_EMBRIONARIA_ACEPTABLE",
-      "authority": ["V46", "V48", "V49", "V43"],
-      "evidence": ["interaction_spaces", "memberships", "private invites", "contributions", "reports", "no feed/likes/followers/ranking"]
-    },
-    {
-      "id": "C12_KNOWLEDGE_EVIDENCE_EVOLUTION",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V46", "V48", "V49", "V41"],
-      "evidence": ["evidence_units", "knowledge_claims", "policy_versions", "change_executions", "rollback_records", "evidence.v49.1"]
-    },
-    {
-      "id": "C13_LEDGER_IRRECOVERABLE_DECISION_DATA",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V46", "V49", "V41"],
-      "evidence": ["append-only domain_events", "selection/help_version/decision trace", "Area/Capacity interpretation versions", "outbox"]
-    },
-    {
-      "id": "C14_PRIVACY_CONSENT_ISOLATION",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V48", "V49", "V41", "V43"],
-      "evidence": ["RLS ownership", "private originals/Sanctuary", "memory/evidence/proactivity consent separated", "authenticated-only sensitive RPCs"]
-    },
-    {
-      "id": "C15_PROACTIVITY_CONSENTED",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V46", "V48", "V49", "V43"],
-      "evidence": ["followups", "explicit opt-in/off", "quiet hours", "custody block", "cancel"]
-    },
-    {
-      "id": "C16_EXPERIENCE_V43",
-      "birth_required": true,
-      "status": "EXPRESION_EMBRIONARIA_ACEPTABLE",
-      "authority": ["V43", "V48", "V49"],
-      "evidence": ["Ahora", "Trayectoria", "Fuente", "Santuario", "Tejido", "P0-P4 semantics", "NO_MATCH/safety", "Prepare→Possibility→Integrate semantic delivery"]
-    },
-    {
-      "id": "C17_MULTILINGUAL_MULTICULTURAL_MULTISURFACE",
-      "birth_required": true,
-      "status": "EXPRESION_EMBRIONARIA_ACEPTABLE",
-      "authority": ["V41", "V43", "V49"],
-      "evidence": ["locale/language persisted", "help localizations", "semantic scene/action IDs", "life taxonomy versioned as data"]
-    },
-    {
-      "id": "C18_NO_FRANKENSTEIN_EVOLUTION",
-      "birth_required": true,
-      "status": "CONFORME",
-      "authority": ["V46", "V48", "V49", "V41"],
-      "evidence": ["one current S1 RPC", "v47_orientation_bridge removed", "versioned S1 RPC chain removed", "coverage_cells removed", "sanctuary stub removed", "V49 PRESERVAR/AJUSTAR/REEMPLAZAR rule"]
-    }
+    {"id":"C01_AUTHORITY_PRECEDENCE","birth_required":true,"status":"CONFORME","authority":["V46","V51","V52","V53","V41"],"evidence":["governance/conduction-context.json","governance/pov-snapshot.json","V48/V49 explicitly superseded after V52/V53 derivation"]},
+    {"id":"C02_GREENFIELD_INDEPENDENCE","birth_required":true,"status":"CONFORME","authority":["V40","V41","V53"],"evidence":["dedicated Supabase project","gf_core/gf_private/gf_ledger","src/greenfield","legacy-independent runtime"]},
+    {"id":"C03_LIFE_MOMENT_TRAJECTORY","birth_required":true,"status":"EXPRESION_EMBRIONARIA_ACEPTABLE","authority":["V46","V51","V52","V53"],"evidence":["moments","moment_interpretations Area/Capacity","trajectories","paths","path_items","cultivation_move additive"]},
+    {"id":"C04_ORIGINAL_EXPRESSION_RECLASSIFIABLE","birth_required":true,"status":"CONFORME","authority":["V46","V52","V53","V41"],"evidence":["gf_private.moment_originals","single lumen_s1_accompany_moment","private_ref","export/delete RPCs","raw text absent from Ledger"]},
+    {"id":"C05_ORIENTATION_AREA_CAPACITY","birth_required":true,"status":"CONFORME","authority":["V46","V51","V52","V53"],"evidence":["life-taxonomy.v1","area_terms","capacity_terms","moment_interpretations.area_keys/capacity_keys","no personal capability score"]},
+    {"id":"C06_SOURCE_APPLICABILITY_COVERAGE","birth_required":true,"status":"CONFORME","authority":["V46","V51","V52","V53"],"evidence":["help_applicability","cultivation_roles cultivation.v1","Coverage evaluated separately","Source discovery Area/Capacity"]},
+    {"id":"C07_MOTOR_SAFETY_NOMATCH","birth_required":true,"status":"CONFORME","authority":["V52","V53","V41","V43"],"evidence":["single S1 flow","decision_runs/candidates/exposures","no_match_events","safety referral scene","deterministic gates"]},
+    {"id":"C08_SELECTION_DELIVERY_OUTCOME","birth_required":true,"status":"CONFORME","authority":["V52","V53","V43"],"evidence":["help_selections pins decision/help version","prepare_possibility_integrate","outcomes_feedback.selection_id","signal_kind additive"]},
+    {"id":"C09_MOTOR_CONTINUITY_REPERTOIRE","birth_required":true,"status":"GAP_REAL","authority":["V46","V51","V52","V53"],"evidence":["decision_runs.continuity_context","decision_kind","personal_repertoire","lumen_s2_reuse_repertoire","awaiting final longitudinal E2E and CI"]},
+    {"id":"C10_SANCTUARY_SOVEREIGN_MEMORY","birth_required":true,"status":"CONFORME","authority":["V46","V52","V53","V41","V43"],"evidence":["gf_private.sanctuary_entries","save/list/update/delete/export","memory consent separated","no cultivation memory duplicate"]},
+    {"id":"C11_TISSUE_VALUE_CIRCULATION","birth_required":true,"status":"EXPRESION_EMBRIONARIA_ACEPTABLE","authority":["V46","V51","V52","V53","V43"],"evidence":["interaction_spaces","memberships","private invites","contributions","reports","no feed/likes/followers/ranking"]},
+    {"id":"C12_KNOWLEDGE_EVIDENCE_EVOLUTION","birth_required":true,"status":"GAP_REAL","authority":["V46","V51","V52","V53","V41"],"evidence":["evidence_units","signal_type help_effect vs longitudinal_signal","knowledge claims/policy rollback baseline","awaiting final live evidence verification"]},
+    {"id":"C13_LEDGER_IRRECOVERABLE_DECISION_DATA","birth_required":true,"status":"CONFORME","authority":["V46","V51","V53","V41"],"evidence":["append-only domain_events","selection/help_version/decision trace","decision_kind","longitudinal events without raw private text","outbox"]},
+    {"id":"C14_PRIVACY_CONSENT_ISOLATION","birth_required":true,"status":"CONFORME","authority":["V52","V53","V41","V43"],"evidence":["RLS ownership","private originals/Sanctuary","memory/evidence/proactivity consent separated","authenticated-only longitudinal RPCs"]},
+    {"id":"C15_PROACTIVITY_CONSENTED","birth_required":true,"status":"CONFORME","authority":["V46","V51","V52","V53","V43"],"evidence":["followups","cultivation followups","explicit opt-in/off","quiet hours","custody block","cancel","no inactivity trigger"]},
+    {"id":"C16_EXPERIENCE_V43","birth_required":true,"status":"GAP_REAL","authority":["V43","V51","V52","V53"],"evidence":["Ahora","Trayectoria","Fuente","Santuario","Tejido","CultivationPanel","constellation copy","awaiting final build/Playwright proof"]},
+    {"id":"C17_MULTILINGUAL_MULTICULTURAL_MULTISURFACE","birth_required":true,"status":"EXPRESION_EMBRIONARIA_ACEPTABLE","authority":["V41","V43","V53"],"evidence":["locale/language persisted","help localizations","semantic scene/action IDs","versioned life/cultivation vocabularies"]},
+    {"id":"C18_NO_FRANKENSTEIN_EVOLUTION","birth_required":true,"status":"CONFORME","authority":["V46","V51","V52","V53","V41"],"evidence":["no constellation table","no capability score/habit tracker/curriculum","one Source and one Motor","no legacy RPC chain","A60 additive deltas only"]},
+    {"id":"C19_CONSTELLATION_DEPTH","birth_required":true,"status":"GAP_REAL","authority":["V51","V52","V53"],"evidence":["lumen_source_constellation live","regulation sample diverse","seed-capacity certification pending permanent live test"]},
+    {"id":"C20_LONGITUDINAL_BIRTH_LATIDO","birth_required":true,"status":"GAP_REAL","authority":["V51","V52","V53","V43"],"evidence":["reuse/variation/application RPCs live","longitudinal signal + WITHDRAW live contracts","final end-to-end proof pending"]}
   ]
 }
