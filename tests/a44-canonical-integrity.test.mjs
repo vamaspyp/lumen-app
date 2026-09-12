@@ -16,7 +16,9 @@ const allowedCertificationStates = new Set(['IN_PROGRESS','READY_FOR_FINAL_CHECK
 
 test('canonical integrity manifest is structured, current and birth-scoped', () => {
   assert.equal(manifest.scope, 'embryo_birth')
-  assert.equal(manifest.certification_act, context.act.id)
+  assert.match(manifest.certification_act, /^A\d+$/)
+  if (manifest.certification_status !== 'CERTIFIED') assert.equal(manifest.certification_act, context.act.id, 'an unfinished certification must belong to the current ACTO')
+  else assert.notEqual(manifest.certification_act, '', 'a completed certification keeps its historical certification ACTO while POV may advance')
   const currentAuthorities = new Set(context.authorities.map((x) => x.id))
   for (const authority of manifest.authority_set) assert.ok(currentAuthorities.has(authority), `${authority} must be current`)
   for (const superseded of ['V37','V39','V47','V48','V49']) assert.equal(manifest.authority_set.includes(superseded), false)
