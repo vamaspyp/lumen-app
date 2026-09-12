@@ -20,8 +20,20 @@ jobs:
       - name: Verify live-POV attestation and governed execution context
         run: node scripts/check-conduction-gate.mjs
 
-  verify:
+  custody-gate:
+    name: Custody Gate
     needs: conduction-gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify organism synchrony and custodian contracts
+        run: node scripts/check-custody-gate.mjs
+
+  verify:
+    needs: [conduction-gate, custody-gate]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +45,7 @@ jobs:
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
       - run: npx playwright install --with-deps chromium
-      - name: Architecture + unit + lint + build + embryo regression
+      - name: Architecture + unit + custody + lint + build + embryo regression
         run: npm run verify
       - name: Certify live greenfield backend
         run: npm run test:live
