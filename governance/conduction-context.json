@@ -2,7 +2,7 @@
   "schema_version": "1.1",
   "system": {"id":"V3","spreadsheet_id":"1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM","role":"POV"},
   "focus": {"id":"F6","name":"Nacimiento del Embrión y primeras vidas reales"},
-  "act": {"id":"A56","name":"Prueba de Nacimiento y Conducción del Embrión","status":"EN CURSO"},
+  "act": {"id":"A46","name":"Certificación final de exposición real · Organismo + Experiencia + Fuente","status":"EN CURSO"},
   "authorities": [
     {"id":"V46","role":"autoridad_conceptual_integral"},
     {"id":"V48","role":"autoridad_funcional"},
@@ -16,7 +16,7 @@
     {"id":"V50","role":"activo_tecnico_descriptivo_as_built"}
   ],
   "required_sequence":["POV_ACTIVOS","FOCO","ACTO_DOD","AUTORIDAD_VIGENTE","REALIDAD_TECNICA","EJECUCION","EVIDENCIA","CIERRE"],
-  "construction_rule":"A56 prueba nacimiento sin perfeccionismo: el runtime preserva lo certificado, ajusta sólo un fallo vital inequívoco y reemplaza únicamente lo que la autoridad vigente haga incompatible. Bridges permanentes, aliases legacy y capas paralelas siguen prohibidos. Cobertura o madurez autorizada no bloquean nacimiento y pasan a A46/evolución posterior.",
+  "construction_rule":"A46 preserva el Embrión certificado y sólo ajusta gaps reales de exposición. Fuente se amplía por diversidad, cobertura honesta, procedencia/derechos, riesgo, acceso y utilidad material; no por cantidad. El runtime preserva lo correcto, ajusta sólo cuando el cambio es local y limpio, y reemplaza lo que exigiría deuda conceptual. Bridges permanentes, aliases legacy y capas paralelas siguen prohibidos. V37/V39 son referencias históricas no normativas: sólo se rescata lo que sobreviva por mérito bajo V46/V48/V49/V50.",
   "fail_closed":true,
-  "updated_at":"2026-09-11T18:35:00-03:00"
+  "updated_at":"2026-09-12T08:05:00-03:00"
 }
