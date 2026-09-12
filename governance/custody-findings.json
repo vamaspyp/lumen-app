@@ -1,9 +1,16 @@
 {
   "schema_version": "1.0",
   "current_review": {
-    "act_id": "A61",
-    "review_set": ["C0","C8"],
-    "status": "IN_PROGRESS"
+    "act_id": "A62",
+    "review_set": ["C0","C1","C2","C3","C7","C8"],
+    "status": "COMPLETED"
   },
-  "findings": []
+  "findings": [
+    {"id":"A62-C0","custodian_id":"C0","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"A62 preserves V46/V51 north, V52 longitudinal metabolism and V53 anatomy; no local optimization harms organism coherence."},
+    {"id":"A62-C1","custodian_id":"C1","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"Live Source: 84 active_limited possibilities, 121 applicability relations, 10 help types; 12 flagship experiences span 9 capacities and all cultivation roles without filler-volume strategy."},
+    {"id":"A62-C2","custodian_id":"C2","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"Fuente and experience scenes receive deliberate hierarchy, immersive reading of steps/reflections, responsive behavior and reduced-motion support; copy remains invitational and non-dependent."},
+    {"id":"A62-C3","custodian_id":"C3","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"Flagships explicitly support APPLY/VARY/REFLECT/INTEGRATE/SUSTAIN and remain compatible with voluntary Repertoire and longitudinal return; no prescribed program or progress score added."},
+    {"id":"A62-C7","custodian_id":"C7","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"All new flagships are low-risk curated possibilities; no privacy boundary, Sanctuary ownership, safety referral or consent contract changed."},
+    {"id":"A62-C8","custodian_id":"C8","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"No new domain entity, second Source/Motor, constellation table, legacy bridge or parallel authority. CI #165 Conduction Gate + Custody Gate + verify + live backend PASS."}
+  ]
 }

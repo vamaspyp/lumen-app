@@ -1,0 +1,203 @@
+/* A62 · Fuente + Experiencia world-class. Visual refinement only; no new product anatomy. */
+:root {
+  --wc-ink: #252924;
+  --wc-muted: #677067;
+  --wc-sage: #667d68;
+  --wc-mist: #eef1e9;
+  --wc-warm: #f7f2e8;
+}
+
+.source-space {
+  position: relative;
+  isolation: isolate;
+}
+.source-space::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 1.5rem -4vw auto;
+  height: 27rem;
+  border-radius: 3rem;
+  background:
+    radial-gradient(circle at 18% 20%, color-mix(in srgb, var(--sage) 22%, transparent), transparent 30%),
+    radial-gradient(circle at 82% 6%, rgba(217, 199, 162, .22), transparent 28%),
+    linear-gradient(135deg, rgba(255,255,255,.52), rgba(238,241,233,.35));
+  pointer-events: none;
+}
+
+.source-space > h1 {
+  max-width: 16ch;
+  margin-inline: auto;
+  text-wrap: balance;
+}
+.source-space > .lumi-line {
+  max-width: 64ch;
+  font-size: clamp(1.04rem, 2vw, 1.18rem);
+}
+
+.source-space .filter-bar {
+  width: min(860px, 100%);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: .65rem;
+  padding: .8rem;
+  border: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  box-shadow: 0 18px 50px rgba(48,45,40,.055);
+  backdrop-filter: blur(14px);
+}
+
+.source-space .filter-bar select {
+  border-radius: 14px;
+  background: rgba(255,255,255,.72);
+  border-color: color-mix(in srgb, var(--line) 72%, transparent);
+}
+
+.source-grid {
+  margin-top: 1.6rem;
+  gap: 1.15rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+}
+
+.source-card {
+  position: relative;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--line) 72%, transparent);
+  border-radius: 28px;
+  padding: clamp(1.3rem, 3vw, 1.75rem);
+  background: linear-gradient(160deg, rgba(255,255,255,.84), rgba(252,250,244,.72));
+  box-shadow: 0 14px 42px rgba(48,45,40,.055);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+.source-card::before {
+  content: '';
+  position: absolute;
+  width: 7.5rem;
+  height: 7.5rem;
+  right: -3.8rem;
+  top: -3.8rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--sage) 13%, transparent);
+  pointer-events: none;
+}
+.source-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--sage) 42%, var(--line));
+  box-shadow: 0 22px 60px rgba(48,45,40,.085);
+}
+.source-card h2 {
+  margin-top: .18rem;
+  font-size: clamp(1.28rem, 2vw, 1.55rem);
+  letter-spacing: -.025em;
+  text-wrap: balance;
+}
+.source-card > p:not(.mini-prompt):not(.provenance-line) {
+  font-size: .95rem;
+}
+.source-card .help-meta:first-child span:first-child {
+  color: var(--sage-deep);
+  border-color: color-mix(in srgb, var(--sage) 35%, var(--line));
+  background: color-mix(in srgb, var(--sage) 8%, transparent);
+  font-weight: 650;
+}
+.source-card .help-meta + .help-meta span {
+  border: 0;
+  background: var(--surface-soft);
+  color: var(--sage-deep);
+}
+.source-card .mini-steps {
+  display: grid;
+  gap: .55rem;
+  margin-top: .7rem;
+  padding: .85rem .85rem .85rem 2rem;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--sage) 7%, transparent);
+}
+.source-card .mini-prompt {
+  margin: .8rem 0 1rem;
+  padding: .7rem .9rem;
+  border-left: 0;
+  border-radius: 15px;
+  background: linear-gradient(135deg, rgba(238,241,233,.82), rgba(247,242,232,.82));
+  font-size: .98rem;
+  line-height: 1.65;
+}
+.source-card .provenance-line {
+  padding-top: .85rem;
+  border-top: 1px solid color-mix(in srgb, var(--line) 68%, transparent);
+  opacity: .78;
+}
+.source-card .small-actions {
+  margin-top: .25rem;
+}
+.source-card .secondary-link,
+.source-card .text-action {
+  min-height: 2.7rem;
+}
+
+/* The selected help scene should feel like an experience, not a document. */
+.experience-scene {
+  position: relative;
+  padding: clamp(1.3rem, 4vw, 2.4rem);
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at 90% 0%, color-mix(in srgb, var(--sage) 13%, transparent), transparent 30%),
+    linear-gradient(160deg, rgba(255,255,255,.74), rgba(252,250,244,.56));
+  border: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
+  box-shadow: 0 24px 80px rgba(48,45,40,.07);
+}
+.experience-scene h1 { text-wrap: balance; }
+.experience-summary { font-size: 1.08rem; }
+.experience-body {
+  border: 0;
+  margin: 1.6rem 0 2rem;
+  padding: clamp(1.25rem, 3vw, 1.8rem);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+}
+.practice-steps { counter-reset: lumen-step; list-style: none; padding: 0; }
+.practice-steps li {
+  counter-increment: lumen-step;
+  position: relative;
+  padding: .2rem 0 .2rem 3.1rem;
+  min-height: 2.35rem;
+}
+.practice-steps li::before {
+  content: counter(lumen-step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2.15rem;
+  height: 2.15rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--wc-mist);
+  color: var(--sage-deep);
+  font-size: .78rem;
+  font-weight: 750;
+}
+.reflection-prompt,
+.reflection-prompts {
+  border-left: 0;
+  padding: 1.1rem 1.2rem;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--wc-mist), var(--wc-warm));
+}
+
+.outcome-scene .outcome-actions button {
+  min-height: 3.35rem;
+  border-radius: 18px;
+}
+
+@media (max-width: 760px) {
+  .source-space::before { inset-inline: -.7rem; height: 23rem; border-radius: 2rem; }
+  .source-space .filter-bar { grid-template-columns: 1fr; border-radius: 20px; }
+  .source-card { border-radius: 22px; }
+  .experience-scene { border-radius: 24px; padding: 1.1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .source-card { transition: none; }
+  .source-card:hover { transform: none; }
+}
