@@ -2,7 +2,7 @@
   "schema_version": "1.1",
   "system": {"id":"V3","spreadsheet_id":"1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM","role":"POV"},
   "focus": {"id":"F6","name":"Nacimiento del Embrión y primeras vidas reales"},
-  "act": {"id":"A62","name":"Elevar Fuente + Experiencia a estándar world-class pre-Pauli","status":"EN CURSO"},
+  "act": {"id":"A46","name":"Certificación final de exposición real · Organismo + Experiencia + Fuente","status":"EN CURSO"},
   "authorities": [
     {"id":"V46","role":"autoridad_conceptual_integral"},
     {"id":"V51","role":"autoridad_canonica_complementaria_norte"},
@@ -18,7 +18,7 @@
     {"id":"V54","version":"1.0","role":"infraestructura_de_custodia_sincronica"}
   ],
   "required_sequence":["POV_ACTIVOS","FOCO","ACTO_DOD","AUTORIDAD_VIGENTE","REALIDAD_TECNICA","EJECUCION","EVIDENCIA","CIERRE"],
-  "construction_rule":"A62 eleva Fuente y experiencia sin reabrir anatomía. Preserva V52/V53 y todo lo certificado; ajusta contenido, composición, descubrimiento, presentación y ejecución experiencial en la capa responsable; reemplaza cualquier patrón de prototipo o catálogo que impida una experiencia de producto seria. Referentes de mercado son piso comparativo, no autoridad ni modelo a copiar. Calidad sobre volumen, diversidad real, constelaciones vivibles, provenance/safety y orientación a capacidad propia son obligatorias. Review V54 requerido: C0+C1+C2+C3+C7+C8. Bridges permanentes, duplicación de Fuente/Motor/memoria, scores, programas coercitivos y PRELAUNCH RESET anticipado siguen prohibidos.",
+  "construction_rule":"A46 vuelve a ser el ACTO vigente de exposición humana. El Embrión llega PAULI-READY tras A60 (integración y capacidad propia), A61 (Custodia Sincrónica V54) y A62 (Fuente + Experiencia world-class), todos cerrados y certificados. No se agrega nueva construcción por anticipación: ante una fricción material observada por Pauli, preservar lo correcto, ajustar sólo el delta responsable y reemplazar cualquier pieza que induzca semántica vieja o duplicación. Todo cambio debe preservar V46/V51/V52/V53/V54, canonical_integrity v7 / embryo.v53.1, No Regresión + Evolución Limpia y custodia fail-closed. Bridges permanentes, aliases legacy, scores, programas coercitivos, tabla Constelación, capas paralelas y PRELAUNCH RESET anticipado siguen prohibidos; el reset sólo ocurre tras GO humano e inmediatamente antes de primeras vidas reales.",
   "fail_closed":true,
-  "updated_at":"2026-09-12T15:20:00-03:00"
+  "updated_at":"2026-09-12T15:58:00-03:00"
 }
