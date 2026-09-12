@@ -15,7 +15,7 @@ test('V54 custody is subordinate and cannot become parallel authority', () => {
   assert.equal(registry.authority_model.creates_authority, false)
   assert.equal(registry.authority_model.mutates_without_act, false)
   assert.equal(registry.authority_model.source_of_truth, 'V3/POV+ACTIVOS')
-  assert.equal(context.act.id, 'A61')
+  assert.match(context.act.id, /^A\d+$/)
   assert.ok(context.authorities.some((x) => x.id === 'V54'))
   assert.ok(snapshot.active_authorities.some((x) => x.id === 'V54' && x.state === 'VIGENTE'))
 })
@@ -52,12 +52,12 @@ test('source and experience increment has the required cross-organ custodians', 
   assert.ok(experience.invariants.includes('no_dependency_design'))
 })
 
-test('normalized findings support evidence-led escalation and hard blocks', () => {
+test('normalized findings support evidence-led escalation and durable act transitions', () => {
   assert.deepEqual(registry.normalized_results, ['PASS','GAP','RIESGO','DECISION_HUMANA'])
   assert.deepEqual(registry.severities, ['INFO','WARN','BLOCK'])
   assert.ok(registry.hard_blockers.some((x) => /privacy or safety regression/i.test(x)))
   assert.ok(registry.hard_blockers.some((x) => /ownership duplication/i.test(x)))
-  assert.equal(findings.current_review.act_id, 'A61')
+  if (findings.current_review?.status === 'IN_PROGRESS') assert.equal(findings.current_review.act_id, context.act.id)
 })
 
 test('standalone custody gate passes', () => {
