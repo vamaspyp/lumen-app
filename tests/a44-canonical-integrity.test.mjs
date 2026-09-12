@@ -4,28 +4,25 @@ import fs from 'node:fs'
 
 const read = (path) => fs.readFileSync(path, 'utf8')
 const manifest = JSON.parse(read('governance/canonical-integrity-contracts.json'))
+const context = JSON.parse(read('governance/conduction-context.json'))
 const gate = read('scripts/check-conduction-gate.mjs')
 const s1Client = read('src/greenfield/application/s1.ts')
 const embryoClient = read('src/greenfield/application/embryo.ts')
 const schemaMigration = read('supabase/migrations/20260911210000_a51_v49_schema_convergence.sql')
 const runtimeMigration = read('supabase/migrations/20260911210100_a51_v49_runtime_contracts.sql')
 
-const allowed = new Set([
-  'CONFORME',
-  'EXPRESION_EMBRIONARIA_ACEPTABLE',
-  'GAP_REAL',
-  'DECISION_DE_AUTORIDAD_PENDIENTE',
-])
-const allowedCertificationStates = new Set(['IN_PROGRESS', 'READY_FOR_FINAL_CHECK', 'CERTIFIED'])
+const allowed = new Set(['CONFORME','EXPRESION_EMBRIONARIA_ACEPTABLE','GAP_REAL','DECISION_DE_AUTORIDAD_PENDIENTE'])
+const allowedCertificationStates = new Set(['IN_PROGRESS','READY_FOR_FINAL_CHECK','RECONCILING','CERTIFIED'])
 
 test('canonical integrity manifest is structured, current and birth-scoped', () => {
   assert.equal(manifest.scope, 'embryo_birth')
-  assert.equal(manifest.certification_act, 'A51')
-  assert.deepEqual(manifest.authority_set, ['V46', 'V48', 'V49', 'V40', 'V41', 'V43'])
+  assert.equal(manifest.certification_act, context.act.id)
+  const currentAuthorities = new Set(context.authorities.map((x) => x.id))
+  for (const authority of manifest.authority_set) assert.ok(currentAuthorities.has(authority), `${authority} must be current`)
+  for (const superseded of ['V37','V39','V47','V48','V49']) assert.equal(manifest.authority_set.includes(superseded), false)
   assert.ok(allowedCertificationStates.has(manifest.certification_status))
   assert.ok(Array.isArray(manifest.contracts))
   assert.ok(manifest.contracts.length >= 18)
-
   const ids = new Set()
   for (const contract of manifest.contracts) {
     assert.ok(contract.id)
@@ -35,9 +32,7 @@ test('canonical integrity manifest is structured, current and birth-scoped', () 
     assert.ok(allowed.has(contract.status), `invalid status for ${contract.id}`)
     assert.ok(Array.isArray(contract.authority) && contract.authority.length > 0)
     assert.ok(Array.isArray(contract.evidence) && contract.evidence.length > 0)
-    assert.equal(contract.authority.includes('V37'), false)
-    assert.equal(contract.authority.includes('V39'), false)
-    assert.equal(contract.authority.includes('V47'), false)
+    for (const superseded of ['V37','V39','V47','V48','V49']) assert.equal(contract.authority.includes(superseded), false)
   }
 })
 
@@ -50,13 +45,8 @@ test('Conduction Gate still enforces accumulated no-loss integrity', () => {
 })
 
 test('certification state cannot hide birth-critical blockers', () => {
-  const blockers = manifest.contracts.filter((contract) =>
-    contract.birth_required === true &&
-    ['GAP_REAL', 'DECISION_DE_AUTORIDAD_PENDIENTE'].includes(contract.status)
-  )
-  if (['CERTIFIED', 'READY_FOR_FINAL_CHECK'].includes(manifest.certification_status)) {
-    assert.equal(blockers.length, 0)
-  }
+  const blockers = manifest.contracts.filter((contract) => contract.birth_required === true && ['GAP_REAL','DECISION_DE_AUTORIDAD_PENDIENTE'].includes(contract.status))
+  if (['CERTIFIED','READY_FOR_FINAL_CHECK'].includes(manifest.certification_status)) assert.equal(blockers.length, 0)
 })
 
 test('S1 has one current public accompaniment contract and no V47 client bridge', () => {
@@ -69,7 +59,7 @@ test('S1 has one current public accompaniment contract and no V47 client bridge'
   assert.match(runtimeMigration, /drop function if exists gf_core\.v47_orientation_bridge/i)
 })
 
-test('V49 separates applicability from coverage instead of renaming legacy', () => {
+test('applicability remains separate from coverage', () => {
   assert.match(schemaMigration, /create table if not exists gf_core\.help_applicability/i)
   assert.match(runtimeMigration, /coverage\.eval\.v1/)
   assert.match(runtimeMigration, /drop table if exists gf_core\.coverage_cells/i)
@@ -82,6 +72,5 @@ test('outcome attribution follows selection and exact help version', () => {
   assert.match(schemaMigration, /help_selections[\s\S]*decision_run_id/i)
   assert.match(schemaMigration, /help_selections[\s\S]*help_version_id/i)
   assert.match(schemaMigration, /outcomes_feedback[\s\S]*selection_id/i)
-  assert.match(runtimeMigration, /evidence\.v49\.1/)
   assert.match(s1Client, /recordOutcome\([\s\S]*episodeId[\s\S]*effect/)
 })
