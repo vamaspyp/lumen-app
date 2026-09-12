@@ -12,11 +12,7 @@ test('A60 models constellations as projections, never as a new domain table', as
 })
 
 test('A60 never creates personal capability scores or habit tracking', async () => {
-  const migrations = [
-    await read('supabase/migrations/20260912144000_a60_integration_capacity_metabolism.sql'),
-    await read('supabase/migrations/20260912145000_a60_constellation_diversity.sql'),
-    await read('supabase/migrations/20260912150000_a60_continuity_snapshots.sql'),
-  ].join('\n')
+  const migrations = [await read('supabase/migrations/20260912144000_a60_integration_capacity_metabolism.sql'),await read('supabase/migrations/20260912145000_a60_constellation_diversity.sql'),await read('supabase/migrations/20260912150000_a60_continuity_snapshots.sql')].join('\n')
   assert.doesNotMatch(migrations, /create\s+table\s+[^;]*(capability_score|habit|streak)/i)
   assert.doesNotMatch(migrations, /capability_(score|level)|progress_score/i)
 })
@@ -24,16 +20,15 @@ test('A60 never creates personal capability scores or habit tracking', async () 
 test('A60 preserves voluntary repertoire integration before longitudinal reuse', async () => {
   const sql = await read('supabase/migrations/20260912144000_a60_integration_capacity_metabolism.sql')
   assert.match(sql, /a helped outcome is required before integration/i)
-  assert.match(sql, /user_confirmed,true/i)
+  assert.match(sql, /user_confirmed\s*,\s*integration_context/i)
+  assert.match(sql, /user_confirmed\s*=\s*true/i)
   assert.match(sql, /lumen_s2_reuse_repertoire/i)
   assert.match(sql, /status='active' and user_confirmed=true/i)
 })
 
 test('A60 differentiates punctual help from longitudinal incorporation evidence', async () => {
   const sql = await read('supabase/migrations/20260912144000_a60_integration_capacity_metabolism.sql')
-  for (const signal of ['HELPED_NOW','REUSED','REPEATED','VARIED','APPLIED_OTHER_CONTEXT','RECOGNIZED_AS_OWN','NO_REMINDER_NEEDED','STOPPED_HELPING']) {
-    assert.match(sql, new RegExp(signal))
-  }
+  for (const signal of ['HELPED_NOW','REUSED','REPEATED','VARIED','APPLIED_OTHER_CONTEXT','RECOGNIZED_AS_OWN','NO_REMINDER_NEEDED','STOPPED_HELPING']) assert.match(sql, new RegExp(signal))
   assert.match(sql, /longitudinal_signal/i)
   assert.match(sql, /decision_kind/i)
   assert.match(sql, /WITHDRAW/i)
