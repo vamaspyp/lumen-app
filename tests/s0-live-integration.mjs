@@ -41,7 +41,7 @@ assert.equal(embryo?.state, 'operational')
 assert.equal(embryo?.release_contract, 'embryo.v53.1')
 assert.deepEqual(Object.keys(embryo ?? {}).sort(), ['canonical_integrity', 'evolution', 'operations', 'prelaunch_reset_required', 'release_contract', 'slices', 'source', 'state'].sort(), 'Public health must remain a narrow operational projection')
 assert.equal(embryo?.canonical_integrity?.status, 'integrally_certified')
-assert.equal(embryo?.canonical_integrity?.version, 6)
+assert.equal(embryo?.canonical_integrity?.version, 7)
 assert.deepEqual(embryo?.canonical_integrity?.authority_set, ['V46', 'V51', 'V52', 'V53', 'V40', 'V41', 'V43'])
 assert.deepEqual(embryo?.slices, {
   s0: 'implemented', s1: 'implemented', s2: 'implemented', s3: 'implemented',
