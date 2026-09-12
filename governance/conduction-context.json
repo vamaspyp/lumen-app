@@ -2,7 +2,7 @@
   "schema_version": "1.1",
   "system": {"id":"V3","spreadsheet_id":"1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM","role":"POV"},
   "focus": {"id":"F6","name":"Nacimiento del Embrión y primeras vidas reales"},
-  "act": {"id":"A46","name":"Certificación final de exposición real · Organismo + Experiencia + Fuente","status":"EN CURSO"},
+  "act": {"id":"A63","name":"LUMEN WORLD CLASS · elevar experiencia integral antes de Pauli","status":"EN CURSO"},
   "authorities": [
     {"id":"V46","role":"autoridad_conceptual_integral"},
     {"id":"V51","role":"autoridad_canonica_complementaria_norte"},
@@ -18,7 +18,7 @@
     {"id":"V54","version":"1.0","role":"infraestructura_de_custodia_sincronica"}
   ],
   "required_sequence":["POV_ACTIVOS","FOCO","ACTO_DOD","AUTORIDAD_VIGENTE","REALIDAD_TECNICA","EJECUCION","EVIDENCIA","CIERRE"],
-  "construction_rule":"A46 vuelve a ser el ACTO vigente de exposición humana. El Embrión llega PAULI-READY tras A60 (integración y capacidad propia), A61 (Custodia Sincrónica V54) y A62 (Fuente + Experiencia world-class), todos cerrados y certificados. No se agrega nueva construcción por anticipación: ante una fricción material observada por Pauli, preservar lo correcto, ajustar sólo el delta responsable y reemplazar cualquier pieza que induzca semántica vieja o duplicación. Todo cambio debe preservar V46/V51/V52/V53/V54, canonical_integrity v7 / embryo.v53.1, No Regresión + Evolución Limpia y custodia fail-closed. Bridges permanentes, aliases legacy, scores, programas coercitivos, tabla Constelación, capas paralelas y PRELAUNCH RESET anticipado siguen prohibidos; el reset sólo ocurre tras GO humano e inmediatamente antes de primeras vidas reales.",
+  "construction_rule":"A63 corrige la brecha cualitativa expuesta por evidencia humana: LUMEN nace world-class, sin calificadores. A62 conserva validez técnica pero su claim cualitativo world-class queda superado. Recuperar los 8 arquetipos del showcase A46 como laboratorio de amplitud, no como autoridad ni UI a copiar; contrastar contra referentes líderes actuales como piso comparativo; construir una experiencia insignia end-to-end que sea competitiva en producto y claramente propia de LUMEN: reservorio vivo, constelaciones, contextualidad, vida real, integración, capacidad propia y retiro. Ningún PASS técnico basta sin revisión visual/humana comparativa. Preservar V46/V51/V52/V53/V54, canonical_integrity v7, No Regresión + Evolución Limpia y custodia fail-closed. Bridges permanentes, aliases legacy, scores, streaks, programas coercitivos, tabla Constelación y PRELAUNCH RESET anticipado siguen prohibidos.",
   "fail_closed":true,
-  "updated_at":"2026-09-12T15:58:00-03:00"
+  "updated_at":"2026-09-12T19:40:00-03:00"
 }
