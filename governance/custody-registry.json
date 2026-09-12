@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0",
+  "system_id": "V54",
+  "mode": "lean_fail_closed",
+  "authority_model": {
+    "creates_authority": false,
+    "mutates_without_act": false,
+    "source_of_truth": "V3/POV+ACTIVOS",
+    "escalates_unresolved_value_conflicts_to": "DECISION_HUMANA"
+  },
+  "normalized_results": ["PASS", "GAP", "RIESGO", "DECISION_HUMANA"],
+  "severities": ["INFO", "WARN", "BLOCK"],
+  "synchrony_dimensions": [
+    {"id":"NORTE","question":"¿Contribuye a Visión, Misión, Norte y E1–E4?"},
+    {"id":"FISIOLOGIA","question":"¿Fortalece los circuitos vivos del organismo sin romperlos?"},
+    {"id":"PERSONA","question":"¿Preserva soberanía, utilidad real, autonomía y no coerción?"},
+    {"id":"ORGANISMO","question":"¿Es coherente con los demás órganos y evita duplicación o suboptimización local?"},
+    {"id":"EVOLUCION","question":"¿Es observable, reversible, aprendible y mantenible?"}
+  ],
+  "custodians": [
+    {
+      "id":"C0","name":"Custodio Integral del Organismo","scope":["organism","cross-organ","strategic coherence"],
+      "authorities":["V46","V51","V52","V53","V41","V42","V43","V54"],
+      "invariants":["one_authority_graph","north_alignment","e1_e4_integrity","no_local_optimization_harming_whole","no_silent_scope_expansion"],
+      "requires_semantic_review":true,"can_block":true,"decision_owner":"Sistema de Conducción / humano cuando excede autoridad"
+    },
+    {
+      "id":"C1","name":"Custodio de Fuente","scope":["Fuente","HelpPossibility","HelpApplicability","constellations"],
+      "authorities":["V46","V51","V52","V53","V41","V54"],
+      "invariants":["quality_over_volume","diversity","provenance_rights_risk_evidence","honest_coverage","constellation_is_projection","capacity_depth","no_catalog_inflation"],
+      "requires_semantic_review":true,"can_block":true,"decision_owner":"ACTO gobernado"
+    },
+    {
+      "id":"C2","name":"Custodio de LUMI y Experiencia","scope":["LUMI","experience","interface","presence"],
+      "authorities":["V43","V46","V51","V52","V53","V41","V54"],
+      "invariants":["human_presence","clarity","accessibility","non_coercion","prepare_experience_integrate","withdraw_when_own","no_dependency_design"],
+      "requires_semantic_review":true,"can_block":true,"decision_owner":"ACTO gobernado"
+    },
+    {
+      "id":"C3","name":"Custodio de Trayectoria y Repertorio","scope":["Trajectory","Path","Repertoire","cultivation"],
+      "authorities":["V46","V51","V52","V53","V41","V54"],
+      "invariants":["voluntary_continuity","own_capacity_orientation","no_scores","no_streaks","no_prescriptive_program","repertoire_user_confirmed","lumi_can_withdraw"],
+      "requires_semantic_review":true,"can_block":true,"decision_owner":"ACTO gobernado"
+    },
+    {
+      "id":"C4","name":"Custodio de Santuario","scope":["Sanctuary","private memory"],
+      "authorities":["V46","V52","V53","V41","V54"],
+      "invariants":["person_ownership","privacy","deletion_control","no_intimate_ledger_payload","sanctuary_knowledge_separation","no_extraction_without_consent"],
+      "requires_semantic_review":true,"can_block":true,"decision_owner":"ACTO gobernado"
+    },
+    {
+      "id":"C5","name":"Custodio de Tejido","scope":["Tissue","Circle","life_to_life circulation"],
+      "authorities":["V46","V52","V53","V41","V43","V54"],
+      "invariants":["consent","safe_exit","reportability","no_feed","no_likes","no_followers","no_ranking","no_social_pressure"],
+      "requires_semantic_review":true,"can_block":true,"decision_owner":"ACTO gobernado"
+    },
+    {
+      "id":"C6","name":"Custodio de Conocimiento y Evolución","scope":["Knowledge","Evolution","evidence","claims","policy changes"],
+      "authorities":["V46","V52","V53","V41","V42","V54"],
+      "invariants":["evidence_before_claim","provisionality","missingness_preserved","traceability","rollback","no_correlation_as_truth","reversible_change"],
+      "requires_semantic_review":true,"can_block":true,"decision_owner":"ACTO gobernado / humano si conflicto epistemológico material"
+    },
+    {
+      "id":"C7","name":"Custodio de Custodia, Seguridad y Privacidad","scope":["safety","privacy","consent","proactivity","human escalation"],
+      "authorities":["V41","V46","V52","V53","V54"],
+      "invariants":["safety_first","honest_no_match","rls_ownership","data_minimization","consent","quiet_custody_gate","no_unconsented_contact","professional_limits"],
+      "requires_semantic_review":true,"can_block":true,"decision_owner":"ACTO gobernado / humano en riesgo no resuelto"
+    },
+    {
+      "id":"C8","name":"Custodio de Arquitectura e Integridad","scope":["architecture","contracts","migrations","CI","greenfield independence"],
+      "authorities":["V40","V41","V45","V53","V54"],
+      "invariants":["greenfield_independence","single_ownership","bounded_contexts","ledger_outbox","replaceable_adapters","no_frankenstein","no_legacy_bridge","no_second_source_motor_memory_ontology","regression_for_material_bugs"],
+      "requires_semantic_review":false,"can_block":true,"decision_owner":"ACTO gobernado"
+    }
+  ],
+  "review_sets": {
+    "default_material_change":["C0","C8"],
+    "source_experience_increment":["C0","C1","C2","C3","C7","C8"],
+    "knowledge_evolution_change":["C0","C6","C7","C8"],
+    "tissue_change":["C0","C5","C7","C8"],
+    "sanctuary_change":["C0","C4","C7","C8"]
+  },
+  "hard_blockers": [
+    "authority contradiction",
+    "privacy or safety regression",
+    "birth-contract loss",
+    "ownership duplication",
+    "permanent legacy bridge",
+    "new parallel Source/Motor/memory/ontology without explicit authority",
+    "unresolved BLOCK finding"
+  ]
+}

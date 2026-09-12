@@ -2,7 +2,7 @@
   "schema_version": "1.1",
   "system": {"id":"V3","spreadsheet_id":"1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM","role":"POV"},
   "focus": {"id":"F6","name":"Nacimiento del Embrión y primeras vidas reales"},
-  "act": {"id":"A46","name":"Certificación final de exposición real · Organismo + Experiencia + Fuente","status":"EN CURSO"},
+  "act": {"id":"A61","name":"Materializar Custodia Sincrónica del Organismo","status":"EN CURSO"},
   "authorities": [
     {"id":"V46","role":"autoridad_conceptual_integral"},
     {"id":"V51","role":"autoridad_canonica_complementaria_norte"},
@@ -14,10 +14,11 @@
     {"id":"V43","role":"autoridad_experiencial"},
     {"id":"V44","role":"runtime_greenfield"},
     {"id":"V45","version":"0.2","role":"infraestructura_de_gobierno"},
-    {"id":"V50","role":"activo_tecnico_descriptivo_as_built_pre_v51"}
+    {"id":"V50","role":"activo_tecnico_descriptivo_as_built_pre_v51"},
+    {"id":"V54","version":"1.0","role":"infraestructura_de_custodia_sincronica"}
   ],
   "required_sequence":["POV_ACTIVOS","FOCO","ACTO_DOD","AUTORIDAD_VIGENTE","REALIDAD_TECNICA","EJECUCION","EVIDENCIA","CIERRE"],
-  "construction_rule":"A46 está PAULI-READY sobre el Embrión V1.1 certificado por A60. No se agrega nueva construcción por anticipación ni se reabre V52/V53. Ante una fricción real observada en Pauli, el runtime preserva lo correcto, ajusta sólo el delta local y reemplaza cualquier pieza que obligue a compatibilidad o semántica vieja. Todo cambio debe preservar canonical_integrity v7 / embryo.v53.1 y cumplir No Regresión + Evolución Limpia. PRELAUNCH RESET permanece prohibido hasta dictamen humano GO y momento inmediatamente previo a primeras vidas reales. Bridges permanentes, aliases legacy, scores, programas, tabla Constelación y capas paralelas siguen prohibidos.",
+  "construction_rule":"A61 materializa una custodia sincrónica lean subordinada al Sistema de Conducción. La red preserva la única autoridad vigente, ajusta sólo controles y contratos de custodia necesarios y reemplaza cualquier mecanismo que duplique gobierno o permita mutación silenciosa. Custodios observan, evidencian y escalan; no canonizan ni ejecutan cambios materiales fuera de ACTO. Bridges permanentes, aliases legacy, sistemas paralelos de autoridad y burocracia multiagente siguen prohibidos. PRELAUNCH RESET permanece prohibido hasta GO humano e instante previo a primeras vidas reales.",
   "fail_closed":true,
-  "updated_at":"2026-09-12T14:23:00-03:00"
+  "updated_at":"2026-09-12T15:12:00-03:00"
 }

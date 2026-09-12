@@ -92,10 +92,14 @@ test('A60 cultivation context is minimized and does not duplicate intimate memor
 test('A60 certification remains bound to V51 V52 V53 after current POV advances', async () => {
   const context = JSON.parse(await read('governance/conduction-context.json'))
   const manifest = JSON.parse(await read('governance/canonical-integrity-contracts.json'))
+  const migrations = [
+    await read('supabase/migrations/20260912144000_a60_integration_capacity_metabolism.sql'),
+    await read('supabase/migrations/20260912170528_a60_final_contract_alignment.sql'),
+  ].join('\n')
   assert.equal(manifest.certification_act, 'A60')
   assert.equal(manifest.certification_status, 'CERTIFIED')
   assert.deepEqual(manifest.authority_set.filter((id) => ['V51','V52','V53'].includes(id)), ['V51','V52','V53'])
   assert.deepEqual(context.authorities.filter((x) => ['V51','V52','V53'].includes(x.id)).map((x) => x.id), ['V51','V52','V53'])
-  assert.match(context.construction_rule, /tabla Constelación/i)
-  assert.match(context.construction_rule, /scores/i)
+  assert.doesNotMatch(migrations, /create\s+table\s+[^;]*constellation/i)
+  assert.doesNotMatch(migrations, /capability_(score|level)|progress_score|streak/i)
 })

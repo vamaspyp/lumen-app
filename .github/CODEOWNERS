@@ -1,9 +1,11 @@
-# Conduction controls are human-custodied. Branch protection/ruleset must require Code Owner review for these paths.
+# Conduction and custody controls are human-custodied. Branch protection/ruleset must require Code Owner review for these paths.
 /.github/CODEOWNERS @vamaspyp
 /.github/workflows/ @vamaspyp
 /.github/copilot-instructions.md @vamaspyp
 /governance/ @vamaspyp
 /scripts/check-conduction-gate.mjs @vamaspyp
+/scripts/check-custody-gate.mjs @vamaspyp
 /tests/conduction-gate.test.mjs @vamaspyp
+/tests/a61-custody-synchrony.test.mjs @vamaspyp
 /AGENTS.md @vamaspyp
 /CLAUDE.md @vamaspyp

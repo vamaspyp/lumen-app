@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0",
+  "current_review": {
+    "act_id": "A61",
+    "review_set": ["C0","C8"],
+    "status": "IN_PROGRESS"
+  },
+  "findings": []
+}
