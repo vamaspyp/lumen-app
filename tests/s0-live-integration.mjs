@@ -40,16 +40,16 @@ assert.equal(embryoError, null, `Embryo health RPC failed: ${embryoError?.messag
 assert.equal(embryo?.state, finalCertification ? 'operational' : 'forming')
 assert.equal(embryo?.release_contract, 'embryo.v49.1')
 assert.deepEqual(Object.keys(embryo ?? {}).sort(), ['canonical_integrity', 'evolution', 'operations', 'prelaunch_reset_required', 'release_contract', 'slices', 'source', 'state'].sort(), 'Public health must remain a narrow operational projection')
-assert.equal(embryo?.canonical_integrity?.status, finalCertification ? 'certified' : 'reconciling')
-assert.equal(embryo?.canonical_integrity?.version, finalCertification ? 4 : 3)
+assert.equal(embryo?.canonical_integrity?.status, finalCertification ? 'integrally_certified' : 'reconciling')
+assert.equal(embryo?.canonical_integrity?.version, finalCertification ? 5 : 3)
 assert.deepEqual(embryo?.canonical_integrity?.authority_set, ['V46', 'V48', 'V49', 'V40', 'V41', 'V43'])
 assert.deepEqual(embryo?.slices, {
   s0: 'implemented', s1: 'implemented', s2: 'implemented', s3: 'implemented',
   s4: 'implemented', s5: 'implemented', s6: 'implemented', s7: 'implemented',
 }, 'Public health reports implementation state; ACTO closure state remains governed by the POV')
-assert.ok(embryo?.source?.active_possibilities >= 60, 'Source must preserve at least 60 active possibilities')
-assert.ok(embryo?.source?.applicability_relations >= 90, 'Source must preserve broad Area×Capacity applicability')
-assert.ok(embryo?.source?.semantic_types >= 4, 'Source must expose several semantic help types')
+assert.ok(embryo?.source?.active_possibilities >= 72, 'Source must preserve the A46 exposure seed')
+assert.ok(embryo?.source?.applicability_relations >= 109, 'Source must preserve governed Area×Capacity applicability')
+assert.ok(embryo?.source?.semantic_types >= 10, 'Source must expose all ten current semantic help forms')
 assert.equal(embryo?.source?.taxonomy_version, 'life-taxonomy.v1')
 assert.equal(embryo?.source?.coverage_contract, 'coverage.eval.v1')
 assert.equal(embryo?.prelaunch_reset_required, true, 'Synthetic construction data must still be reset before real users')
@@ -59,6 +59,7 @@ assert.equal(taxonomyError, null, `Source taxonomy failed: ${taxonomyError?.mess
 assert.equal(taxonomy?.taxonomy_version, 'life-taxonomy.v1')
 assert.ok(Array.isArray(taxonomy?.areas) && taxonomy.areas.length >= 8)
 assert.ok(Array.isArray(taxonomy?.capacities) && taxonomy.capacities.length >= 10)
+assert.ok(Array.isArray(taxonomy?.help_types) && taxonomy.help_types.length >= 10, 'Source taxonomy must expose dynamic semantic forms')
 
 const { data: source, error: sourceError } = await supabase.rpc('lumen_source_discover', {
   p_area_key: null,
@@ -71,32 +72,43 @@ assert.equal(sourceError, null, `Public Source discovery failed: ${sourceError?.
 assert.ok(Array.isArray(source), 'Source discovery must return an array')
 assert.equal(source.length, 50, 'Broad discovery should reach the public hard cap')
 
-const allowedSourceKeys = new Set(['help_id', 'canonical_code', 'help_type', 'lifecycle', 'risk_class', 'evidence_class', 'title', 'summary', 'content', 'duration_minutes', 'energy', 'provider', 'areas', 'capacities', 'taxonomy_version', 'localization_provenance'])
+const allowedSourceKeys = new Set(['help_id', 'canonical_code', 'help_type', 'lifecycle', 'risk_class', 'evidence_class', 'title', 'summary', 'content', 'duration_minutes', 'energy', 'accessibility', 'provider', 'areas', 'capacities', 'taxonomy_version', 'localization_provenance'])
 for (const item of source) {
   for (const field of Object.keys(item ?? {})) assert.ok(allowedSourceKeys.has(field), `Unexpected public Source field: ${field}`)
   assert.equal(Object.hasOwn(item ?? {}, 'person_id'), false, 'Public Source must never expose person_id')
   assert.equal(item?.taxonomy_version, 'life-taxonomy.v1')
   assert.ok(Array.isArray(item?.areas))
   assert.ok(Array.isArray(item?.capacities))
+  assert.equal(typeof item?.accessibility, 'object')
 }
 
 const providers = new Set(source.map((item) => item?.provider?.name).filter(Boolean))
 const helpTypes = new Set(source.map((item) => item?.help_type).filter(Boolean))
 assert.ok(providers.size >= 5, `Expected diverse Source provenance, got ${providers.size} providers in capped discovery`)
-assert.ok(helpTypes.size >= 4, `Expected several semantic help types, got ${helpTypes.size}`)
+assert.ok(helpTypes.size >= 10, `Expected all current semantic help forms in broad browse, got ${helpTypes.size}`)
 assert.ok(source.some((item) => typeof item?.content?.external_url === 'string'), 'Source must include at least one traceable external resource')
 
+const mentalHealthDoor = source.find((item) => item?.canonical_code === 'argentina_mental_health_0800')
+const justiceDoor = source.find((item) => item?.canonical_code === 'argentina_caj_access_to_justice')
+assert.ok(mentalHealthDoor, 'Professional mental-health support must be visible in broad Source browse')
+assert.ok(justiceDoor, 'Access-to-justice service must be visible in broad Source browse')
+assert.deepEqual(mentalHealthDoor.areas, [], 'Context-dependent professional support must not gain fake Motor applicability')
+assert.deepEqual(mentalHealthDoor.capacities, [], 'Context-dependent professional support must not gain fake Motor applicability')
+assert.deepEqual(justiceDoor.areas, [], 'Context-dependent institutional service must not gain fake Motor applicability')
+assert.deepEqual(justiceDoor.capacities, [], 'Context-dependent institutional service must not gain fake Motor applicability')
+
 const representativeApplicability = [
-  ['wellbeing', 'regulation'],
-  ['relationships', 'connection'],
-  ['general_life', 'agency'],
-  ['economy', 'discernment'],
-  ['work', 'regulation'],
-  ['learning_growth', 'attention'],
-  ['meaning_spirituality', 'meaning'],
-  ['family_care', 'self_compassion'],
+  ['wellbeing', 'regulation', 1],
+  ['relationships', 'connection', 1],
+  ['general_life', 'agency', 1],
+  ['economy', 'discernment', 3],
+  ['work', 'regulation', 3],
+  ['learning_growth', 'attention', 3],
+  ['meaning_spirituality', 'meaning', 1],
+  ['family_care', 'self_compassion', 3],
+  ['general_life', 'adaptation', 3],
 ]
-for (const [area, capacity] of representativeApplicability) {
+for (const [area, capacity, minResults] of representativeApplicability) {
   const { data, error } = await supabase.rpc('lumen_source_discover', {
     p_area_key: area,
     p_capacity_key: capacity,
@@ -105,7 +117,7 @@ for (const [area, capacity] of representativeApplicability) {
     p_limit: 10,
   })
   assert.equal(error, null, `Source discovery failed for ${area}×${capacity}: ${error?.message ?? 'unknown'}`)
-  assert.ok(Array.isArray(data) && data.length >= 1, `Source must cover representative applicability ${area}×${capacity}`)
+  assert.ok(Array.isArray(data) && data.length >= minResults, `Source must expose at least ${minResults} possibilities for ${area}×${capacity}`)
 }
 
 const { data: privateData, error: privateError } = await supabase.rpc('lumen_s2_snapshot')
