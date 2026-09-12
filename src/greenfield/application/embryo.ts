@@ -2,12 +2,17 @@ import { getGreenfieldSupabase } from '../adapters/supabase/client'
 import { emitOperationalLog } from '../kernel/observability'
 import { newTraceId } from '../kernel/trace'
 
+export type CultivationRole = 'UNDERSTAND' | 'PRACTICE' | 'APPLY' | 'VARY' | 'REFLECT' | 'INTEGRATE' | 'CONNECT' | 'SUSTAIN'
+export type CultivationMove = 'REUSE_REPERTOIRE' | 'REPEAT' | 'VARY' | 'APPLY_IN_CONTEXT' | 'REFLECT' | 'INTEGRATE' | 'CONTINUE_PATH'
+export type LongitudinalSignal = 'REUSED' | 'REPEATED' | 'VARIED' | 'APPLIED_OTHER_CONTEXT' | 'ADAPTED' | 'RECOGNIZED_AS_OWN' | 'NO_REMINDER_NEEDED' | 'STOPPED_HELPING' | 'UNKNOWN'
+
 export type PathItem = Readonly<{
   path_item_id: string
   help_id: string | null
   label: string
   position: number
   status: 'planned' | 'done' | 'skipped'
+  cultivation_move?: CultivationMove | null
 }>
 
 export type Trajectory = Readonly<{
@@ -23,6 +28,9 @@ export type RepertoireItem = Readonly<{
   title: string
   summary: string
   times_reused: number
+  last_used_at?: string | null
+  capability_keys?: string[]
+  user_confirmed?: boolean
 }>
 
 export type ContinuitySnapshot = Readonly<{
@@ -52,6 +60,7 @@ export type SanctuaryExport = Readonly<{
 
 export type SourceItem = Readonly<{
   help_id: string
+  help_version_id?: string
   canonical_code: string
   help_type: string
   lifecycle: 'active_limited' | 'active'
@@ -62,14 +71,19 @@ export type SourceItem = Readonly<{
   content: Record<string, unknown>
   duration_minutes: number | null
   energy: string | null
+  accessibility?: Record<string, unknown> | null
   provider: {
     name: string
     kind: string
     provenance?: Record<string, unknown>
     rights?: Record<string, unknown>
   }
-  areas: string[]
-  capacities: string[]
+  areas?: string[]
+  capacities?: string[]
+  area_key?: string | null
+  capacity_key?: string
+  cultivation_roles?: CultivationRole[]
+  cultivation_vocab_version?: string
   taxonomy_version: string
   localization_provenance?: Record<string, unknown>
 }>
@@ -77,8 +91,11 @@ export type SourceItem = Readonly<{
 export type TaxonomyTerm = Readonly<{ key: string; label: string }>
 export type SourceTaxonomy = Readonly<{
   taxonomy_version: string
+  cultivation_vocab_version?: string
   areas: TaxonomyTerm[]
   capacities: TaxonomyTerm[]
+  help_types?: TaxonomyTerm[]
+  cultivation_roles?: TaxonomyTerm[]
 }>
 
 export type CircleContribution = Readonly<{
@@ -106,6 +123,9 @@ export type Followup = Readonly<{
   channel: 'in_app'
   related_trajectory_id: string | null
   related_help_id: string | null
+  cultivation_move?: CultivationMove | null
+  capacity_key?: string | null
+  repertoire_id?: string | null
 }>
 
 export type ProactivitySnapshot = Readonly<{
@@ -138,6 +158,41 @@ export type EmbryoHealth = Readonly<{
   evolution: { source_policy_version: number }
   operations: { providers_ready: number }
   prelaunch_reset_required: boolean
+}>
+
+export type CultivationScene = Readonly<{
+  scene_id: 'continuity.cultivate'
+  scene_version: string
+  episode_id: string
+  moment_id: string
+  decision_run_id: string
+  selection_id: string
+  decision_kind: CultivationMove
+  help: {
+    help_id: string
+    help_version_id: string
+    help_type: string
+    title: string
+    summary: string
+    content: Record<string, unknown>
+    duration_minutes: number | null
+    energy: string | null
+    detail: Record<string, unknown>
+    from_own_repertoire: true
+  }
+  semantic_key: string
+  trace_id: string
+}>
+
+export type LongitudinalSignalResult = Readonly<{
+  outcome_id: string
+  episode_id: string
+  signal_kind: LongitudinalSignal
+  effect: 'helped' | 'not_helped' | 'unsure'
+  decision_kind: 'WITHDRAW' | null
+  withdraw_decision_run_id: string | null
+  semantic_key: string
+  trace_id: string
 }>
 
 async function rpc<T>(name: string, args?: Record<string, unknown>): Promise<T> {
@@ -207,6 +262,22 @@ export function integrateHelp(helpId: string) {
   return rpc('lumen_s2_add_repertoire', { p_help_id: helpId, p_trace_id: newTraceId() })
 }
 
+export function reuseRepertoire(repertoireId: string, move: Exclude<CultivationMove, 'CONTINUE_PATH'>): Promise<CultivationScene> {
+  return rpc('lumen_s2_reuse_repertoire', {
+    p_repertoire_id: repertoireId,
+    p_move: move,
+    p_trace_id: newTraceId(),
+  })
+}
+
+export function recordLongitudinalSignal(episodeId: string, signalKind: LongitudinalSignal): Promise<LongitudinalSignalResult> {
+  return rpc('lumen_s2_record_longitudinal_signal', {
+    p_episode_id: episodeId,
+    p_signal_kind: signalKind,
+    p_trace_id: newTraceId(),
+  })
+}
+
 export function addPathItem(trajectoryId: string, helpId: string | null, label: string) {
   return rpc('lumen_s2_add_path_item', {
     p_trajectory_id: trajectoryId,
@@ -231,6 +302,20 @@ export function discoverSource(
     p_area_key: areaKey ?? null,
     p_capacity_key: capacityKey ?? null,
     p_help_type: helpType ?? null,
+    p_locale: locale,
+    p_limit: limit,
+  })
+}
+
+export function discoverConstellation(
+  capacityKey: string,
+  areaKey?: string | null,
+  locale = 'es-AR',
+  limit = 16,
+): Promise<SourceItem[]> {
+  return rpc('lumen_source_constellation', {
+    p_capacity_key: capacityKey,
+    p_area_key: areaKey ?? null,
     p_locale: locale,
     p_limit: limit,
   })
@@ -278,6 +363,24 @@ export function scheduleFollowup(reasonCode: Followup['reason_code'], dueAt: str
     p_due_at: dueAt,
     p_trajectory_id: trajectoryId ?? null,
     p_help_id: helpId ?? null,
+    p_trace_id: newTraceId(),
+  })
+}
+
+export function scheduleCultivationFollowup(
+  reasonCode: 'trajectory_checkin' | 'practice_return' | 'self_chosen',
+  dueAt: string,
+  move: CultivationMove,
+  context: { trajectoryId?: string | null; helpId?: string | null; repertoireId?: string | null; capacityKey?: string | null },
+) {
+  return rpc<{ followup_id: string }>('lumen_s6_schedule_cultivation_followup', {
+    p_reason_code: reasonCode,
+    p_due_at: dueAt,
+    p_trajectory_id: context.trajectoryId ?? null,
+    p_help_id: context.helpId ?? null,
+    p_repertoire_id: context.repertoireId ?? null,
+    p_capacity_key: context.capacityKey ?? null,
+    p_cultivation_move: move,
     p_trace_id: newTraceId(),
   })
 }
