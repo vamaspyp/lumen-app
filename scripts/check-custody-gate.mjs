@@ -25,7 +25,11 @@ if (!authorityIds.has('V54')) fail('V54 must be present in governed execution co
 const activeIds = new Set((snapshot.active_authorities ?? []).filter((x) => x.state === 'VIGENTE').map((x) => x.id))
 if (!activeIds.has('V54')) fail('V54 must be VIGENTE in POV snapshot')
 if (context.act?.id !== snapshot.act?.id) fail('context and POV must agree on current ACTO')
-if (context.act?.id !== 'A61') fail('A61 must own custody materialization while this gate is introduced')
+
+const currentReview = findings.current_review ?? null
+if (currentReview?.status === 'IN_PROGRESS' && currentReview.act_id !== context.act?.id) {
+  fail(`active custody review belongs to ${currentReview.act_id}, not current ACTO ${context.act?.id ?? '?'}`)
+}
 
 for (const custodian of registry.custodians ?? []) {
   if (!Array.isArray(custodian.scope) || custodian.scope.length === 0) fail(`${custodian.id} missing scope`)
@@ -56,4 +60,4 @@ for (const finding of findings.findings ?? []) {
   }
 }
 
-console.log(`CUSTODY_GATE_PASS: ${actualCustodians.length} custodians · ACTO ${context.act.id} · no unresolved BLOCK findings`)
+console.log(`CUSTODY_GATE_PASS: ${actualCustodians.length} custodians · ACTO ${context.act.id} · review=${currentReview?.status ?? 'NONE'} · no unresolved BLOCK findings`)
