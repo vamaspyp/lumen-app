@@ -1,41 +1,11 @@
 {
-  "schema_version": "1.1",
-  "source": {
-    "system_id": "V3",
-    "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
-    "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "verified_at": "2026-09-11T17:41:00-03:00",
-    "verified_by": "conductor_agent_with_google_drive_read"
-  },
-  "focus": {"id": "F6", "name": "Nacimiento del Embrión y primeras vidas reales", "status": "ACTIVO"},
-  "act": {
-    "id": "A54",
-    "name": "Certificación Integral de Conformidad del Embrión",
-    "status": "EN CURSO",
-    "purpose": "Demostrar bidireccionalmente que el Embrión construido representa íntegramente V48/V49 y que no contiene gaps materiales, desvíos, excesos ni residuos arquitectónicos injustificados antes de certificar exposición real.",
-    "dod": "Existe matriz exhaustiva V48/V49→runtime y runtime→V48/V49; cada función/contrato y cada componente material quedan CONFORME / GAP / EXCESO / DESVÍO con evidencia; todo GAP/DESVÍO/EXCESO material se corrige o escala si requiere decisión humana; se verifican función, datos, backend, experiencia, privacidad, safety, missingness, Fuente, Tejido, continuidad, Knowledge/Evolution, Ledger, independencia legacy y no-Frankenstein; 0 gaps materiales conocidos y 0 residuos injustificados al cierre; CI/live PASS; queda base verificable para Especificación As-Built y A46."
-  },
-  "active_authorities": [
-    {"id":"V3","name":"Sistema de Conducción","state":"VIGENTE"},
-    {"id":"V40","name":"Arquitectura Greenfield del Embrión V0.1","state":"VIGENTE"},
-    {"id":"V41","name":"Constitución Operativa y Guardrails Transversales V1.0","state":"VIGENTE"},
-    {"id":"V42","name":"Ficha Transversal · Guardrails Obligatorios para Todo Agente · V1.2","state":"VIGENTE"},
-    {"id":"V43","name":"Diseño Canónico de Experiencia y Comportamiento del Embrión V1.0","state":"VIGENTE"},
-    {"id":"V44","name":"Runtime Greenfield","state":"VIGENTE"},
-    {"id":"V45","name":"Conduction Gate v0.2","state":"VIGENTE"},
-    {"id":"V46","name":"Modelo Canónico Integral Definitivo V1.0","state":"VIGENTE"},
-    {"id":"V48","name":"Especificación Funcional del Embrión V1.0","state":"VIGENTE"},
-    {"id":"V49","name":"Especificación Técnico-Funcional del Embrión V1.0","state":"VIGENTE"}
+  "schema_version":"1.1",
+  "source":{"system_id":"V3","spreadsheet_id":"1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM","title":"VA+LUMEN · Sistema de Conducción · OPERATIVO","verified_at":"2026-09-11T18:35:00-03:00","verified_by":"conductor_agent_with_google_drive_read"},
+  "focus":{"id":"F6","name":"Nacimiento del Embrión y primeras vidas reales","status":"ACTIVO"},
+  "act":{"id":"A56","name":"Prueba de Nacimiento y Conducción del Embrión","status":"EN CURSO","purpose":"Comprobar sobre la base certificada que el Embrión puede nacer operativamente y que VA+ puede conducirlo sin explicación externa, antes de ampliar Fuente y exponerlo a revisión/vidas reales.","dod":"Recorrido de nacimiento end-to-end PASS sobre runtime integrado; funciones vitales V48 presentes y conectadas según V50; Conducción puede leer POV→elegir ACTO→ejecutar→evidenciar→cerrar sin bypass; privacy/safety/no-match/missingness/rollback preservados; límites de madurez no bloqueantes explícitos; CI/live verde; dictamen GO/NO-GO para desbloquear A46 sin reabrir diseño."},
+  "active_authorities":[
+    {"id":"V3","name":"Sistema de Conducción","state":"VIGENTE"},{"id":"V40","name":"Arquitectura Greenfield del Embrión V0.1","state":"VIGENTE"},{"id":"V41","name":"Constitución Operativa y Guardrails Transversales V1.0","state":"VIGENTE"},{"id":"V42","name":"Ficha Transversal · Guardrails Obligatorios para Todo Agente · V1.2","state":"VIGENTE"},{"id":"V43","name":"Diseño Canónico de Experiencia y Comportamiento del Embrión V1.0","state":"VIGENTE"},{"id":"V44","name":"Runtime Greenfield","state":"VIGENTE"},{"id":"V45","name":"Conduction Gate v0.2","state":"VIGENTE"},{"id":"V46","name":"Modelo Canónico Integral Definitivo V1.0","state":"VIGENTE"},{"id":"V48","name":"Especificación Funcional del Embrión V1.0","state":"VIGENTE"},{"id":"V49","name":"Especificación Técnico-Funcional del Embrión V1.0","state":"VIGENTE"},{"id":"V50","name":"Especificación As-Built del Embrión Certificado V1.0","state":"VIGENTE"}
   ],
-  "superseded_authorities": ["V37", "V39", "V47"],
-  "integrity": {
-    "source_is_private_pov": true,
-    "historical_sources_are_non_authoritative": true,
-    "implementation_is_not_authority": true,
-    "target_precedes_runtime_diff": true,
-    "permanent_bridges_forbidden": true,
-    "bidirectional_conformity_required": true,
-    "fail_closed": true,
-    "snapshot_max_age_hours": 72
-  }
+  "superseded_authorities":["V37","V39","V47"],
+  "integrity":{"source_is_private_pov":true,"historical_sources_are_non_authoritative":true,"implementation_is_not_authority":true,"target_precedes_runtime_diff":true,"permanent_bridges_forbidden":true,"bidirectional_conformity_required":true,"a54_integrally_certified":true,"fail_closed":true,"snapshot_max_age_hours":72}
 }
