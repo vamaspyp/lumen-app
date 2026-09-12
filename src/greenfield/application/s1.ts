@@ -74,12 +74,15 @@ export type SelectionResult = {
 }
 
 export type OutcomeEffect = 'helped' | 'not_helped' | 'unsure'
+export type OutcomeSignal = 'HELPED_NOW' | 'NOT_HELPED_NOW' | 'REUSED' | 'UNKNOWN'
 
 export type OutcomeResult = {
   selection_id: string
   episode_id: string
   effect: OutcomeEffect
+  signal_kind: OutcomeSignal
   applied: boolean
+  repertoire_id?: string | null
   trace_id: string
   semantic_key: string
 }
