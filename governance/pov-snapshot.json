@@ -4,8 +4,8 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "modified_time": "2026-09-07T14:02:20.228Z",
-    "verified_at": "2026-09-07T16:06:00-03:00",
+    "modified_time": "2026-09-13T14:36:19.101Z",
+    "verified_at": "2026-09-13T14:36:19.101Z",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {
@@ -14,22 +14,24 @@
     "status": "ACTIVO"
   },
   "act": {
-    "id": "A46",
-    "name": "Certificación final de exposición real · Organismo + Experiencia + Fuente",
+    "id": "A63",
+    "name": "LUMEN WORLD CLASS · elevar experiencia integral antes de Pauli",
     "status": "EN CURSO",
-    "purpose": "Certificar y corregir sólo gaps reales de nacimiento antes de primeras vidas: organismo funcional completo, experiencia V43 y Fuente Viva con cobertura digna, diversidad tipada, procedencia y presentación material visible.",
-    "dod": "Realidad actual contrastada contra V37/V39/V43; mínimos experienciales E0–E10 PASS o gap explícito corregido; Fuente activa auditada contra sobre común V39 (identidad/version, tipo, autor/provider/procedencia, derechos, hipótesis, contexto, acceso, riesgo, evidencia, conflictos, lifecycle); Sobre de Cobertura explícito y honesto con CUBIERTA/PARCIAL/RESTRINGIDA/NO_CUBIERTA; portfolio no reducido a microprácticas y con varios tipos semánticos reales según V43; ficha Fuente muestra qué es/para qué/formato-tiempo/acceso/procedencia/riesgo-costo relevante con evidencia por progressive disclosure; matching/NO_MATCH/safety preservados; sin inflar catálogo por cantidad; regresiones permanentes; CI/live PASS; dictamen GO/NO-GO para A40."
+    "purpose": "Reconstruir la expresión visible y vivible del Embrión hasta una vara genuinamente world-class, usando los 8 arquetipos A46 como laboratorio de amplitud y los mejores referentes actuales como piso comparativo, sin copiar modelos ajenos y haciendo inequívoca la ventaja propia de LUMEN: constelaciones, contextualidad, vida real, integración, capacidad propia y retiro.",
+    "dod": "Experiencia insignia end-to-end alcanza calidad competitiva seria en jerarquía visual, navegación, descubrimiento, inmersión, audio/motion cuando corresponda, ejecución, retorno y continuidad; los 8 arquetipos quedan absorbidos como gramática de posibilidades o descartados con fundamento; Fuente se siente reservorio vivo, no catálogo; benchmark actual documentado contra referentes líderes; criterio world-class incorporado a V54 con revisión humana/visual además de gates técnicos; cero autoengaño por tests verdes; V52/V53 preservados salvo gap real; C0+C1+C2+C3+C7+C8 sin BLOCK; CI/backend/Playwright/visual QA PASS; deployment final listo para Pauli sólo si supera revisión comparativa explícita."
   },
   "active_authorities": [
     {"id":"V3","name":"Sistema de Conducción","state":"VIGENTE"},
-    {"id":"V37","name":"Modelo C V0.4 · Integridad Fundacional","state":"VIGENTE"},
-    {"id":"V39","name":"Especificación Técnico-Funcional del Embrión V0.1","state":"VIGENTE"},
-    {"id":"V40","name":"Arquitectura Greenfield del Embrión V0.1","state":"VIGENTE"},
+    {"id":"V46","name":"Modelo Canónico Integral Definitivo V1.0","state":"VIGENTE"},
     {"id":"V41","name":"Constitución Operativa y Guardrails Transversales V1.0","state":"VIGENTE"},
     {"id":"V42","name":"Ficha Transversal · Guardrails Obligatorios para Todo Agente · V1.1","state":"VIGENTE"},
     {"id":"V43","name":"Diseño Canónico de Experiencia y Comportamiento del Embrión V1.0","state":"VIGENTE"},
-    {"id":"V44","name":"Runtime Greenfield S0","state":"VIGENTE"},
-    {"id":"V45","name":"Conduction Gate v0.2","state":"VIGENTE"}
+    {"id":"V50","name":"Especificación As-Built del Embrión Certificado V1.0","state":"VIGENTE"},
+    {"id":"V51","name":"Precisión Canónica de Norte, Visión y Misión · V1.1","state":"VIGENTE"},
+    {"id":"V52","name":"Especificación Funcional del Embrión V1.1 · Integración y Capacidad Propia","state":"VIGENTE"},
+    {"id":"V53","name":"Especificación Técnico-Funcional del Embrión V1.1 · Integración y Capacidad Propia","state":"VIGENTE"},
+    {"id":"V54","name":"Sistema de Custodia Sincrónica del Organismo · V1.0","state":"VIGENTE"},
+    {"id":"V55","name":"LUMEN Experience & Sensation · Especificación V1.0","state":"VIGENTE"}
   ],
   "integrity": {
     "source_is_private_pov": true,
