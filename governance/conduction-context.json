@@ -11,14 +11,15 @@
     {"id":"V40","role":"autoridad_tecnica_complementaria"},
     {"id":"V41","role":"autoridad_transversal"},
     {"id":"V42","version":"1.2","role":"gobierno_de_agentes"},
-    {"id":"V43","role":"autoridad_experiencial"},
+    {"id":"V43","role":"autoridad_experiencial_base"},
     {"id":"V44","role":"runtime_greenfield"},
     {"id":"V45","version":"0.2","role":"infraestructura_de_gobierno"},
     {"id":"V50","role":"activo_tecnico_descriptivo_as_built_pre_v51"},
-    {"id":"V54","version":"1.0","role":"infraestructura_de_custodia_sincronica"}
+    {"id":"V54","version":"1.0","role":"infraestructura_de_custodia_sincronica"},
+    {"id":"V55","version":"1.0","role":"autoridad_experience_sensation"}
   ],
   "required_sequence":["POV_ACTIVOS","FOCO","ACTO_DOD","AUTORIDAD_VIGENTE","REALIDAD_TECNICA","EJECUCION","EVIDENCIA","CIERRE"],
-  "construction_rule":"A63 corrige la brecha cualitativa expuesta por evidencia humana: LUMEN nace world-class, sin calificadores. A62 conserva validez técnica pero su claim cualitativo world-class queda superado. Recuperar los 8 arquetipos del showcase A46 como laboratorio de amplitud, no como autoridad ni UI a copiar; contrastar contra referentes líderes actuales como piso comparativo; construir una experiencia insignia end-to-end que sea competitiva en producto y claramente propia de LUMEN: reservorio vivo, constelaciones, contextualidad, vida real, integración, capacidad propia y retiro. Preserva lo que hoy volveríamos a elegir, ajusta sólo el delta responsable y reemplaza toda pieza que no alcance la vara o induzca semántica vieja. Ningún PASS técnico basta sin revisión visual/humana comparativa. Preservar V46/V51/V52/V53/V54, canonical_integrity v7, No Regresión + Evolución Limpia y custodia fail-closed. Bridges permanentes, aliases legacy, scores, streaks, programas coercitivos, tabla Constelación y PRELAUNCH RESET anticipado siguen prohibidos.",
+  "construction_rule":"A63 corrige la brecha cualitativa expuesta por evidencia humana: LUMEN nace world-class, sin calificadores. V55 precisa V43 y gobierna la relación dinámica Vida↔LUMEN y la gramática universal de Experience & Sensation. A62 conserva validez técnica pero su claim cualitativo world-class queda superado. Recuperar los 8 arquetipos del showcase A46 como laboratorio de amplitud, no como autoridad ni UI a copiar; construir una experiencia insignia end-to-end que materialice V55 como una sola presencia viva, sin convertir órganos en navegación, y haga inequívocas las ventajas propias de LUMEN: reservorio vivo, constelaciones, contextualidad, vida real, integración, capacidad propia y retiro. Preserva lo que hoy volveríamos a elegir, ajusta sólo el delta responsable y reemplaza toda pieza que no alcance la vara o induzca semántica vieja. Ningún PASS técnico basta sin revisión visual/humana comparativa. Preservar V46/V51/V52/V53/V54/V55, canonical_integrity v7, No Regresión + Evolución Limpia y custodia fail-closed. Bridges permanentes, aliases legacy, scores, streaks, programas coercitivos, tabla Constelación y PRELAUNCH RESET anticipado siguen prohibidos.",
   "fail_closed":true,
-  "updated_at":"2026-09-13T09:58:00-03:00"
+  "updated_at":"2026-09-13"
 }
