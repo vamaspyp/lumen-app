@@ -10,18 +10,20 @@
     "name": "Nacimiento del Embrión y primeras vidas reales"
   },
   "act": {
-    "id": "A46",
-    "name": "Certificación final de exposición real · Organismo + Experiencia + Fuente",
+    "id": "A63",
+    "name": "LUMEN WORLD CLASS · elevar experiencia integral antes de Pauli",
     "status": "EN CURSO"
   },
   "authorities": [
-    {"id": "V37", "role": "autoridad_conceptual"},
-    {"id": "V39", "role": "autoridad_funcional"},
-    {"id": "V40", "role": "autoridad_tecnica"},
+    {"id": "V46", "role": "autoridad_conceptual_integral"},
     {"id": "V41", "role": "autoridad_transversal"},
     {"id": "V42", "version": "1.1", "role": "gobierno_de_agentes"},
-    {"id": "V43", "role": "autoridad_experiencial"},
-    {"id": "V45", "version": "0.2", "role": "infraestructura_de_gobierno"}
+    {"id": "V43", "role": "autoridad_experiencial_base"},
+    {"id": "V51", "version": "1.1", "role": "norte_vision_mision"},
+    {"id": "V52", "version": "1.1", "role": "autoridad_funcional"},
+    {"id": "V53", "version": "1.1", "role": "autoridad_tecnico_funcional"},
+    {"id": "V54", "version": "1.0", "role": "custodia_sincronica"},
+    {"id": "V55", "version": "1.0", "role": "autoridad_experience_sensation"}
   ],
   "required_sequence": [
     "POV_ACTIVOS",
@@ -34,5 +36,5 @@
     "CIERRE"
   ],
   "fail_closed": true,
-  "updated_at": "2026-09-07T16:06:00-03:00"
+  "updated_at": "2026-09-13"
 }
