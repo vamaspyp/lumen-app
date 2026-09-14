@@ -4,6 +4,7 @@ import './index.css'
 import './worldclass.css'
 import App from './App.tsx'
 import './master-scenes.css'
+import './master-photographic.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
