@@ -1,16 +1,16 @@
 {
   "schema_version": "1.0",
   "current_review": {
-    "act_id": "A62",
+    "act_id": "A63",
     "review_set": ["C0","C1","C2","C3","C7","C8"],
-    "status": "COMPLETED"
+    "status": "IN_PROGRESS"
   },
   "findings": [
-    {"id":"A62-C0","custodian_id":"C0","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"A62 preserves V46/V51 north, V52 longitudinal metabolism and V53 anatomy; no local optimization harms organism coherence."},
-    {"id":"A62-C1","custodian_id":"C1","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"Live Source: 84 active_limited possibilities, 121 applicability relations, 10 help types; 12 flagship experiences span 9 capacities and all cultivation roles without filler-volume strategy."},
-    {"id":"A62-C2","custodian_id":"C2","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"Fuente and experience scenes receive deliberate hierarchy, immersive reading of steps/reflections, responsive behavior and reduced-motion support; copy remains invitational and non-dependent."},
-    {"id":"A62-C3","custodian_id":"C3","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"Flagships explicitly support APPLY/VARY/REFLECT/INTEGRATE/SUSTAIN and remain compatible with voluntary Repertoire and longitudinal return; no prescribed program or progress score added."},
-    {"id":"A62-C7","custodian_id":"C7","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"All new flagships are low-risk curated possibilities; no privacy boundary, Sanctuary ownership, safety referral or consent contract changed."},
-    {"id":"A62-C8","custodian_id":"C8","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"No new domain entity, second Source/Motor, constellation table, legacy bridge or parallel authority. CI #165 Conduction Gate + Custody Gate + verify + live backend PASS."}
+    {"id":"A63-C0","custodian_id":"C0","result":"GAP","severity":"WARN","status":"OPEN","evidence":"V55 + Atlas Premium are now materially represented in the real React runtime on greenfield-a63-embryo-complete: arrival, Source, Territory, Sanctuary, Tissue, return, integration, continuity and semantic Experience families. Vercel production build passes. Final human end-to-end judgment on the new runtime remains required before a world-class claim or A63 closure."},
+    {"id":"A63-C1","custodian_id":"C1","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"Source remains the existing greenfield reservoir and existing discover/constellation contracts are reused. The UI now preserves help_type semantics and provenance instead of flattening all possibilities into one card experience. Premium editorial/source curation is explicitly deferred to the next Source-focused act and is not falsely claimed here."},
+    {"id":"A63-C2","custodian_id":"C2","result":"GAP","severity":"WARN","status":"OPEN","evidence":"Universal HelpContent was replaced by semantic compositions for editorial, practice, audio, video, external work/resource, real-world action, person/professional, circle/group, event/place/service, material help, quiet and dialogue. Premium fullscreen treatments and P1 presence are implemented. A navigable /experience-atlas certifies all required families with real technical audio/video assets. Final visual/human review of the deployed runtime is still missing and cannot be substituted by build success."},
+    {"id":"A63-C3","custodian_id":"C3","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"Territory preserves voluntary Faros, open Path, user-confirmed Repertoire, reuse/vary/apply cultivation, consented followups and longitudinal withdrawal signals. No score, streak or prescribed program was introduced."},
+    {"id":"A63-C7","custodian_id":"C7","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"Existing safety referral, honest NO_MATCH, authentication boundary, private original retention/export/delete, Sanctuary consent, proactivity custody and human-support boundaries are preserved. The experience layer does not bypass those contracts."},
+    {"id":"A63-C8","custodian_id":"C8","result":"GAP","severity":"WARN","status":"OPEN","evidence":"The product entrypoint now routes only to AppE63; the former /master-react parallel product route was removed. Existing greenfield application/RPC adapters remain single owners. Vercel executes tsc -b + vite build successfully. Repository CI is configured to certify this A63 branch, but no GitHub Actions run is being emitted by the repository, so full npm verify + live-backend CI evidence remains unavailable."}
   ]
 }
