@@ -7,6 +7,7 @@ const seed = read('supabase/migrations/20260912184500_a62_worldclass_flagship_so
 const app = read('src/app/App.tsx')
 const experience = read('src/app/Experience.tsx')
 const css = read('src/app/styles.css')
+const accessibility = read('src/app/accessibility.css')
 const main = read('src/main.tsx')
 const embryo = read('src/greenfield/application/embryo.ts')
 const custody = JSON.parse(read('governance/custody-registry.json'))
@@ -40,6 +41,7 @@ test('clean-room Fuente remains possibilities, not a catalog or program', () => 
 
 test('clean-room Premium runtime differentiates experiential families and preserves accessibility', () => {
   assert.match(main, /\.\/app\/styles\.css/)
+  assert.match(main, /\.\/app\/accessibility\.css/)
   assert.match(experience, /experience-practice/)
   assert.match(experience, /experience-editorial/)
   assert.match(experience, /experience-audio/)
@@ -49,7 +51,7 @@ test('clean-room Premium runtime differentiates experiential families and preser
   assert.match(experience, /experience-group/)
   assert.match(experience, /experience-action/)
   assert.match(experience, /experience-quiet/)
-  assert.match(css, /prefers-reduced-motion/)
+  assert.match(accessibility, /prefers-reduced-motion/)
   assert.match(css, /grid-template-columns:\s*repeat\(3/)
 })
 
