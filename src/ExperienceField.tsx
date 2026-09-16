@@ -103,7 +103,7 @@ export function PossibilityPreview({ help, onOpen, compact = false }: { help: Ex
       <p>{help.summary}</p>
       {roles.length > 0 && <div className="role-line">{roles.slice(0, 3).map((role) => <span key={role}>{role.toLowerCase()}</span>)}</div>}
       <div className="possibility-foot">
-        {provider && <span>{provider}</span>}
+        {provider && <span>Origen: {provider}</span>}
         <button type="button" className="field-link" onClick={onOpen}>Vivir esta posibilidad →</button>
       </div>
     </article>
@@ -153,7 +153,7 @@ function PracticeExperience({ help, onExit }: { help: ExperientialHelp; onExit: 
         <p className="practice-step">{current}</p>
         {steps.length > 1 && <div className="practice-progress" aria-label={`Paso ${step + 1} de ${steps.length}`}>{steps.map((_, index) => <i key={index} className={index <= step ? 'done' : ''} />)}</div>}
         <div className="experience-actions">
-          {!complete && steps.length > 0 ? <button className="field-primary" type="button" onClick={() => setStep((value) => Math.min(value + 1, steps.length - 1))}>Seguir</button> : <button className="field-primary" type="button" onClick={onExit}>Volver cuando quieras</button>}
+          {!complete && steps.length > 0 ? <><button className="field-primary" type="button" onClick={() => setStep((value) => Math.min(value + 1, steps.length - 1))}>Seguir</button><button className="field-ghost" type="button" onClick={onExit}>Terminé</button></> : <button className="field-primary" type="button" onClick={onExit}>Terminé</button>}
           {step > 0 && <button className="field-ghost" type="button" onClick={() => setStep((value) => Math.max(0, value - 1))}>Atrás</button>}
         </div>
       </div>
