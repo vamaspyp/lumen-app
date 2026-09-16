@@ -4,13 +4,13 @@ import './index.css'
 import './worldclass.css'
 import './premium-field.css'
 import './premium-field-final.css'
-import AppE63 from './AppE63'
+import AppPremium from './AppPremium'
 import ExperienceAtlasRoute from './ExperienceAtlasRoute'
 
 const certificationAtlas = window.location.pathname === '/experience-atlas' || window.location.pathname === '/experience-atlas/'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {certificationAtlas ? <ExperienceAtlasRoute /> : <AppE63 />}
+    {certificationAtlas ? <ExperienceAtlasRoute /> : <AppPremium />}
   </StrictMode>,
 )
