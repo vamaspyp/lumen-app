@@ -79,15 +79,22 @@ async function installRpcMocks(page: Page, calls: string[]) {
   })
 }
 
+function nav(page: Page) {
+  return page.getByRole('navigation', { name: 'Espacios de LUMEN' })
+}
+
 test('approved Premium design is the only public runtime shell', async ({ page }) => {
+  await page.setViewportSize({ width: 1536, height: 1024 })
+  await installRpcMocks(page, [])
   await page.goto('/')
   await expect(page.getByRole('heading', { name: '¿Cómo estás hoy?' })).toBeVisible()
-  await expect(page.getByRole('navigation', { name: 'Espacios de LUMEN' })).toBeVisible()
+  await expect(nav(page)).toBeVisible()
   await expect(page.getByText('MI VIDA', { exact: true })).toBeVisible()
   await expect(page.getByText('EXPLORAR', { exact: true })).toBeVisible()
   await expect(page.getByText('SANTUARIO', { exact: true })).toBeVisible()
   await expect(page.getByText('TEJIDO', { exact: true })).toBeVisible()
   await expect(page.getByText('ALGUNAS FORMAS', { exact: false })).toBeVisible()
+  await page.screenshot({ path: 'test-results/cleanroom-home.png', fullPage: true })
 })
 
 test('authenticated person can move through Mi Vida, Explorar, Santuario and Tejido in the same Field', async ({ page }) => {
@@ -95,14 +102,14 @@ test('authenticated person can move through Mi Vida, Explorar, Santuario and Tej
   await installSession(page)
   await installRpcMocks(page, calls)
   await page.goto('/')
-  await page.getByRole('button', { name: 'Mi Vida' }).click()
+  await nav(page).getByRole('button', { name: 'Mi Vida', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Tu vida, aquí y ahora' })).toBeVisible()
   await expect(page.getByText('Vivir con más calma y presencia')).toBeVisible()
-  await page.getByRole('button', { name: 'Explorar' }).click()
+  await nav(page).getByRole('button', { name: 'Explorar', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Todo lo que puede ayudarte a vivir una vida más plena.' })).toBeVisible()
-  await page.getByRole('button', { name: 'Santuario' }).click()
+  await nav(page).getByRole('button', { name: 'Santuario', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Aquí vive lo que importa.' })).toBeVisible()
-  await page.getByRole('button', { name: 'Tejido' }).click()
+  await nav(page).getByRole('button', { name: 'Tejido', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'La vida también se vive con otros.' })).toBeVisible()
   expect(calls).toContain('lumen_s2_snapshot')
   expect(calls).toContain('lumen_s5_snapshot')
@@ -122,7 +129,7 @@ test('Momento resolves end to end through help, experience, return and voluntary
   await page.getByRole('button', { name: 'Seguir' }).click()
   await page.getByRole('button', { name: 'Terminé' }).click()
   await expect(page.getByRole('heading', { name: '¿Cómo fue para vos?' })).toBeVisible()
-  await page.getByRole('button', { name: 'Me ayudó' }).click()
+  await page.getByRole('button', { name: 'Me ayudó', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Gracias. Con esto alcanza por ahora.' })).toBeVisible()
   await page.getByRole('button', { name: /Guardar .* en mi repertorio/ }).click()
   expect(calls).toContain('lumen_s1_accompany_moment')
@@ -135,7 +142,7 @@ test('Fuente preserves the nature and provenance of an external resource', async
   const calls: string[] = []
   await installRpcMocks(page, calls)
   await page.goto('/')
-  await page.getByRole('button', { name: 'Explorar' }).click()
+  await nav(page).getByRole('button', { name: 'Explorar', exact: true }).click()
   await page.getByRole('button', { name: 'Vivir esta posibilidad' }).first().click()
   await expect(page.getByRole('heading', { name: 'En tiempos de estrés: haz lo que importa' })).toBeVisible()
   await expect(page.getByText('Fuente: World Health Organization')).toBeVisible()
