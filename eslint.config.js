@@ -23,4 +23,14 @@ export default defineConfig([
       '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^addPathItem$' }],
     },
   },
+  {
+    // AppE63 is the governed A63 Experience & Sensation Field shell. Its three
+    // private-space loaders intentionally synchronize remote snapshots on mount.
+    // Keep this exception scoped to the shell; new components remain under the
+    // default React hooks rule and should prefer subscription/query primitives.
+    files: ['src/AppE63.tsx'],
+    rules: {
+      'react-hooks/set-state-in-effect': 'off',
+    },
+  },
 ])
