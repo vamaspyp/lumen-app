@@ -5,6 +5,7 @@ import test from 'node:test'
 
 const ROOT = process.cwd()
 const GREENFIELD = join(ROOT, 'src', 'greenfield')
+const APP = join(ROOT, 'src', 'app')
 
 async function walk(dir) {
   const entries = await readdir(dir, { withFileTypes: true })
@@ -17,18 +18,20 @@ async function walk(dir) {
   return files
 }
 
-test('greenfield runtime has no business imports from legacy src', async () => {
-  const files = [join(ROOT, 'src', 'App.tsx'), ...await walk(GREENFIELD)]
+test('clean-room runtime has no business imports from legacy src', async () => {
+  const files = [...await walk(APP), ...await walk(GREENFIELD)]
   const forbidden = [
     '/components/',
     '/lib/',
+    '/master-react/',
+    '/master-exact/',
     "from './components",
     "from './lib",
     "from '../components",
     "from '../lib",
   ]
 
-  for (const file of files) {
+  for (const file of files.filter((path) => /\.(?:ts|tsx|js|mjs)$/.test(path))) {
     const source = await readFile(file, 'utf8')
     for (const marker of forbidden) {
       assert.equal(source.includes(marker), false, `${relative(ROOT, file)} imports legacy via ${marker}`)
