@@ -1,6 +1,0 @@
-.field-scene .entry-links[aria-label="Moverme por LUMEN"]{display:none}
-.field-chrome nav.entry-links{display:flex;align-items:center;gap:6px;min-width:0;overflow-x:auto;scrollbar-width:none}
-.field-chrome nav.entry-links::-webkit-scrollbar{display:none}
-.field-chrome nav.entry-links button{white-space:nowrap;background:transparent;border:1px solid transparent;box-shadow:none;padding:8px 11px;color:#716a5e}
-.field-chrome nav.entry-links button:hover{background:rgba(255,253,248,.66);border-color:rgba(112,96,70,.10)}
-@media(max-width:760px){.field-chrome{padding:0 16px}.field-chrome nav.entry-links{justify-content:flex-start}.field-chrome nav.entry-links button{font-size:11px;padding:7px 8px}}
