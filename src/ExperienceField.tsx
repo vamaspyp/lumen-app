@@ -54,7 +54,7 @@ function imageUrl(help: ExperientialHelp): string | null {
   return stringValue(content.image_url) ?? stringValue(content.hero_image) ?? stringValue(content.poster_url)
 }
 
-export function resolveExperienceKind(help: ExperientialHelp): ExperienceKind {
+function resolveExperienceKind(help: ExperientialHelp): ExperienceKind {
   const type = help.help_type.toLowerCase().replace(/[-\s]+/g, '_')
   const content = contentOf(help)
   if (type.includes('audio') || mediaUrl(help, 'audio')) return 'audio'
