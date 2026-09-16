@@ -104,7 +104,7 @@ test('authenticated person can move through Mi Vida, Explorar, Santuario and Tej
   await page.goto('/')
   await nav(page).getByRole('button', { name: 'Mi Vida', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Tu vida, aquí y ahora' })).toBeVisible()
-  await expect(page.getByText('Vivir con más calma y presencia')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Vivir con más calma y presencia', exact: true })).toBeVisible()
   await nav(page).getByRole('button', { name: 'Explorar', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Todo lo que puede ayudarte a vivir una vida más plena.' })).toBeVisible()
   await nav(page).getByRole('button', { name: 'Santuario', exact: true }).click()
@@ -132,10 +132,10 @@ test('Momento resolves end to end through help, experience, return and voluntary
   await page.getByRole('button', { name: 'Me ayudó', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Gracias. Con esto alcanza por ahora.' })).toBeVisible()
   await page.getByRole('button', { name: /Guardar .* en mi repertorio/ }).click()
+  await expect.poll(() => calls.includes('lumen_s2_add_repertoire')).toBe(true)
   expect(calls).toContain('lumen_s1_accompany_moment')
   expect(calls).toContain('lumen_s1_select_help')
   expect(calls).toContain('lumen_s1_record_outcome')
-  expect(calls).toContain('lumen_s2_add_repertoire')
 })
 
 test('Fuente preserves the nature and provenance of an external resource', async ({ page }) => {
