@@ -33,8 +33,10 @@ export async function requestMagicLink(email: string, redirectTo?: string): Prom
   const normalized = email.trim().toLowerCase()
   if (!normalized || !normalized.includes('@')) throw new Error('A valid email is required')
 
+  // The runtime origin is the source of truth for preview deployments. A configured
+  // fallback is used only when the caller cannot provide the current origin.
   const configuredRedirect = import.meta.env.VITE_LUMEN_AUTH_REDIRECT_URL
-  const effectiveRedirect = canonicalAuthRedirect(configuredRedirect || redirectTo)
+  const effectiveRedirect = canonicalAuthRedirect(redirectTo || configuredRedirect)
   const traceId = newTraceId()
   const supabase = getGreenfieldSupabase()
   const { error } = await supabase.auth.signInWithOtp({
