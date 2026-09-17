@@ -54,15 +54,15 @@ test('irrecoverable foundation and decision events have canonical names', async 
   }
 })
 
-test('magic-link callback is canonicalized to an allowed origin root', async () => {
+test('email OTP authentication does not depend on legacy redirect configuration', async () => {
   const auth = await readFile(join(GREENFIELD, 'application', 'auth.ts'), 'utf8')
   const env = await readFile(join(ROOT, '.env.production'), 'utf8')
 
-  assert.match(auth, /function canonicalAuthRedirect/)
-  assert.match(auth, /url\.pathname = '\/'/)
-  assert.match(auth, /url\.search = ''/)
-  assert.match(auth, /url\.hash = ''/)
-  assert.match(auth, /emailRedirectTo: effectiveRedirect/)
-  assert.equal(env.includes('VITE_LUMEN_AUTH_REDIRECT_URL=http://localhost'), false)
-  assert.match(env, /VITE_LUMEN_AUTH_REDIRECT_URL=https:\/\/lumen-app-git-greenfield-v04-embryo-vamaspyps-projects\.vercel\.app/)
+  assert.match(auth, /signInWithOtp/)
+  assert.match(auth, /verifyOtp/)
+  assert.match(auth, /type: 'email'/)
+  assert.match(auth, /normalizedToken\.length < 6/)
+  assert.match(auth, /normalizedToken\.length > 10/)
+  assert.doesNotMatch(auth, /emailRedirectTo/)
+  assert.equal(env.includes('VITE_LUMEN_AUTH_REDIRECT_URL='), false)
 })
