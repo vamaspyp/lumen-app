@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
-import type { HelpPossibility, OutcomeEffect } from '../greenfield/application/s1'
+import { useEffect, useMemo, useState } from 'react'
+import { recordOutcome, type HelpPossibility, type OutcomeEffect } from '../greenfield/application/s1'
+import { beginDirectSourceExperience } from '../greenfield/application/source-feedback'
 import type { SourceItem } from '../greenfield/application/embryo'
 
 type Help = HelpPossibility | SourceItem
@@ -32,6 +33,7 @@ export function Experience({ help, onExit, onFeedback }: { help: Help; onExit: (
   const [step, setStep] = useState(0)
   const [reflecting, setReflecting] = useState(false)
   const [sending, setSending] = useState(false)
+  const [directEpisodeId, setDirectEpisodeId] = useState<string | null>(null)
   const steps = arr(content.steps).length ? arr(content.steps) : arr(content.structure)
   const body = arr(content.paragraphs)
   const prompt = str(content.prompt) || str(content.template) || str(content.note)
@@ -42,10 +44,25 @@ export function Experience({ help, onExit, onFeedback }: { help: Help; onExit: (
   const availability = str(content.availability)
   const access = str(content.access)
   const parentOwnsOutcome = 'help_version_id' in help
+
+  useEffect(() => {
+    let cancelled = false
+    setDirectEpisodeId(null)
+    if (parentOwnsOutcome) return () => { cancelled = true }
+    void beginDirectSourceExperience(help.help_id, navigator.language || 'es-AR', 'es')
+      .then((result) => { if (!cancelled) setDirectEpisodeId(result.episode_id) })
+      .catch(() => { /* Public exploration remains available without forcing identification. */ })
+    return () => { cancelled = true }
+  }, [help.help_id, parentOwnsOutcome])
+
   const finish = () => parentOwnsOutcome ? onExit() : setReflecting(true)
   const feedback = async (effect: OutcomeEffect) => {
     setSending(true)
-    try { await onFeedback?.(effect); onExit() } finally { setSending(false) }
+    try {
+      if (onFeedback) await onFeedback(effect)
+      else if (directEpisodeId) await recordOutcome(directEpisodeId, effect)
+      onExit()
+    } finally { setSending(false) }
   }
 
   if (reflecting) return <section className="experience experience-return"><button className="experience-close" type="button" onClick={onExit} aria-label="Salir sin responder">×</button><div className="experience-return-inner"><div className="experience-lumi return"><span className="orb tiny"/><small>LUMI · RETORNO</small></div><p className="eyebrow">DESPUÉS DE VIVIRLO</p><h1>¿Cómo fue para vos?</h1><p>No hace falta explicar. Esta señal ayuda a que LUMEN acompañe mejor sin convertir tu vida en una métrica.</p><div className="outcome-row premium"><button type="button" disabled={sending} onClick={() => void feedback('helped')}>Me ayudó</button><button type="button" disabled={sending} onClick={() => void feedback('unsure')}>No estoy segura</button><button type="button" disabled={sending} onClick={() => void feedback('not_helped')}>No me ayudó</button></div><button className="text-action return-skip" type="button" onClick={onExit}>Prefiero no responder</button></div></section>
