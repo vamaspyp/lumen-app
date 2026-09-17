@@ -31,11 +31,9 @@ test('A54 Source intake stays one type-neutral pipeline', async () => {
 
 test('Source exploration can save to Sanctuary without conflating it with Repertoire', async () => {
   const app = await read('src/app/App.tsx')
-  const saveHandler = app.slice(app.indexOf('const saveFromSource'), app.indexOf('const closeMoment'))
-  assert.match(saveHandler, /saveSanctuary\('treasure'/)
-  assert.doesNotMatch(saveHandler, /integrateHelp\(/)
-  const integrateHandler = app.slice(app.indexOf('const integrate ='), app.indexOf('const askMagic'))
-  assert.match(integrateHandler, /integrateHelp\(/)
+  assert.match(app, /saveFromSource=.*saveSanctuary\('treasure'/s)
+  assert.match(app, /integrate=.*integrateHelp\(help\.help_id\)/s)
+  assert.doesNotMatch(app, /saveFromSource=.*integrateHelp\(/s)
 })
 
 test('regression gate executes every E2E spec instead of a handpicked legacy file', async () => {
