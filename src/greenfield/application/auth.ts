@@ -40,7 +40,9 @@ export async function verifyEmailOtp(email: string, token: string): Promise<Auth
   const normalized = email.trim().toLowerCase()
   const normalizedToken = token.replace(/\D/g, '')
   if (!normalized || !normalized.includes('@')) throw new Error('A valid email is required')
-  if (normalizedToken.length !== 6) throw new Error('A 6 digit code is required')
+  // Hosted Supabase can be configured with different OTP lengths. Keep the client
+  // compatible with the project setting instead of hard-coding six digits.
+  if (normalizedToken.length < 6 || normalizedToken.length > 10) throw new Error('A valid OTP code is required')
 
   const traceId = newTraceId()
   const supabase = getGreenfieldSupabase()
