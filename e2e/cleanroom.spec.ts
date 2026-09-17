@@ -36,12 +36,17 @@ const sourceItems = [
     help_id: '71000000-0000-0000-0000-000000000001', canonical_code: 'who_doing_what_matters_es', help_type: 'external_resource', lifecycle: 'active_limited', risk_class: 'low', evidence_class: 'institutional_guidance',
     title: 'En tiempos de estrés: haz lo que importa', summary: 'Guía de la OMS con habilidades prácticas para atravesar estrés y adversidad.',
     content: { external_url: 'https://www.who.int/' }, duration_minutes: 10, energy: 'low',
-    provider: { name: 'World Health Organization', kind: 'institution' }, areas: ['wellbeing'], capacities: ['regulation'], taxonomy_version: 'life-taxonomy.v1',
+    provider: { name: 'World Health Organization', kind: 'institution' }, areas: ['wellbeing'], capacities: ['regulation'], cultivation_roles: ['UNDERSTAND'], taxonomy_version: 'life-taxonomy.v1',
   },
   {
     help_id: practice.help_id, help_version_id: practice.help_version_id, canonical_code: 'flagship_breathe_arrive', help_type: 'practice', lifecycle: 'active_limited', risk_class: 'low', evidence_class: 'practice_based',
     title: practice.title, summary: practice.summary, content: practice.content, duration_minutes: practice.duration_minutes, energy: practice.energy,
-    provider: { name: 'VA+LUMEN', kind: 'internal' }, areas: ['wellbeing'], capacities: ['regulation'], taxonomy_version: 'life-taxonomy.v1',
+    provider: { name: 'VA+LUMEN', kind: 'internal' }, areas: ['wellbeing'], capacities: ['regulation'], cultivation_roles: ['PRACTICE','APPLY'], taxonomy_version: 'life-taxonomy.v1',
+  },
+  {
+    help_id: '71000000-0000-0000-0000-000000000003', canonical_code: 'public_support', help_type: 'institutional_service', lifecycle: 'active_limited', risk_class: 'low', evidence_class: 'institutional_guidance',
+    title: 'Orientación pública de bienestar', summary: 'Una puerta institucional cuando hace falta apoyo concreto.', content: {}, duration_minutes: null, energy: 'low',
+    provider: { name: 'Institución pública', kind: 'institution' }, areas: ['wellbeing'], capacities: ['regulation'], cultivation_roles: ['CONNECT'], taxonomy_version: 'life-taxonomy.v1',
   },
 ]
 
@@ -62,15 +67,23 @@ async function installRpcMocks(page: Page, calls: string[]) {
     if (name === 'lumen_bootstrap_person') return fulfill(route, { person_id: '90000000-0000-0000-0000-000000000101', preferences: { proactive_allowed: false, memory_allowed: true, evidence_use_allowed: false, sharing_allowed: false, revision: 1 } })
     if (name === 'lumen_source_taxonomy') return fulfill(route, taxonomy)
     if (name === 'lumen_source_discover') return fulfill(route, sourceItems)
+    if (name === 'lumen_source_constellation') return fulfill(route, sourceItems)
     if (name === 'lumen_s2_snapshot') return fulfill(route, { memory_allowed: true, trajectories: [{ trajectory_id: 't-1', faro_text: 'Vivir con más calma y presencia', status: 'active', path: [] }], repertoire: [{ repertoire_id: 'r-1', help_id: practice.help_id, title: practice.title, summary: practice.summary, times_reused: 2, user_confirmed: true }], sanctuary_count: 1 })
     if (name === 'lumen_s2_list_sanctuary') return fulfill(route, [{ entry_id: 's-1', entry_kind: 'reflection', title: 'Una idea que quiero recordar', content: 'No tengo que resolver todo al mismo tiempo.', source_help_id: null, created_at: new Date().toISOString() }])
     if (name === 'lumen_s5_snapshot') return fulfill(route, [{ space_id: 'c-1', name: 'Círculo de presencia', purpose: 'Un espacio para compartir y practicar.', role: 'member', member_count: 8, contributions: [] }])
+    if (name === 'lumen_s6_snapshot') return fulfill(route, { proactive_allowed: false, settings: { quiet_start_hour: 22, quiet_end_hour: 8, timezone: 'America/Buenos_Aires', custody_blocked: false }, followups: [] })
     if (name === 'lumen_s1_accompany_moment') return fulfill(route, helpScene())
     if (name === 'lumen_s1_select_help') return fulfill(route, { selection_id: 'sel-1', episode_id: helpScene().episode_id, action: 'selected', help: practice, trace_id: 'trace-1' })
     if (name === 'lumen_s1_record_outcome') return fulfill(route, { selection_id: 'sel-1', episode_id: helpScene().episode_id, effect: 'helped', signal_kind: 'HELPED_NOW', applied: true, trace_id: 'trace-2', semantic_key: 'outcome.thank_and_release' })
     if (name === 'lumen_s2_add_repertoire') return fulfill(route, { repertoire_id: 'r-2', help_id: practice.help_id })
     if (name === 'lumen_s2_set_memory') return fulfill(route, { memory_allowed: false })
     if (name === 'lumen_s2_create_trajectory') return fulfill(route, { trajectory_id: 't-2' })
+    if (name === 'lumen_s2_update_trajectory') return fulfill(route, { trajectory_id: 't-1', status: 'paused' })
+    if (name === 'lumen_s2_add_path_item') return fulfill(route, { path_item_id: 'p-1' })
+    if (name === 'lumen_s2_reuse_repertoire') return fulfill(route, { scene_id: 'continuity.cultivate', scene_version: 'v1', episode_id: 'ep-reuse', moment_id: 'm-reuse', decision_run_id: 'd-reuse', selection_id: 'sel-reuse', decision_kind: 'REPEAT', help: { ...practice, from_own_repertoire: true }, semantic_key: 'continuity.repeat', trace_id: 'trace-reuse' })
+    if (name === 'lumen_s2_record_longitudinal_signal') return fulfill(route, { outcome_id: 'o-long', episode_id: 'ep-reuse', signal_kind: 'REPEATED', effect: 'helped', decision_kind: null, withdraw_decision_run_id: null, semantic_key: 'continuity.signal', trace_id: 'trace-long' })
+    if (name === 'lumen_s6_set_proactivity') return fulfill(route, { proactive_allowed: true })
+    if (name === 'lumen_s6_cancel_followup') return fulfill(route, { cancelled: true })
     if (name === 'lumen_s2_save_sanctuary') return fulfill(route, { entry_id: 's-2' })
     if (name === 'lumen_s5_create_circle') return fulfill(route, { space_id: 'c-2' })
     if (name === 'lumen_s2_export_sanctuary') return fulfill(route, { export_version: '1', generated_at: new Date().toISOString(), sanctuary_entries: [], trajectories: [], personal_repertoire: [] })
@@ -79,9 +92,8 @@ async function installRpcMocks(page: Page, calls: string[]) {
   })
 }
 
-function nav(page: Page) {
-  return page.getByRole('navigation', { name: 'Espacios de LUMEN' })
-}
+function nav(page: Page) { return page.getByRole('navigation', { name: 'Espacios de LUMEN' }) }
+function utilities(page: Page) { return page.getByRole('navigation', { name: 'Utilidades' }) }
 
 test('approved Premium design is the only public runtime shell', async ({ page }) => {
   await page.setViewportSize({ width: 1536, height: 1024 })
@@ -113,6 +125,7 @@ test('authenticated person can move through Mi Vida, Explorar, Santuario and Tej
   await expect(page.getByRole('heading', { name: 'La vida también se vive con otros.' })).toBeVisible()
   expect(calls).toContain('lumen_s2_snapshot')
   expect(calls).toContain('lumen_s5_snapshot')
+  expect(calls).toContain('lumen_s6_snapshot')
 })
 
 test('Momento resolves end to end through help, experience, return and voluntary repertoire', async ({ page }) => {
@@ -147,4 +160,59 @@ test('Fuente preserves the nature and provenance of an external resource', async
   await expect(page.getByRole('heading', { name: 'En tiempos de estrés: haz lo que importa' })).toBeVisible()
   await expect(page.getByText('Fuente: World Health Organization')).toBeVisible()
   await expect(page.getByRole('link', { name: /Abrir en su fuente/ })).toBeVisible()
+})
+
+test('Capacidades compose a real constellation instead of filtering a painted catalogue', async ({ page }) => {
+  const calls: string[] = []
+  await installRpcMocks(page, calls)
+  await page.goto('/')
+  await nav(page).getByRole('button', { name: 'Explorar', exact: true }).click()
+  await page.getByRole('button', { name: /Regulación.*Componer constelación/ }).click()
+  await expect(page.getByRole('heading', { name: 'Constelación para Regulación' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Comprender' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Practicar' })).toBeVisible()
+  expect(calls).toContain('lumen_source_constellation')
+})
+
+test('Repertoire can be reused longitudinally through repeat and explicit signal', async ({ page }) => {
+  const calls: string[] = []
+  await installSession(page)
+  await installRpcMocks(page, calls)
+  await page.goto('/')
+  await nav(page).getByRole('button', { name: 'Mi Vida', exact: true }).click()
+  await page.getByRole('button', { name: 'Repetir', exact: true }).click()
+  await expect(page.locator('.experience-practice')).toBeVisible()
+  await page.getByRole('button', { name: 'Seguir' }).click()
+  await page.getByRole('button', { name: 'Seguir' }).click()
+  await page.getByRole('button', { name: 'Terminé' }).click()
+  await expect.poll(() => calls.includes('lumen_s2_record_longitudinal_signal')).toBe(true)
+  expect(calls).toContain('lumen_s2_reuse_repertoire')
+})
+
+test('Sidebar utilities are functional rather than inert controls', async ({ page }) => {
+  const calls: string[] = []
+  await installSession(page)
+  await installRpcMocks(page, calls)
+  await page.goto('/')
+  await utilities(page).getByRole('button', { name: 'Buscar', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Encontrar sin perderte en un catálogo.' })).toBeVisible()
+  await page.getByPlaceholder('¿Qué estás buscando?').fill('estrés')
+  await expect(page.getByText(/resultados/)).toBeVisible()
+  await utilities(page).getByRole('button', { name: 'Ajustes', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Tu soberanía también se configura.' })).toBeVisible()
+  await expect(page.getByLabel('Memoria')).toBeVisible()
+  await utilities(page).getByRole('button', { name: 'Notificaciones', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Continuidad sin perseguirte.' })).toBeVisible()
+})
+
+test('Santuario filters operate on sovereign stored entries', async ({ page }) => {
+  await installSession(page)
+  await installRpcMocks(page, [])
+  await page.goto('/')
+  await nav(page).getByRole('button', { name: 'Santuario', exact: true }).click()
+  await expect(page.getByText('Una idea que quiero recordar')).toBeVisible()
+  await page.getByRole('button', { name: 'Notas', exact: true }).click()
+  await expect(page.getByText('No hay elementos de este tipo.')).toBeVisible()
+  await page.getByRole('button', { name: 'Reflexiones', exact: true }).click()
+  await expect(page.getByText('Una idea que quiero recordar')).toBeVisible()
 })
