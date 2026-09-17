@@ -42,3 +42,23 @@ test('Sanctuary and Tissue expose the real existing contracts', () => {
   assert.match(app, /leaveCircle/)
   assert.match(app, /reportCircle/)
 })
+
+test('Moment and Explore render Source possibilities through one canonical Premium resource card', () => {
+  assert.match(app, /function ResourceCard/)
+  assert.match(app, /function SourceCard[\s\S]*<ResourceCard/)
+  assert.match(app, /moment-source-grid[\s\S]*<ResourceCard item=\{primary\}/)
+  assert.match(app, /rest\.map\(\(item,index\)=>\s*<ResourceCard/)
+  assert.doesNotMatch(app, /<article className="medicine-now"/)
+  assert.doesNotMatch(app, /<div className="constellation-cards"/)
+})
+
+test('Fuente exploration restores hidden deliberate filters without becoming a permanent control wall', () => {
+  assert.match(app, /function SourceFilters/)
+  assert.match(app, /aria-expanded=\{open\}/)
+  assert.match(app, />Filtros\{activeCount/)
+  assert.match(app, /aria-label="Duración"/)
+  assert.match(app, /aria-label="Formato"/)
+  assert.match(app, /aria-label="Energía"/)
+  assert.match(app, /Con información de accesibilidad/)
+  assert.match(app, /matchesSourceFilters/)
+})
