@@ -18,38 +18,50 @@ export async function getAuthSnapshot(): Promise<AuthSnapshot> {
   return { session: data.session, user: data.session?.user ?? null }
 }
 
-function canonicalAuthRedirect(candidate?: string): string | undefined {
-  const value = candidate?.trim()
-  if (!value) return undefined
-
-  const url = new URL(value)
-  url.pathname = '/'
-  url.search = ''
-  url.hash = ''
-  return url.toString()
-}
-
-export async function requestMagicLink(email: string, redirectTo?: string): Promise<void> {
+export async function requestEmailOtp(email: string): Promise<void> {
   const normalized = email.trim().toLowerCase()
   if (!normalized || !normalized.includes('@')) throw new Error('A valid email is required')
 
-  // The runtime origin is the source of truth for preview deployments. A configured
-  // fallback is used only when the caller cannot provide the current origin.
-  const configuredRedirect = import.meta.env.VITE_LUMEN_AUTH_REDIRECT_URL
-  const effectiveRedirect = canonicalAuthRedirect(redirectTo || configuredRedirect)
   const traceId = newTraceId()
   const supabase = getGreenfieldSupabase()
   const { error } = await supabase.auth.signInWithOtp({
     email: normalized,
-    options: effectiveRedirect ? { emailRedirectTo: effectiveRedirect } : undefined,
   })
 
   if (error) {
-    emitOperationalLog('error', 'foundation.auth.magic_link.failed', traceId, { code: error.code })
+    emitOperationalLog('error', 'foundation.auth.email_otp.failed', traceId, { code: error.code })
     throw error
   }
 
-  emitOperationalLog('info', 'foundation.auth.magic_link.requested', traceId)
+  emitOperationalLog('info', 'foundation.auth.email_otp.requested', traceId)
+}
+
+export async function verifyEmailOtp(email: string, token: string): Promise<AuthSnapshot> {
+  const normalized = email.trim().toLowerCase()
+  const normalizedToken = token.replace(/\D/g, '')
+  if (!normalized || !normalized.includes('@')) throw new Error('A valid email is required')
+  if (normalizedToken.length !== 6) throw new Error('A 6 digit code is required')
+
+  const traceId = newTraceId()
+  const supabase = getGreenfieldSupabase()
+  const { data, error } = await supabase.auth.verifyOtp({
+    email: normalized,
+    token: normalizedToken,
+    type: 'email',
+  })
+
+  if (error) {
+    emitOperationalLog('error', 'foundation.auth.email_otp.verify_failed', traceId, { code: error.code })
+    throw error
+  }
+
+  emitOperationalLog('info', 'foundation.auth.email_otp.verified', traceId)
+  return { session: data.session, user: data.user }
+}
+
+// Compatibility alias while callers migrate. This no longer sends a clickable link.
+export async function requestMagicLink(email: string): Promise<void> {
+  return requestEmailOtp(email)
 }
 
 export async function signOut(): Promise<void> {
