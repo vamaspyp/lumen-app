@@ -184,6 +184,8 @@ function PrivateGate({ name, email, setEmail, goHome, goExplore }: { name: strin
   const [code, setCode] = useState('')
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
+  const normalizedCode = code.replace(/\D/g, '')
+  const codeLooksValid = normalizedCode.length >= 6 && normalizedCode.length <= 10
 
   const sendCode = async () => {
     if (!email.trim()) return
@@ -192,7 +194,7 @@ function PrivateGate({ name, email, setEmail, goHome, goExplore }: { name: strin
     try {
       await requestEmailOtp(email)
       setCodeSent(true)
-      setMessage('Te envié un código de 6 dígitos. Revisá tu correo.')
+      setMessage('Te envié un código de acceso. Revisá tu correo.')
     } catch (error) {
       const authError = error as { code?: string; status?: number }
       setMessage(authError.code === 'over_email_send_rate_limit' || authError.status === 429
@@ -204,11 +206,11 @@ function PrivateGate({ name, email, setEmail, goHome, goExplore }: { name: strin
   }
 
   const verifyCode = async () => {
-    if (code.replace(/\D/g, '').length !== 6) return
+    if (!codeLooksValid) return
     setBusy(true)
     setMessage('')
     try {
-      await verifyEmailOtp(email, code)
+      await verifyEmailOtp(email, normalizedCode)
       setMessage('Listo. Entrando a tu espacio...')
       window.location.reload()
     } catch {
@@ -218,7 +220,7 @@ function PrivateGate({ name, email, setEmail, goHome, goExplore }: { name: strin
     }
   }
 
-  return <section className="gate-page"><div className="gate-card"><span className="orb"/><p>{name.toUpperCase()}</p><h1>Este espacio se construye alrededor de tu vida.</h1><p className="gate-copy">Entrá para conservar continuidad, memoria soberana y aquello que decidís hacer propio. También podés seguir explorando LUMEN sin identificarte.</p>{!codeSent ? <div className="gate-form"><input aria-label="Correo" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="tu@email.com"/><button onClick={() => void sendCode()} disabled={busy || !email.trim()} type="button">Enviarme un código</button></div> : <><div className="gate-form"><input aria-label="Código de acceso" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Código de 6 dígitos"/><button onClick={() => void verifyCode()} disabled={busy || code.length !== 6} type="button">Entrar</button></div><button className="text-action" type="button" disabled={busy} onClick={() => { setCode(''); setCodeSent(false); setMessage('') }}>Usar otro correo</button></>}{message && <small className="status-message">{message}</small>}<div className="gate-links"><button onClick={goExplore} type="button">Seguir explorando</button><button onClick={goHome} type="button">Volver al inicio</button></div></div></section>
+  return <section className="gate-page"><div className="gate-card"><span className="orb"/><p>{name.toUpperCase()}</p><h1>Este espacio se construye alrededor de tu vida.</h1><p className="gate-copy">Entrá para conservar continuidad, memoria soberana y aquello que decidís hacer propio. También podés seguir explorando LUMEN sin identificarte.</p>{!codeSent ? <div className="gate-form"><input aria-label="Correo" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="tu@email.com"/><button onClick={() => void sendCode()} disabled={busy || !email.trim()} type="button">Enviarme un código</button></div> : <><div className="gate-form"><input aria-label="Código de acceso" inputMode="numeric" autoComplete="one-time-code" maxLength={10} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 10))} placeholder="Código recibido"/><button onClick={() => void verifyCode()} disabled={busy || !codeLooksValid} type="button">Entrar</button></div><button className="text-action" type="button" disabled={busy} onClick={() => { setCode(''); setCodeSent(false); setMessage('') }}>Usar otro correo</button></>}{message && <small className="status-message">{message}</small>}<div className="gate-links"><button onClick={goExplore} type="button">Seguir explorando</button><button onClick={goHome} type="button">Volver al inicio</button></div></div></section>
 }
 
 function MomentFlow({ stage, scene, help, busy, onTry, onExperienceExit, onOutcome, onIntegrate, onClose, integrated }: { stage: MomentStage; scene: S1Scene | null; help: HelpPossibility | null; busy: boolean; onTry: () => void; onExperienceExit: () => void; onOutcome: (effect: 'helped'|'not_helped'|'unsure') => void; onIntegrate: () => void; onClose: () => void; integrated: boolean }) {
