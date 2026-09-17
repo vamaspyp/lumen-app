@@ -463,8 +463,6 @@ export default function App() {
     setProactivityState(nextProactivity)
   },[])
 
-  const refreshPrivate=useCallback(async()=>{if(authenticated)await loadPrivate()},[authenticated,loadPrivate])
-
   useEffect(()=>{void (async()=>{try{const auth=await getAuthSnapshot();setAuthenticated(Boolean(auth.session));if(auth.session){await bootstrapPerson();await loadPrivate()}await loadPublic()}finally{setAuthChecked(true)}})()},[loadPrivate,loadPublic])
 
   const go=(next:Space)=>{setSpace(next);if(next!=='home'&&stage!=='idle')setStage('idle')}
@@ -501,7 +499,7 @@ export default function App() {
   const chooseMomentHelp=async(item:ExperienceHelp)=>{if(!scene?.episode_id)return;setBusy(true);try{const selection=await selectHelp(scene.episode_id,item.help_id,'selected');setHelp(isSourceItem(item)?item:selection.help);setStage('experience')}finally{setBusy(false)}}
   const momentOutcome=async(effect:OutcomeEffect)=>{if(!scene?.episode_id)return;setBusy(true);try{await recordOutcome(scene.episode_id,effect);setStage('closed');if(authenticated)await loadPrivate()}finally{setBusy(false)}}
   const integrateMoment=async()=>{if(!help)return;setBusy(true);try{await integrateHelp(help.help_id);setIntegrated(true);await loadPrivate()}finally{setBusy(false)}}
-  const changeMomentCapabilities=async(keys:string[])=>{setCapacityKeys(keys);if(createdTrajectoryId)await setTrajectoryCapabilities(createdTrajectoryId,keys);if(!scene?.episode_id)return;if(keys.length===1){try{const recomposed=await discoverConstellation(keys[0],scene.interpretation?.area_keys?.[0]||null,navigator.language||'es-AR',12);setMomentConstellation(recomposed)}catch{}}}
+  const changeMomentCapabilities=async(keys:string[])=>{setCapacityKeys(keys);if(createdTrajectoryId)await setTrajectoryCapabilities(createdTrajectoryId,keys);if(!scene?.episode_id)return;if(keys.length===1){try{const recomposed=await discoverConstellation(keys[0],scene.interpretation?.area_keys?.[0]||null,navigator.language||'es-AR',12);setMomentConstellation(recomposed)}catch{setMomentConstellation([])}}}
   const createMomentFaro=async(text:string)=>{setBusy(true);try{const result=await createTrajectoryFromMoment(text,capacityKeys,scene?.moment_id||null);setCreatedTrajectoryId(result.trajectory_id);await loadPrivate()}finally{setBusy(false)}}
   const saveMomentPath=async()=>{if(!createdTrajectoryId||!selectedPathIds.length)return;setBusy(true);try{await saveConstellationToPath(createdTrajectoryId,selectedPathIds);await loadPrivate()}finally{setBusy(false)}}
 
