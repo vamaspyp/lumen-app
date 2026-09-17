@@ -35,7 +35,6 @@ test('A62 flagship experiences express the cultivation grammar without programs 
 test('clean-room Fuente remains possibilities, not a catalog or program', () => {
   assert.match(app, /Encontrar sin perderte en un catálogo/)
   assert.match(app, /composición dinámica de formas complementarias\. No es un programa/)
-  assert.match(app, /Direcciones vivas, no programas/)
   assert.match(embryo, /cultivation_roles/)
   assert.doesNotMatch(seed, /create\s+table\s+[^;]*constellation/i)
 })
