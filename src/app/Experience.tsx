@@ -7,6 +7,8 @@ type Help = HelpPossibility | SourceItem
 
 type Kind = 'editorial'|'practice'|'audio'|'video'|'external'|'human'|'group'|'action'|'quiet'
 
+type DirectEpisode = Readonly<{ helpId: string; episodeId: string }>
+
 function contentOf(help: Help): Record<string, unknown> { return help.content || {} }
 function str(value: unknown): string | null { return typeof value === 'string' && value.trim() ? value.trim() : null }
 function arr(value: unknown): string[] { return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0) : [] }
@@ -33,7 +35,7 @@ export function Experience({ help, onExit, onFeedback }: { help: Help; onExit: (
   const [step, setStep] = useState(0)
   const [reflecting, setReflecting] = useState(false)
   const [sending, setSending] = useState(false)
-  const [directEpisodeId, setDirectEpisodeId] = useState<string | null>(null)
+  const [directEpisode, setDirectEpisode] = useState<DirectEpisode | null>(null)
   const steps = arr(content.steps).length ? arr(content.steps) : arr(content.structure)
   const body = arr(content.paragraphs)
   const prompt = str(content.prompt) || str(content.template) || str(content.note)
@@ -44,18 +46,18 @@ export function Experience({ help, onExit, onFeedback }: { help: Help; onExit: (
   const availability = str(content.availability)
   const access = str(content.access)
   const parentOwnsOutcome = 'help_version_id' in help
+  const directEpisodeId = directEpisode?.helpId === help.help_id ? directEpisode.episodeId : null
 
   useEffect(() => {
     let cancelled = false
-    setDirectEpisodeId(null)
     if (parentOwnsOutcome) return () => { cancelled = true }
     void beginDirectSourceExperience(help.help_id, navigator.language || 'es-AR', 'es')
-      .then((result) => { if (!cancelled) setDirectEpisodeId(result.episode_id) })
+      .then((result) => { if (!cancelled) setDirectEpisode({ helpId: help.help_id, episodeId: result.episode_id }) })
       .catch(() => { /* Public exploration remains available without forcing identification. */ })
     return () => { cancelled = true }
   }, [help.help_id, parentOwnsOutcome])
 
-  const finish = () => parentOwnsOutcome ? onExit() : setReflecting(true)
+  const finish = () => (onFeedback || !parentOwnsOutcome) ? setReflecting(true) : onExit()
   const feedback = async (effect: OutcomeEffect) => {
     setSending(true)
     try {
