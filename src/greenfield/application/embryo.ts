@@ -5,6 +5,7 @@ import { newTraceId } from '../kernel/trace'
 export type CultivationRole = 'UNDERSTAND' | 'PRACTICE' | 'APPLY' | 'VARY' | 'REFLECT' | 'INTEGRATE' | 'CONNECT' | 'SUSTAIN'
 export type CultivationMove = 'REUSE_REPERTOIRE' | 'REPEAT' | 'VARY' | 'APPLY_IN_CONTEXT' | 'REFLECT' | 'INTEGRATE' | 'CONTINUE_PATH'
 export type LongitudinalSignal = 'REUSED' | 'REPEATED' | 'VARIED' | 'APPLIED_OTHER_CONTEXT' | 'ADAPTED' | 'RECOGNIZED_AS_OWN' | 'NO_REMINDER_NEEDED' | 'STOPPED_HELPING' | 'UNKNOWN'
+export type PathSourceKind = 'source' | 'repertoire' | 'sanctuary' | 'tissue' | 'custom'
 
 export type PathItem = Readonly<{
   path_item_id: string
@@ -13,12 +14,16 @@ export type PathItem = Readonly<{
   position: number
   status: 'planned' | 'done' | 'skipped'
   cultivation_move?: CultivationMove | null
+  source_kind?: PathSourceKind
+  source_ref_id?: string | null
 }>
 
 export type Trajectory = Readonly<{
   trajectory_id: string
   faro_text: string
   status: 'active' | 'paused' | 'closed'
+  capability_keys?: string[]
+  origin_moment_id?: string | null
   path: PathItem[]
 }>
 
@@ -71,6 +76,7 @@ export type SourceItem = Readonly<{
   content: Record<string, unknown>
   duration_minutes: number | null
   energy: string | null
+  detail?: Record<string, unknown>
   accessibility?: Record<string, unknown> | null
   provider: {
     name: string
@@ -86,6 +92,19 @@ export type SourceItem = Readonly<{
   cultivation_vocab_version?: string
   taxonomy_version: string
   localization_provenance?: Record<string, unknown>
+  primary_now?: boolean
+  from_own_repertoire?: boolean
+  applicability_confidence?: number | null
+}>
+
+export type MomentConstellation = Readonly<{
+  episode_id: string
+  moment_id: string
+  decision_run_id: string
+  items: SourceItem[]
+  capacity_keys: string[]
+  area_keys: string[]
+  trace_id: string
 }>
 
 export type TaxonomyTerm = Readonly<{ key: string; label: string }>
@@ -249,11 +268,28 @@ export function createTrajectory(faroText: string) {
   return rpc<{ trajectory_id: string }>('lumen_s2_create_trajectory', { p_faro_text: faroText, p_trace_id: newTraceId() })
 }
 
+export function createTrajectoryFromMoment(faroText: string, capacityKeys: string[], originMomentId?: string | null) {
+  return rpc<{ trajectory_id: string; path_id: string; capability_keys: string[]; origin_moment_id: string | null }>('lumen_s2_create_trajectory_from_moment', {
+    p_faro_text: faroText,
+    p_capacity_keys: capacityKeys,
+    p_origin_moment_id: originMomentId ?? null,
+    p_trace_id: newTraceId(),
+  })
+}
+
 export function updateTrajectory(trajectoryId: string, faroText: string, status: Trajectory['status']) {
   return rpc('lumen_s2_update_trajectory', {
     p_trajectory_id: trajectoryId,
     p_faro_text: faroText,
     p_status: status,
+    p_trace_id: newTraceId(),
+  })
+}
+
+export function setTrajectoryCapabilities(trajectoryId: string, capacityKeys: string[]) {
+  return rpc<{ trajectory_id: string; capability_keys: string[] }>('lumen_s2_set_trajectory_capabilities', {
+    p_trajectory_id: trajectoryId,
+    p_capacity_keys: capacityKeys,
     p_trace_id: newTraceId(),
   })
 }
@@ -283,6 +319,48 @@ export function addPathItem(trajectoryId: string, helpId: string | null, label: 
     p_trajectory_id: trajectoryId,
     p_help_id: helpId,
     p_label: label,
+    p_trace_id: newTraceId(),
+  })
+}
+
+export function addPathReference(
+  trajectoryId: string,
+  sourceKind: PathSourceKind,
+  sourceRefId: string | null,
+  helpId: string | null,
+  label: string,
+  move?: CultivationMove | 'CONNECT_HUMAN' | null,
+) {
+  return rpc<{ path_item_id: string }>('lumen_s2_add_path_reference', {
+    p_trajectory_id: trajectoryId,
+    p_source_kind: sourceKind,
+    p_source_ref_id: sourceRefId,
+    p_help_id: helpId,
+    p_label: label,
+    p_cultivation_move: move ?? null,
+    p_trace_id: newTraceId(),
+  })
+}
+
+export function removePathItem(pathItemId: string) {
+  return rpc<{ path_item_id: string; removed: boolean }>('lumen_s2_remove_path_item', {
+    p_path_item_id: pathItemId,
+    p_trace_id: newTraceId(),
+  })
+}
+
+export function reorderPathItem(pathItemId: string, position: number) {
+  return rpc<{ path_item_id: string; position: number }>('lumen_s2_reorder_path_item', {
+    p_path_item_id: pathItemId,
+    p_position: position,
+    p_trace_id: newTraceId(),
+  })
+}
+
+export function saveConstellationToPath(trajectoryId: string, helpIds: string[]) {
+  return rpc<{ trajectory_id: string; added_count: number }>('lumen_s2_save_constellation_to_path', {
+    p_trajectory_id: trajectoryId,
+    p_help_ids: helpIds,
     p_trace_id: newTraceId(),
   })
 }
@@ -318,6 +396,15 @@ export function discoverConstellation(
     p_area_key: areaKey ?? null,
     p_locale: locale,
     p_limit: limit,
+  })
+}
+
+export function getMomentConstellation(episodeId: string, locale = 'es-AR', limit = 12): Promise<MomentConstellation> {
+  return rpc('lumen_s1_moment_constellation', {
+    p_episode_id: episodeId,
+    p_locale: locale,
+    p_limit: limit,
+    p_trace_id: newTraceId(),
   })
 }
 
