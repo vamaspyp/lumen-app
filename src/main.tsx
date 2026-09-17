@@ -5,6 +5,7 @@ import './app/a63-continuity.css'
 import './app/accessibility.css'
 import './app/premium-v4.css'
 import './app/premium-v4-ci.css'
+import './app/premium-v4-feedback.css'
 import App from './app/App'
 import { LumiPresence } from './app/LumiPresence'
 
