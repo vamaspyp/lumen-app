@@ -41,7 +41,7 @@ export function Experience({ help, onExit, onFeedback }: { help: Help; onExit: (
   const phone = str(content.phone)
   const availability = str(content.availability)
   const access = str(content.access)
-  const parentOwnsOutcome = 'help_version_id' in help && !help.from_own_repertoire
+  const parentOwnsOutcome = 'help_version_id' in help
   const finish = () => parentOwnsOutcome ? onExit() : setReflecting(true)
   const feedback = async (effect: OutcomeEffect) => {
     setSending(true)
