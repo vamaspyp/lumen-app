@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
-import { getAuthSnapshot, requestMagicLink, signOut } from '../greenfield/application/auth'
+import { getAuthSnapshot, requestEmailOtp, signOut, verifyEmailOtp } from '../greenfield/application/auth'
 import { bootstrapPerson } from '../greenfield/application/consent'
 import {
   createCircle,
@@ -179,8 +179,46 @@ function StartWays({ go, setExpression }: { go: (space: Space) => void; setExpre
   return <section className="start-ways"><div className="start-copy"><b>ALGUNAS FORMAS<br/>DE COMENZAR</b><p>Diferentes entradas,<br/>un mismo lugar.</p></div>{items.map((item) => <button className="start-card" key={item.title} type="button" onClick={item.action} style={{ backgroundImage: `linear-gradient(0deg,rgba(16,20,17,.72),rgba(16,20,17,.03)),url(${item.image})` }}><b>{item.title}</b><small>{item.quote}</small></button>)}<div className="start-end"><em>Diferentes caminos.<br/>Una misma intención.<br/>Vidas más plenas.</em><span>—</span><b>LUMEN</b></div></section>
 }
 
-function PrivateGate({ name, email, setEmail, request, message, goHome, goExplore }: { name: string; email: string; setEmail: (value: string) => void; request: () => void; message: string; goHome: () => void; goExplore: () => void }) {
-  return <section className="gate-page"><div className="gate-card"><span className="orb"/><p>{name.toUpperCase()}</p><h1>Este espacio se construye alrededor de tu vida.</h1><p className="gate-copy">Entrá para conservar continuidad, memoria soberana y aquello que decidís hacer propio. También podés seguir explorando LUMEN sin identificarte.</p><div className="gate-form"><input aria-label="Correo" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="tu@email.com"/><button onClick={request} type="button">Enviarme un enlace</button></div>{message && <small className="status-message">{message}</small>}<div className="gate-links"><button onClick={goExplore} type="button">Seguir explorando</button><button onClick={goHome} type="button">Volver al inicio</button></div></div></section>
+function PrivateGate({ name, email, setEmail, goHome, goExplore }: { name: string; email: string; setEmail: (value: string) => void; goHome: () => void; goExplore: () => void }) {
+  const [codeSent, setCodeSent] = useState(false)
+  const [code, setCode] = useState('')
+  const [message, setMessage] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const sendCode = async () => {
+    if (!email.trim()) return
+    setBusy(true)
+    setMessage('')
+    try {
+      await requestEmailOtp(email)
+      setCodeSent(true)
+      setMessage('Te envié un código de 6 dígitos. Revisá tu correo.')
+    } catch (error) {
+      const authError = error as { code?: string; status?: number }
+      setMessage(authError.code === 'over_email_send_rate_limit' || authError.status === 429
+        ? 'Pediste varios códigos en poco tiempo. Esperá un momento e intentá otra vez.'
+        : 'No pude enviar el código. Revisá el correo e intentá otra vez.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const verifyCode = async () => {
+    if (code.replace(/\D/g, '').length !== 6) return
+    setBusy(true)
+    setMessage('')
+    try {
+      await verifyEmailOtp(email, code)
+      setMessage('Listo. Entrando a tu espacio...')
+      window.location.reload()
+    } catch {
+      setMessage('Ese código no es válido o venció. Pedí uno nuevo e intentá otra vez.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return <section className="gate-page"><div className="gate-card"><span className="orb"/><p>{name.toUpperCase()}</p><h1>Este espacio se construye alrededor de tu vida.</h1><p className="gate-copy">Entrá para conservar continuidad, memoria soberana y aquello que decidís hacer propio. También podés seguir explorando LUMEN sin identificarte.</p>{!codeSent ? <div className="gate-form"><input aria-label="Correo" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="tu@email.com"/><button onClick={() => void sendCode()} disabled={busy || !email.trim()} type="button">Enviarme un código</button></div> : <><div className="gate-form"><input aria-label="Código de acceso" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Código de 6 dígitos"/><button onClick={() => void verifyCode()} disabled={busy || code.length !== 6} type="button">Entrar</button></div><button className="text-action" type="button" disabled={busy} onClick={() => { setCode(''); setCodeSent(false); setMessage('') }}>Usar otro correo</button></>}{message && <small className="status-message">{message}</small>}<div className="gate-links"><button onClick={goExplore} type="button">Seguir explorando</button><button onClick={goHome} type="button">Volver al inicio</button></div></div></section>
 }
 
 function MomentFlow({ stage, scene, help, busy, onTry, onExperienceExit, onOutcome, onIntegrate, onClose, integrated }: { stage: MomentStage; scene: S1Scene | null; help: HelpPossibility | null; busy: boolean; onTry: () => void; onExperienceExit: () => void; onOutcome: (effect: 'helped'|'not_helped'|'unsure') => void; onIntegrate: () => void; onClose: () => void; integrated: boolean }) {
@@ -227,7 +265,6 @@ export default function App() {
   const [authenticated, setAuthenticated] = useState(false)
   const [authReady, setAuthReady] = useState(false)
   const [email, setEmail] = useState('')
-  const [authMessage, setAuthMessage] = useState('')
   const [expression, setExpression] = useState('')
   const [stage, setStage] = useState<MomentStage>('idle')
   const [scene, setScene] = useState<S1Scene | null>(null)
@@ -261,7 +298,6 @@ export default function App() {
   const chooseHelp = async () => { if (!scene?.episode_id || !help) return; setBusy(true); try { await selectHelp(scene.episode_id, help.help_id, 'selected'); setStage('experience') } finally { setBusy(false) } }
   const outcome = async (effect: 'helped'|'not_helped'|'unsure') => { if (!scene?.episode_id) return; setBusy(true); try { await recordOutcome(scene.episode_id, effect); setStage('closed') } finally { setBusy(false) } }
   const integrate = async () => { if (!help) return; setBusy(true); try { await integrateHelp(help.help_id); setIntegrated(true); await refreshPrivate() } finally { setBusy(false) } }
-  const askMagic = async () => { if (!email.trim()) return; setBusy(true); try { await requestMagicLink(email, window.location.origin); setAuthMessage('Te envié un enlace de acceso.') } catch { setAuthMessage('No pude enviar el enlace. Revisá el correo e intentá otra vez.') } finally { setBusy(false) } }
   const logout = async () => { await signOut(); setAuthenticated(false); setSpace('home'); setStage('idle'); setIntegrated(false) }
   const saveFromSource = async (item: SourceItem) => { await saveSanctuary('treasure', item.title, item.summary, item.help_id); await refreshPrivate() }
   const closeMoment = () => { setStage('idle'); setExpression(''); setScene(null); setHelp(null); setIntegrated(false) }
@@ -269,12 +305,12 @@ export default function App() {
 
   return <div className="app-shell"><Sidebar active={space} go={go} authenticated={authenticated} onSignOut={() => void logout()}/><main className="main-field">
     {space === 'home' && stage === 'idle' && <><HomeHero expression={expression} setExpression={setExpression} submit={() => void runMoment()} busy={busy} go={go} authenticated={authenticated}/><HomePreviews go={go} snapshot={snapshot} source={source} entries={entries} circles={circles}/><StartWays go={go} setExpression={(value) => { setExpression(value); window.scrollTo({ top: 0, behavior: 'smooth' }) }}/><footer>CONOCIMIENTO · EXPERIENCIA · PERSONAS · VIDA REAL<br/><span>CIRCULANDO JUNTAS PARA UN MUNDO CON MÁS VIDAS PLENAS</span></footer></>}
-    {space === 'home' && stage === 'auth' && <PrivateGate name="Tu continuidad" email={email} setEmail={setEmail} request={() => void askMagic()} message={authMessage} goHome={() => setStage('idle')} goExplore={() => { setStage('idle'); setSpace('explore') }}/>} 
+    {space === 'home' && stage === 'auth' && <PrivateGate name="Tu continuidad" email={email} setEmail={setEmail} goHome={() => setStage('idle')} goExplore={() => { setStage('idle'); setSpace('explore') }}/>} 
     {space === 'home' && stage !== 'idle' && stage !== 'auth' && <MomentFlow stage={stage} scene={scene} help={help} busy={busy} onTry={() => void chooseHelp()} onExperienceExit={() => setStage('outcome')} onOutcome={(effect) => void outcome(effect)} onIntegrate={() => void integrate()} onClose={closeMoment} integrated={integrated}/>} 
     {space === 'explore' && !sourceExperience && <ExploreView source={source} taxonomy={taxonomy} refreshSource={refreshSource} authenticated={authenticated} onOpen={setSourceExperience} onSave={saveFromSource}/>} 
     {space === 'explore' && sourceExperience && <Experience help={sourceExperience} onExit={() => setSourceExperience(null)}/>} 
-    {space === 'life' && (authenticated ? <LifeView snapshot={snapshot} refresh={refreshPrivate}/> : <PrivateGate name={privateName} email={email} setEmail={setEmail} request={() => void askMagic()} message={authMessage} goHome={() => setSpace('home')} goExplore={() => setSpace('explore')}/>)}
-    {space === 'sanctuary' && (authenticated ? <SanctuaryView entries={entries} refresh={refreshPrivate}/> : <PrivateGate name={privateName} email={email} setEmail={setEmail} request={() => void askMagic()} message={authMessage} goHome={() => setSpace('home')} goExplore={() => setSpace('explore')}/>)}
-    {space === 'tissue' && (authenticated ? <TissueView circles={circles} refresh={refreshPrivate}/> : <PrivateGate name={privateName} email={email} setEmail={setEmail} request={() => void askMagic()} message={authMessage} goHome={() => setSpace('home')} goExplore={() => setSpace('explore')}/>)}
+    {space === 'life' && (authenticated ? <LifeView snapshot={snapshot} refresh={refreshPrivate}/> : <PrivateGate name={privateName} email={email} setEmail={setEmail} goHome={() => setSpace('home')} goExplore={() => setSpace('explore')}/>)}
+    {space === 'sanctuary' && (authenticated ? <SanctuaryView entries={entries} refresh={refreshPrivate}/> : <PrivateGate name={privateName} email={email} setEmail={setEmail} goHome={() => setSpace('home')} goExplore={() => setSpace('explore')}/>)}
+    {space === 'tissue' && (authenticated ? <TissueView circles={circles} refresh={refreshPrivate}/> : <PrivateGate name={privateName} email={email} setEmail={setEmail} goHome={() => setSpace('home')} goExplore={() => setSpace('explore')}/>)}
   </main></div>
 }
