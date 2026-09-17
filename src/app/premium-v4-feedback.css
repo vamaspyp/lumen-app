@@ -1,0 +1,88 @@
+/* A63 · Premium Field V4 · post-experience return + Moment resource consistency */
+
+/* LUMI leads; explanatory copy becomes quiet support. */
+.moment-dialogue-wide > .eyebrow,
+.moment-dialogue-wide > h1,
+.moment-dialogue-wide > p {
+  max-width: 760px;
+}
+.moment-dialogue-wide > .eyebrow { margin-top: 22px; font-size: 9px; letter-spacing: .22em; color: #7a817d; }
+.moment-dialogue-wide > h1 { margin: 6px 0 8px; font-family: var(--serif); font-size: clamp(32px,4vw,48px); font-weight: 400; line-height: 1; color: #24302c; }
+.moment-dialogue-wide > p { margin: 0 0 18px; font-size: 13px; line-height: 1.45; color: #747d79; }
+.lumi-presence { position: relative; z-index: 2; box-shadow: 0 8px 24px rgba(69,56,38,.07); }
+.lumi-presence small { font-size: 9px; letter-spacing: .18em; color: #7c745f; }
+.lumi-presence p { margin: 4px 0 0!important; color: #2b342f!important; }
+
+/* Moment constellation resources use the same Premium card grammar as Fuente. */
+.constellation-cards > article {
+  position: relative;
+  grid-template-columns: 300px minmax(0,1fr)!important;
+  min-height: 190px!important;
+  overflow: hidden;
+}
+.constellation-cards > article::before {
+  content: '';
+  min-height: 190px;
+  background:
+    linear-gradient(0deg,rgba(34,42,36,.12),rgba(34,42,36,.02)),
+    url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=900&q=86') center/cover no-repeat;
+}
+.constellation-cards > article > div:first-child { padding: 24px 28px 14px; }
+.constellation-cards > article > .card-actions {
+  grid-column: 2;
+  padding: 0 28px 24px;
+  margin: 0;
+  align-self: end;
+}
+.constellation-cards .path-toggle {
+  min-height: 37px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #f0ebe2;
+  color: #45504b;
+}
+.constellation-cards .path-toggle.active { background: #dfe3d7; color: #26372e; }
+
+/* Post-experience feedback is a first-class LUMEN return, not a survey screen. */
+.experience-return {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 20px;
+  background:
+    radial-gradient(circle at 52% 35%, rgba(243,224,189,.34), transparent 30%),
+    linear-gradient(180deg,#fbf8f1,#f3ecdf);
+}
+.experience-return-inner {
+  width: min(720px,100%);
+  padding: 42px 44px;
+  border: 1px solid rgba(42,51,46,.09);
+  border-radius: 30px;
+  background: rgba(255,253,248,.94);
+  box-shadow: 0 24px 70px rgba(52,43,31,.12);
+  text-align: center;
+}
+.experience-lumi.return { justify-content: center; margin-bottom: 26px; }
+.experience-return-inner > .eyebrow { margin: 0 0 10px; font-size: 9px; letter-spacing: .24em; color: #82745f; }
+.experience-return-inner h1 { margin: 0; font-family: var(--serif); font-size: clamp(48px,6vw,70px); font-weight: 400; line-height: .95; }
+.experience-return-inner > p:not(.eyebrow) { max-width: 530px; margin: 18px auto 28px; font-size: 14px; line-height: 1.55; color: #69736f; }
+.outcome-row.premium { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.outcome-row.premium button {
+  min-height: 52px;
+  border: 1px solid rgba(43,54,48,.10);
+  border-radius: 18px;
+  background: #f4efe7;
+  color: #2f3b36;
+  cursor: pointer;
+}
+.outcome-row.premium button:first-child { background: #293b32; color: #fff; }
+.return-skip { margin-top: 20px!important; }
+
+@media (max-width: 760px) {
+  .constellation-cards > article { grid-template-columns: 1fr!important; }
+  .constellation-cards > article::before { min-height: 160px; }
+  .constellation-cards > article > .card-actions { grid-column: 1; }
+  .experience-return-inner { padding: 32px 20px; }
+  .outcome-row.premium { grid-template-columns: 1fr; }
+}
