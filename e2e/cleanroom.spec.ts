@@ -28,6 +28,7 @@ function helpScene() {
     episode_id: '30000000-0000-0000-0000-000000000101', moment_id: '40000000-0000-0000-0000-000000000101', decision_run_id: '50000000-0000-0000-0000-000000000101',
     semantic_blocks: [{ type: 'help_preview', primary: practice }],
     coverage: { state: 'covered', reason: 'applicable_source_available' }, safety: { state: 'clear' },
+    interpretation: { taxonomy_version: 'life-taxonomy.v1', area_keys: ['wellbeing'], capacity_keys: ['regulation'], confidence: 0.88 },
   }
 }
 
@@ -68,16 +69,23 @@ async function installRpcMocks(page: Page, calls: string[]) {
     if (name === 'lumen_source_taxonomy') return fulfill(route, taxonomy)
     if (name === 'lumen_source_discover') return fulfill(route, sourceItems)
     if (name === 'lumen_source_constellation') return fulfill(route, sourceItems)
-    if (name === 'lumen_s2_snapshot') return fulfill(route, { memory_allowed: true, trajectories: [{ trajectory_id: 't-1', faro_text: 'Vivir con más calma y presencia', status: 'active', path: [] }], repertoire: [{ repertoire_id: 'r-1', help_id: practice.help_id, title: practice.title, summary: practice.summary, times_reused: 2, user_confirmed: true }], sanctuary_count: 1 })
+    if (name === 'lumen_s2_snapshot') return fulfill(route, { memory_allowed: true, trajectories: [{ trajectory_id: 't-1', faro_text: 'Vivir con más calma y presencia', status: 'active', capability_keys: ['regulation'], origin_moment_id: null, path: [] }], repertoire: [{ repertoire_id: 'r-1', help_id: practice.help_id, title: practice.title, summary: practice.summary, times_reused: 2, user_confirmed: true }], sanctuary_count: 1 })
     if (name === 'lumen_s2_list_sanctuary') return fulfill(route, [{ entry_id: 's-1', entry_kind: 'reflection', title: 'Una idea que quiero recordar', content: 'No tengo que resolver todo al mismo tiempo.', source_help_id: null, created_at: new Date().toISOString() }])
     if (name === 'lumen_s5_snapshot') return fulfill(route, [{ space_id: 'c-1', name: 'Círculo de presencia', purpose: 'Un espacio para compartir y practicar.', role: 'member', member_count: 8, contributions: [] }])
     if (name === 'lumen_s6_snapshot') return fulfill(route, { proactive_allowed: false, settings: { quiet_start_hour: 22, quiet_end_hour: 8, timezone: 'America/Buenos_Aires', custody_blocked: false }, followups: [] })
     if (name === 'lumen_s1_accompany_moment') return fulfill(route, helpScene())
+    if (name === 'lumen_s1_moment_constellation') return fulfill(route, { episode_id: helpScene().episode_id, moment_id: helpScene().moment_id, decision_run_id: helpScene().decision_run_id, capacity_keys: ['regulation'], area_keys: ['wellbeing'], trace_id: 'trace-constellation', items: sourceItems.map((item) => ({ ...item, primary_now: item.help_id === practice.help_id })) })
     if (name === 'lumen_s1_select_help') return fulfill(route, { selection_id: 'sel-1', episode_id: helpScene().episode_id, action: 'selected', help: practice, trace_id: 'trace-1' })
     if (name === 'lumen_s1_record_outcome') return fulfill(route, { selection_id: 'sel-1', episode_id: helpScene().episode_id, effect: 'helped', signal_kind: 'HELPED_NOW', applied: true, trace_id: 'trace-2', semantic_key: 'outcome.thank_and_release' })
     if (name === 'lumen_s2_add_repertoire') return fulfill(route, { repertoire_id: 'r-2', help_id: practice.help_id })
     if (name === 'lumen_s2_set_memory') return fulfill(route, { memory_allowed: false })
     if (name === 'lumen_s2_create_trajectory') return fulfill(route, { trajectory_id: 't-2' })
+    if (name === 'lumen_s2_create_trajectory_from_moment') return fulfill(route, { trajectory_id: 't-moment', path_id: 'path-moment', faro_text: 'Vivir con más calma', status: 'active', capability_keys: ['regulation'], origin_moment_id: helpScene().moment_id })
+    if (name === 'lumen_s2_set_trajectory_capabilities') return fulfill(route, { trajectory_id: 't-1', capability_keys: ['regulation','attention'] })
+    if (name === 'lumen_s2_save_constellation_to_path') return fulfill(route, { trajectory_id: 't-moment', added_count: 2 })
+    if (name === 'lumen_s2_add_path_reference') return fulfill(route, { path_item_id: 'p-ref' })
+    if (name === 'lumen_s2_remove_path_item') return fulfill(route, { path_item_id: 'p-ref', removed: true })
+    if (name === 'lumen_s2_reorder_path_item') return fulfill(route, { path_item_id: 'p-ref', position: 1 })
     if (name === 'lumen_s2_update_trajectory') return fulfill(route, { trajectory_id: 't-1', status: 'paused' })
     if (name === 'lumen_s2_add_path_item') return fulfill(route, { path_item_id: 'p-1' })
     if (name === 'lumen_s2_reuse_repertoire') return fulfill(route, { scene_id: 'continuity.cultivate', scene_version: 'v1', episode_id: 'ep-reuse', moment_id: 'm-reuse', decision_run_id: 'd-reuse', selection_id: 'sel-reuse', decision_kind: 'REPEAT', help: { ...practice, from_own_repertoire: true }, semantic_key: 'continuity.repeat', trace_id: 'trace-reuse' })
@@ -128,15 +136,20 @@ test('authenticated person can move through Mi Vida, Explorar, Santuario and Tej
   expect(calls).toContain('lumen_s6_snapshot')
 })
 
-test('Momento resolves end to end through help, experience, return and voluntary repertoire', async ({ page }) => {
+test('Momento composes singular constellation with LUMI, immediate help and voluntary continuity', async ({ page }) => {
   const calls: string[] = []
   await installSession(page)
   await installRpcMocks(page, calls)
   await page.goto('/')
   await page.getByLabel('Lo que te está pasando').fill('Estoy saturada y necesito bajar un poco la intensidad.')
   await page.getByRole('button', { name: 'Continuar' }).click()
+  await expect(page.getByText('LUMI · P2')).toBeVisible()
+  await expect(page.getByText('UNA CONSTELACIÓN PARA ESTE MOMENTO')).toBeVisible()
+  await expect(page.getByText(/PARA AHORA/)).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Llegar al cuerpo' })).toBeVisible()
-  await page.getByRole('button', { name: 'Vivir esta posibilidad' }).click()
+  await expect(page.getByRole('heading', { name: 'En tiempos de estrés: haz lo que importa' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Regulación' }).first()).toHaveClass(/active/)
+  await page.getByRole('button', { name: 'Vivir esto ahora' }).click()
   await expect(page.locator('.experience-practice')).toBeVisible()
   await page.getByRole('button', { name: 'Seguir' }).click()
   await page.getByRole('button', { name: 'Seguir' }).click()
@@ -147,6 +160,7 @@ test('Momento resolves end to end through help, experience, return and voluntary
   await page.getByRole('button', { name: /Guardar .* en mi repertorio/ }).click()
   await expect.poll(() => calls.includes('lumen_s2_add_repertoire')).toBe(true)
   expect(calls).toContain('lumen_s1_accompany_moment')
+  expect(calls).toContain('lumen_s1_moment_constellation')
   expect(calls).toContain('lumen_s1_select_help')
   expect(calls).toContain('lumen_s1_record_outcome')
 })
