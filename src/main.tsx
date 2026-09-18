@@ -1,16 +1,19 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
-import './worldclass.css'
-import App from './App.tsx'
-import MasterReact from './master-react/MasterReact'
-import './master-scenes.css'
-import './master-photographic.css'
-
-const isMasterReact = window.location.pathname === '/master-react' || window.location.pathname === '/master-react/'
+import './app/styles.css'
+import './app/a63-continuity.css'
+import './app/accessibility.css'
+import './app/premium-v4.css'
+import './app/premium-v4-ci.css'
+import './app/premium-v4-feedback.css'
+import './app/a63-source-consistency.css'
+import './app/premium-source.css'
+import App from './app/App'
+import { LumiPresence } from './app/LumiPresence'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {isMasterReact ? <MasterReact /> : <App />}
+    <App />
+    <LumiPresence />
   </StrictMode>,
 )
