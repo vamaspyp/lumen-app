@@ -1,116 +1,29 @@
-// ════════════════════════════════════════════════════════════════
-// LUMEN — Sistema de tokens cromáticos por módulo
-// Paleta Nordic/zen — arena, tiza, humo, pasteles tierra
-// ════════════════════════════════════════════════════════════════
-
-/** Convierte hex (#RRGGBB) a rgba con alfa específico (0–1). */
-export function withAlpha(hex: string, alpha: number): string {
-  const h = hex.replace('#', '')
-  const r = parseInt(h.substring(0, 2), 16)
-  const g = parseInt(h.substring(2, 4), 16)
-  const b = parseInt(h.substring(4, 6), 16)
+// LUMEN Premium v2.1 — tokens compartidos. La identidad es única;
+// los módulos conservan sólo matices funcionales, nunca una app distinta.
+export function withAlpha(hex:string,alpha:number):string{
+  const h=hex.replace('#',''); const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16)
   return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
-
-/** Paleta canónica por módulo — versión nordic/zen. */
-const CANON = {
-  lumi: {
-    background: '#F4EFE6', // tiza arena cálida
-    accent:     '#8FA38C', // salvia silenciosa
-    accentDeep: '#5F7A5E', // salvia profunda
-    energy:     'presencia · calma',
-  },
-  fuente: {
-    background: '#F0EEE6', // pergamino apagado
-    accent:     '#9B7A52', // bronce de libro antiguo
-    accentDeep: '#6E5536', // bronce profundo
-    energy:     'claridad · sabiduría',
-  },
-  sanctuary: {
-    background: '#EEF4F6', // celeste lechoso
-    accent:     '#7FAEC2', // celeste Santuario
-    accentDeep: '#567F91', // celeste profundo
-    energy:     'intimidad · memoria',
-  },
-  circles: {
-    background: '#ECEEF1', // humo azul
-    accent:     '#7090B5', // azul niebla
-    accentDeep: '#4A6A8E', // azul profundo
-    energy:     'encuentro · conexión',
-  },
+const PREMIUM={
+  background:'#FAF8F3', card:'#FFFDF9', border:'#EAE4D7',
+  salvia:'#A7B096', oliva:'#55624A', humo:'#6B6B68', oro:'#DCC9A3'
 } as const
-
-export type ModuleKey = keyof typeof CANON
-
-export interface ModuleTokens {
-  background:    string
-  cardBg:        string
-  cardBorder:    string
-
-  accent:        string
-  accentDeep:    string
-  accentSoft10:  string
-  accentSoft20:  string
-  accentSoft30:  string
-
-  textPrimary:   string
-  textSecondary: string
-  textMuted:     string
-
-  orbInner:      string
-  orbMid:        string
-  orbOuter:      string
-  orbGlow:       string
-
-  shadow:        string
-
-  energy:        string
-  source:        ModuleKey
+export type ModuleKey='lumi'|'fuente'|'sanctuary'|'circles'
+export interface ModuleTokens{
+  background:string;cardBg:string;cardBorder:string;accent:string;accentDeep:string;
+  accentSoft10:string;accentSoft20:string;accentSoft30:string;textPrimary:string;
+  textSecondary:string;textMuted:string;orbInner:string;orbMid:string;orbOuter:string;
+  orbGlow:string;shadow:string;energy:string;source:ModuleKey
 }
-
-export function getModuleTokens(contentSource: string | undefined | null): ModuleTokens {
-  const key: ModuleKey = (
-    contentSource === 'fuente'    ? 'fuente'    :
-    contentSource === 'sanctuary' ? 'sanctuary' :
-    contentSource === 'circles'   ? 'circles'   :
-    'lumi'
-  )
-  const palette = CANON[key]
-  const { background, accent, accentDeep, energy } = palette
-
-  return {
-    background,
-    cardBg:        'rgba(252, 248, 240, 0.72)',
-    cardBorder:    withAlpha(accent, 0.15),
-
-    accent,
-    accentDeep,
-    accentSoft10:  withAlpha(accent, 0.10),
-    accentSoft20:  withAlpha(accent, 0.18),
-    accentSoft30:  withAlpha(accent, 0.28),
-
-    textPrimary:   '#3A332A',
-    textSecondary: '#6E665C',
-    textMuted:     '#A89F92',
-
-    orbInner:      lighten(accent, 0.30),
-    orbMid:        accent,
-    orbOuter:      accentDeep,
-    orbGlow:       `0 0 32px ${withAlpha(accent, 0.40)}`,
-
-    shadow:        '0 8px 24px rgba(0,0,0,0.08)',
-
-    energy,
-    source:        key,
+export function getModuleTokens(contentSource:string|undefined|null):ModuleTokens{
+  const source:ModuleKey=contentSource==='fuente'?'fuente':contentSource==='sanctuary'?'sanctuary':contentSource==='circles'?'circles':'lumi'
+  const accent=source==='fuente'?PREMIUM.oro:source==='circles'?'#929A8B':source==='sanctuary'?'#879784':PREMIUM.salvia
+  const energy=source==='fuente'?'claridad · sabiduría':source==='sanctuary'?'intimidad · memoria':source==='circles'?'encuentro · conexión':'presencia · calma'
+  return{
+    background:PREMIUM.background,cardBg:'rgba(255,253,249,.92)',cardBorder:'rgba(85,98,74,.12)',
+    accent,accentDeep:PREMIUM.oliva,accentSoft10:withAlpha(accent,.10),accentSoft20:withAlpha(accent,.18),accentSoft30:withAlpha(accent,.28),
+    textPrimary:'#292822',textSecondary:'#5F5C55',textMuted:'#8B877F',
+    orbInner:'#FFF8E9',orbMid:PREMIUM.oro,orbOuter:'#B78A45',orbGlow:'0 0 38px rgba(220,201,163,.48)',
+    shadow:'0 12px 34px rgba(56,48,35,.07)',energy,source
   }
-}
-
-function lighten(hex: string, amount: number): string {
-  const h = hex.replace('#', '')
-  const r = parseInt(h.substring(0, 2), 16)
-  const g = parseInt(h.substring(2, 4), 16)
-  const b = parseInt(h.substring(4, 6), 16)
-  const mix = (c: number) => Math.min(255, Math.round(c + (255 - c) * amount))
-  const toHex = (c: number) => c.toString(16).padStart(2, '0')
-  return `#${toHex(mix(r))}${toHex(mix(g))}${toHex(mix(b))}`
 }
