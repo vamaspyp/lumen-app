@@ -159,12 +159,23 @@ function App() {
           minHeight: '100vh',
           color: tokens.textPrimary,
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-          paddingTop: (isLandingScan || isSimpleView) ? 0 : '2rem',
+          paddingTop: isLandingScan ? 0 : '0.5rem',
           paddingLeft: '1.25rem',
           paddingRight: '1.25rem',
           boxSizing: 'border-box',
         }}
       >
+        {!isLandingScan && !isSharedLightReceiverMode && (
+          <header style={{
+            height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 1rem', maxWidth: 560, position: 'relative'
+          }}>
+            <div style={{
+              fontSize: '0.72rem', letterSpacing: '0.42em', fontWeight: 600,
+              color: '#34352F', paddingLeft: '0.42em'
+            }}>LUMEN</div>
+          </header>
+        )}
         {import.meta.env.DEV && (
           <details
             style={{
