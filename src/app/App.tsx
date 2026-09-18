@@ -499,7 +499,7 @@ export default function App() {
   const [integrated,setIntegrated]=useState(false)
 
   const loadPublic=useCallback(async()=>{
-    const [tax,items]=await Promise.all([getSourceTaxonomy(),discoverSource(null,null,null,navigator.language||'es-AR',80)])
+    const [tax,items]=await Promise.all([getSourceTaxonomy(),discoverSource(null,null,null,navigator.language||'es-AR',100)])
     setTaxonomy(tax)
     setSource(items)
   },[])
