@@ -83,3 +83,10 @@
   .premium-external-body{grid-template-columns:1fr;gap:24px;padding:38px 22px}
   .premium-constellation-grid{grid-template-columns:1fr}
 }
+
+/* When a constellation opens, discovery recedes so the composition becomes the scene. */
+.explore-view.constellation-open .premium-constellation-showcase,
+.explore-view.constellation-open #related-to-faro,
+.explore-view.constellation-open .capability-heading,
+.explore-view.constellation-open .faro-large-grid{display:none}
+.explore-view.constellation-open .explore-toolbar{margin-bottom:24px}
