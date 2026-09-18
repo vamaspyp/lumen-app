@@ -310,7 +310,7 @@ test('regulation_premium_v1 is visible and can be lived end to end inside the LU
   await expect(page.getByRole('link',{name:'Escuchar en su fuente ↗'})).toHaveAttribute('href',/paho_grounding_audio_es/)
   await page.getByRole('button',{name:'Volver a la constelación'}).click()
   await expect(page.getByRole('heading',{name:'¿Cómo fue para vos?'})).toBeVisible()
-  await page.getByRole('button',{name:'Me ayudó'}).click()
+  await page.getByRole('button',{name:'Me ayudó',exact:true}).click()
   await expect(page.getByText('CONSTELACIÓN PREMIUM · FUENTE',{exact:true})).toBeVisible()
   expect(calls).toContain('lumen_source_begin_experience')
   expect(calls).toContain('lumen_s1_record_outcome')
