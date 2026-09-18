@@ -74,10 +74,15 @@ assert.equal(sourceError, null, `Public Source discovery failed: ${sourceError?.
 assert.ok(Array.isArray(source), 'Source discovery must return an array')
 assert.equal(source.length, 50, 'Broad discovery should reach the public hard cap')
 
-const allowedSourceKeys = new Set(['help_id', 'canonical_code', 'help_type', 'lifecycle', 'risk_class', 'evidence_class', 'title', 'summary', 'content', 'duration_minutes', 'energy', 'accessibility', 'provider', 'areas', 'capacities', 'taxonomy_version', 'localization_provenance'])
+const allowedSourceKeys = new Set(['help_id', 'canonical_code', 'help_type', 'lifecycle', 'risk_class', 'evidence_class', 'title', 'summary', 'content', 'duration_minutes', 'energy', 'accessibility', 'detail', 'provider', 'areas', 'capacities', 'taxonomy_version', 'localization_provenance'])
+const allowedSourceDetailKeys = new Set(['action_key', 'browse_priority', 'collection', 'constellation_key', 'constellation_role', 'delivery', 'experience_manifest_version', 'experience_quality', 'experience_standard', 'external_url', 'premium_family', 'premium_wrapper', 'prompt_key', 'prompt_keys', 'render_contract', 'render_status', 'source_fidelity', 'source_kind', 'steps'])
 for (const item of source) {
   for (const field of Object.keys(item ?? {})) assert.ok(allowedSourceKeys.has(field), `Unexpected public Source field: ${field}`)
   assert.equal(Object.hasOwn(item ?? {}, 'person_id'), false, 'Public Source must never expose person_id')
+  if (item?.detail != null) {
+    assert.equal(typeof item.detail, 'object', 'Public Source detail must remain structured metadata')
+    for (const key of Object.keys(item.detail)) assert.ok(allowedSourceDetailKeys.has(key), `Unexpected public Source detail field: ${key}`)
+  }
   assert.equal(item?.taxonomy_version, 'life-taxonomy.v1')
   assert.ok(Array.isArray(item?.areas))
   assert.ok(Array.isArray(item?.capacities))
