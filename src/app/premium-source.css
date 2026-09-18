@@ -1,0 +1,83 @@
+
+/* A63 · Premium Source / constellation continuity.
+   This layer harmonizes new semantic renderers with the already approved field; it does not redesign the shell. */
+
+.profile-initials{
+  width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(255,252,247,.86);border:1px solid rgba(78,86,61,.18);
+  color:#32412e;font-family:"Cormorant Garamond",Georgia,serif;font-size:1.05rem;font-weight:600;
+  box-shadow:0 8px 24px rgba(23,31,24,.08);
+}
+.profile-initials.lumen{font-size:.9rem;letter-spacing:.08em}
+.profile img{object-fit:cover}
+
+.constellation-hero{
+  min-height:290px;border-radius:28px;display:flex;align-items:flex-end;overflow:hidden;
+  background-position:center;background-size:cover;margin:8px 0 28px;
+  box-shadow:0 18px 56px rgba(23,31,24,.10);
+}
+.constellation-hero>div{padding:34px 38px;max-width:760px;color:#fff}
+.constellation-hero .eyebrow{color:rgba(255,255,255,.78)}
+.constellation-hero h1{margin:.25rem 0 .6rem;font-size:clamp(2.3rem,5vw,4.8rem);line-height:.92;color:#fff}
+.constellation-hero p{max-width:650px;color:rgba(255,255,255,.88);font-size:1rem}
+.constellation-hero small{display:block;margin-top:1rem;color:rgba(255,255,255,.66);letter-spacing:.08em;text-transform:uppercase}
+
+.premium-constellation-showcase{margin:32px 0 38px}
+.premium-constellation-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.premium-constellation-grid button{
+  min-height:270px;border:0;border-radius:26px;padding:30px;text-align:left;display:flex;flex-direction:column;justify-content:flex-end;
+  background-position:center;background-size:cover;color:#fff;cursor:pointer;box-shadow:0 18px 48px rgba(23,31,24,.12);
+}
+.premium-constellation-grid button small{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;opacity:.76}
+.premium-constellation-grid button b{font-family:"Cormorant Garamond",Georgia,serif;font-size:2.6rem;line-height:1;margin:.45rem 0}
+.premium-constellation-grid button span{font-size:.9rem;opacity:.82}
+
+.premium-source-card{box-shadow:0 18px 44px rgba(23,31,24,.08)}
+.premium-source-card>img{min-height:220px;object-fit:cover}
+
+.organism-bridges{margin:46px 0 34px}
+.bridge-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.bridge-grid article{padding:22px;border-radius:20px;border:1px solid rgba(79,87,65,.14);background:rgba(255,252,247,.72)}
+.bridge-grid small{display:block;font-size:.7rem;letter-spacing:.12em;color:#7b7e69;margin-bottom:.5rem}
+.bridge-grid b{display:block;font-family:"Cormorant Garamond",Georgia,serif;font-size:1.45rem;line-height:1.05;color:#2e3b2c}
+.bridge-grid p{margin:.6rem 0 0;color:#65695b;font-size:.92rem}
+
+.premium-external{min-height:100vh;background:#f5f0e7;color:#293329;padding-bottom:80px}
+.premium-external-hero{
+  min-height:58vh;display:flex;align-items:flex-end;padding:72px clamp(28px,7vw,110px) 58px;
+  background:
+    linear-gradient(90deg,rgba(21,29,22,.78),rgba(21,29,22,.20)),
+    url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=2200&q=90') center/cover;
+}
+.premium-external-hero>div{max-width:840px;color:white}
+.premium-external-hero .eyebrow{color:rgba(255,255,255,.72)}
+.premium-external-hero h1{font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(3rem,7vw,6.8rem);line-height:.88;margin:.4rem 0 1rem;color:white}
+.premium-external-hero p{font-size:1.05rem;line-height:1.65;max-width:680px;color:rgba(255,255,255,.88)}
+.premium-external-hero small{color:rgba(255,255,255,.72)}
+.premium-external-body{display:grid;grid-template-columns:minmax(210px,.7fr) minmax(0,1.8fr);gap:58px;max-width:1120px;margin:0 auto;padding:58px 30px}
+.premium-external-body aside{padding-top:10px}
+.premium-external-body aside b{display:block;margin:.8rem 0 .35rem;font-size:.72rem;letter-spacing:.12em}
+.premium-external-body aside p{color:#6d715f;line-height:1.65}
+.premium-external-body article{font-size:1.05rem;line-height:1.7}
+.premium-external-body .media-boundary{border-left:2px solid rgba(132,113,67,.28);padding-left:24px;background:none}
+
+.premium-classic_reading .premium-external-hero{
+  background-image:linear-gradient(90deg,rgba(27,25,20,.82),rgba(27,25,20,.22)),url('https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=2200&q=90')
+}
+.premium-video_or_audio_visual_sequence .premium-external-hero{
+  background-image:linear-gradient(90deg,rgba(22,28,24,.76),rgba(22,28,24,.16)),url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2200&q=90')
+}
+.premium-contemplative_reading_audio .premium-external-hero{
+  background-image:linear-gradient(90deg,rgba(25,32,25,.74),rgba(25,32,25,.18)),url('https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=2200&q=90')
+}
+.premium-health_reference .premium-external-hero{
+  background-image:linear-gradient(90deg,rgba(28,35,31,.80),rgba(28,35,31,.26)),url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2200&q=90')
+}
+
+@media (max-width:760px){
+  .constellation-hero{min-height:320px;border-radius:22px}
+  .constellation-hero>div{padding:26px 24px}
+  .premium-external-hero{min-height:54vh;padding:88px 24px 38px}
+  .premium-external-body{grid-template-columns:1fr;gap:24px;padding:38px 22px}
+  .premium-constellation-grid{grid-template-columns:1fr}
+}
