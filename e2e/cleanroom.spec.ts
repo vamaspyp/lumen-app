@@ -51,6 +51,27 @@ const sourceItems = [
   },
 ]
 
+
+const premiumSourceItems = [
+  ['paho_doing_what_matters_latam','En tiempos de estrés: haz lo que importa','illustrated_guide','foundation_guide','OPS/OMS'],
+  ['paho_grounding_audio_es','Poner los pies en la tierra · audio OPS/OMS','audio_practice','practice_now','OPS/OMS'],
+  ['paho_leave_space_audio_es','Dejar espacio · audio OPS/OMS','audio_practice','acceptance_practice','OPS/OMS'],
+  ['plum_village_mindful_breathing_es','Respiración consciente · Plum Village','contemplative_reading_audio','contemplative_practice','Plum Village · Tradición de Thich Nhat Hanh'],
+  ['marcus_aurelius_meditations_pd_es','Meditaciones · Marco Aurelio','classic_reading','philosophical_perspective','textos.info · Biblioteca digital'],
+  ['bbva_castellanos_breathing_brain_es','Si el cerebro fuera una orquesta, la respiración sería el director','video_or_audio_visual_sequence','understand_science','BBVA · Aprendemos Juntos 2030'],
+  ['medlineplus_anxiety_es','Ansiedad · MedlinePlus','health_reference','health_understanding','MedlinePlus en español'],
+].map(([code,title,family,role,provider],index)=>({
+  help_id:`72000000-0000-0000-0000-00000000000${index+1}`,
+  canonical_code:code, help_type:'external_resource', lifecycle:'active_limited', risk_class:'low', evidence_class:'institutional_guidance',
+  title, summary:`Posibilidad testigo PREMIUM para Regulación · ${title}.`,
+  content:{ external_url:`https://example.invalid/${code}` }, duration_minutes:index===1||index===2?5:12, energy:'low',
+  detail:{ constellation_key:'regulation_premium_v1', collection:'regulation_premium_v1', premium_family:family, constellation_role:role, premium_wrapper:true, source_fidelity:'external_original_unchanged', external_url:`https://example.invalid/${code}` },
+  provider:{ name:provider, kind:'external' }, areas:['wellbeing'], capacities:['regulation'], capacity_key:'regulation',
+  cultivation_roles:index===1?['PRACTICE','APPLY']:['UNDERSTAND'], taxonomy_version:'life-taxonomy.v1',
+}))
+
+const allSourceItems = [...sourceItems,...premiumSourceItems]
+
 const taxonomy = {
   taxonomy_version: 'life-taxonomy.v1',
   areas: [{ key: 'wellbeing', label: 'Bienestar' }, { key: 'relationships', label: 'Vínculos' }],
@@ -67,12 +88,13 @@ async function installRpcMocks(page: Page, calls: string[]) {
     calls.push(name)
     if (name === 'lumen_bootstrap_person') return fulfill(route, { person_id: '90000000-0000-0000-0000-000000000101', preferences: { proactive_allowed: false, memory_allowed: true, evidence_use_allowed: false, sharing_allowed: false, revision: 1 } })
     if (name === 'lumen_source_taxonomy') return fulfill(route, taxonomy)
-    if (name === 'lumen_source_discover') return fulfill(route, sourceItems)
+    if (name === 'lumen_source_discover') return fulfill(route, allSourceItems)
     if (name === 'lumen_source_constellation') return fulfill(route, sourceItems)
     if (name === 'lumen_s2_snapshot') return fulfill(route, { memory_allowed: true, trajectories: [{ trajectory_id: 't-1', faro_text: 'Vivir con más calma y presencia', status: 'active', capability_keys: ['regulation'], origin_moment_id: null, path: [] }], repertoire: [{ repertoire_id: 'r-1', help_id: practice.help_id, title: practice.title, summary: practice.summary, times_reused: 2, user_confirmed: true }], sanctuary_count: 1 })
     if (name === 'lumen_s2_list_sanctuary') return fulfill(route, [{ entry_id: 's-1', entry_kind: 'reflection', title: 'Una idea que quiero recordar', content: 'No tengo que resolver todo al mismo tiempo.', source_help_id: practice.help_id, created_at: new Date().toISOString() }])
     if (name === 'lumen_s5_snapshot') return fulfill(route, [{ space_id: 'c-1', name: 'Círculo de presencia', purpose: 'Un espacio para compartir y practicar.', role: 'member', member_count: 8, contributions: [] }])
     if (name === 'lumen_s6_snapshot') return fulfill(route, { proactive_allowed: false, settings: { quiet_start_hour: 22, quiet_end_hour: 8, timezone: 'America/Buenos_Aires', custody_blocked: false }, followups: [] })
+    if (name === 'lumen_source_begin_experience') return fulfill(route, { episode_id:'ep-direct-premium', moment_id:'m-direct-premium', decision_run_id:'d-direct-premium', selection_id:'sel-direct-premium', help_id:premiumSourceItems[1].help_id, help_version_id:'hv-direct-premium', trace_id:'trace-direct-premium' })
     if (name === 'lumen_s1_accompany_moment') return fulfill(route, helpScene())
     if (name === 'lumen_s1_moment_constellation') return fulfill(route, { episode_id: helpScene().episode_id, moment_id: helpScene().moment_id, decision_run_id: helpScene().decision_run_id, capacity_keys: ['regulation'], area_keys: ['wellbeing'], trace_id: 'trace-constellation', items: sourceItems.map((item) => ({ ...item, primary_now: item.help_id === practice.help_id })) })
     if (name === 'lumen_s1_select_help') return fulfill(route, { selection_id: 'sel-1', episode_id: helpScene().episode_id, action: 'selected', help: practice, trace_id: 'trace-1' })
@@ -268,6 +290,30 @@ test('Inicio and LUMI circulate contextual value across the existing organism', 
 
   await nav(page).getByRole('button', { name: 'Tejido', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Relacionado con tu Faro' })).toBeVisible()
+})
+
+
+test('regulation_premium_v1 is visible and can be lived end to end inside the LUMEN field', async ({ page }) => {
+  await installSession(page)
+  const calls:string[]=[]
+  await installRpcMocks(page,calls)
+  await page.goto('/')
+  await nav(page).getByRole('button',{name:'Explorar',exact:true}).click()
+  await expect(page.getByRole('heading',{name:'Constelaciones destacadas'})).toBeVisible()
+  const premium=page.getByRole('button',{name:/CONSTELACIÓN PREMIUM.*Regulación/i})
+  await expect(premium).toBeVisible()
+  await premium.click()
+  await expect(page.getByText('CONSTELACIÓN PREMIUM · FUENTE',{exact:true})).toBeVisible()
+  for (const item of premiumSourceItems) await expect(page.getByRole('heading',{name:item.title,exact:true})).toBeVisible()
+  await page.getByRole('heading',{name:'Poner los pies en la tierra · audio OPS/OMS',exact:true}).locator('..').getByRole('button',{name:'Vivir esta posibilidad'}).click()
+  await expect(page.getByText('PRÁCTICA GUIADA · FUENTE ORIGINAL',{exact:true})).toBeVisible()
+  await expect(page.getByRole('link',{name:'Escuchar en su fuente ↗'})).toHaveAttribute('href',/paho_grounding_audio_es/)
+  await page.getByRole('button',{name:'Volver a la constelación'}).click()
+  await expect(page.getByRole('heading',{name:'¿Cómo fue para vos?'})).toBeVisible()
+  await page.getByRole('button',{name:'Me ayudó'}).click()
+  await expect(page.getByText('CONSTELACIÓN PREMIUM · FUENTE',{exact:true})).toBeVisible()
+  expect(calls).toContain('lumen_source_begin_experience')
+  expect(calls).toContain('lumen_s1_record_outcome')
 })
 
 test('Santuario filters operate on sovereign stored entries', async ({ page }) => {
