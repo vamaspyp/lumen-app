@@ -52,7 +52,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cleanroom-visual-qa
-          path: test-results/cleanroom-home.png
+          path: |
+            test-results/cleanroom-home.png
+            test-results/cleanroom-home-mobile.png
           if-no-files-found: ignore
       - name: Certify live greenfield backend
         run: npm run test:live
