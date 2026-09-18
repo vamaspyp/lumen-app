@@ -13,6 +13,7 @@ type DirectEpisode = Readonly<{ helpId: string; episodeId: string }>
 function contentOf(help: Help): Record<string, unknown> { return help.content || {} }
 function str(value: unknown): string | null { return typeof value === 'string' && value.trim() ? value.trim() : null }
 function arr(value: unknown): string[] { return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0) : [] }
+function record(value: unknown): Record<string, unknown> { return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {} }
 function provider(help: Help): string | null { return 'provider' in help && help.provider ? help.provider.name : null }
 function sourceItem(help: Help): SourceItem | null { return 'canonical_code' in help ? help as SourceItem : null }
 function externalUrl(help: Help): string | null { const c = contentOf(help); return str(c.external_url) || str(c.url) || str(c.href) }
@@ -44,6 +45,12 @@ export function Experience({ help, onExit, onFeedback }: { help: Help; onExit: (
   const current = steps[step] || prompt || help.summary
   const media = kind === 'audio' ? mediaUrl(help, 'audio') : kind === 'video' ? mediaUrl(help, 'video') : null
   const premium = sourceItem(help) ? premiumFamily(sourceItem(help) as SourceItem) : null
+  const premiumWrapper = record(content.lumen_wrapper)
+  const premiumEyebrow = str(premiumWrapper.eyebrow)
+  const premiumDeck = str(premiumWrapper.deck)
+  const premiumAfter = str(premiumWrapper.after_prompt)
+  const premiumFind = arr(premiumWrapper.what_you_find)
+  const premiumCta = str(content.cta_label)
   const destination = sourceItem(help) ? (sourceUrl(sourceItem(help) as SourceItem) || externalUrl(help)) : externalUrl(help)
   const phone = str(content.phone)
   const availability = str(content.availability)
@@ -80,10 +87,10 @@ export function Experience({ help, onExit, onFeedback }: { help: Help; onExit: (
     {kind === 'audio' && <div className="experience-center media"><div className="audio-halo"><i/><i/><i/></div><p className="eyebrow">ESCUCHA</p><h1>{help.title}</h1><p>{help.summary}</p>{media ? <audio controls preload="metadata" src={media}/> : <p className="media-boundary">Esta posibilidad está preparada para audio. El asset todavía no está publicado; LUMEN no simula una experiencia inexistente.</p>}<button className="ghost" type="button" onClick={finish}>Terminé</button></div>}
     {kind === 'video' && <div className="video-layout">{media ? <video controls playsInline src={media}/> : <div className="video-empty"><span className="orb"/><p>El audiovisual todavía no tiene un asset publicado. LUMEN no lo finge.</p></div>}<div><p className="eyebrow">AUDIOVISUAL</p><h1>{help.title}</h1><p>{help.summary}</p><button className="ghost" type="button" onClick={finish}>Terminé</button></div></div>}
     {kind === 'external' && premium && <div className={`premium-external premium-${premium}`}>
-      <div className="premium-external-hero"><div><p className="eyebrow">{premium==='audio_practice'?'PRÁCTICA GUIADA · FUENTE ORIGINAL':premium==='contemplative_reading_audio'?'CONTEMPLACIÓN · FUENTE ORIGINAL':premium==='classic_reading'?'LECTURA PROFUNDA · OBRA ORIGINAL':premium==='video_or_audio_visual_sequence'?'PROFUNDIZACIÓN AUDIOVISUAL · FUENTE ORIGINAL':premium==='health_reference'?'COMPRENSIÓN SANITARIA · FUENTE ORIGINAL':'GUÍA ESENCIAL · FUENTE ORIGINAL'}</p><h1>{help.title}</h1><p>{help.summary}</p>{provider(help)&&<small>Fuente: {provider(help)}</small>}</div></div>
+      <div className="premium-external-hero"><div><p className="eyebrow">{premiumEyebrow || (premium==='audio_practice'?'PRÁCTICA GUIADA · FUENTE ORIGINAL':premium==='contemplative_reading_audio'?'CONTEMPLACIÓN · FUENTE ORIGINAL':premium==='classic_reading'?'LECTURA PROFUNDA · OBRA ORIGINAL':premium==='video_or_audio_visual_sequence'?'PROFUNDIZACIÓN AUDIOVISUAL · FUENTE ORIGINAL':premium==='health_reference'?'COMPRENSIÓN SANITARIA · FUENTE ORIGINAL':'GUÍA ESENCIAL · FUENTE ORIGINAL')}</p><h1>{help.title}</h1><p>{premiumDeck || help.summary}</p>{provider(help)&&<small>Fuente: {provider(help)}</small>}</div></div>
       <div className="premium-external-body">
-        <aside><span className="orb tiny"/><b>LUMEN</b><p>{premium==='health_reference'?'Información sanitaria para comprender mejor y reconocer cuándo conviene pedir ayuda.':premium==='classic_reading'?'Una obra para entrar en perspectiva sin convertirla en receta.':premium==='video_or_audio_visual_sequence'?'Una profundización para comprender cómo cuerpo, respiración y cerebro se relacionan.':premium.includes('audio')?'Una práctica para vivir en su fuente, con LUMEN acompañando sólo el umbral y el regreso.':'Una pieza de referencia para comprender y después volver a tu propia vida.'}</p></aside>
-        <article><p className="media-boundary">Esta pieza conserva su identidad y autoría. LUMEN contextualiza; no sustituye ni reescribe la fuente.</p><div className="button-row">{destination&&<a className="primary as-link" href={destination} target="_blank" rel="noreferrer">{premium==='video_or_audio_visual_sequence'?'Ver en su fuente ↗':premium.includes('audio')?'Escuchar en su fuente ↗':'Abrir en su fuente ↗'}</a>}<button className="ghost" type="button" onClick={finish}>Volver a la constelación</button></div></article>
+        <aside><span className="orb tiny"/><b>LUMEN · CONTEXTO</b><p>{help.summary}</p></aside>
+        <article>{premiumFind.length>0&&<div className="premium-find"><small>QUÉ VAS A ENCONTRAR</small>{premiumFind.map((item)=><span key={item}>{item}</span>)}</div>}<p className="media-boundary">Esta pieza conserva su identidad y autoría. LUMEN contextualiza; no sustituye ni reescribe la fuente.</p>{premiumAfter&&<blockquote>{premiumAfter}</blockquote>}<div className="button-row">{destination&&<a className="primary as-link" href={destination} target="_blank" rel="noreferrer">{premiumCta ? `${premiumCta} ↗` : premium==='video_or_audio_visual_sequence'?'Ver en su fuente ↗':premium.includes('audio')?'Escuchar en su fuente ↗':'Abrir en su fuente ↗'}</a>}<button className="ghost" type="button" onClick={finish}>Volver a la constelación</button></div></article>
       </div>
     </div>}
     {kind === 'external' && !premium && <div className="experience-center"><p className="eyebrow">OBRA / RECURSO EXTERNO</p><h1>{help.title}</h1><p>{help.summary}</p>{provider(help) && <small className="source-line">Fuente: {provider(help)}</small>}<p className="media-boundary">LUMEN te acompaña hasta la puerta; la obra sigue siendo de su fuente.</p><div className="button-row center">{destination && <a className="primary as-link" href={destination} target="_blank" rel="noreferrer">Abrir en su fuente ↗</a>}<button className="ghost" type="button" onClick={finish}>Volver a LUMEN</button></div></div>}
