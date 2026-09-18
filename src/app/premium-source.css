@@ -90,3 +90,8 @@
 .explore-view.constellation-open .capability-heading,
 .explore-view.constellation-open .faro-large-grid{display:none}
 .explore-view.constellation-open .explore-toolbar{margin-bottom:24px}
+
+.premium-find{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 26px}
+.premium-find small{width:100%;font-size:.68rem;letter-spacing:.14em;color:#7d806f;margin-bottom:3px}
+.premium-find span{border:1px solid rgba(79,87,65,.16);border-radius:999px;padding:8px 12px;font-size:.82rem;color:#596052;background:rgba(255,252,247,.68)}
+.premium-external-body blockquote{margin:28px 0;padding:0 0 0 22px;border-left:2px solid rgba(132,113,67,.28);font-family:"Cormorant Garamond",Georgia,serif;font-size:1.45rem;line-height:1.2;color:#46503e}
