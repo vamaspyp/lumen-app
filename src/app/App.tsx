@@ -187,11 +187,12 @@ function Profile({ authenticated,profile }: { authenticated: boolean; profile:Vi
 function HomeHero({ expression, setExpression, submit, busy, authenticated,profile }: { expression: string; setExpression: (value: string) => void; submit: () => void; busy: boolean; authenticated: boolean; profile:ViewerProfile|null }) {
   const chips = ['Necesito calma','Quiero claridad','Me siento abrumada','Quiero explorar','Solo quiero estar']
   return <section className="hero" style={{ backgroundImage: `linear-gradient(90deg,rgba(255,252,247,.18),rgba(255,252,247,.02)),url(${IMG.hero})` }}>
+    <div className="hero-brand">LUMEN</div>
     <Profile authenticated={authenticated} profile={profile}/>
     <div className="hero-copy">
-      <p>Hola.</p>
+      <p>TU MOMENTO · AHORA</p>
       <h1>¿Cómo estás hoy?</h1>
-      <h2>Un lugar para pausar, comprender<br/>y encontrar lo que puede ayudarte ahora.</h2>
+      <h2>Un lugar para pausar, comprender y encontrar lo que puede ayudarte ahora.</h2>
       <form className="moment-bar" onSubmit={(event) => { event.preventDefault(); submit() }}>
         <span className="moment-leaf"><Icon name="leaf"/></span>
         <input aria-label="Lo que te está pasando" value={expression} onChange={(event) => setExpression(event.target.value)} placeholder="Contame qué está presente en tu vida..."/>
@@ -199,7 +200,7 @@ function HomeHero({ expression, setExpression, submit, busy, authenticated,profi
       </form>
       <div className="moment-chips">{chips.map((chip) => <button type="button" key={chip} onClick={() => setExpression(chip)}>{chip}</button>)}</div>
     </div>
-    <aside className="hero-note"><em>“No estás sola.<br/>Estás en camino.”</em><span>LUMEN</span></aside>
+    <aside className="hero-note"><em>Un momento más calmo también es una forma de avanzar.</em><span>—</span></aside>
   </section>
 }
 
@@ -261,19 +262,22 @@ function resourceProvider(item: ExperienceHelp): string | null {
 function ResourceCard({ item,index,authenticated,onOpen,onSave,contextLabel,extraAction,openLabel='Vivir esta posibilidad' }: { item:ExperienceHelp; index:number; authenticated:boolean; onOpen:(item:ExperienceHelp)=>void; onSave?:(item:SourceItem)=>Promise<void>; contextLabel?:string; extraAction?:ReactNode; openLabel?:string }) {
   const roles = resourceRoles(item)
   const provider = resourceProvider(item)
-  return <article className={`source-card${isSourceItem(item)&&premiumFamily(item)?' premium-source-card':''}`}>
+  const familyLabel = isSourceItem(item)&&premiumFamily(item) ? premiumFamilyLabel(item) : item.help_type.replaceAll('_',' ')
+  const eyebrow = [provider || familyLabel, item.duration_minutes ? `${item.duration_minutes} MIN` : null].filter(Boolean).join(' · ')
+  const tags = Array.from(new Set([...roles.map((role)=>ROLE_LABEL[role]||role), ...(item.energy?[item.energy.replaceAll('_',' ')]:[])])).slice(0,3)
+  return <article className={`source-card premium-card${isSourceItem(item)&&premiumFamily(item)?' premium-source-card':''}`}>
     <img src={resourceImage(item,index)} alt=""/>
-    <div>
-      <p className="eyebrow">{contextLabel || (isSourceItem(item)&&premiumFamily(item)?premiumFamilyLabel(item):item.help_type.replaceAll('_',' '))}</p>
+    <div className="source-card-copy">
+      <p className="eyebrow">{eyebrow}</p>
       <h3>{item.title}</h3>
-      <p>{item.summary}</p>
-      <div className="source-meta">{provider&&<span>{provider}</span>}{item.duration_minutes&&<span>{item.duration_minutes} min</span>}{item.energy&&<span>{item.energy}</span>}</div>
-      {roles.length?<div className="tiny-chips">{roles.map((role)=><span key={role}>{ROLE_LABEL[role]||role}</span>)}</div>:null}
-      <div className="card-actions">
-        <button className="primary small" type="button" onClick={()=>onOpen(item)}>{openLabel}</button>
-        {authenticated&&onSave&&isSourceItem(item)&&<button className="ghost small" type="button" onClick={()=>void onSave(item)}>Conservar para mí</button>}
-        {extraAction}
-      </div>
+      <p className="source-summary">{item.summary}</p>
+      {tags.length?<div className="tiny-chips">{tags.map((tag)=><span key={tag}>{tag}</span>)}</div>:null}
+      {contextLabel&&<small className="card-context">{contextLabel}</small>}
+      {extraAction&&<div className="card-extra">{extraAction}</div>}
+    </div>
+    <div className="card-edge-actions">
+      <button className="card-open" type="button" onClick={()=>onOpen(item)} aria-label={openLabel}><Icon name="arrow"/></button>
+      {authenticated&&onSave&&isSourceItem(item)&&<button className="card-save" type="button" onClick={()=>void onSave(item)} aria-label="Conservar para mí"><Icon name="heart"/></button>}
     </div>
   </article>
 }
@@ -388,7 +392,20 @@ function LifeView({ snapshot,proactivity,taxonomy,source,entries,circles,refresh
 }
 
 function SpaceHero({ kicker,title,text,image }: { kicker:string; title:string; text:string; image:string }) {
-  return <header className="space-hero" style={{backgroundImage:`linear-gradient(90deg,rgba(255,252,247,.98),rgba(255,252,247,.40)),url(${image})`}}><div><p>{kicker}</p><h1>{title}</h1><span>{text}</span></div></header>
+  const identity = kicker==='EXPLORAR'||kicker==='BUSCAR' ? 'FUENTE' : kicker
+  const notes:Record<string,string> = {
+    'FUENTE':'Explorar también es una forma de cuidarte.',
+    'MI VIDA':'También aquí, en lo cotidiano, hay un lugar para volver a ti.',
+    'SANTUARIO':'Conservar lo que importa también es una forma de cuidarte.',
+    'TEJIDO':'Compartir también es una forma de cuidar.',
+    'NOTIFICACIONES':'Volver sólo cuando lo elegís.',
+    'AJUSTES':'Una vida más tuya también se construye con límites claros.',
+  }
+  return <header className="space-hero" style={{backgroundImage:`url(${image})`}}>
+    <div className="space-brand">LUMEN · {identity}</div>
+    <aside className="space-hero-note"><em>{notes[identity]||notes[kicker]||'Una vida más tuya.'}</em><span>—</span></aside>
+    <div className="space-hero-copy"><p>{kicker}</p><h1>{title}</h1><span>{text}</span></div>
+  </header>
 }
 
 function ExploreView({ source,taxonomy,snapshot,authenticated,onOpen,onSave,returnConstellationKey,onReturnConstellationChange }: { source:SourceItem[]; taxonomy:SourceTaxonomy|null; snapshot:ContinuitySnapshot|null; authenticated:boolean; onOpen:(item:SourceItem)=>void; onSave:(item:SourceItem)=>Promise<void>; returnConstellationKey:string|null; onReturnConstellationChange:(key:string|null)=>void }) {
