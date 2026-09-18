@@ -975,3 +975,160 @@ a{color:inherit}
   .premium-editorial{width:calc(100vw - 34px)!important;padding:34px 0 72px!important}
   .premium-editorial header h2{font-size:31px}
 }
+
+
+/* A63 · Sovereign interpretation → capacities → constellation → Faro */
+.moment-interpretation{
+  margin:10px 0 26px;
+  padding:26px 28px;
+  border:1px solid var(--premium-line);
+  border-radius:22px;
+  background:
+    linear-gradient(135deg,rgba(247,241,229,.88),rgba(255,253,248,.94));
+  box-shadow:var(--premium-shadow-soft);
+}
+.moment-interpretation>blockquote{
+  margin:8px 0 18px;
+  max-width:900px;
+  font-family:var(--serif);
+  font-size:clamp(28px,3.5vw,44px);
+  line-height:1.04;
+  font-style:italic;
+  color:#334239;
+}
+.interpretation-capabilities>small{
+  display:block;
+  margin-bottom:10px;
+  color:#68716d;
+  font-size:11px;
+  line-height:1.45;
+}
+.moment-interpretation details{
+  margin-top:14px;
+  border-top:1px solid var(--premium-line);
+  padding-top:12px;
+}
+.moment-interpretation summary{
+  cursor:pointer;
+  color:#425348;
+  font-size:11px;
+  font-weight:600;
+}
+.reexpression-editor{
+  display:grid;
+  gap:10px;
+  padding-top:12px;
+}
+.reexpression-editor textarea{
+  width:100%;
+  min-height:94px;
+  resize:vertical;
+  padding:14px 16px;
+  border:1px solid var(--premium-line);
+  border-radius:16px;
+  background:rgba(255,253,248,.86);
+  color:#25302b;
+  font-family:var(--serif);
+  font-size:20px;
+  line-height:1.25;
+}
+.reexpression-editor p{
+  margin:0;
+  max-width:720px;
+  color:#727870;
+  font-size:11px;
+  line-height:1.5;
+}
+
+.capacity-tags{
+  margin-top:8px!important;
+}
+.capacity-tags span{
+  background:#e5e6da!important;
+  color:#34483b!important;
+  font-weight:600;
+}
+.secondary-tags{
+  margin-top:6px!important;
+  opacity:.88;
+}
+.faro-proposal h2{
+  margin:6px 0 8px;
+  font-family:var(--serif);
+  font-size:clamp(30px,3.6vw,44px);
+  font-weight:400;
+  line-height:1.02;
+}
+.faro-selection-summary{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  gap:8px 14px;
+  margin:14px 0 18px;
+  padding:12px 14px;
+  border-radius:14px;
+  background:rgba(255,253,248,.58);
+  border:1px solid rgba(79,87,65,.08);
+}
+.faro-selection-summary span{
+  color:#3f5145;
+  font-weight:600;
+  font-size:11px;
+}
+.faro-selection-summary small{
+  color:#747a73;
+  font-size:10px;
+}
+.faro-saved .button-row{
+  margin-top:14px;
+}
+
+/* Path composer makes cross-organ editing visibly first-class. */
+.path-composer>details{
+  margin-top:14px;
+  border-top:1px solid var(--premium-line);
+  padding-top:13px;
+}
+.path-composer>details>summary{
+  font-size:11px!important;
+  letter-spacing:.02em;
+}
+.path-source-grid{
+  margin-top:14px!important;
+}
+.path-source-grid label{
+  border:1px solid rgba(79,87,65,.08);
+  border-radius:16px;
+  padding:12px;
+  background:rgba(255,253,248,.55);
+}
+.path-source-grid label::first-line{
+  font-weight:600;
+}
+.path-source-grid select,.path-source-grid input{
+  border-radius:12px!important;
+  border:1px solid var(--premium-line)!important;
+  background:#faf7f0!important;
+}
+
+/* Capability tags remain visible before secondary metadata on compact cards. */
+@media(max-width:760px){
+  .moment-interpretation{
+    padding:20px 18px;
+    border-radius:18px;
+  }
+  .moment-interpretation>blockquote{font-size:30px}
+  .reexpression-editor textarea{font-size:18px}
+  .capacity-tags{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    max-height:54px;
+    overflow:hidden;
+  }
+  .capacity-tags span{
+    font-size:7.5px!important;
+    padding:0 7px!important;
+  }
+  .secondary-tags{display:none!important}
+  .faro-selection-summary{align-items:flex-start;flex-direction:column}
+}
