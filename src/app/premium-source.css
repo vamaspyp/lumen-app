@@ -37,7 +37,9 @@
 
 .organism-bridges{margin:46px 0 34px}
 .bridge-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
-.bridge-grid article{padding:22px;border-radius:20px;border:1px solid rgba(79,87,65,.14);background:rgba(255,252,247,.72)}
+.bridge-grid article,.bridge-grid .bridge-card{padding:22px;border-radius:20px;border:1px solid rgba(79,87,65,.14);background:rgba(255,252,247,.72);text-align:left;color:inherit}
+.bridge-grid .bridge-card{font:inherit;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.bridge-grid .bridge-card:hover{transform:translateY(-2px);border-color:rgba(79,87,65,.26);box-shadow:0 12px 30px rgba(23,31,24,.07)}
 .bridge-grid small{display:block;font-size:.7rem;letter-spacing:.12em;color:#7b7e69;margin-bottom:.5rem}
 .bridge-grid b{display:block;font-family:"Cormorant Garamond",Georgia,serif;font-size:1.45rem;line-height:1.05;color:#2e3b2c}
 .bridge-grid p{margin:.6rem 0 0;color:#65695b;font-size:.92rem}
