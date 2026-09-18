@@ -1,0 +1,353 @@
+/* LUMEN PREMIUM v2.1 — canonical acceptance layer
+   Presentation only. Loaded last. No business, data or backend contract is changed. */
+:root{
+  --l21-marfil:#FAF8F3;
+  --l21-arena:#EAE4D7;
+  --l21-salvia:#A7B096;
+  --l21-oliva:#55624A;
+  --l21-humo:#6B6B68;
+  --l21-oro:#DCC9A3;
+  --l21-paper:#FFFDF9;
+  --l21-ink:#252722;
+  --l21-line:rgba(85,98,74,.13);
+  --p-ivory:var(--l21-marfil);
+  --p-paper:var(--l21-paper);
+  --p-olive:var(--l21-oliva);
+  --p-muted:var(--l21-humo);
+  --p-soft:#F0EDE5;
+  --p-line:var(--l21-line);
+
+  /* Warm photographic vocabulary from the approved Premium field. */
+  --visual-woman:url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=1800&q=88');
+  --visual-journal:url('https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1200&q=88');
+  --visual-landscape:url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1400&q=88');
+  --visual-feet:url('https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=88');
+  --visual-cushion:url('https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=88');
+  --visual-mat:url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=1400&q=88');
+  --visual-community:url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1400&q=88');
+  --visual-hands:url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1400&q=88');
+}
+
+html,body,#root{background:var(--l21-marfil)!important}
+body{color:var(--l21-ink)!important}
+.lumen-field{background:
+  radial-gradient(circle at 80% 4%,rgba(220,201,163,.13),transparent 22rem),
+  var(--l21-marfil)!important}
+
+/* Quiet, editorial chrome. */
+.field-chrome{
+  height:72px!important;
+  background:rgba(250,248,243,.90)!important;
+  border-bottom:1px solid rgba(85,98,74,.055)!important;
+  backdrop-filter:blur(18px)!important;
+}
+.field-brand{
+  color:#20231f!important;
+  font-size:15px!important;
+  font-weight:600!important;
+  letter-spacing:.34em!important;
+  padding-left:.34em!important;
+}
+.field-auth{color:#626760!important;font-size:12px!important}
+.field-scene{width:min(1100px,calc(100% - 48px))!important}
+.field-scene h1,.section-title,.possibility-preview h3,.premium-detail-hero h1,
+.premium-what h2,.premium-source-card strong,.sanctuary-card h3,.circle h3{
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-weight:400!important;
+}
+.field-eyebrow,.experience-eyebrow,.possibility-kicker{
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif!important;
+  letter-spacing:.20em!important;
+  text-transform:uppercase!important;
+}
+.field-panel,.sanctuary-card,.circle,.repertoire-item{
+  background:rgba(255,253,249,.94)!important;
+  border:1px solid var(--l21-line)!important;
+  box-shadow:0 10px 30px rgba(61,52,39,.055)!important;
+}
+
+/* Canonical visible navigation: one material, one icon language, five destinations. */
+.premium-nav{
+  width:min(960px,100%)!important;
+  height:78px!important;
+  background:rgba(255,253,249,.96)!important;
+  border:1px solid rgba(85,98,74,.11)!important;
+  border-bottom:0!important;
+  border-radius:26px 26px 0 0!important;
+  box-shadow:0 -10px 32px rgba(61,52,39,.05)!important;
+}
+.premium-nav button{
+  color:#71766f!important;
+  gap:5px!important;
+  font-size:12px!important;
+  font-weight:450!important;
+}
+.premium-nav button.active{color:#354338!important;font-weight:650!important}
+.premium-nav svg{width:25px!important;height:25px!important;stroke-width:1.45!important}
+
+/* INICIO — same warm human field as the approved Premium home without inventing data. */
+.now-scene.now-home{
+  width:min(960px,100%)!important;
+  min-height:calc(100svh - 72px)!important;
+  padding:clamp(210px,38vh,390px) 30px 138px!important;
+  border-radius:0 0 30px 30px!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+  justify-content:flex-end!important;
+}
+.now-scene.now-home::before{
+  content:""!important;
+  position:absolute!important;
+  z-index:-2!important;
+  inset:0!important;
+  background:
+    linear-gradient(180deg,rgba(18,21,18,.10) 0%,rgba(18,21,18,.14) 32%,rgba(18,21,18,.68) 76%,rgba(22,24,20,.78) 100%),
+    var(--visual-woman) center 34%/cover no-repeat!important;
+  filter:saturate(.78) sepia(.055)!important;
+}
+.now-scene.now-home::after{
+  content:""!important;
+  position:absolute!important;
+  z-index:-1!important;
+  inset:auto 0 0!important;
+  height:40%!important;
+  background:linear-gradient(180deg,transparent,rgba(20,23,19,.28))!important;
+  pointer-events:none!important;
+}
+.now-scene.now-home .presence-orb{
+  width:70px!important;height:70px!important;
+  margin-bottom:24px!important;
+  background:radial-gradient(circle at 36% 30%,#fff9ea 0 10%,#ead8b1 34%,#d0ab70 68%,#af7f3d 100%)!important;
+  box-shadow:0 0 46px rgba(235,205,155,.34),0 0 0 12px rgba(255,248,230,.09)!important;
+}
+.now-scene.now-home .field-eyebrow,
+.now-scene.now-home h1,
+.now-scene.now-home>.field-copy{color:#fff!important;text-shadow:0 1px 14px rgba(0,0,0,.12)}
+.now-scene.now-home h1{font-size:clamp(48px,8vw,72px)!important;line-height:.98!important}
+.now-scene.now-home>.field-copy{max-width:560px!important;font-size:18px!important;line-height:1.45!important}
+.now-scene.now-home .moment-box{
+  width:min(610px,100%)!important;
+  background:rgba(255,253,249,.95)!important;
+  border:1px solid rgba(255,255,255,.72)!important;
+  border-radius:22px!important;
+  box-shadow:0 16px 44px rgba(24,22,17,.18)!important;
+}
+.now-scene.now-home .moment-box textarea{color:#343832!important}
+.now-scene.now-home .privacy-soft{color:rgba(255,255,255,.75)!important}
+
+/* EXPLORAR — editorial page, not a giant photographic billboard. */
+.source-intro{
+  min-height:0!important;
+  margin:0 0 24px!important;
+  padding:20px 0 22px!important;
+  display:grid!important;
+  grid-template-columns:1.2fr .8fr!important;
+  gap:34px!important;
+  align-items:end!important;
+  overflow:visible!important;
+  background:none!important;
+  border-radius:0!important;
+}
+.source-intro::before{
+  content:""!important;
+  display:none!important;
+}
+.source-intro .field-eyebrow{color:#596259!important}
+.source-intro h1{
+  color:#171a17!important;
+  font-size:clamp(58px,8vw,92px)!important;
+  line-height:.94!important;
+  margin:4px 0 10px!important;
+  max-width:none!important;
+}
+.source-intro .field-copy{
+  color:#656b65!important;
+  font-size:20px!important;
+  line-height:1.35!important;
+  max-width:620px!important;
+}
+.source-controls{
+  background:rgba(255,253,249,.82)!important;
+  border:1px solid var(--l21-line)!important;
+  border-radius:22px!important;
+  padding:14px!important;
+  box-shadow:0 10px 30px rgba(61,52,39,.045)!important;
+}
+.source-controls label{color:#676d67!important;font-size:11px!important}
+.source-controls select{
+  background:#F7F4ED!important;
+  border:1px solid rgba(85,98,74,.12)!important;
+  color:#3e443f!important;
+}
+.constellation-note{background:#F1EEE6!important;border:1px solid rgba(85,98,74,.07)!important}
+
+/* RESOURCE CARD — canonical horizontal anatomy on every viewport. */
+.possibility-grid{gap:13px!important}
+.possibility-preview{
+  grid-template-columns:minmax(190px,36%) 1fr!important;
+  border-radius:18px!important;
+  background:rgba(255,253,249,.97)!important;
+  border:1px solid rgba(85,98,74,.10)!important;
+  box-shadow:0 8px 25px rgba(61,52,39,.045)!important;
+}
+.possibility-visual{
+  min-height:205px!important;
+  background-image:var(--premium-visual)!important;
+  background-size:cover!important;
+  background-position:center!important;
+  filter:saturate(.84) sepia(.035)!important;
+}
+.possibility-visual::after{min-height:205px!important;background:linear-gradient(135deg,rgba(255,248,236,.04),transparent 58%)!important}
+.possibility-content{padding:19px 22px 16px!important}
+.possibility-kicker{font-size:10px!important;color:#556159!important}
+.possibility-preview h3{
+  color:#22251f!important;
+  font-size:clamp(25px,3vw,36px)!important;
+  line-height:1.02!important;
+  margin:8px 0 6px!important;
+}
+.possibility-preview p{
+  color:#666c66!important;
+  font-size:14px!important;
+  line-height:1.38!important;
+  margin-bottom:10px!important;
+}
+.role-line{margin:3px 0 6px!important}
+.role-line span{
+  background:#F0EEE7!important;
+  color:#60665f!important;
+  border-radius:999px!important;
+  padding:5px 10px!important;
+  font-size:10px!important;
+}
+.possibility-foot{padding-top:8px!important}
+.possibility-foot .field-link{
+  width:44px!important;height:44px!important;
+  border:1px solid rgba(85,98,74,.24)!important;
+  background:rgba(255,253,249,.82)!important;
+}
+.possibility-foot .field-link::after{content:"›"!important;color:#39473c!important}
+
+/* DETAILS / PLAYERS — one editorial family, format-specific body only. */
+.experience-fullscreen{background:var(--l21-marfil)!important}
+.premium-detail-hero{
+  min-height:530px!important;
+  border-radius:0 0 28px 28px!important;
+  background-image:
+    linear-gradient(90deg,rgba(18,22,18,.72),rgba(18,22,18,.22) 68%,rgba(18,22,18,.06)),
+    var(--premium-visual)!important;
+  filter:saturate(.92)!important;
+}
+.premium-detail-hero h1{font-size:clamp(50px,7vw,82px)!important}
+.editorial-body,.external-premium-body,.practice-premium-body,.media-premium-body{
+  width:min(860px,calc(100% - 48px))!important;
+}
+.premium-source-card,.premium-after-card,.editorial-prompts{
+  background:#F0EDE5!important;
+  border:1px solid rgba(85,98,74,.07)!important;
+}
+.field-primary{background:var(--l21-oliva)!important;border-color:var(--l21-oliva)!important}
+.experience-close{background:rgba(255,253,249,.90)!important;color:#354137!important}
+
+/* MI PROCESO / COMUNIDAD / SANTUARIO — same cards and editorial rhythm, no dashboard grammar. */
+.territory-side .field-eyebrow,
+.field-scene>.field-eyebrow{color:#596259!important}
+.territory-side h1{font-size:clamp(42px,5vw,62px)!important}
+.sky{
+  border:1px solid rgba(85,98,74,.09)!important;
+  background:
+    radial-gradient(circle at 72% 16%,rgba(220,201,163,.22),transparent 13rem),
+    linear-gradient(155deg,#F0F1E9,#E9E4D9)!important;
+  box-shadow:0 12px 36px rgba(61,52,39,.05)!important;
+}
+.sanctuary-card,.circle,.repertoire-item{border-radius:20px!important}
+.circle h3,.sanctuary-card h3{color:#2e342e!important}
+.success-field{color:#586b59!important}
+
+/* LUMI signature stays available without becoming a floating UI toy. */
+.presence-orb{
+  background:radial-gradient(circle at 35% 30%,#FFF9EA,#E9D7AD 34%,#D1AB6F 68%,#B38346 100%)!important;
+  box-shadow:0 0 42px rgba(220,201,163,.40),0 0 0 15px rgba(220,201,163,.08)!important;
+}
+
+@media(max-width:820px){
+  body{padding-bottom:72px!important}
+  .field-chrome{height:60px!important;padding-inline:18px!important}
+  .field-brand{font-size:13px!important}
+  .field-auth{font-size:0!important;width:32px!important;height:32px!important;border:1px solid rgba(85,98,74,.25)!important;border-radius:50%!important}
+  .field-auth::before{content:"○";font-size:22px!important;color:#3f4841!important;line-height:1!important}
+
+  .field-scene{width:min(100% - 30px,960px)!important;padding:42px 0 98px!important}
+  .field-scene.narrow{width:min(100% - 30px,760px)!important}
+
+  .premium-nav{
+    width:100%!important;height:72px!important;border-radius:22px 22px 0 0!important;
+  }
+  .premium-nav button{font-size:10.5px!important}
+  .premium-nav svg{width:24px!important;height:24px!important}
+
+  .now-scene.now-home{
+    width:100%!important;
+    min-height:calc(100svh - 60px)!important;
+    padding:230px 22px 110px!important;
+    border-radius:0 0 26px 26px!important;
+  }
+  .now-scene.now-home h1{font-size:55px!important}
+  .now-scene.now-home>.field-copy{font-size:16px!important}
+
+  .source-intro{
+    grid-template-columns:1fr!important;
+    gap:18px!important;
+    padding-top:10px!important;
+  }
+  .source-intro h1{font-size:66px!important}
+  .source-intro .field-copy{font-size:18px!important}
+  .source-controls{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:8px!important}
+
+  .possibility-preview{
+    grid-template-columns:35% 1fr!important;
+    min-height:165px!important;
+    border-radius:16px!important;
+  }
+  .possibility-visual{min-height:165px!important}
+  .possibility-visual::after{min-height:165px!important}
+  .possibility-content{padding:13px 14px 12px!important}
+  .possibility-kicker{font-size:8px!important;letter-spacing:.15em!important;gap:5px!important}
+  .possibility-preview h3{font-size:22px!important;line-height:1.02!important;margin:6px 0 4px!important}
+  .possibility-preview p{
+    font-size:12px!important;line-height:1.25!important;
+    display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important;
+  }
+  .role-line{max-height:24px!important;overflow:hidden!important}
+  .role-line span{font-size:9px!important;padding:4px 8px!important}
+  .possibility-foot{padding-top:5px!important}
+  .possibility-foot>span{display:none!important}
+  .possibility-foot .field-link{width:36px!important;height:36px!important}
+
+  .premium-detail-hero{min-height:470px!important;padding:140px 24px 34px!important}
+  .premium-detail-hero h1{font-size:50px!important}
+  .premium-detail-hero p:last-child{font-size:16px!important}
+  .editorial-body,.external-premium-body,.practice-premium-body,.media-premium-body{width:calc(100% - 34px)!important}
+  .editorial-body p{font-size:19px!important}
+
+  .territory-layout{grid-template-columns:1fr!important}
+  .territory-side{position:static!important}
+}
+
+@media(max-width:560px){
+  .source-controls{grid-template-columns:1fr!important}
+  .source-intro h1{font-size:58px!important}
+  /* Canonical Premium cards remain horizontal on phone. */
+  .possibility-preview{grid-template-columns:36% 1fr!important}
+  .possibility-visual{min-height:158px!important}
+  .possibility-visual::after{min-height:158px!important}
+  .possibility-preview h3{font-size:20px!important}
+  .possibility-preview p{font-size:11.5px!important}
+  .role-line span:nth-child(n+3){display:none!important}
+  .premium-detail-hero{min-height:445px!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .presence-orb{animation:none!important}
+  .possibility-preview,.circle,.sanctuary-card,.repertoire-item{transition:none!important}
+}
