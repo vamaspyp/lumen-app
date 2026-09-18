@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import type { CSSProperties } from 'react'
 import type { HelpPossibility } from './greenfield/application/s1'
 import type { SourceItem } from './greenfield/application/embryo'
 
@@ -54,6 +55,45 @@ function imageUrl(help: ExperientialHelp): string | null {
   return stringValue(content.image_url) ?? stringValue(content.hero_image) ?? stringValue(content.poster_url)
 }
 
+function wrapperOf(help: ExperientialHelp): Record<string, unknown> {
+  const wrapper = contentOf(help).lumen_wrapper
+  return wrapper && typeof wrapper === 'object' ? wrapper as Record<string, unknown> : {}
+}
+
+function canonicalCodeOf(help: ExperientialHelp): string {
+  return 'canonical_code' in help && typeof help.canonical_code === 'string' ? help.canonical_code : ''
+}
+
+type PremiumVisual = 'woman' | 'journal' | 'landscape' | 'feet' | 'cushion' | 'mat' | 'community' | 'hands'
+
+function premiumVisualKey(help: ExperientialHelp): PremiumVisual {
+  const code = canonicalCodeOf(help).toLowerCase()
+  const title = help.title.toLowerCase()
+  const provider = (providerOf(help) ?? '').toLowerCase()
+  if (code.includes('ground') || code.includes('feet') || title.includes('pies en la tierra')) return 'feet'
+  if (code.includes('plum') || provider.includes('plum village') || title.includes('respiración consciente')) return 'cushion'
+  if (code.includes('kabat') || title.includes('escaneo corporal')) return 'mat'
+  if (code.includes('marcus') || code.includes('meditations') || title.includes('meditaciones')) return 'journal'
+  if (code.includes('bbva') || code.includes('video') || title.includes('5%') || resolveExperienceKind(help) === 'video') return 'landscape'
+  if (resolveExperienceKind(help) === 'gathering' || resolveExperienceKind(help) === 'human' || resolveExperienceKind(help) === 'dialogue') return 'community'
+  if (resolveExperienceKind(help) === 'practice' || resolveExperienceKind(help) === 'audio') return 'hands'
+  if (resolveExperienceKind(help) === 'editorial' || resolveExperienceKind(help) === 'external') return 'journal'
+  return 'woman'
+}
+
+function premiumVisualStyle(help: ExperientialHelp): CSSProperties {
+  const direct = imageUrl(help)
+  return ({ '--premium-visual': direct ? `url("${direct}")` : `var(--visual-${premiumVisualKey(help)})` } as CSSProperties)
+}
+
+function premiumEyebrow(help: ExperientialHelp, fallback: string): string {
+  return stringValue(wrapperOf(help).eyebrow) ?? fallback
+}
+
+function premiumDeck(help: ExperientialHelp): string {
+  return stringValue(wrapperOf(help).deck) ?? help.summary
+}
+
 export function resolveExperienceKind(help: ExperientialHelp): ExperienceKind {
   const type = help.help_type.toLowerCase().replace(/[-\s]+/g, '_')
   const content = contentOf(help)
@@ -97,14 +137,17 @@ export function PossibilityPreview({ help, onOpen, compact = false }: { help: Ex
   const provider = providerOf(help)
   const roles = 'cultivation_roles' in help ? help.cultivation_roles ?? [] : []
   return (
-    <article className={`possibility-preview kind-${kind} ${compact ? 'compact' : ''}`}>
-      <div className="possibility-kicker"><span>{KIND_LABEL[kind]}</span>{help.duration_minutes ? <span>{help.duration_minutes} min</span> : null}</div>
-      <h3>{help.title}</h3>
-      <p>{help.summary}</p>
-      {roles.length > 0 && <div className="role-line">{roles.slice(0, 3).map((role) => <span key={role}>{role.toLowerCase()}</span>)}</div>}
-      <div className="possibility-foot">
-        {provider && <span>{provider}</span>}
-        <button type="button" className="field-link" onClick={onOpen}>Vivir esta posibilidad →</button>
+    <article className={`possibility-preview kind-${kind} ${compact ? 'compact' : ''}`} style={premiumVisualStyle(help)}>
+      <div className="possibility-visual" aria-hidden="true" />
+      <div className="possibility-content">
+        <div className="possibility-kicker"><span>{KIND_LABEL[kind]}</span>{help.duration_minutes ? <span>{help.duration_minutes} min</span> : null}</div>
+        <h3>{help.title}</h3>
+        <p>{help.summary}</p>
+        {roles.length > 0 && <div className="role-line">{roles.slice(0, 3).map((role) => <span key={role}>{role.toLowerCase()}</span>)}</div>}
+        <div className="possibility-foot">
+          {provider && <span>{provider}</span>}
+          <button type="button" className="field-link" onClick={onOpen} aria-label={`Abrir ${help.title}`}>Vivir esta posibilidad →</button>
+        </div>
       </div>
     </article>
   )
@@ -114,7 +157,7 @@ function ExperienceChrome({ kind, help, onExit, children }: { kind: ExperienceKi
   return (
     <section className={`experience-fullscreen experience-${kind}`} aria-label={`${KIND_LABEL[kind]}: ${help.title}`}>
       <button className="experience-close" type="button" onClick={onExit} aria-label="Salir de la experiencia">×</button>
-      <div className="experience-presence"><span className="presence-seed" aria-hidden="true" /><span>LUMI · P1</span></div>
+      <div className="experience-presence"><span className="presence-seed" aria-hidden="true" /><span>LUMEN · FUENTE</span></div>
       {children}
     </section>
   )
@@ -128,7 +171,9 @@ function EditorialExperience({ help, onExit }: { help: ExperientialHelp; onExit:
   const quote = stringValue(content.quote) ?? stringValue(content.pull_quote) ?? stringValue(content.prompt)
   return (
     <ExperienceChrome kind="editorial" help={help} onExit={onExit}>
-      <div className="editorial-hero"><div><p className="experience-eyebrow">{providerOf(help) ?? 'LUMEN · perspectiva'}</p><h1>{help.title}</h1><p>{help.summary}</p></div></div>
+      <div className="premium-detail-hero" style={premiumVisualStyle(help)}>
+        <div><p className="experience-eyebrow">{premiumEyebrow(help, providerOf(help) ?? 'LECTURA EDITORIAL')}</p><h1>{help.title}</h1><p>{premiumDeck(help)}</p></div>
+      </div>
       <article className="editorial-body">
         {body.map((paragraph, index) => <p key={`${paragraph}-${index}`} className={index === 0 ? 'lede' : ''}>{paragraph}</p>)}
         {quote && <blockquote>{quote}</blockquote>}
@@ -147,14 +192,17 @@ function PracticeExperience({ help, onExit }: { help: ExperientialHelp; onExit: 
   return (
     <ExperienceChrome kind="practice" help={help} onExit={onExit}>
       <div className="practice-field">
-        <p className="experience-eyebrow">PRÁCTICA · {help.duration_minutes ? `${help.duration_minutes} min` : 'a tu ritmo'}</p>
-        <h1>{help.title}</h1>
-        <div className="practice-breath" aria-hidden="true" />
-        <p className="practice-step">{current}</p>
-        {steps.length > 1 && <div className="practice-progress" aria-label={`Paso ${step + 1} de ${steps.length}`}>{steps.map((_, index) => <i key={index} className={index <= step ? 'done' : ''} />)}</div>}
-        <div className="experience-actions">
-          {!complete && steps.length > 0 ? <button className="field-primary" type="button" onClick={() => setStep((value) => Math.min(value + 1, steps.length - 1))}>Seguir</button> : <button className="field-primary" type="button" onClick={onExit}>Volver cuando quieras</button>}
-          {step > 0 && <button className="field-ghost" type="button" onClick={() => setStep((value) => Math.max(0, value - 1))}>Atrás</button>}
+        <div className="premium-detail-hero" style={premiumVisualStyle(help)}>
+          <div><p className="experience-eyebrow">{premiumEyebrow(help, `PRÁCTICA GUIADA · ${help.duration_minutes ? `${help.duration_minutes} MIN` : 'A TU RITMO'}`)}</p><h1>{help.title}</h1><p>{premiumDeck(help)}</p></div>
+        </div>
+        <div className="practice-premium-body">
+          <p className="practice-step">{current}</p>
+          {steps.length > 1 && <div className="practice-progress" aria-label={`Paso ${step + 1} de ${steps.length}`}>{steps.map((_, index) => <i key={index} className={index <= step ? 'done' : ''} />)}</div>}
+          <div className="experience-actions">
+            {!complete && steps.length > 0 ? <button className="field-primary" type="button" onClick={() => setStep((value) => Math.min(value + 1, steps.length - 1))}>Siguiente</button> : <button className="field-primary" type="button" onClick={onExit}>Terminar</button>}
+            {step > 0 && <button className="field-ghost" type="button" onClick={() => setStep((value) => Math.max(0, value - 1))}>Atrás</button>}
+          </div>
+          {complete && <div className="premium-after-card">Quedate un instante con lo que cambió, aunque sea pequeño.</div>}
         </div>
       </div>
     </ExperienceChrome>
@@ -167,12 +215,15 @@ function AudioExperience({ help, onExit }: { help: ExperientialHelp; onExit: () 
   return (
     <ExperienceChrome kind="audio" help={help} onExit={onExit}>
       <div className="media-field audio-field">
-        <div className="audio-halo" aria-hidden="true"><span /><span /><span /></div>
-        <p className="experience-eyebrow">ESCUCHA · {help.duration_minutes ? `${help.duration_minutes} min` : 'sin apuro'}</p>
-        <h1>{help.title}</h1><p className="media-summary">{help.summary}</p>
-        {url ? <audio className="premium-audio" controls preload="metadata" src={url}>Tu navegador no puede reproducir este audio.</audio> : <p className="media-missing">Esta experiencia está preparada para audio, pero todavía no tiene un asset publicado. LUMEN no simula contenido inexistente.</p>}
-        {transcript.length > 0 && <details className="transcript"><summary>Leer transcripción</summary>{transcript.map((line) => <p key={line}>{line}</p>)}</details>}
-        <p className="offscreen-note">Podés cerrar los ojos. LUMI no necesita que mires la pantalla.</p>
+        <div className="premium-detail-hero" style={premiumVisualStyle(help)}>
+          <div><p className="experience-eyebrow">{premiumEyebrow(help, `PRÁCTICA GUIADA · ${help.duration_minutes ? `${help.duration_minutes} MIN` : 'A TU RITMO'}`)}</p><h1>{help.title}</h1><p>{premiumDeck(help)}</p></div>
+        </div>
+        <div className="media-premium-body">
+          <div className="audio-halo" aria-hidden="true"><span /><span /><span /></div>
+          {url ? <audio className="premium-audio" controls preload="metadata" src={url}>Tu navegador no puede reproducir este audio.</audio> : <p className="media-missing">El audio todavía no tiene un asset reproducible dentro de LUMEN. No simulamos contenido inexistente.</p>}
+          {transcript.length > 0 && <details className="transcript"><summary>Ver transcripción</summary>{transcript.map((line) => <p key={line}>{line}</p>)}</details>}
+          <p className="offscreen-note">Podés cerrar los ojos. LUMI no necesita que mires la pantalla.</p>
+        </div>
       </div>
     </ExperienceChrome>
   )
@@ -193,9 +244,24 @@ function VideoExperience({ help, onExit }: { help: ExperientialHelp; onExit: () 
 
 function ExternalExperience({ help, onExit }: { help: ExperientialHelp; onExit: () => void }) {
   const url = externalUrl(help)
+  const wrapper = wrapperOf(help)
+  const what = stringArray(wrapper.what_you_find)
+  const after = stringValue(wrapper.after_prompt)
+  const sourceLabel = stringValue(contentOf(help).source_label) ?? providerOf(help)
+  const cta = stringValue(contentOf(help).cta_label) ?? 'Abrir en su fuente'
   return (
     <ExperienceChrome kind="external" help={help} onExit={onExit}>
-      <div className="external-field"><p className="experience-eyebrow">OBRA / RECURSO EXTERNO</p><h1>{help.title}</h1><p>{help.summary}</p><p className="boundary-copy">{KIND_PROMISE.external}</p>{providerOf(help) && <p className="source-line">Fuente: {providerOf(help)}</p>}<div className="experience-actions">{url && <a className="field-primary as-link" href={url} target="_blank" rel="noreferrer">Abrir en su fuente ↗</a>}<button className="field-ghost" type="button" onClick={onExit}>Volver a LUMEN</button></div></div>
+      <div className="external-field">
+        <div className="premium-detail-hero" style={premiumVisualStyle(help)}>
+          <div><p className="experience-eyebrow">{premiumEyebrow(help, providerOf(help) ?? 'FUENTE EXTERNA')}</p><h1>{help.title}</h1><p>{premiumDeck(help)}</p></div>
+        </div>
+        <div className="external-premium-body">
+          {what.length > 0 && <section className="premium-what"><p className="field-eyebrow">QUÉ VAS A ENCONTRAR</p><h2>Qué vas a encontrar</h2><div className="premium-find-list">{what.map((item, index) => <div className="premium-find-item" key={item}><span className="premium-find-icon">{index + 1}</span><div><strong>{item}</strong><span>Una puerta concreta para llevar esta fuente a tu vida sin desvirtuarla.</span></div></div>)}</div></section>}
+          <div className="premium-source-card"><div><p className="field-eyebrow">FUENTE</p><strong>{sourceLabel ?? 'Procedencia explícita'}</strong><br/><span>{KIND_PROMISE.external}</span></div>{url && <a className="field-primary as-link" href={url} target="_blank" rel="noreferrer">{cta} ↗</a>}</div>
+          {after && <div className="premium-after-card">{after}</div>}
+          <div className="experience-actions"><button className="field-ghost" type="button" onClick={onExit}>Volver a LUMEN</button></div>
+        </div>
+      </div>
     </ExperienceChrome>
   )
 }
