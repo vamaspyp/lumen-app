@@ -80,7 +80,7 @@ const EMPTY_SOURCE_FILTERS: SourceFiltersState = {
 }
 
 const IMG = {
-  hero: 'https://images.unsplash.com/photo-1743437607612-b079eb62021d?auto=format&fit=crop&w=2200&q=90',
+  hero: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=2200&q=90',
   calm: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=1000&q=88',
   practice: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1000&q=88',
   journal: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1000&q=88',
