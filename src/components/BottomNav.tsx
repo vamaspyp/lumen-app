@@ -22,7 +22,7 @@ export function BottomNav({currentSource,dispatch}:{currentSource:string;dispatc
       onClick={()=>!i.disabled&&!on&&dispatch(i.action)}
       aria-current={on?'page':undefined}
       style={{border:0,background:'transparent',padding:'5px 2px 2px',minHeight:48,cursor:i.disabled?'default':on?'default':'pointer',
-        opacity:i.disabled?.42:1,color:on?tokens.accentDeep:tokens.textMuted,display:'flex',flexDirection:'column',gap:3,alignItems:'center',justifyContent:'center'}}>
+        opacity:i.disabled ? .42 : 1,color:on?tokens.accentDeep:tokens.textMuted,display:'flex',flexDirection:'column',gap:3,alignItems:'center',justifyContent:'center'}}>
       <span aria-hidden style={{fontSize:17,lineHeight:1,fontFamily:'Georgia,serif',transform:on?'scale(1.08)':'none'}}>{i.icon}</span>
       <span style={{fontSize:9.5,letterSpacing:'.01em',fontWeight:on?600:450,whiteSpace:'nowrap'}}>{i.label}</span>
       <span style={{width:on?14:0,height:1.5,borderRadius:9,background:tokens.accentDeep,transition:'width .2s ease'}}/>
