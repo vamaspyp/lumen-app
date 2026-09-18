@@ -153,7 +153,7 @@ export function PossibilityPreview({ help, onOpen, compact = false }: { help: Ex
   )
 }
 
-function ExperienceChromefunction ExperienceChrome({ kind, help, onExit, children }: { kind: ExperienceKind; help: ExperientialHelp; onExit: () => void; children: React.ReactNode }) {
+function ExperienceChrome({ kind, help, onExit, children }: { kind: ExperienceKind; help: ExperientialHelp; onExit: () => void; children: React.ReactNode }) {
   return (
     <section className={`experience-fullscreen experience-${kind}`} aria-label={`${KIND_LABEL[kind]}: ${help.title}`}>
       <button className="experience-close" type="button" onClick={onExit} aria-label="Salir de la experiencia">×</button>
@@ -229,7 +229,7 @@ function AudioExperience({ help, onExit }: { help: ExperientialHelp; onExit: () 
   )
 }
 
-function VideoExperiencefunction VideoExperience({ help, onExit }: { help: ExperientialHelp; onExit: () => void }) {
+function VideoExperience({ help, onExit }: { help: ExperientialHelp; onExit: () => void }) {
   const url = mediaUrl(help, 'video')
   const poster = imageUrl(help) ?? undefined
   return (
@@ -266,7 +266,7 @@ function ExternalExperience({ help, onExit }: { help: ExperientialHelp; onExit: 
   )
 }
 
-function RealWorldExperiencefunction RealWorldExperience({ help, kind, onExit }: { help: ExperientialHelp; kind: 'action' | 'place' | 'material'; onExit: () => void }) {
+function RealWorldExperience({ help, kind, onExit }: { help: ExperientialHelp; kind: 'action' | 'place' | 'material'; onExit: () => void }) {
   const content = contentOf(help)
   const instructions = stringArray(content.steps)
   const conditions = [stringValue(content.when), stringValue(content.where), stringValue(content.cost), stringValue(content.availability)].filter((item): item is string => Boolean(item))
