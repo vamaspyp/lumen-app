@@ -48,6 +48,9 @@ body{color:var(--premium-ink)!important}
 
 /* One quiet five-destination navigation family. */
 .sidebar{
+  position:fixed!important;
+  inset:auto 0 0 0!important;
+  width:100%!important;
   height:82px!important;
   background:rgba(255,253,249,.97)!important;
   border-top:1px solid rgba(85,98,74,.10)!important;
