@@ -65,6 +65,7 @@ type MomentStage = 'idle' | 'auth' | 'scene' | 'experience' | 'outcome' | 'close
 type TissueKind = 'circles' | 'professionals' | 'institutions' | 'actions'
 type ExperienceHelp = HelpPossibility | SourceItem
 type DurationFilter = 'all' | 'quick' | 'medium' | 'long' | 'unspecified'
+type ViewerProfile = Readonly<{ name:string; email:string|null; avatarUrl:string|null; initials:string }>
 
 type SourceFiltersState = Readonly<{
   duration: DurationFilter
