@@ -58,7 +58,7 @@ import {
 } from '../greenfield/application/s1'
 import { Experience } from './Experience'
 import { composeHomeCues, relatedSanctuaryToActiveLife, relatedSourceToActiveLife } from './contextual-orchestration'
-import { constellationKey, premiumConstellations, premiumFamily, premiumFamilyLabel } from './premium-source'
+import { premiumConstellations, premiumFamily, premiumFamilyLabel } from './premium-source'
 
 type Space = 'home' | 'life' | 'explore' | 'sanctuary' | 'tissue' | 'search' | 'notifications' | 'settings'
 type MomentStage = 'idle' | 'auth' | 'scene' | 'experience' | 'outcome' | 'closed'
