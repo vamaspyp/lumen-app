@@ -70,7 +70,7 @@ async function installRpcMocks(page: Page, calls: string[]) {
     if (name === 'lumen_source_discover') return fulfill(route, sourceItems)
     if (name === 'lumen_source_constellation') return fulfill(route, sourceItems)
     if (name === 'lumen_s2_snapshot') return fulfill(route, { memory_allowed: true, trajectories: [{ trajectory_id: 't-1', faro_text: 'Vivir con más calma y presencia', status: 'active', capability_keys: ['regulation'], origin_moment_id: null, path: [] }], repertoire: [{ repertoire_id: 'r-1', help_id: practice.help_id, title: practice.title, summary: practice.summary, times_reused: 2, user_confirmed: true }], sanctuary_count: 1 })
-    if (name === 'lumen_s2_list_sanctuary') return fulfill(route, [{ entry_id: 's-1', entry_kind: 'reflection', title: 'Una idea que quiero recordar', content: 'No tengo que resolver todo al mismo tiempo.', source_help_id: null, created_at: new Date().toISOString() }])
+    if (name === 'lumen_s2_list_sanctuary') return fulfill(route, [{ entry_id: 's-1', entry_kind: 'reflection', title: 'Una idea que quiero recordar', content: 'No tengo que resolver todo al mismo tiempo.', source_help_id: practice.help_id, created_at: new Date().toISOString() }])
     if (name === 'lumen_s5_snapshot') return fulfill(route, [{ space_id: 'c-1', name: 'Círculo de presencia', purpose: 'Un espacio para compartir y practicar.', role: 'member', member_count: 8, contributions: [] }])
     if (name === 'lumen_s6_snapshot') return fulfill(route, { proactive_allowed: false, settings: { quiet_start_hour: 22, quiet_end_hour: 8, timezone: 'America/Buenos_Aires', custody_blocked: false }, followups: [] })
     if (name === 'lumen_s1_accompany_moment') return fulfill(route, helpScene())
@@ -244,6 +244,30 @@ test('Sidebar utilities are functional rather than inert controls', async ({ pag
   await expect(page.getByLabel('Memoria')).toBeVisible()
   await utilities(page).getByRole('button', { name: 'Notificaciones', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Continuidad sin perseguirte.' })).toBeVisible()
+})
+
+
+test('Inicio and LUMI circulate contextual value across the existing organism', async ({ page }) => {
+  await installSession(page)
+  await installRpcMocks(page, [])
+  await page.goto('/')
+  await expect(page.getByText('Tu Faro sigue disponible', { exact: true })).toBeVisible()
+  await expect(page.getByText('Relacionado con tu Faro', { exact: true })).toBeVisible()
+  await page.getByText('Tu Faro sigue disponible', { exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Tu vida, aquí y ahora' })).toBeVisible()
+
+  await nav(page).getByRole('button', { name: 'Explorar', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Relacionado con tu Faro' })).toBeVisible()
+  await page.getByRole('button', { name: 'Abrir LUMI' }).click()
+  await expect(page.getByText('LUMI · EXPLORAR', { exact: true })).toBeVisible()
+  await expect(page.getByText('Fuente no es un catálogo.', { exact: false })).toBeVisible()
+  await page.getByRole('button', { name: 'Cerrar LUMI' }).click()
+
+  await nav(page).getByRole('button', { name: 'Santuario', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Conexiones con tu Faro' })).toBeVisible()
+
+  await nav(page).getByRole('button', { name: 'Tejido', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Relacionado con tu Faro' })).toBeVisible()
 })
 
 test('Santuario filters operate on sovereign stored entries', async ({ page }) => {
