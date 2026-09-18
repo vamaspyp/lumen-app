@@ -91,7 +91,7 @@ begin
    limit v_limit
  ) q;
  return v_result;
-end $function$
+end $function$;
 
 
 
