@@ -33,8 +33,12 @@ test('A63 premium constellation is semantic, discoverable and visually part of t
 
 test('A63 premium Source uses family renderers and preserves external authorship',()=>{
   for(const family of ['illustrated_guide','audio_practice','contemplative_reading_audio','classic_reading','video_or_audio_visual_sequence','health_reference']){
+    assert.match(semantic,new RegExp(family))
+  }
+  for(const family of ['audio_practice','contemplative_reading_audio','classic_reading','video_or_audio_visual_sequence','health_reference']){
     assert.match(exp,new RegExp(family))
   }
+  assert.match(exp,/GUÍA ESENCIAL · FUENTE ORIGINAL/)
   assert.match(exp,/LUMEN contextualiza; no sustituye ni reescribe la fuente/)
   assert.match(exp,/Volver a la constelación/)
   assert.match(exp,/Abrir en su fuente/)
