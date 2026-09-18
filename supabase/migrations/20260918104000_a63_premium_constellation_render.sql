@@ -31,8 +31,7 @@ begin
    order by effective_priority,hl.title limit v_limit
  )x;
  return v_result;
-end $function$
-
+end $function$;
 
 CREATE OR REPLACE FUNCTION public.lumen_source_constellation(p_capacity_key text, p_area_key text DEFAULT NULL::text, p_context jsonb DEFAULT '{}'::jsonb, p_locale text DEFAULT 'es-AR'::text, p_limit integer DEFAULT 16)
  RETURNS jsonb
