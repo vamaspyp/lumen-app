@@ -195,6 +195,7 @@ function Topbar({ authenticated,profile,go,onSignOut }: { authenticated:boolean;
       </button>
       {open&&<div className="parity-profile-menu">
         {authenticated&&<small>{profile?.name||'Tu espacio'}</small>}
+        <button type="button" onClick={()=>navigate('search')}>Buscar</button>
         <button type="button" onClick={()=>navigate('notifications')}>Notificaciones</button>
         <button type="button" onClick={()=>navigate('settings')}>Ajustes</button>
         {authenticated?<button type="button" onClick={()=>{setOpen(false);onSignOut()}}>Cerrar sesión</button>:<button type="button" onClick={()=>navigate('life')}>Entrar</button>}

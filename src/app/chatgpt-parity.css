@@ -13,6 +13,7 @@
 .parity-profile-menu small{display:block;padding:8px 10px;color:#7a817d;overflow:hidden;text-overflow:ellipsis}
 .parity-profile-menu button{width:100%;padding:10px;border:0;border-radius:10px;background:none;text-align:left;color:var(--parity-green)}
 .parity-profile-menu button:hover{background:#f1ede4}
+.sidebar .nav-minor,.sidebar .nav-separator{display:none!important}
 .parity-home{padding-bottom:34px}
 .parity-home-hero{position:relative;isolation:isolate;width:min(1180px,calc(100vw - 38px));min-height:625px;margin:0 auto;overflow:hidden;border-radius:0 0 30px 30px;background-size:cover;background-position:center 45%;box-shadow:0 24px 72px rgba(47,39,29,.12)}
 .parity-home-hero::before{content:'';position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,rgba(19,26,22,.78),rgba(19,26,22,.46) 45%,rgba(19,26,22,.08) 76%)}
