@@ -19,7 +19,7 @@ const CONTEXT: Record<Space, { label:string; title:string; body:string; tip:stri
     tip:'Podés partir de lo que está presente o volver a algo que ya venías cuidando.',
   },
   life: {
-    label:'MI VIDA',
+    label:'MI PROCESO',
     title:'Tu continuidad, sin presión.',
     body:'Acá viven tus Faros, Caminos y recursos propios. Una dirección puede cambiar, pausarse o dejar de importar.',
     tip:'Si querés, puedo acercarte Fuente, Santuario o Tejido alrededor de lo que elegiste cuidar.',
@@ -37,7 +37,7 @@ const CONTEXT: Record<Space, { label:string; title:string; body:string; tip:stri
     tip:'Puedo ayudarte a reencontrar algo propio y conectarlo, si vos querés, con un Faro o Camino.',
   },
   tissue: {
-    label:'TEJIDO',
+    label:'COMUNIDAD',
     title:'La vida también acompaña a la vida.',
     body:'Acá LUMEN puede acercarte personas, círculos, profesionales, instituciones o acciones humanas cuando tienen sentido.',
     tip:'No hay feed ni popularidad: la relación importa más que el movimiento.',
@@ -79,7 +79,7 @@ export function LumiPresence() {
   const actions = useMemo(() => {
     if(space === 'home') return [
       ['Contarme qué está presente','moment'],
-      ['Volver a algo mío','Mi Vida'],
+      ['Volver a algo mío','Mi proceso'],
       ['Explorar posibilidades','Explorar'],
     ] as const
     if(space === 'life') return [
@@ -89,22 +89,22 @@ export function LumiPresence() {
     ] as const
     if(space === 'explore') return [
       ['Ver lo relacionado con mi Faro','related'],
-      ['Volver a mi vida','Mi Vida'],
-      ['Buscar presencia humana','Tejido'],
+      ['Volver a mi proceso','Mi proceso'],
+      ['Buscar presencia humana','Comunidad'],
     ] as const
     if(space === 'sanctuary') return [
-      ['Volver a mi Faro','Mi Vida'],
+      ['Volver a mi Faro','Mi proceso'],
       ['Explorar posibilidades','Explorar'],
-      ['Buscar presencia humana','Tejido'],
+      ['Buscar presencia humana','Comunidad'],
     ] as const
     if(space === 'tissue') return [
-      ['Volver a mi Faro','Mi Vida'],
+      ['Volver a mi Faro','Mi proceso'],
       ['Explorar posibilidades','Explorar'],
       ['Volver a mi Santuario','Santuario'],
     ] as const
     return [
       ['Volver al Inicio','Inicio'],
-      ['Volver a mi vida','Mi Vida'],
+      ['Volver a mi proceso','Mi proceso'],
       ['Explorar posibilidades','Explorar'],
     ] as const
   }, [space])

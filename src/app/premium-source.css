@@ -49,7 +49,7 @@
   min-height:58vh;display:flex;align-items:flex-end;padding:72px clamp(28px,7vw,110px) 58px;
   background:
     linear-gradient(90deg,rgba(21,29,22,.78),rgba(21,29,22,.20)),
-    url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=2200&q=90') center/cover;
+    url('/images/landscape-path.webp') center/cover;
 }
 .premium-external-hero>div{max-width:840px;color:white}
 .premium-external-hero .eyebrow{color:rgba(255,255,255,.72)}
@@ -64,16 +64,16 @@
 .premium-external-body .media-boundary{border-left:2px solid rgba(132,113,67,.28);padding-left:24px;background:none}
 
 .premium-classic_reading .premium-external-hero{
-  background-image:linear-gradient(90deg,rgba(27,25,20,.82),rgba(27,25,20,.22)),url('https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=2200&q=90')
+  background-image:linear-gradient(90deg,rgba(27,25,20,.82),rgba(27,25,20,.22)),url('/images/practice-hand.webp')
 }
 .premium-video_or_audio_visual_sequence .premium-external-hero{
-  background-image:linear-gradient(90deg,rgba(22,28,24,.76),rgba(22,28,24,.16)),url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2200&q=90')
+  background-image:linear-gradient(90deg,rgba(22,28,24,.76),rgba(22,28,24,.16)),url('/images/landscape-path.webp')
 }
 .premium-contemplative_reading_audio .premium-external-hero{
-  background-image:linear-gradient(90deg,rgba(25,32,25,.74),rgba(25,32,25,.18)),url('https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=2200&q=90')
+  background-image:linear-gradient(90deg,rgba(25,32,25,.74),rgba(25,32,25,.18)),url('/images/practice-hand.webp')
 }
 .premium-health_reference .premium-external-hero{
-  background-image:linear-gradient(90deg,rgba(28,35,31,.80),rgba(28,35,31,.26)),url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2200&q=90')
+  background-image:linear-gradient(90deg,rgba(28,35,31,.80),rgba(28,35,31,.26)),url('/images/landscape-path.webp')
 }
 
 @media (max-width:760px){

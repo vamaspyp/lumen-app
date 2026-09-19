@@ -57,7 +57,7 @@ import {
   type S1Scene,
 } from '../greenfield/application/s1'
 import { Experience } from './Experience'
-import { composeHomeCues, relatedSanctuaryToActiveLife, relatedSourceToActiveLife } from './contextual-orchestration'
+import { relatedSanctuaryToActiveLife, relatedSourceToActiveLife } from './contextual-orchestration'
 import { constellationKey, premiumConstellations, premiumFamily, premiumFamilyLabel } from './premium-source'
 
 type Space = 'home' | 'life' | 'explore' | 'sanctuary' | 'tissue' | 'search' | 'notifications' | 'settings'
@@ -82,15 +82,15 @@ const EMPTY_SOURCE_FILTERS: SourceFiltersState = {
 }
 
 const IMG = {
-  hero: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=92',
-  calm: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=1000&q=88',
-  practice: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1000&q=88',
-  journal: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1000&q=88',
-  meeting: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1000&q=88',
-  walk: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=88',
-  portrait: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=500&q=88',
-  sleep: 'https://images.unsplash.com/photo-1511295742362-92c96b1cf484?auto=format&fit=crop&w=900&q=88',
-  sunrise: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1000&q=88',
+  hero: '/images/hero-presence.webp',
+  calm: '/images/landscape-path.webp',
+  practice: '/images/practice-hand.webp',
+  journal: '/images/practice-hand.webp',
+  meeting: '/images/hero-presence.webp',
+  walk: '/images/landscape-path.webp',
+  portrait: '/images/hero-presence.webp',
+  sleep: '/images/landscape-path.webp',
+  sunrise: '/images/landscape-path.webp',
 }
 
 const RESOURCE_IMAGES = [IMG.calm, IMG.practice, IMG.journal, IMG.meeting, IMG.walk, IMG.sleep]
@@ -161,7 +161,7 @@ function Logo() {
 
 function Sidebar({ active, go, authenticated, onSignOut }: { active: Space; go: (space: Space) => void; authenticated: boolean; onSignOut: () => void }) {
   const links: Array<[Space, string, Parameters<typeof Icon>[0]['name']]> = [
-    ['home','Inicio','home'],['life','Mi Vida','life'],['explore','Explorar','explore'],['sanctuary','Santuario','heart'],['tissue','Tejido','people'],
+    ['home','Inicio','home'],['explore','Explorar','explore'],['life','Mi proceso','life'],['tissue','Comunidad','people'],['sanctuary','Santuario','heart'],
   ]
   const utilities: Array<[Space, string, Parameters<typeof Icon>[0]['name']]> = [
     ['search','Buscar','search'],['notifications','Notificaciones','bell'],['settings','Ajustes','settings'],
@@ -180,59 +180,59 @@ function Sidebar({ active, go, authenticated, onSignOut }: { active: Space; go: 
   </aside>
 }
 
-function Profile({ authenticated,profile }: { authenticated: boolean; profile:ViewerProfile|null }) {
-  return <div className="profile">{authenticated?(profile?.avatarUrl?<img src={profile.avatarUrl} alt="Tu perfil"/>:<span className="profile-initials" aria-label="Tu perfil">{profile?.initials||'T'}</span>):<span className="profile-initials lumen">L</span>}<span><b>{authenticated ? profile?.name||'Tu espacio' : 'LUMEN'}</b><small>{authenticated ? profile?.email||'Una vida en proceso' : 'Entrá cuando quieras'}</small></span><span>⌄</span></div>
-}
-
-function HomeHero({ expression, setExpression, submit, busy, authenticated,profile }: { expression: string; setExpression: (value: string) => void; submit: () => void; busy: boolean; authenticated: boolean; profile:ViewerProfile|null }) {
-  const chips = ['Necesito calma','Quiero claridad','Me siento abrumada','Quiero explorar','Solo quiero estar']
-  return <section className="hero" style={{ backgroundImage: `linear-gradient(90deg,rgba(255,252,247,.18),rgba(255,252,247,.02)),url(${IMG.hero})` }}>
-    <div className="hero-brand">LUMEN</div>
-    <Profile authenticated={authenticated} profile={profile}/>
-    <div className="hero-copy">
-      <p>TU MOMENTO · AHORA</p>
-      <h1>¿Cómo estás hoy?</h1>
-      <h2>Un lugar para pausar, comprender y encontrar lo que puede ayudarte ahora.</h2>
-      <form className="moment-bar" onSubmit={(event) => { event.preventDefault(); submit() }}>
-        <span className="moment-leaf"><Icon name="leaf"/></span>
-        <input aria-label="Lo que te está pasando" value={expression} onChange={(event) => setExpression(event.target.value)} placeholder="Contame qué está presente en tu vida..."/>
-        <button type="submit" disabled={busy || !expression.trim()} aria-label="Continuar"><Icon name="arrow"/></button>
-      </form>
-      <div className="moment-chips">{chips.map((chip) => <button type="button" key={chip} onClick={() => setExpression(chip)}>{chip}</button>)}</div>
+function Topbar({ authenticated,profile,go,onSignOut }: { authenticated:boolean; profile:ViewerProfile|null; go:(space:Space)=>void; onSignOut:()=>void }) {
+  const [open,setOpen]=useState(false)
+  const navigate=(space:Space)=>{setOpen(false);go(space)}
+  return <header className="parity-topbar">
+    <button className="parity-brand" type="button" onClick={()=>navigate('home')} aria-label="Ir al inicio">
+      <b>LUMEN</b><span>Saberes aplicados<br/>para mejorar vidas</span>
+    </button>
+    <p>Más presencia. Una vida más tuya.</p>
+    <div className="parity-profile-wrap">
+      <button className="parity-profile" type="button" aria-label="Abrir menú personal" aria-expanded={open} onClick={()=>setOpen((value)=>!value)}>
+        {authenticated&&profile?.avatarUrl?<img src={profile.avatarUrl} alt=""/>:<span>{authenticated?profile?.initials||'T':'L'}</span>}
+        <i aria-hidden="true">⌄</i>
+      </button>
+      {open&&<div className="parity-profile-menu">
+        {authenticated&&<small>{profile?.name||'Tu espacio'}</small>}
+        <button type="button" onClick={()=>navigate('search')}>Buscar</button>
+        <button type="button" onClick={()=>navigate('notifications')}>Notificaciones</button>
+        <button type="button" onClick={()=>navigate('settings')}>Ajustes</button>
+        {authenticated?<button type="button" onClick={()=>{setOpen(false);onSignOut()}}>Cerrar sesión</button>:<button type="button" onClick={()=>navigate('life')}>Entrar</button>}
+      </div>}
     </div>
-    <aside className="hero-note"><em>Un momento más calmo también es una forma de avanzar.</em><span>—</span></aside>
-  </section>
+  </header>
 }
 
-function StartWays({ go,setExpression,authenticated,snapshot,source,entries,circles,proactivity,onOpenSource }: { go:(space:Space)=>void; setExpression:(value:string)=>void; authenticated:boolean; snapshot:ContinuitySnapshot|null; source:SourceItem[]; entries:SanctuaryEntry[]; circles:Circle[]; proactivity:ProactivitySnapshot|null; onOpenSource:(item:SourceItem)=>void }) {
-  const cues = authenticated ? composeHomeCues({ snapshot,source,entries,circles,proactivity,limit:5 }) : []
-  const imageByOrigin = { followup:IMG.sunrise, faro:IMG.calm, repertoire:IMG.practice, sanctuary:IMG.journal, source:IMG.walk, tissue:IMG.meeting } as const
-  const contextualItems = cues.map((cue) => ({
-    image:imageByOrigin[cue.origin],
-    title:cue.title,
-    quote:`“${cue.text}”`,
-    action:()=>{
-      if(cue.sourceHelpId){
-        const item=source.find((candidate)=>candidate.help_id===cue.sourceHelpId)
-        if(item){onOpenSource(item);return}
-      }
-      go(cue.target)
-    },
-  }))
-  const genericItems = [
-    {image:IMG.practice,title:'1. Llego con un momento',quote:'“Estoy muy estresada...”',action:()=>setExpression('Estoy muy estresada')},
-    {image:IMG.journal,title:'2. Retomo algo propio',quote:'“Quiero volver a algo que ya me sirve.”',action:()=>go('life')},
-    {image:IMG.walk,title:'3. Exploro',quote:'“Quiero ver distintas maneras de acercarme a esto.”',action:()=>go('explore')},
-    {image:IMG.meeting,title:'4. Busco un encuentro',quote:'“Me gustaría que otra vida pueda acompañar.”',action:()=>go('tissue')},
-    {image:IMG.calm,title:'5. Integro en mi vida',quote:'“Esto me sirvió y quiero conservarlo.”',action:()=>go('life')},
-    {image:IMG.sunrise,title:'6. Vuelvo al camino',quote:'“Quiero retomar una dirección que elegí.”',action:()=>go('life')},
-  ]
-  const items = [...contextualItems,...genericItems].slice(0,6)
-  return <section className="start-ways">
-    <div className="start-copy"><b>ALGUNAS FORMAS<br/>DE COMENZAR</b><p>{contextualItems.length?'Algo de tu vida + otras puertas que siguen disponibles.':'Diferentes entradas,\n un mismo lugar.'}</p></div>
-    {items.map((item)=><button className="start-card" key={item.title} type="button" onClick={item.action} style={{backgroundImage:`linear-gradient(0deg,rgba(16,20,17,.72),rgba(16,20,17,.03)),url(${item.image})`}}><b>{item.title}</b><small>{item.quote}</small></button>)}
-    <div className="start-end"><em>Diferentes caminos.<br/>Una misma intención.<br/>Vidas más plenas.</em><span>—</span><b>LUMEN</b></div>
-  </section>
+function PremiumHome({ expression,setExpression,submit,startPath,busy,source,taxonomy,authenticated,onOpen,onSave,go }: { expression:string; setExpression:(value:string)=>void; submit:()=>void; startPath:()=>void; busy:boolean; source:SourceItem[]; taxonomy:SourceTaxonomy|null; authenticated:boolean; onOpen:(item:SourceItem)=>void; onSave:(item:SourceItem)=>Promise<void>; go:(space:Space)=>void }) {
+  const featured=source.slice(0,3)
+  return <div className="parity-home">
+    <section className="parity-home-hero" style={{backgroundImage:`url(${IMG.hero})`}}>
+      <div className="parity-home-copy">
+        <p>TU ESPACIO DE HOY</p>
+        <h1>Recuperar<br/>mi espacio</h1>
+        <h2>Cuando afuera parece urgente, volver a vos también puede ser una forma de avanzar.</h2>
+        <button className="parity-hero-action" type="button" disabled={busy} onClick={startPath}>Comenzar el camino <Icon name="arrow"/></button>
+      </div>
+      <aside className="parity-hero-note"><em>“No todo lo urgente merece tu energía.”</em><span>Una pausa también es movimiento.</span></aside>
+    </section>
+    <section className="parity-lumi-card">
+      <span className="parity-lumi-mark">✦</span>
+      <div className="parity-lumi-copy"><small>LUMI · PRESENCIA</small><h2>Estoy acá.</h2><p>Podemos empezar por lo que hoy necesita un poco de espacio. No hace falta tenerlo claro.</p></div>
+      <form className="parity-moment-form" onSubmit={(event)=>{event.preventDefault();submit()}}>
+        <input aria-label="Lo que te está pasando" value={expression} onChange={(event)=>setExpression(event.target.value)} placeholder="Contame qué está presente..."/>
+        <button type="submit" disabled={busy||!expression.trim()} aria-label="Continuar"><Icon name="arrow"/></button>
+      </form>
+    </section>
+    <section className="parity-today">
+      <div className="parity-section-heading"><div><p>PARA EMPEZAR HOY</p><h2>Pequeñas puertas.<br/>Un espacio más tuyo.</h2></div><button type="button" onClick={()=>go('explore')}>Ver todas las posibilidades <Icon name="arrow"/></button></div>
+      <div className="parity-resource-grid">
+        {featured.map((item,index)=><ResourceCard key={item.help_id} item={item} index={index} authenticated={authenticated} onOpen={(resource)=>onOpen(resource as SourceItem)} onSave={onSave} taxonomy={taxonomy}/>) }
+        {!featured.length&&[0,1,2].map((item)=><div className="parity-resource-skeleton" key={item} aria-hidden="true"/>)}
+      </div>
+    </section>
+    <blockquote className="parity-home-quote">“Volver a vos no es detenerte.<br/>Es recordar desde dónde querés vivir.”<small>LUMEN</small></blockquote>
+  </div>
 }
 
 function PrivateGate({ name,email,setEmail,goHome,goExplore }: { name:string; email:string; setEmail:(value:string)=>void; goHome:()=>void; goExplore:()=>void }) {
@@ -343,10 +343,10 @@ function MomentFlow({ stage,scene,help,constellation,capacityKeys,taxonomy,expre
         </div>
         {!createdTrajectoryId&&<details><summary>Reexpresar o ajustar mi lectura</summary><div className="reexpression-editor"><textarea value={reExpression} onChange={(e)=>setReExpression(e.target.value.slice(0,1200))}/><p>Podés cambiar tus palabras y también elegir o quitar capacidades. La lectura de LUMEN es una propuesta; tu criterio manda.</p><button className="ghost" type="button" disabled={busy||!reExpression.trim()||reExpression.trim()===expression.trim()} onClick={()=>onReexpress(reExpression.trim())}>Volver a interpretar desde mis palabras</button></div></details>}
       </section>
-      <div className="constellation-hero" style={{backgroundImage:`linear-gradient(90deg,rgba(18,24,18,.72),rgba(18,24,18,.18)),url(${IMG.calm})`}}><div><p className="eyebrow">TU CONSTELACIÓN · ABIERTA Y EDITABLE</p><h1>Algunas formas de acompañar lo que está vivo.</h1><p>Está compuesta desde las capacidades que ves arriba. Podés quitar o sumar piezas antes de hacerla parte de un Camino.</p></div></div>
+      <div className="constellation-hero" style={{backgroundImage:`linear-gradient(90deg,rgba(18,24,18,.72),rgba(18,24,18,.18)),url(${IMG.calm})`}}><div><p className="eyebrow">UNA CONSTELACIÓN PARA ESTE MOMENTO · ABIERTA Y EDITABLE</p><h1>Algunas formas de acompañar lo que está vivo.</h1><p>Está compuesta desde las capacidades que ves arriba. Podés quitar o sumar piezas antes de hacerla parte de un Camino.</p></div></div>
       {primary&&<><div className="section-heading moment-section-heading"><h2>Para ahora</h2><p>Una primera ayuda posible, de baja fricción y pertinente a este momento.</p></div><div className="source-grid moment-source-grid"><ResourceCard item={primary} index={0} authenticated={false} onOpen={onSelect} taxonomy={taxonomy} contextLabel="PARA AHORA · UNA PRIMERA AYUDA POSIBLE" extraAction={<button className={selectedPathIds.includes(primary.help_id)?'ghost small active':'ghost small'} type="button" onClick={()=>onTogglePath(primary.help_id)}>{selectedPathIds.includes(primary.help_id)?'✓ En mi posible Camino':'+ Sumar al Camino'}</button>}/></div></>}
       {rest.length>0&&<div className="moment-constellation"><div className="section-heading"><h2>Otras maneras de acercarte</h2><p>Comprender, practicar, aplicar, conversar, integrar. Sin un orden obligatorio.</p></div><div className="source-grid moment-source-grid">{rest.map((item,index)=><ResourceCard key={item.help_id} item={item} index={index+1} authenticated={false} onOpen={onSelect} taxonomy={taxonomy} extraAction={<button className={selectedPathIds.includes(item.help_id)?'ghost small active':'ghost small'} type="button" onClick={()=>onTogglePath(item.help_id)}>{selectedPathIds.includes(item.help_id)?'✓ En mi posible Camino':'+ Sumar al Camino'}</button>}/>)}</div></div>}
-      <section className="faro-proposal"><p className="eyebrow">SI ESTO MERECE CONTINUIDAD</p><h2>Convertirlo en un Faro propio.</h2><p>Podés reexpresar la dirección, confirmar las capacidades y elegir qué piezas de esta constelación querés llevar a tu Camino. Nada queda fijado para siempre.</p><input value={faroText} onChange={(e)=>setFaroText(e.target.value.slice(0,280))} placeholder="Una dirección que quiero cuidar..."/><CapabilityPicker taxonomy={taxonomy} selected={capacityKeys} onChange={onCapacityChange} disabled={busy||Boolean(createdTrajectoryId)}/><div className="faro-selection-summary"><span>{selectedPathIds.length} {selectedPathIds.length===1?'pieza elegida':'piezas elegidas'} para el Camino</span><small>Podés sumar o quitar piezas desde las tarjetas de la constelación.</small></div>{!createdTrajectoryId?<button className="primary" type="button" disabled={busy||!faroText.trim()||!capacityKeys.length} onClick={()=>onCreateFaro(faroText.trim())}>Crear Faro con estas capacidades y esta constelación</button>:<div className="faro-saved"><b>Faro y Camino creados.</b><p>Quedaron vinculados a estas capacidades y a las piezas que elegiste. Desde Mi Vida podés sumar, quitar y ordenar elementos de Fuente, Santuario, Tejido, Repertorio o algo propio.</p><div className="button-row"><button className="primary" type="button" onClick={onOpenPath}>Abrir mi Camino y ajustarlo</button><button className="ghost" type="button" disabled={busy||!selectedPathIds.length} onClick={onSavePath}>Actualizar con mi selección actual</button></div></div>}</section>
+      <section className="faro-proposal"><p className="eyebrow">SI ESTO MERECE CONTINUIDAD</p><h2>Convertirlo en un Faro propio.</h2><p>Podés reexpresar la dirección, confirmar las capacidades y elegir qué piezas de esta constelación querés llevar a tu Camino. Nada queda fijado para siempre.</p><input value={faroText} onChange={(e)=>setFaroText(e.target.value.slice(0,280))} placeholder="Una dirección que quiero cuidar..."/><CapabilityPicker taxonomy={taxonomy} selected={capacityKeys} onChange={onCapacityChange} disabled={busy||Boolean(createdTrajectoryId)}/><div className="faro-selection-summary"><span>{selectedPathIds.length} {selectedPathIds.length===1?'pieza elegida':'piezas elegidas'} para el Camino</span><small>Podés sumar o quitar piezas desde las tarjetas de la constelación.</small></div>{!createdTrajectoryId?<button className="primary" type="button" disabled={busy||!faroText.trim()||!capacityKeys.length} onClick={()=>onCreateFaro(faroText.trim())}>Conservar como Faro</button>:<div className="faro-saved"><b>Faro y Camino creados.</b><p>Quedaron vinculados a estas capacidades y a las piezas que elegiste. Desde Mi Vida podés sumar, quitar y ordenar elementos de Fuente, Santuario, Tejido, Repertorio o algo propio.</p><div className="button-row"><button className="primary" type="button" onClick={onOpenPath}>Abrir mi Camino y ajustarlo</button><button className="ghost" type="button" disabled={busy||!selectedPathIds.length} onClick={onSavePath}>Conservar selección como mi Camino</button></div></div>}</section>
     </>}</>}
     {stage==='outcome'&&<><p className="eyebrow">RETORNO</p><h1>¿Cómo fue para vos?</h1><p>No hace falta explicar demasiado. Sólo nos ayuda a saber si tuvo sentido en tu vida real.</p><div className="outcome-row"><button type="button" onClick={()=>onOutcome('helped')}>Me ayudó</button><button type="button" onClick={()=>onOutcome('unsure')}>No estoy segura</button><button type="button" onClick={()=>onOutcome('not_helped')}>No me ayudó</button></div></>}
     {stage==='closed'&&<><p className="eyebrow">COSECHA</p><h1>Gracias. Con esto alcanza por ahora.</h1><p>{integrated?'Quedó en tu repertorio porque vos lo elegiste.':'Si querés, podés conservar esta posibilidad como algo a lo que volver.'}</p><div className="button-row">{!integrated&&help&&<button className="primary" type="button" onClick={onIntegrate} disabled={busy}>Guardar “{help.title}” en mi repertorio</button>}<button className="ghost" type="button" onClick={onClose}>Volver a mi vida</button></div></>}
@@ -554,12 +554,14 @@ export default function App() {
   const go=(next:Space)=>{setSpace(next);if(next!=='home'&&stage!=='idle')setStage('idle')}
   const resetMoment=()=>{setStage('idle');setScene(null);setHelp(null);setMomentConstellation([]);setCapacityKeys([]);setSelectedPathIds([]);setCreatedTrajectoryId(null);setIntegrated(false)}
 
-  const runMoment=async()=>{
-    if(!expression.trim())return
+  const runMoment=async(value=expression)=>{
+    const momentExpression=value.trim()
+    if(!momentExpression)return
+    if(momentExpression!==expression)setExpression(momentExpression)
     if(!authenticated){setStage('auth');return}
     setBusy(true)
     try{
-      const nextScene=await accompanyMoment(expression.trim(),navigator.language||'es-AR','es')
+      const nextScene=await accompanyMoment(momentExpression,navigator.language||'es-AR','es')
       setScene(nextScene)
       const primary=primaryHelpFromScene(nextScene)
       setHelp(primary)
@@ -643,7 +645,7 @@ export default function App() {
   const content=useMemo(()=>{
     if(stage==='auth')return <AuthFlow email={email} setEmail={setEmail} otp={otp} setOtp={setOtp} otpSent={otpSent} busy={busy} error={authError} onSend={()=>void sendOtp()} onVerify={()=>void verifyOtp()} onCancel={()=>resetMoment()}/>
     if(stage!=='idle')return <MomentFlow stage={stage} scene={scene} help={help} constellation={momentConstellation} capacityKeys={capacityKeys} taxonomy={taxonomy} expression={expression} busy={busy} selectedPathIds={selectedPathIds} createdTrajectoryId={createdTrajectoryId} onSelect={(item)=>void chooseMomentHelp(item)} onExperienceExit={closeExperience} onOutcome={(effect)=>void momentOutcome(effect)} onIntegrate={()=>void integrateMoment()} onClose={()=>{resetMoment();setSpace('home')}} onClarify={()=>{setStage('idle');setSpace('home')}} onReexpress={(text)=>void reexpressMoment(text)} onCapacityChange={(keys)=>void changeMomentCapabilities(keys)} onTogglePath={(helpId)=>setSelectedPathIds((current)=>current.includes(helpId)?current.filter((id)=>id!==helpId):[...current,helpId])} onCreateFaro={(text)=>void createMomentFaro(text)} onSavePath={()=>void saveMomentPath()} onOpenPath={()=>{resetMoment();setSpace('life')}} integrated={integrated}/>
-    if(space==='home')return <><HomeHero expression={expression} setExpression={setExpression} submit={()=>void runMoment()} busy={busy} authenticated={authenticated} profile={profile}/><StartWays go={go} setExpression={setExpression} authenticated={authenticated} snapshot={snapshot} source={source} entries={entries} circles={circles} proactivity={proactivity} onOpenSource={(item)=>void openSource(item)}/></>
+    if(space==='home')return <PremiumHome expression={expression} setExpression={setExpression} submit={()=>void runMoment()} startPath={()=>void runMoment('Necesito recuperar mi espacio')} busy={busy} source={source} taxonomy={taxonomy} authenticated={authenticated} onOpen={(item)=>void openSource(item)} onSave={saveSource} go={go}/>
     if(space==='explore')return <ExploreView source={source} taxonomy={taxonomy} snapshot={snapshot} authenticated={authenticated} onOpen={(item)=>void openSource(item)} onSave={saveSource} returnConstellationKey={sourceReturnConstellationKey} onReturnConstellationChange={setSourceReturnConstellationKey}/>
     if(!authenticated&&!['search'].includes(space))return <PrivateGate name={space==='life'?'MI VIDA':space==='sanctuary'?'SANTUARIO':space==='tissue'?'TEJIDO':'TU ESPACIO'} email={email} setEmail={setEmail} goHome={()=>setStage('auth')} goExplore={()=>go('explore')}/>
     if(space==='life')return <LifeView snapshot={snapshot} proactivity={proactivity} taxonomy={taxonomy} source={source} entries={entries} circles={circles} refresh={loadPrivate} onOpenSource={(item)=>void openSource(item)} go={go}/>
@@ -655,5 +657,6 @@ export default function App() {
   },[stage,space,email,otp,otpSent,busy,authError,scene,help,momentConstellation,capacityKeys,taxonomy,expression,selectedPathIds,createdTrajectoryId,integrated,authenticated,profile,sourceReturnConstellationKey,source,snapshot,entries,circles,proactivity,loadPrivate])
 
   if(!authChecked)return <div className="boot-screen"><span className="orb"/><p>LUMEN</p></div>
-  return <div className="app-shell"><Sidebar active={space} go={go} authenticated={authenticated} onSignOut={()=>void (async()=>{await signOut();setAuthenticated(false);setProfile(null);setSourceReturnConstellationKey(null);setSnapshot(null);setEntries([]);setCircles([]);setProactivityState(null);resetMoment();setSpace('home')})()}/><main className="main-field">{content}</main></div>
+  const logout=()=>void (async()=>{await signOut();setAuthenticated(false);setProfile(null);setSourceReturnConstellationKey(null);setSnapshot(null);setEntries([]);setCircles([]);setProactivityState(null);resetMoment();setSpace('home')})()
+  return <div className="app-shell">{stage==='idle'&&<Topbar authenticated={authenticated} profile={profile} go={go} onSignOut={logout}/>}<Sidebar active={space} go={go} authenticated={authenticated} onSignOut={logout}/><main className="main-field">{content}</main></div>
 }

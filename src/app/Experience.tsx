@@ -20,15 +20,15 @@ function externalUrl(help: Help): string | null { const c = contentOf(help); ret
 function mediaUrl(help: Help, kind: 'audio'|'video'): string | null { const c = contentOf(help); return str(c[`${kind}_url`]) || str(c.media_url) || str(c.asset_url) || str(c.src) }
 
 const EXPERIENCE_IMAGE: Record<Kind,string> = {
-  editorial:'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1800&q=90',
-  practice:'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1800&q=90',
-  audio:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=1800&q=90',
-  video:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=90',
-  external:'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1800&q=90',
-  human:'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1800&q=90',
-  group:'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1800&q=90',
-  action:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=90',
-  quiet:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=1800&q=90',
+  editorial:'/images/practice-hand.webp',
+  practice:'/images/practice-hand.webp',
+  audio:'/images/landscape-path.webp',
+  video:'/images/landscape-path.webp',
+  external:'/images/landscape-path.webp',
+  human:'/images/hero-presence.webp',
+  group:'/images/hero-presence.webp',
+  action:'/images/landscape-path.webp',
+  quiet:'/images/landscape-path.webp',
 }
 
 function premiumHeroImage(kind:Kind,premium:string|null):string {

@@ -25,7 +25,7 @@
   min-height: 190px;
   background:
     linear-gradient(0deg,rgba(34,42,36,.12),rgba(34,42,36,.02)),
-    url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=900&q=86') center/cover no-repeat;
+    url('/images/landscape-path.webp') center/cover no-repeat;
 }
 .constellation-cards > article > div:first-child { padding: 24px 28px 14px; }
 .constellation-cards > article > .card-actions {

@@ -9,6 +9,7 @@ import './app/premium-v4-feedback.css'
 import './app/a63-source-consistency.css'
 import './app/premium-source.css'
 import './app/premium-field-v5.css'
+import './app/chatgpt-parity.css'
 import App from './app/App'
 import { LumiPresence } from './app/LumiPresence'
 
