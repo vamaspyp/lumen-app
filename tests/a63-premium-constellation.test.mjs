@@ -6,6 +6,7 @@ const app=fs.readFileSync('src/app/App.tsx','utf8')
 const exp=fs.readFileSync('src/app/Experience.tsx','utf8')
 const semantic=fs.readFileSync('src/app/premium-source.ts','utf8')
 const css=fs.readFileSync('src/app/premium-source.css','utf8')
+const feedbackCss=fs.readFileSync('src/app/premium-v4-feedback.css','utf8')
 const migration=fs.readFileSync('supabase/migrations/20260918104000_a63_premium_constellation_render.sql','utf8')
 
 test('A63 profile never impersonates the person with a stock portrait',()=>{
@@ -51,4 +52,15 @@ test('A63 Source contracts expose premium metadata without new anatomy',()=>{
   assert.match(migration,/plum_village_mindful_breathing_es/)
   assert.match(migration,/bbva_castellanos_breathing_brain_es/)
   assert.doesNotMatch(migration,/create\s+table/i)
+})
+
+test('A63 Premium visual field ships its canonical imagery with the product',()=>{
+  for(const asset of ['hero-presence.webp','practice-hand.webp','landscape-path.webp']){
+    assert.ok(fs.existsSync(`public/images/${asset}`),`${asset} must ship locally`)
+  }
+  for(const surface of [app,exp,css,feedbackCss]){
+    assert.doesNotMatch(surface,/images\.unsplash\.com/)
+  }
+  assert.match(app,/\/images\/hero-presence\.webp/)
+  assert.match(exp,/\/images\/practice-hand\.webp/)
 })
