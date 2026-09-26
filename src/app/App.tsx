@@ -161,7 +161,7 @@ function Logo() {
 
 function Sidebar({ active, go, authenticated, onSignOut }: { active: Space; go: (space: Space) => void; authenticated: boolean; onSignOut: () => void }) {
   const links: Array<[Space, string, Parameters<typeof Icon>[0]['name']]> = [
-    ['home','Inicio','home'],['explore','Explorar','explore'],['life','Mi proceso','life'],['tissue','Comunidad','people'],['sanctuary','Santuario','heart'],
+    ['home','Inicio','home'],['explore','Explorar','explore'],['life','Mi proceso','life'],['tissue','Tejido','people'],['sanctuary','Santuario','heart'],
   ]
   const utilities: Array<[Space, string, Parameters<typeof Icon>[0]['name']]> = [
     ['search','Buscar','search'],['notifications','Notificaciones','bell'],['settings','Ajustes','settings'],
@@ -276,7 +276,6 @@ function ResourceCard({ item,index,authenticated,onOpen,onSave,taxonomy,contextL
     <img src={resourceImage(item,index)} alt=""/>
     <div className="source-card-copy">
       <p className="eyebrow">{eyebrow}</p>
-      {provider&&<small className="resource-provenance">{provider}</small>}
       <h3>{item.title}</h3>
       <p className="source-summary">{item.summary}</p>
       <div className="premium-tags">
