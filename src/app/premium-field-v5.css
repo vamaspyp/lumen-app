@@ -1338,3 +1338,709 @@ a{color:inherit}
     margin-right:auto;
   }
 }
+
+/* A63 · PREMIUM fidelity closure · semantic renderers + reference-level rhythm.
+   This remains inside the single canonical premium field. */
+
+/* LUMI knows when to leave the scene. */
+.lumi-global.retired{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transform:translateY(10px) scale(.96);
+}
+
+/* Constellation composition is one editorial scene, not a stack of mini-catalogues. */
+.premium-constellation-resources{
+  width:100%;
+  margin:0 auto 34px;
+}
+.premium-constellation-resources>.section-heading{
+  margin:0 0 18px;
+}
+.premium-constellation-resources>.section-heading h2{
+  font-size:clamp(42px,4.8vw,64px);
+}
+.premium-constellation-resources>.section-heading p{
+  max-width:720px;
+}
+.explore-view.constellation-open .source-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+
+/* Premium cards: one anatomy everywhere. */
+.source-card.premium-card{
+  grid-template-columns:minmax(220px,36%) minmax(0,1fr) 64px!important;
+  min-height:184px!important;
+}
+.source-card.premium-card>img{
+  min-height:184px!important;
+}
+.source-card-copy{
+  padding:20px 16px 17px 22px!important;
+}
+.source-card-copy .eyebrow{
+  margin:0 0 8px;
+  color:#68706b;
+  font-size:9px!important;
+  font-weight:600;
+  letter-spacing:.19em!important;
+}
+.source-card-copy h3{
+  font-size:clamp(27px,2.4vw,35px)!important;
+  line-height:1!important;
+}
+.source-card-copy .source-summary{
+  max-width:620px;
+  margin:7px 0 11px!important;
+  color:#69716c!important;
+  line-height:1.34!important;
+}
+.premium-tags{
+  margin-top:auto!important;
+}
+.premium-tags span{
+  min-height:27px;
+  padding:0 11px;
+  background:#efebe3!important;
+  color:#59635c!important;
+  font-size:9px!important;
+}
+.card-open{
+  width:44px;
+  height:44px;
+  background:rgba(252,249,243,.82);
+  border-color:rgba(43,54,49,.18);
+}
+.card-open svg{
+  width:18px;height:18px;
+}
+.card-save{
+  width:32px;height:32px;
+}
+.card-edge-actions{
+  padding-right:12px;
+}
+
+/* Experience top bar follows the approved detail screens. */
+.experience-feature-hero{
+  min-height:610px;
+  padding:96px 48px 50px;
+}
+.experience-feature-hero::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  z-index:1;
+  background:linear-gradient(90deg,rgba(14,19,16,.56) 0%,rgba(14,19,16,.22) 58%,rgba(14,19,16,.02) 100%);
+  pointer-events:none;
+}
+.experience-feature-hero::after{
+  z-index:1;
+  background:linear-gradient(0deg,rgba(13,18,15,.48) 0%,rgba(13,18,15,.06) 54%,rgba(13,18,15,.03));
+}
+.experience-feature-hero>.experience-topbar{
+  position:absolute;
+  z-index:4;
+  top:18px;
+  left:24px;
+  right:24px;
+  width:auto!important;
+  max-width:none!important;
+  display:grid;
+  grid-template-columns:48px 1fr 48px;
+  align-items:center;
+  color:white;
+}
+.experience-topbar .experience-brand{
+  position:static!important;
+  transform:none!important;
+  justify-self:center;
+  color:#fff;
+  font-size:13px;
+  letter-spacing:.34em;
+  text-shadow:0 2px 14px rgba(0,0,0,.24);
+}
+.experience-back{
+  width:44px;
+  height:44px;
+  display:grid;
+  place-items:center;
+  border:0;
+  background:transparent;
+  color:white;
+  cursor:pointer;
+}
+.experience-back svg{
+  width:31px;
+  height:31px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.35;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.experience-source-mark{
+  justify-self:end;
+  max-width:150px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:8px;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.72);
+}
+.experience-feature-hero>.experience-hero-copy{
+  position:relative;
+  z-index:3;
+  width:min(790px,82%)!important;
+  max-width:none!important;
+}
+.experience-hero-copy .eyebrow{
+  margin:0 0 9px;
+  color:rgba(255,255,255,.86);
+  font-size:10px!important;
+  letter-spacing:.19em!important;
+}
+.experience-hero-copy h1{
+  max-width:850px;
+  margin:0;
+  color:#fff;
+  font-family:var(--serif);
+  font-size:clamp(62px,7vw,102px);
+  font-weight:400;
+  line-height:.87;
+  letter-spacing:-.035em;
+  text-wrap:balance;
+}
+.experience-hero-copy>p:not(.eyebrow){
+  max-width:680px;
+  margin:17px 0 0;
+  color:rgba(255,255,255,.92);
+  font-size:17px;
+  line-height:1.42;
+}
+
+/* Shared body: calm editorial rhythm. */
+.experience-premium-body{
+  width:min(920px,calc(100vw - 42px));
+  padding:42px 0 84px;
+}
+.premium-section-heading{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:5px;
+  margin:2px 0 24px;
+}
+.premium-section-heading small,
+.experience-source-panel small,
+.classic-reading-intro small{
+  color:#68716c;
+  font-size:9px;
+  font-weight:600;
+  letter-spacing:.19em;
+  text-transform:uppercase;
+}
+.premium-section-heading h2{
+  max-width:760px;
+  margin:0;
+  font-family:var(--serif);
+  font-size:clamp(38px,4vw,54px);
+  font-weight:400;
+  line-height:1;
+  letter-spacing:-.025em;
+}
+
+/* Audio: LUMEN player only when a real audio asset exists. */
+.audio-source-card{
+  padding:22px 24px!important;
+}
+.premium-audio-player{
+  min-height:124px;
+  display:grid;
+  grid-template-columns:92px minmax(0,1fr) 70px;
+  align-items:center;
+  gap:22px;
+}
+.audio-play{
+  width:82px;
+  height:82px;
+  display:grid;
+  place-items:center;
+  border:0;
+  border-radius:50%;
+  background:var(--premium-forest);
+  color:white;
+  box-shadow:0 10px 30px rgba(31,48,39,.18);
+  cursor:pointer;
+}
+.audio-play svg{
+  width:34px;
+  height:34px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.audio-track{
+  min-width:0;
+  display:grid;
+  gap:7px;
+}
+.audio-wave{
+  height:46px;
+  display:flex;
+  align-items:center;
+  gap:4px;
+  overflow:hidden;
+}
+.audio-wave i{
+  width:4px;
+  flex:0 0 4px;
+  border-radius:999px;
+  background:#ced0c9;
+}
+.audio-wave i:nth-child(-n+12){background:#3d5044}
+.audio-track input[type="range"]{
+  width:100%;
+  height:3px;
+  margin:0;
+  accent-color:var(--premium-forest);
+  cursor:pointer;
+}
+.audio-time{
+  display:flex;
+  justify-content:space-between;
+  color:#2c3631;
+  font-size:11px;
+  font-variant-numeric:tabular-nums;
+}
+.audio-rate{
+  min-width:58px;
+  height:52px;
+  border:1px solid var(--premium-line-strong);
+  border-radius:999px;
+  background:#f5f1e8;
+  color:#25312b;
+  font-family:var(--serif);
+  font-size:18px;
+  cursor:pointer;
+}
+
+/* When the source only exposes an external page, do not fake media. */
+.source-media-launch{
+  min-height:152px;
+  display:grid;
+  grid-template-columns:90px minmax(0,1fr);
+  align-items:center;
+  gap:24px;
+  padding:24px 28px;
+  border:1px solid var(--premium-line);
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 90% 10%,rgba(220,193,151,.18),transparent 38%),
+    rgba(255,253,248,.93);
+  box-shadow:var(--premium-shadow-soft);
+  text-decoration:none;
+}
+.source-media-launch:hover{
+  transform:translateY(-1px);
+  box-shadow:0 16px 42px rgba(53,44,32,.10);
+}
+.source-media-play{
+  width:78px;
+  height:78px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:var(--premium-forest);
+  color:white;
+}
+.source-media-play svg{
+  width:31px;
+  height:31px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.6;
+}
+.source-media-launch>span:last-child{
+  display:grid;
+  gap:4px;
+}
+.source-media-launch small{
+  color:#6b736e;
+  font-size:9px;
+  font-weight:600;
+  letter-spacing:.18em;
+}
+.source-media-launch b{
+  font-family:var(--serif);
+  font-size:clamp(27px,3vw,38px);
+  font-weight:400;
+  line-height:1;
+}
+.source-media-launch em{
+  color:#707771;
+  font-size:11px;
+  font-style:normal;
+}
+
+/* "Qué ofrece" / source work renderer. */
+.premium-offer-list{
+  display:grid;
+  gap:0;
+  margin:0 0 32px;
+}
+.premium-offer-list article{
+  min-height:142px;
+  display:grid;
+  grid-template-columns:210px minmax(0,1fr);
+  gap:26px;
+  align-items:center;
+  padding:14px 0;
+  border-bottom:1px solid var(--premium-line);
+}
+.offer-image{
+  height:116px;
+  border-radius:16px;
+  background-position:center;
+  background-size:cover;
+  filter:saturate(.85);
+}
+.premium-offer-list h3{
+  margin:0 0 5px;
+  font-family:var(--serif);
+  font-size:29px;
+  font-weight:400;
+  line-height:1;
+}
+.premium-offer-list p{
+  margin:0;
+  color:#69716c;
+  font-family:var(--serif);
+  font-size:18px;
+  line-height:1.32;
+}
+.experience-quote{
+  margin:34px 0;
+  padding:4px 0 4px 26px;
+  border-left:2px solid #3f5044;
+  color:#3d4d42;
+  font-family:var(--serif);
+  font-size:clamp(29px,3.2vw,39px);
+  line-height:1.08;
+  font-style:italic;
+}
+
+/* Provenance is material, but remains quiet. */
+.experience-source-panel{
+  display:grid;
+  grid-template-columns:64px minmax(0,1fr) 54px;
+  align-items:center;
+  gap:18px;
+  min-height:108px;
+  margin:30px 0;
+  padding:18px 18px;
+  border:1px solid rgba(70,78,67,.08);
+  border-radius:20px;
+  background:
+    linear-gradient(90deg,rgba(236,232,218,.86),rgba(250,247,239,.96));
+}
+.source-leaf{
+  width:54px;
+  height:54px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:rgba(255,253,248,.68);
+  color:#536259;
+  font-family:var(--serif);
+  font-size:34px;
+}
+.experience-source-panel h3{
+  margin:3px 0 0;
+  font-family:var(--serif);
+  font-size:25px;
+  font-weight:400;
+  line-height:1.03;
+}
+.experience-source-panel p{
+  margin:5px 0 0;
+  color:#747a74;
+  font-size:11px;
+  line-height:1.4;
+}
+.source-open-link{
+  width:46px;
+  height:46px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--premium-line-strong);
+  border-radius:50%;
+  text-decoration:none;
+  font-size:18px;
+}
+.experience-finish-row{
+  display:flex;
+  justify-content:center;
+  margin-top:26px;
+}
+
+/* Contemplative / classic / clinical families are different rooms of the same house. */
+.contemplative-intro,
+.classic-reading-intro,
+.human-premium-card{
+  margin:0 0 26px;
+  padding:30px 32px;
+  border:1px solid var(--premium-line);
+  border-radius:22px;
+  background:rgba(255,253,248,.82);
+  box-shadow:var(--premium-shadow-soft);
+}
+.contemplative-intro{
+  display:grid;
+  grid-template-columns:64px 1fr;
+  gap:18px;
+  align-items:center;
+}
+.quiet-mark{
+  width:56px;
+  height:56px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:#eeeadf;
+  color:#3e5145;
+  font-size:26px;
+}
+.contemplative-intro p,
+.classic-reading-intro p,
+.human-premium-card>p{
+  margin:0;
+  font-family:var(--serif);
+  font-size:clamp(22px,2.5vw,29px);
+  line-height:1.3;
+}
+.classic-reading-intro{
+  display:grid;
+  gap:9px;
+}
+.source-focus{
+  margin:22px 0 0;
+  padding-left:18px;
+  border-left:2px solid #45554a;
+  color:#536058;
+  font-family:var(--serif);
+  font-size:20px;
+  line-height:1.3;
+}
+.health-sections{
+  display:grid;
+  gap:0;
+  margin:0 0 28px;
+}
+.health-sections article{
+  min-height:72px;
+  display:grid;
+  grid-template-columns:50px 1fr;
+  align-items:center;
+  border-bottom:1px solid var(--premium-line);
+}
+.health-sections span{
+  color:#879088;
+  font-size:9px;
+  letter-spacing:.15em;
+}
+.health-sections h3{
+  margin:0;
+  font-family:var(--serif);
+  font-size:24px;
+  font-weight:400;
+}
+.human-premium-card .human-symbol{
+  margin:0 auto 22px;
+}
+.human-premium-card .help-meta{
+  margin:18px 0;
+}
+
+/* Family-specific art direction remains restrained. */
+.premium-family-illustrated_guide .experience-feature-hero{background-position:center 58%}
+.premium-family-audio_practice .experience-feature-hero{background-position:center 50%}
+.premium-family-contemplative_reading_audio .experience-feature-hero{background-position:center 50%}
+.premium-family-classic_reading .experience-feature-hero{background-position:center 55%}
+.premium-family-video_or_audio_visual_sequence .experience-feature-hero{background-position:center 52%}
+.premium-family-health_reference .experience-feature-hero{background-position:center 45%}
+
+/* Return remains relational, not survey-like. */
+.experience-return-inner{
+  border-radius:26px!important;
+  background:rgba(255,253,248,.96)!important;
+}
+.outcome-row.premium button{
+  border-radius:999px!important;
+}
+
+/* Exact mobile rhythm is the primary visual acceptance surface. */
+@media(max-width:760px){
+  .source-card.premium-card{
+    grid-template-columns:39% minmax(0,1fr) 46px!important;
+    min-height:164px!important;
+  }
+  .source-card.premium-card>img{min-height:164px!important}
+  .source-card-copy{padding:13px 7px 11px 13px!important}
+  .source-card-copy .eyebrow{
+    margin-bottom:5px;
+    font-size:7.5px!important;
+    letter-spacing:.15em!important;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:100%;
+  }
+  .source-card-copy h3{
+    font-size:22px!important;
+    line-height:.98!important;
+  }
+  .source-card-copy .source-summary{
+    margin:5px 0 7px!important;
+    font-size:10.5px!important;
+    line-height:1.25!important;
+    -webkit-line-clamp:2;
+  }
+  .premium-tags{gap:4px!important;max-height:24px;overflow:hidden}
+  .premium-tags span{
+    min-height:23px;
+    padding:0 8px;
+    font-size:7.5px!important;
+  }
+  .card-edge-actions{padding-right:7px}
+  .card-open{width:37px;height:37px}
+  .card-save{display:none}
+
+  .premium-constellation-resources{
+    width:calc(100vw - 28px);
+    margin-left:auto;
+    margin-right:auto;
+  }
+  .premium-constellation-resources>.section-heading h2{font-size:42px}
+
+  .experience-feature-hero{
+    width:100%;
+    min-height:520px;
+    margin:0;
+    padding:92px 22px 34px;
+    border-radius:0 0 26px 26px;
+  }
+  .experience-feature-hero>.experience-topbar{
+    top:14px;left:12px;right:12px;
+    grid-template-columns:44px 1fr 44px;
+  }
+  .experience-topbar .experience-brand{
+    font-size:10px;
+    letter-spacing:.29em;
+  }
+  .experience-source-mark{display:none}
+  .experience-back{width:40px;height:40px}
+  .experience-back svg{width:29px;height:29px}
+  .experience-feature-hero>.experience-hero-copy{
+    width:91%!important;
+  }
+  .experience-hero-copy .eyebrow{
+    font-size:8.5px!important;
+    letter-spacing:.17em!important;
+  }
+  .experience-hero-copy h1{
+    font-size:clamp(48px,12.7vw,62px);
+    line-height:.88;
+  }
+  .experience-hero-copy>p:not(.eyebrow){
+    max-width:94%;
+    margin-top:13px;
+    font-size:14px;
+    line-height:1.38;
+  }
+  .experience-premium-body{
+    width:calc(100vw - 32px);
+    padding:28px 0 70px;
+  }
+  .premium-section-heading{margin-bottom:18px}
+  .premium-section-heading h2{font-size:36px}
+
+  .audio-source-card{padding:17px 16px!important}
+  .premium-audio-player{
+    min-height:104px;
+    grid-template-columns:70px minmax(0,1fr) 52px;
+    gap:13px;
+  }
+  .audio-play{width:66px;height:66px}
+  .audio-play svg{width:28px;height:28px}
+  .audio-wave{height:38px;gap:3px}
+  .audio-wave i{width:3px;flex-basis:3px}
+  .audio-rate{
+    min-width:48px;
+    height:44px;
+    font-size:16px;
+  }
+  .audio-time{font-size:9px}
+
+  .source-media-launch{
+    min-height:126px;
+    grid-template-columns:66px 1fr;
+    gap:16px;
+    padding:18px;
+    border-radius:20px;
+  }
+  .source-media-play{width:60px;height:60px}
+  .source-media-play svg{width:25px;height:25px}
+  .source-media-launch b{font-size:27px}
+  .source-media-launch em{font-size:9px}
+
+  .premium-offer-list article{
+    min-height:116px;
+    grid-template-columns:31% 1fr;
+    gap:16px;
+    padding:10px 0;
+  }
+  .offer-image{height:96px;border-radius:14px}
+  .premium-offer-list h3{font-size:24px}
+  .premium-offer-list p{font-size:15px}
+  .experience-quote{
+    margin:28px 0;
+    padding-left:18px;
+    font-size:29px;
+  }
+
+  .experience-source-panel{
+    grid-template-columns:52px minmax(0,1fr) 42px;
+    gap:12px;
+    min-height:96px;
+    padding:14px;
+    border-radius:18px;
+  }
+  .source-leaf{width:44px;height:44px;font-size:27px}
+  .experience-source-panel h3{font-size:21px}
+  .source-open-link{width:38px;height:38px}
+  .contemplative-intro,.classic-reading-intro,.human-premium-card{
+    padding:22px 20px;
+    border-radius:19px;
+  }
+  .contemplative-intro{
+    grid-template-columns:50px 1fr;
+    gap:14px;
+  }
+  .quiet-mark{width:46px;height:46px}
+  .contemplative-intro p,.classic-reading-intro p,.human-premium-card>p{font-size:20px}
+  .health-sections article{min-height:64px}
+  .health-sections h3{font-size:21px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .lumi-orb,.orb,.breath-orb,.lumi-glow{animation:none!important}
+  *{scroll-behavior:auto!important}
+}
+
