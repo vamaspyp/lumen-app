@@ -1132,3 +1132,224 @@ a{color:inherit}
   .secondary-tags{display:none!important}
   .faro-selection-summary{align-items:flex-start;flex-direction:column}
 }
+
+
+/* A63 · Premium convergence against approved reference.
+   Existing A63 field only: no parallel theme, no alternate renderer system. */
+
+/* Fuente / Buscar use the light editorial opening seen in the approved reference. */
+.space-hero-editorial{
+  min-height:330px;
+  background-image:none!important;
+  background:linear-gradient(180deg,#fbf8f1 0%,#f7f2e8 100%)!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  color:var(--premium-ink);
+}
+.space-hero-editorial::after{display:none!important}
+.space-hero-editorial .space-brand{
+  color:#1c2722;
+  text-shadow:none;
+}
+.space-hero-editorial .space-hero-copy{
+  width:min(920px,72%);
+  padding:94px 42px 42px;
+  color:var(--premium-ink);
+}
+.space-hero-editorial .space-hero-copy>p{
+  color:#69716d;
+}
+.space-hero-editorial .space-hero-copy h1{
+  color:#151d1a;
+  font-size:clamp(66px,8vw,112px);
+  line-height:.84;
+  text-shadow:none;
+}
+.space-hero-editorial .space-hero-copy>span{
+  color:#68716d;
+  font-size:20px;
+}
+.space-hero-editorial .space-hero-note{
+  color:#59645d;
+  border-left-color:rgba(38,48,43,.35);
+}
+.space-hero-editorial .space-hero-note span{color:#7c817d}
+
+/* Once a constellation opens it becomes the scene: no duplicate Explore header/search. */
+.explore-view.constellation-open>.space-hero{display:none!important}
+.explore-view.constellation-open .space-content{padding-top:10px}
+.explore-view.constellation-open .explore-toolbar{display:none!important}
+.explore-view.constellation-open .constellation-hero{margin-top:0}
+
+/* Capacities are lenses, not dashboard tiles. */
+.explore-view .faro-large-grid{
+  display:flex!important;
+  flex-wrap:wrap;
+  gap:9px;
+  margin:0 0 34px;
+}
+.explore-view .faro-large-grid button{
+  min-height:42px!important;
+  width:auto!important;
+  padding:0 17px!important;
+  display:inline-flex!important;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--premium-line-strong)!important;
+  border-radius:999px!important;
+  background:rgba(252,249,243,.72)!important;
+  box-shadow:none!important;
+  color:#56615a!important;
+}
+.explore-view .faro-large-grid button>span,
+.explore-view .faro-large-grid button>small{display:none!important}
+.explore-view .faro-large-grid button>b{
+  font-family:Inter,system-ui,sans-serif!important;
+  font-size:12px!important;
+  font-weight:500!important;
+  letter-spacing:0!important;
+}
+.explore-view .faro-large-grid button.active{
+  background:var(--premium-forest)!important;
+  border-color:var(--premium-forest)!important;
+  color:#fff!important;
+}
+
+/* Canonical resource card metadata: family -> provenance -> title -> capacities/qualities. */
+.source-provider{
+  display:block;
+  margin:-1px 0 7px;
+  color:#737a75;
+  font-size:9px;
+  font-weight:500;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.resource-tags{
+  margin-top:auto;
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+.resource-tags span{
+  display:inline-flex;
+  align-items:center;
+  min-height:27px;
+  padding:0 11px;
+  border-radius:999px;
+  background:#efebe2;
+  color:#59625d;
+  font-size:9px;
+  line-height:1;
+  white-space:nowrap;
+}
+.resource-tags .capacity-tag{
+  background:#e2e4d7;
+  color:#33483b;
+  font-weight:600;
+}
+.source-card-copy .source-summary{
+  margin-bottom:12px!important;
+}
+
+/* Keep one typographic rhythm through private spaces. */
+.life-view .life-columns>section>h2,
+.sanctuary-view .life-columns>section>h2{
+  margin:.25rem 0 .7rem;
+  font-family:var(--serif);
+  font-size:clamp(34px,4vw,52px);
+  font-weight:400;
+  line-height:1;
+}
+.path-grid-wide>article,
+.sanctuary-grid-large>article,
+.circle-large>article,
+.people-large>article{
+  border-radius:20px!important;
+}
+.path-items{gap:9px}
+.path-item-row{border-radius:14px!important}
+
+/* LUMI stays visible without competing with a full-screen experience. */
+.experience .experience-lumi{opacity:.78}
+.experience-premium-page .experience-brand,
+.premium-external .experience-brand{letter-spacing:.30em}
+
+/* Mobile is the primary visual acceptance surface for the approved standard. */
+@media(max-width:760px){
+  .space-hero-editorial{
+    min-height:360px;
+    width:100%;
+  }
+  .space-hero-editorial .space-brand{
+    top:23px;
+  }
+  .space-hero-editorial .space-hero-copy{
+    width:100%;
+    padding:108px 22px 34px!important;
+  }
+  .space-hero-editorial .space-hero-copy h1{
+    font-size:64px;
+    line-height:.86;
+  }
+  .space-hero-editorial .space-hero-copy>span{
+    max-width:78%;
+    font-size:17px;
+    line-height:1.35;
+  }
+  .space-hero-editorial .space-hero-note{
+    top:100px;
+    right:18px;
+    width:122px;
+    color:#59645d;
+    font-size:14px;
+  }
+  .explore-view .faro-large-grid{
+    overflow-x:auto;
+    flex-wrap:nowrap;
+    padding-bottom:4px;
+    scrollbar-width:none;
+  }
+  .explore-view .faro-large-grid::-webkit-scrollbar{display:none}
+  .explore-view .faro-large-grid button{white-space:nowrap}
+  .source-provider{
+    margin-bottom:4px;
+    font-size:7px;
+  }
+  .resource-tags{
+    gap:5px;
+    max-height:52px;
+    overflow:hidden;
+  }
+  .resource-tags span{
+    min-height:23px;
+    padding:0 8px;
+    font-size:7.5px;
+  }
+  .source-card-copy .source-summary{
+    margin-bottom:7px!important;
+  }
+  .explore-view.constellation-open .space-content{
+    width:100%;
+    padding-top:0;
+  }
+  .explore-view.constellation-open .constellation-hero{
+    width:100%;
+    border-radius:0 0 26px 26px;
+    min-height:510px;
+    margin:0 0 28px;
+  }
+  .explore-view.constellation-open .constellation-hero>div{
+    padding:270px 22px 34px;
+  }
+  .explore-view.constellation-open .constellation-hero h1{
+    font-size:58px;
+  }
+  .explore-view.constellation-open .moment-source-grid,
+  .explore-view.constellation-open .source-grid,
+  .explore-view.constellation-open> .space-content>section{
+    width:calc(100vw - 28px);
+    margin-left:auto;
+    margin-right:auto;
+  }
+}
