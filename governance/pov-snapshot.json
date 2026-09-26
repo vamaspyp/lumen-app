@@ -1,25 +1,138 @@
 {
-  "schema_version":"1.1",
-  "source":{"system_id":"V3","spreadsheet_id":"1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM","title":"VA+LUMEN · Sistema de Conducción · OPERATIVO","verified_at":"2026-09-16T18:02:00Z","verified_by":"conductor_agent_with_google_drive_read"},
-  "focus":{"id":"F6","name":"Nacimiento del Embrión y primeras vidas reales","status":"ACTIVO"},
-  "act":{"id":"A63","name":"LUMEN WORLD CLASS · elevar experiencia integral antes de Pauli","status":"EN CURSO","purpose":"Materializar en el runtime real la fisiología integral del Embrión definida por V55, preservando la continuidad del Experience & Sensation Field y elevando cada familia de experiencia a una expresión inequívocamente LUMEN. El Atlas Premium A63 funciona como referencia material subordinada —no nueva autoridad— para navegación, presencia, transiciones, inmersión y quality bar por arquetipo; world-class es piso, no techo. No se copia mecánicamente el prototipo: se conserva su naturaleza y se evoluciona con criterio limpio.","dod":"A63 sólo cierra cuando: (1) Especificación funcional/V55, Atlas Premium, modelo de datos y React están mapeados sin omisiones materiales; (2) el runtime real materializa familias diferenciadas —perspectiva/lectura editorial, práctica, audio, video, obra/recurso externo, acción real, persona/mentor/profesional, círculo/grupo, evento/lugar/servicio, ayuda material/pública/profesional y quietud/no contenido— sin renderer universal; (3) cada familia representativa supera Quality Bar LUMEN: experiencia propia, fullscreen/inmersiva por default cuando corresponda, dirección de arte y ritmo adecuados a su naturaleza, procedencia/condiciones/riesgos/costo/disponibilidad sólo cuando sean materialmente necesarios, entrada/salida/retorno cuidados y LUMI P0–P2 coherente; (4) audio/video cuentan con contenido o asset real representativo, no sólo simulación visual; (5) Fuente/Territorio/Tejido conservan el mismo Field sin convertirse en catálogo/dashboard/red social; (6) FUNCTIONAL + ARCHITECTURE + DATA + CUSTODY + EXPERIENCE + HUMAN PASS, con C0+C1+C2+C3+C7+C8 sin BLOCK, CI/backend/visual QA PASS y revisión humana sobre runtime real. Tests verdes no sustituyen Experience PASS."},
-  "active_authorities":[
-    {"id":"V3","name":"Sistema de Conducción","state":"VIGENTE"},
-    {"id":"V40","name":"Arquitectura Greenfield del Embrión V0.1","state":"VIGENTE"},
-    {"id":"V41","name":"Constitución Operativa y Guardrails Transversales V1.0","state":"VIGENTE"},
-    {"id":"V42","name":"Ficha Transversal · Guardrails Obligatorios para Todo Agente · V1.2","state":"VIGENTE"},
-    {"id":"V43","name":"Diseño Canónico de Experiencia y Comportamiento del Embrión V1.0","state":"VIGENTE"},
-    {"id":"V44","name":"Runtime Greenfield","state":"VIGENTE"},
-    {"id":"V45","name":"Conduction Gate v0.2","state":"VIGENTE"},
-    {"id":"V46","name":"Modelo Canónico Integral Definitivo V1.0","state":"VIGENTE"},
-    {"id":"V50","name":"Especificación As-Built del Embrión Certificado V1.0","state":"VIGENTE"},
-    {"id":"V51","name":"Precisión Canónica de Norte, Visión y Misión · V1.1","state":"VIGENTE"},
-    {"id":"V52","name":"Especificación Funcional del Embrión V1.1 · Integración y Capacidad Propia","state":"VIGENTE"},
-    {"id":"V53","name":"Especificación Técnico-Funcional del Embrión V1.1 · Integración y Capacidad Propia","state":"VIGENTE"},
-    {"id":"V54","name":"Sistema de Custodia Sincrónica del Organismo · V1.0","state":"VIGENTE"},
-    {"id":"V55","name":"LUMEN Experience & Sensation Field · Especificación Canónica V1.5","state":"VIGENTE"},
-    {"id":"V56","name":"VA+LUMEN · Fuente LUMEN · Estándar Canónico del Embrión V1.0","state":"VIGENTE"}
+  "schema_version": "1.1",
+  "source": {
+    "system_id": "V3",
+    "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
+    "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
+    "verified_at": "2026-09-26T15:09:00Z",
+    "verified_by": "conductor_agent_with_google_drive_read"
+  },
+  "focus": {
+    "id": "F6",
+    "name": "Nacimiento del Embrión y primeras vidas reales",
+    "status": "ACTIVO"
+  },
+  "act": {
+    "id": "A63",
+    "name": "LUMEN WORLD CLASS · elevar experiencia integral antes de Pauli",
+    "status": "EN CURSO",
+    "purpose": "Materializar en el runtime real la fisiología integral del Embrión definida por V55, preservando la continuidad del Experience & Sensation Field y elevando cada familia de experiencia a una expresión inequívocamente LUMEN. El Atlas Premium A63 funciona como referencia material subordinada —no nueva autoridad— para navegación, presencia, transiciones, inmersión y quality bar por arquetipo; world-class es piso, no techo. No se copia mecánicamente el prototipo: se conserva su naturaleza y se evoluciona con criterio limpio.",
+    "dod": "A63 sólo cierra cuando: (1) Especificación funcional/V55, Atlas Premium, modelo de datos y React están mapeados sin omisiones materiales; (2) el runtime real materializa familias diferenciadas —perspectiva/lectura editorial, práctica, audio, video, obra/recurso externo, acción real, persona/mentor/profesional, círculo/grupo, evento/lugar/servicio, ayuda material/pública/profesional y quietud/no contenido— sin renderer universal; (3) cada familia representativa supera Quality Bar LUMEN: experiencia propia, fullscreen/inmersiva por default cuando corresponda, dirección de arte y ritmo adecuados a su naturaleza, procedencia/condiciones/riesgos/costo/disponibilidad sólo cuando sean materialmente necesarios, entrada/salida/retorno cuidados y LUMI P0–P2 coherente; (4) audio/video cuentan con contenido o asset real representativo, no sólo simulación visual; (5) Fuente/Territorio/Tejido conservan el mismo Field sin convertirse en catálogo/dashboard/red social; (6) FUNCTIONAL + ARCHITECTURE + DATA + CUSTODY + EXPERIENCE + HUMAN PASS, con C0+C1+C2+C3+C7+C8 sin BLOCK, CI/backend/visual QA PASS y revisión humana sobre runtime real. Tests verdes no sustituyen Experience PASS."
+  },
+  "active_authorities": [
+    {
+      "id": "V3",
+      "name": "Sistema de Conducción",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V40",
+      "name": "Arquitectura Greenfield del Embrión V0.1",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V41",
+      "name": "Constitución Operativa y Guardrails Transversales V1.0",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V42",
+      "name": "Ficha Transversal · Guardrails Obligatorios para Todo Agente · V1.2",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V43",
+      "name": "Diseño Canónico de Experiencia y Comportamiento del Embrión V1.0",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V44",
+      "name": "Runtime Greenfield",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V45",
+      "name": "Conduction Gate v0.2",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V46",
+      "name": "Modelo Canónico Integral Definitivo V1.0",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V50",
+      "name": "Especificación As-Built del Embrión Certificado V1.0",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V51",
+      "name": "Precisión Canónica de Norte, Visión y Misión · V1.1",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V52",
+      "name": "Especificación Funcional del Embrión V1.1 · Integración y Capacidad Propia",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V53",
+      "name": "Especificación Técnico-Funcional del Embrión V1.1 · Integración y Capacidad Propia",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V54",
+      "name": "Sistema de Custodia Sincrónica del Organismo · V1.0",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V55",
+      "name": "LUMEN Experience & Sensation Field · Especificación Canónica V1.6",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V56",
+      "name": "VA+LUMEN · Fuente LUMEN · Estándar Canónico del Embrión V1.1",
+      "state": "VIGENTE"
+    }
   ],
-  "superseded_authorities":["V37","V39","V47","V48","V49"],
-  "integrity":{"source_is_private_pov":true,"historical_sources_are_non_authoritative":true,"implementation_is_not_authority":true,"target_precedes_runtime_diff":true,"permanent_bridges_forbidden":true,"bidirectional_conformity_required":true,"a54_integrally_certified":true,"a56_birth_go":true,"a60_v11_certified":true,"a61_custody_certified":true,"a62_technical_implementation_certified":true,"a62_worldclass_claim_valid":false,"canonical_integrity_version":7,"release_contract":"embryo.v53.1","custody_system":"V54","custody_fail_closed":true,"pauli_ready":false,"world_class_non_negotiable":true,"v55_experience_sensation_authority":true,"v55_version":"1.5","v55_relational_field_canonical":true,"v55_human_validated_baseline":true,"v55_material_baseline":"A63 V15 Deep","v55_no_regression_required":true,"v55_perceptual_continuity_required":true,"v56_source_authority":true,"prelaunch_reset_required":true,"fail_closed":true,"snapshot_max_age_hours":72}
+  "superseded_authorities": [
+    "V37",
+    "V39",
+    "V47",
+    "V48",
+    "V49"
+  ],
+  "integrity": {
+    "source_is_private_pov": true,
+    "historical_sources_are_non_authoritative": true,
+    "implementation_is_not_authority": true,
+    "target_precedes_runtime_diff": true,
+    "permanent_bridges_forbidden": true,
+    "bidirectional_conformity_required": true,
+    "a54_integrally_certified": true,
+    "a56_birth_go": true,
+    "a60_v11_certified": true,
+    "a61_custody_certified": true,
+    "a62_technical_implementation_certified": true,
+    "a62_worldclass_claim_valid": false,
+    "canonical_integrity_version": 7,
+    "release_contract": "embryo.v53.1",
+    "custody_system": "V54",
+    "custody_fail_closed": true,
+    "pauli_ready": false,
+    "world_class_non_negotiable": true,
+    "v55_experience_sensation_authority": true,
+    "v55_version": "1.6",
+    "v55_relational_field_canonical": true,
+    "v55_human_validated_baseline": true,
+    "v55_material_baseline": "A63 V15 Deep",
+    "v55_no_regression_required": true,
+    "v55_perceptual_continuity_required": true,
+    "v56_source_authority": true,
+    "prelaunch_reset_required": true,
+    "fail_closed": true,
+    "snapshot_max_age_hours": 72,
+    "v56_version": "1.1"
+  }
 }
