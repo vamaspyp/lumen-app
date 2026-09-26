@@ -553,6 +553,7 @@ export default function App() {
 
   useEffect(()=>{void (async()=>{try{const auth=await getAuthSnapshot();setAuthenticated(Boolean(auth.session));setProfile(auth.user?viewerProfile(auth.user):null);if(auth.session){await bootstrapPerson();await loadPrivate()}await loadPublic()}finally{setAuthChecked(true)}})()},[loadPrivate,loadPublic])
   useEffect(()=>{window.dispatchEvent(new CustomEvent('lumen:space',{detail:{space}}))},[space])
+  useEffect(()=>{window.dispatchEvent(new CustomEvent('lumen:presence',{detail:{mode:stage==='experience'?'retired':'ambient'}}))},[stage])
 
   const go=(next:Space)=>{setSpace(next);if(next!=='home'&&stage!=='idle')setStage('idle')}
   const resetMoment=()=>{setStage('idle');setScene(null);setHelp(null);setMomentConstellation([]);setCapacityKeys([]);setSelectedPathIds([]);setCreatedTrajectoryId(null);setIntegrated(false)}
@@ -658,5 +659,5 @@ export default function App() {
   },[stage,space,email,otp,otpSent,busy,authError,scene,help,momentConstellation,capacityKeys,taxonomy,expression,selectedPathIds,createdTrajectoryId,integrated,authenticated,profile,sourceReturnConstellationKey,source,snapshot,entries,circles,proactivity,loadPrivate])
 
   if(!authChecked)return <div className="boot-screen"><span className="orb"/><p>LUMEN</p></div>
-  return <div className="app-shell"><Sidebar active={space} go={go} authenticated={authenticated} onSignOut={()=>void (async()=>{await signOut();setAuthenticated(false);setProfile(null);setSourceReturnConstellationKey(null);setSnapshot(null);setEntries([]);setCircles([]);setProactivityState(null);resetMoment();setSpace('home')})()}/><main className="main-field">{content}</main></div>
+  return <div className="app-shell">{stage!=='experience'&&<Sidebar active={space} go={go} authenticated={authenticated} onSignOut={()=>void (async()=>{await signOut();setAuthenticated(false);setProfile(null);setSourceReturnConstellationKey(null);setSnapshot(null);setEntries([]);setCircles([]);setProactivityState(null);resetMoment();setSpace('home')})()}/>}<main className="main-field">{content}</main></div>
 }
