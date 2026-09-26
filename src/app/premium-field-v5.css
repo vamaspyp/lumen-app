@@ -1132,3 +1132,209 @@ a{color:inherit}
   .secondary-tags{display:none!important}
   .faro-selection-summary{align-items:flex-start;flex-direction:column}
 }
+
+
+/* A63 · PREMIUM convergence · approved visual reference
+   One Field, not a parallel skin. These are the remaining continuity deltas. */
+
+.space-hero-editorial{
+  min-height:330px;
+  background-image:none!important;
+  background:linear-gradient(180deg,#fcfaf5 0%,#f7f2e8 100%)!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  color:var(--premium-ink);
+}
+.space-hero-editorial::after{display:none!important}
+.space-hero-editorial .space-brand{color:#1b2721;text-shadow:none}
+.space-hero-editorial .space-hero-copy{
+  width:min(920px,72%);
+  padding:96px 42px 42px;
+  color:var(--premium-ink);
+}
+.space-hero-editorial .space-hero-copy>p{color:#69716d}
+.space-hero-editorial .space-hero-copy h1{
+  color:#151d1a;
+  font-size:clamp(66px,8vw,112px);
+  line-height:.84;
+  text-shadow:none;
+}
+.space-hero-editorial .space-hero-copy>span{
+  max-width:720px;
+  color:#68716d;
+  font-size:20px;
+}
+.space-hero-editorial .space-hero-note{
+  color:#59645d;
+  border-left-color:rgba(38,48,43,.34);
+}
+.space-hero-editorial .space-hero-note span{color:#7c817d}
+
+/* When a constellation opens it owns the scene: remove duplicated discovery chrome. */
+.explore-view.constellation-open>.space-hero{display:none!important}
+.explore-view.constellation-open .space-content{padding-top:10px}
+.explore-view.constellation-open .explore-toolbar{display:none!important}
+.explore-view.constellation-open .constellation-hero{margin-top:0}
+
+/* Capacities are quiet lenses, never a dashboard. */
+.explore-view .faro-large-grid{
+  display:flex!important;
+  flex-wrap:wrap;
+  gap:9px;
+  margin:0 0 34px;
+}
+.explore-view .faro-large-grid button{
+  min-height:42px!important;
+  width:auto!important;
+  padding:0 17px!important;
+  display:inline-flex!important;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--premium-line-strong)!important;
+  border-radius:999px!important;
+  background:rgba(252,249,243,.74)!important;
+  box-shadow:none!important;
+  color:#56615a!important;
+}
+.explore-view .faro-large-grid button>span,
+.explore-view .faro-large-grid button>small{display:none!important}
+.explore-view .faro-large-grid button>b{
+  font-family:Inter,system-ui,sans-serif!important;
+  font-size:12px!important;
+  font-weight:500!important;
+  letter-spacing:0!important;
+}
+.explore-view .faro-large-grid button.active{
+  background:var(--premium-forest)!important;
+  border-color:var(--premium-forest)!important;
+  color:#fff!important;
+}
+
+/* Resource metadata follows the approved hierarchy: family, provenance, title, capacities, secondary qualities. */
+.resource-provenance{
+  display:block;
+  margin:-1px 0 7px;
+  color:#737a75;
+  font-size:9px;
+  font-weight:500;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.premium-tags{
+  margin-top:auto;
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+.premium-tags span{
+  display:inline-flex;
+  align-items:center;
+  min-height:27px;
+  padding:0 11px;
+  border:0;
+  border-radius:999px;
+  background:#efebe2;
+  color:#59625d;
+  font-size:9px;
+  line-height:1;
+  white-space:nowrap;
+}
+.premium-tags .capacity-tag{
+  background:#e2e4d7;
+  color:#33483b;
+  font-weight:600;
+}
+.source-card-copy .source-summary{margin-bottom:12px!important}
+
+/* Same typographic gravity through personal territory and community. */
+.life-view .life-columns>section>h2,
+.sanctuary-view .life-columns>section>h2{
+  margin:.25rem 0 .7rem;
+  font-family:var(--serif);
+  font-size:clamp(34px,4vw,52px);
+  font-weight:400;
+  line-height:1;
+}
+.path-grid-wide>article,
+.sanctuary-grid-large>article,
+.circle-large>article,
+.people-large>article{
+  border-radius:20px!important;
+}
+.path-items{gap:9px}
+.path-item-row{border-radius:14px!important}
+
+/* Mobile is the strict acceptance surface because it matches the approved references. */
+@media(max-width:760px){
+  .space-hero-editorial{
+    width:100%;
+    min-height:360px;
+  }
+  .space-hero-editorial .space-brand{
+    top:22px;
+    color:#1b2721;
+  }
+  .space-hero-editorial .space-hero-copy{
+    width:100%;
+    padding:108px 22px 34px!important;
+  }
+  .space-hero-editorial .space-hero-copy h1{
+    font-size:64px;
+    line-height:.86;
+  }
+  .space-hero-editorial .space-hero-copy>span{
+    max-width:78%;
+    font-size:17px;
+    line-height:1.35;
+  }
+  .space-hero-editorial .space-hero-note{
+    top:100px;
+    right:18px;
+    width:122px;
+    color:#59645d;
+    font-size:14px;
+  }
+  .explore-view .faro-large-grid{
+    overflow-x:auto;
+    flex-wrap:nowrap;
+    padding-bottom:4px;
+    scrollbar-width:none;
+  }
+  .explore-view .faro-large-grid::-webkit-scrollbar{display:none}
+  .explore-view .faro-large-grid button{white-space:nowrap}
+  .resource-provenance{
+    margin-bottom:4px;
+    font-size:7px;
+  }
+  .premium-tags{
+    gap:5px;
+    max-height:52px;
+    overflow:hidden;
+  }
+  .premium-tags span{
+    min-height:23px;
+    padding:0 8px;
+    font-size:7.5px;
+  }
+  .source-card-copy .source-summary{margin-bottom:7px!important}
+  .explore-view.constellation-open .space-content{
+    width:100%;
+    padding-top:0;
+  }
+  .explore-view.constellation-open .constellation-hero{
+    width:100%;
+    min-height:510px;
+    margin:0 0 28px;
+    border-radius:0 0 26px 26px;
+  }
+  .explore-view.constellation-open .constellation-hero>div{
+    padding:270px 22px 34px;
+  }
+  .explore-view.constellation-open .constellation-hero h1{font-size:58px}
+  .explore-view.constellation-open .source-grid,
+  .explore-view.constellation-open> .space-content>section{
+    width:calc(100vw - 28px);
+    margin-left:auto;
+    margin-right:auto;
+  }
+}
