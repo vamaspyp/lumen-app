@@ -47,12 +47,12 @@ export function premiumConstellations(source: SourceItem[], taxonomy: SourceTaxo
 export function premiumFamilyLabel(item: SourceItem): string {
   const family = premiumFamily(item)
   const labels: Record<string,string> = {
-    illustrated_guide: 'Guía esencial',
-    audio_practice: 'Práctica guiada',
+    illustrated_guide: 'Guía ilustrada',
+    audio_practice: 'Audio oficial',
     contemplative_reading_audio: 'Práctica contemplativa',
-    classic_reading: 'Lectura profunda',
-    video_or_audio_visual_sequence: 'Profundización audiovisual',
-    health_reference: 'Comprensión sanitaria',
+    classic_reading: 'Lectura esencial',
+    video_or_audio_visual_sequence: 'Video / profundización',
+    health_reference: 'Referencia sanitaria',
   }
   return (family && labels[family]) || item.help_type.replaceAll('_',' ')
 }
