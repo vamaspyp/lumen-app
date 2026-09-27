@@ -269,7 +269,7 @@ export function Experience({ help, onExit, onFeedback }: { help: Help; onExit: (
     return () => { cancelled = true }
   }, [help.help_id, parentOwnsOutcome])
 
-  const finish = () => parentOwnsOutcome ? onExit() : setReflecting(true)
+  const finish = () => (onFeedback || !parentOwnsOutcome) ? setReflecting(true) : onExit()
   const feedback = async (effect: OutcomeEffect) => {
     setSending(true)
     try {
