@@ -102,3 +102,20 @@ test('A63 approved storyboard keeps the ten canonical scenes and central flow vi
  await page.getByText('Comunidad',{exact:true}).click();await page.getByRole('button',{name:'Cómo aprendemos juntos'}).click();await expect(page.getByRole('heading',{name:'Impacto y Aprendizaje'})).toBeVisible();
  await page.screenshot({path:'test-results/a63-approved-storyboard-final.png',fullPage:true})
 })
+
+test('A63 prototype contract is materially present screen by screen',async({page})=>{
+ const calls:string[]=[];await session(page);await mocks(page,calls);await page.goto('/?vnext=1');
+ for(const label of ['Inicio','Explorar','Mi Vida','Comunidad','Biblioteca']) await expect(page.getByText(label,{exact:true})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Una vida más tuya.'})).toBeVisible();await expect(page.getByText('Me siento estresado',{exact:true})).toBeVisible();await expect(page.getByText('Necesito claridad',{exact:true})).toBeVisible();await expect(page.getByText('Quiero avanzar en algo',{exact:true})).toBeVisible();await expect(page.getByText('Solo quiero explorar',{exact:true})).toBeVisible();
+ await page.getByPlaceholder('Cuéntame en qué momento estás...').fill('Quiero estar más presente con mi familia');await page.getByRole('button',{name:'→'}).click();
+ await expect(page.getByText('TU MOMENTO',{exact:true})).toBeVisible();await expect(page.getByRole('heading',{name:'¿Qué estás viviendo hoy?'})).toBeVisible();await page.getByRole('button',{name:'→'}).click();
+ for(const lens of ['Dirección','Potencial','Condiciones','Realización']) await expect(page.locator('.vx-lenses').getByText(lens,{exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Ver mi Faro'}).click();await expect(page.getByText('Próximos pasos sugeridos',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:/Explorar más sobre este Faro/})).toBeVisible();await expect(page.getByRole('button',{name:/Ver cómo se conecta con tu vida actual/})).toBeVisible();await page.getByRole('button',{name:/Abrir una constelación/}).click();
+ for(const filter of ['Todos','Práctica','Lectura','Audio','Experiencia']) await expect(page.getByRole('button',{name:filter,exact:true})).toBeVisible();
+ await page.getByRole('button').filter({hasText:'Llegar al cuerpo'}).click();await expect(page.getByRole('button',{name:'Marcar como realizada'})).toBeVisible();await expect(page.getByText('Biblioteca',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Seguir'}).click();await page.getByRole('button',{name:'Seguir'}).click();await page.getByRole('button',{name:'Marcar como realizada'}).click();
+ for(const signal of ['Me ayudó mucho','Me ayudó','Algo','No mucho','No me sirvió']) await expect(page.getByRole('button',{name:signal,exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Me ayudó',exact:true}).click();await page.getByPlaceholder(/Qué fue lo más valioso/).fill('Pude estar presente.');await page.getByRole('button',{name:'Guardar en mi Santuario'}).click();
+ for(const tab of ['Recursos','Experiencias','Reflexiones','Notas']) await expect(page.getByRole('button',{name:tab,exact:true})).toBeVisible();
+ await page.getByText('Explorar',{exact:true}).click();for(const area of ['Bienestar físico y mental','Trabajo y propósito','Relaciones','Familia y hogar','Desarrollo personal','Creatividad','Comunidad y servicio','Entorno y naturaleza','Finanzas y recursos']) await expect(page.getByRole('button',{name:area,exact:true})).toBeVisible();
+ await page.getByText('Comunidad',{exact:true}).click();await page.getByRole('button',{name:'Cómo aprendemos juntos'}).click();for(const item of ['Vidas reales','Aprendizaje colectivo','Mejores acompañamientos']) await expect(page.getByText(item,{exact:true})).toBeVisible();
+})
