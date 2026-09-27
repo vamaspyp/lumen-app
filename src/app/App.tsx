@@ -267,7 +267,6 @@ function resourceCapabilityLabels(item: ExperienceHelp, taxonomy: SourceTaxonomy
 
 function ResourceCard({ item,index,authenticated,onOpen,onSave,taxonomy,contextLabel,extraAction,openLabel='Vivir esta posibilidad' }: { item:ExperienceHelp; index:number; authenticated:boolean; onOpen:(item:ExperienceHelp)=>void; onSave?:(item:SourceItem)=>Promise<void>; taxonomy?:SourceTaxonomy|null; contextLabel?:string; extraAction?:ReactNode; openLabel?:string }) {
   const roles = resourceRoles(item)
-  const provider = resourceProvider(item)
   const familyLabel = isSourceItem(item)&&premiumFamily(item) ? premiumFamilyLabel(item) : item.help_type.replaceAll('_',' ')
   const eyebrow = [familyLabel, item.duration_minutes ? `${item.duration_minutes} MIN` : null].filter(Boolean).join(' · ')
   const capabilities = resourceCapabilityLabels(item,taxonomy||null)
