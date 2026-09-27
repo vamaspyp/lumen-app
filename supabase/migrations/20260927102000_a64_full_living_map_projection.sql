@@ -1,0 +1,6 @@
+-- A64 FULL Living Map projection
+-- Applied to Supabase on 2026-09-27.
+-- Runtime contract: public.lumen_living_map_snapshot()
+-- Returns consent-aware JSON for territory, direction, potential, conditions and realization.
+-- Sources: current person's Faros, moment interpretations, own reusable resources and lived outcomes.
+-- The projection is partial and correctable; no score is produced.
