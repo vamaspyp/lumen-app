@@ -43,3 +43,8 @@
 .vx-list2>header,.vx-settings>header{position:relative;padding:26px 2px 18px}
 .vx-list2>header:after,.vx-settings>header:after{content:"";display:block;width:42px;height:1px;background:#8a6e55;margin-top:14px}
 .vx-list2>header h1,.vx-settings>header h1{font-family:var(--serif);font-weight:500}
+
+.vx-lenses button{border:0;aspect-ratio:1.08;border-radius:22px;background:rgba(249,246,237,.9);color:#2f3d35;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;backdrop-filter:blur(8px);box-shadow:0 10px 24px rgba(0,0,0,.1);padding:12px}
+.vx-lens-detail{margin:10px 0;padding:14px 15px;border-radius:17px;background:rgba(248,244,234,.94);color:#35423a;box-shadow:0 10px 24px rgba(0,0,0,.08)}
+.vx-lens-detail small{font-size:7px;letter-spacing:.14em}.vx-lens-detail p{font-family:var(--serif);font-size:14px;line-height:1.25;margin:7px 0}
+.vx-saved-open{cursor:pointer}.vx-saved-open:hover{transform:translateY(-1px)}
