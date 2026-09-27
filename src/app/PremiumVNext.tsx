@@ -29,8 +29,8 @@ export default function PremiumVNext(){
  const createSpace=async()=>{if(!circleName.trim())return;await createCircle(circleName.trim(),'Un espacio de acompañamiento entre vidas.');setCircleName('');setCircles(await getTissueSnapshot())}
  const joinSpace=async()=>{if(!invite.trim())return;await joinCircle(invite.trim());setInvite('');setCircles(await getTissueSnapshot())}
  const remindTomorrow=async()=>{if(!chosen)return;const due=new Date(Date.now()+24*60*60*1000).toISOString();await scheduleFollowup('practice_return',due,null,chosen.help_id);setProactivityState(await getProactivitySnapshot())}
- const openSaved=(helpId:string|null)=>{if(!helpId)return;const item=source.find(x=>x.help_id===helpId);if(item)openSource(item)}
  const openSource=(item:SourceItem)=>{setChosen(item);setScene('vivir')}
+ const openSaved=(helpId:string|null)=>{if(!helpId)return;const item=source.find(x=>x.help_id===helpId);if(item)openSource(item)}
  const choose=async(item:SourceItem)=>{setChosen(item);if(s1?.episode_id){try{await selectHelp(s1.episode_id,item.help_id,'selected')}catch{setError('No pude completar esa acción. Intentá de nuevo.')}}setScene('vivir')}
  const save=async()=>{if(!auth){setAuthOpen(true);return}if(!chosen)return;await saveSanctuary('treasure',chosen.title,chosen.summary,chosen.help_id);setEntries(await listSanctuary());setScene('santuario')}
  const removeEntry=async(id:string)=>{await deleteSanctuary(id);setEntries(await listSanctuary())}
