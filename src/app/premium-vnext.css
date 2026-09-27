@@ -48,3 +48,9 @@
 .vx-lens-detail{margin:10px 0;padding:14px 15px;border-radius:17px;background:rgba(248,244,234,.94);color:#35423a;box-shadow:0 10px 24px rgba(0,0,0,.08)}
 .vx-lens-detail small{font-size:7px;letter-spacing:.14em}.vx-lens-detail p{font-family:var(--serif);font-size:14px;line-height:1.25;margin:7px 0}
 .vx-saved-open{cursor:pointer}.vx-saved-open:hover{transform:translateY(-1px)}
+
+.vx-compact-hero{min-height:205px!important;margin:-18px -14px 14px!important;padding:72px 18px 20px!important;color:#fff!important;background-size:cover!important;background-position:center!important}
+.vx-settings .vx-compact-hero{margin:-28px -18px 18px!important}
+.vx-compact-hero h1{color:#fff!important;font-size:36px!important;line-height:.95!important;margin:6px 0 8px!important}
+.vx-compact-hero>span{color:rgba(255,255,255,.8)!important}
+.vx-list2>.vx-compact-hero:after,.vx-settings>.vx-compact-hero:after{display:none}
