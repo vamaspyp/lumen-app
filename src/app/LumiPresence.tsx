@@ -62,7 +62,7 @@ const CONTEXT: Record<Space, { label:string; title:string; body:string; tip:stri
   },
 }
 
-export function LumiPresence() {
+export function LumiPresence({ onNavigate }: { onNavigate?: (target: string) => void } = {}) {
   const [open, setOpen] = useState(false)
   const [space, setSpace] = useState<Space>('home')
   const [retired, setRetired] = useState(false)
@@ -121,6 +121,11 @@ export function LumiPresence() {
   }, [space])
 
   const returnToMoment = () => {
+    if (onNavigate) {
+      onNavigate('moment')
+      setOpen(false)
+      return
+    }
     clickNav('Inicio')
     window.setTimeout(() => {
       const input = document.querySelector<HTMLInputElement>('[aria-label="Lo que te está pasando"]')
@@ -132,6 +137,7 @@ export function LumiPresence() {
 
   const act = (target:string) => {
     if(target === 'moment'){returnToMoment();return}
+    if(onNavigate){onNavigate(target);setOpen(false);return}
     if(target === 'related'){clickNav('Explorar');scrollTo('related-to-faro');setOpen(false);return}
     clickNav(target)
     setOpen(false)
