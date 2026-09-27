@@ -255,10 +255,6 @@ function resourceRoles(item: ExperienceHelp): string[] {
   return isSourceItem(item) ? (item.cultivation_roles || []) : []
 }
 
-function resourceProvider(item: ExperienceHelp): string | null {
-  return isSourceItem(item) ? item.provider?.name || null : null
-}
-
 function resourceCapabilityLabels(item: ExperienceHelp, taxonomy: SourceTaxonomy | null): string[] {
   if (!isSourceItem(item)) return []
   const keys = Array.from(new Set([...(item.capacities || []), ...(item.capacity_key ? [item.capacity_key] : [])].filter(Boolean)))
