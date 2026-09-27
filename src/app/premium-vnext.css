@@ -72,3 +72,10 @@
 .vx-territory2 header{padding-top:6px}.vx-territory2 header h1{font-size:38px;line-height:.96}.vx-area-grid{grid-template-columns:repeat(3,1fr);gap:8px}.vx-area-grid button{min-height:104px;font-size:10px;line-height:1.05;padding:8px}
 .vx-learn2>div>h2{font-family:var(--serif);font-size:16px;line-height:1.25;font-weight:400;color:rgba(255,255,255,.82);margin:0 0 16px}
 .vx-bottom button small{font-size:7px}.vx-bottom button{gap:2px}
+
+/* A63 · storyboard fidelity pass 2 */
+.vx-faces{grid-template-columns:repeat(5,1fr)!important;gap:5px!important}.vx-faces button{min-width:0!important;padding:8px 2px!important;font-size:18px!important}.vx-faces button small{font-size:6px!important;line-height:1.05!important;min-height:14px}.vx-faces button.on{background:#f1e6cf!important;transform:translateY(-1px)}
+.vx-return2 textarea{min-height:128px!important;border-radius:14px!important;background:#fffdf8!important}
+.vx-san-tabs{gap:4px!important}.vx-san-tabs button{border:0;background:transparent;color:#5a625c;font-size:8px;padding:8px 10px;border-bottom:2px solid transparent}.vx-san-tabs button.on{color:#233a30;border-bottom-color:#233a30;font-weight:700}
+.vx-territory2{background-position:center;background-size:cover}.vx-area-grid button{text-transform:none!important}
+.vx-faro2{background-position:center;background-size:cover}
