@@ -54,3 +54,21 @@
 .vx-compact-hero h1{color:#fff!important;font-size:36px!important;line-height:.95!important;margin:6px 0 8px!important}
 .vx-compact-hero>span{color:rgba(255,255,255,.8)!important}
 .vx-list2>.vx-compact-hero:after,.vx-settings>.vx-compact-hero:after{display:none}
+
+/* A63 · CONFORMIDAD MATERIAL CON STORYBOARD PREMIUM APROBADO */
+.vx-phone{background:#f6f1e7}.vx-phone-top{background:rgba(246,241,231,.16);backdrop-filter:blur(9px);border-bottom:1px solid rgba(255,255,255,.12)}
+.vx-home2-copy{padding-bottom:28px}.vx-home2-copy h1{font-size:58px;letter-spacing:-.025em}.vx-home2-copy h2{max-width:330px}
+.vx-quick{grid-template-columns:1fr 1fr;gap:7px}.vx-quick button{min-height:34px;border:1px solid rgba(255,255,255,.35);background:rgba(16,23,19,.58);backdrop-filter:blur(8px);color:#fff}
+.vx-moment2 .vx-overcopy{padding-bottom:22px}.vx-moment2 textarea{min-height:145px;background:rgba(252,249,241,.96);border-radius:18px}
+.vx-moment-tools{display:flex;gap:11px;margin:8px 0 0;color:#25372f}.vx-moment-tools span{display:grid;place-items:center;width:31px;height:31px;border-radius:50%;background:rgba(250,247,239,.92)}
+.vx-round-next{width:46px!important;height:46px!important;border-radius:50%!important;padding:0!important;margin-left:auto!important;font-size:20px!important}
+.vx-map2{padding:78px 16px 20px}.vx-map-head h1{max-width:330px}.vx-map-tabs{margin-top:12px;display:flex;gap:4px;align-items:center;padding:4px;border-radius:18px;background:rgba(250,247,239,.90);overflow-x:auto;color:#39463f}.vx-map-tabs>*{white-space:nowrap;padding:6px 9px;font-size:7px;font-weight:400}.vx-map-tabs b{background:#fff;border-radius:14px;font-weight:600}
+.vx-lenses{margin-top:18px}.vx-lenses article{border:1px solid rgba(255,255,255,.5);box-shadow:0 12px 32px rgba(28,36,31,.12)}
+.vx-faro2-copy{width:100%;padding-bottom:0}.vx-faro2-copy>textarea{min-height:112px;font-family:var(--serif);font-size:25px;line-height:1.1;text-align:center;background:rgba(252,249,241,.92);border-radius:20px}.vx-faro2-copy>.vx-light{max-width:220px;margin:10px auto 16px;display:block}
+.vx-next-steps{margin:0 -22px -22px;padding:15px 18px 22px;background:#f7f2e8;color:#26372f;display:grid;gap:7px}.vx-next-steps>b{font-family:var(--serif);font-size:15px}.vx-next-steps button{display:grid;grid-template-columns:1fr auto;align-items:center;text-align:left;border:0;border-radius:13px;background:#fffdf8;padding:11px 12px;font-size:9px;color:#334139}.vx-next-steps i{font-style:normal;font-size:16px}
+.vx-list2{padding-top:18px}.vx-list2 .vx-resource-list button{min-height:78px}.vx-resource-list button span b{font-size:15px}.vx-resource-list button span em{font-size:8px;line-height:1.25}
+.vx-return2 header h1{font-size:44px}.vx-return-note{margin:12px 0;padding:13px;border-radius:15px;background:#f1eadf;color:#536057;font-size:9px;line-height:1.35}
+.vx-san-tabs{display:flex;gap:16px;padding:2px 3px 12px;border-bottom:1px solid #d9d2c6;overflow-x:auto}.vx-san-tabs>*{font-size:8px;white-space:nowrap}.vx-san-tabs b{border-bottom:2px solid #31463b;padding-bottom:7px}
+.vx-territory2 header{padding-top:6px}.vx-territory2 header h1{font-size:38px;line-height:.96}.vx-area-grid{grid-template-columns:repeat(3,1fr);gap:8px}.vx-area-grid button{min-height:104px;font-size:10px;line-height:1.05;padding:8px}
+.vx-learn2>div>h2{font-family:var(--serif);font-size:16px;line-height:1.25;font-weight:400;color:rgba(255,255,255,.82);margin:0 0 16px}
+.vx-bottom button small{font-size:7px}.vx-bottom button{gap:2px}
