@@ -23,7 +23,7 @@ export default function PremiumVNext(){
  const removeEntry=async(id:string)=>{await deleteSanctuary(id);setEntries(await listSanctuary())}
  const downloadExport=async()=>{const data=await exportSanctuary();const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='lumen-santuario.json';a.click();URL.revokeObjectURL(url)}
  const toggleMemory=async()=>{if(!continuity)return;const r=await setMemory(!continuity.memory_allowed);setContinuity({...continuity,memory_allowed:r.memory_allowed})}
- const toggleProactivity=async()=>{const r=await setProactivity(!(proactivity?.proactive_allowed??false));setProactivityState(p=>p?{...p,proactive_allowed:r.proactive_allowed}:p)}
+ const toggleProactivity=async()=>{await setProactivity(!(proactivity?.proactive_allowed??false));setProactivityState(await getProactivitySnapshot())}
  const saveFaro=async()=>{if(!auth){setAuthOpen(true);return}if(!faro.trim())return;await createTrajectory(faro.trim());setScene('constelacion')}
  const outcome=async(v:'helped'|'unsure'|'not_helped')=>{setEffect(v);if(s1?.episode_id){try{await recordOutcome(s1.episode_id,v)}catch{}}}
  const areas=s1?.interpretation?.area_keys?.length?s1.interpretation.area_keys.map(x=>x.replaceAll('_',' ')):['Familia y hogar','Trabajo y propósito','Cuerpo y salud','Relaciones','Interioridad','Creatividad']
