@@ -35,7 +35,9 @@ export default function PremiumVNext(){
  const saveFaro=async()=>{if(!auth){setAuthOpen(true);return}if(!faro.trim())return;await createTrajectory(faro.trim());setScene('constelacion')}
  const outcome=async(v:'helped'|'unsure'|'not_helped')=>{setEffect(v);if(longEpisode){try{await recordLongitudinalSignal(longEpisode,v==='helped'?'REPEATED':'UNKNOWN')}catch{setError('No pude completar esa acción. Intentá de nuevo.')};setLongEpisode(null);return}if(s1?.episode_id){try{await recordOutcome(s1.episode_id,v)}catch{setError('No pude completar esa acción. Intentá de nuevo.')}}}
  const areas=s1?.interpretation?.area_keys?.length?s1.interpretation.area_keys.map(x=>x.replaceAll('_',' ')):['Familia y hogar','Trabajo y propósito','Cuerpo y salud','Relaciones','Interioridad','Creatividad']
- const possibilities=constellation.length?constellation:source.slice(0,8)
+ const tissueIds=new Set(circles.flatMap(c=>c.contributions.map(x=>x.help_id)))
+ const tissuePossibilities=source.filter(x=>tissueIds.has(x.help_id))
+ const possibilities=Array.from(new Map([...(constellation.length?constellation:source.slice(0,8)),...tissuePossibilities].map(x=>[x.help_id,x])).values())
  const defaultFaro=expression?'Quiero cuidar lo que importa en este momento sin dejarme afuera.':'Quiero vivir con más presencia aquello que importa.'
  const content=useMemo(()=>{
   if(scene==='inicio')return <section className="vx-screen vx-home2" style={{backgroundImage:'linear-gradient(0deg,rgba(19,24,20,.52),rgba(19,24,20,.03)),url('+art.hero+')'}}><div className="vx-home2-copy"><p>TU VIDA · AHORA</p><h1>Una vida<br/>más tuya.</h1><h2>Recursos, prácticas y personas para volver al cuerpo, habitar el presente y crear una vida más consciente.</h2><div className="vx-entry"><input value={expression} onChange={e=>setExpression(e.target.value)} placeholder="Cuéntame en qué momento estás..."/><button disabled={busy||!expression.trim()} onClick={()=>void runMoment()}>→</button></div><div className="vx-quick">{['Me siento estresado','Necesito claridad','Quiero avanzar en algo','Solo quiero explorar'].map(x=><button key={x} onClick={()=>setExpression(x)}>{x}</button>)}</div></div></section>
