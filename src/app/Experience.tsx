@@ -170,13 +170,13 @@ function PremiumSourceExperience({ help,premium,onExit,onFinish }: { help:Help; 
   const sections=arr(experience.sections)
   const structuredSections=objectArray(experience.sections)
   const pullouts=arr(experience.pullouts)
-  const cta=str(content.cta_label)||'Abrir fuente original'
+  const cta=str(content.cta_label)||'Abrir en su fuente'
   const directAudio=mediaUrl(help,'audio')
   const directVideo=mediaUrl(help,'video')
 
   return <div className={`experience-premium-page premium-family-${premium}`}>
-    <ExperienceHero kind="external" premium={premium} eyebrow={eyebrow} title={help.title} deck={deck} onExit={onExit} sourceName={sourceName}/>
-    <main className="experience-premium-body">
+    <ExperienceHero kind="external" premium={premium} eyebrow={premium==='illustrated_guide'?'GUÍA ESENCIAL · FUENTE ORIGINAL':eyebrow} title={help.title} deck={deck} onExit={onExit} sourceName={sourceName}/>
+    <main className="experience-premium-body"><p className="source-fidelity-note">LUMEN contextualiza; no sustituye ni reescribe la fuente.</p>
       {premium==='illustrated_guide'&&<>
         <div className="premium-section-heading"><small>QUÉ OFRECE</small><h2>Una obra para entrar por donde hoy tenga sentido.</h2></div>
         {structuredSections.length>0?<div className="premium-offer-list">{structuredSections.map((section,index)=>{
@@ -237,7 +237,7 @@ function PremiumSourceExperience({ help,premium,onExit,onFinish }: { help:Help; 
         <AfterCard text={after}/>
       </>}
 
-      <div className="experience-finish-row"><button className="ghost" type="button" onClick={onFinish}>Volver a LUMEN</button></div>
+      <div className="experience-finish-row"><button className="ghost" type="button" onClick={onFinish}>Volver a la constelación</button></div>
     </main>
   </div>
 }
