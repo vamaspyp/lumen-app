@@ -8,13 +8,14 @@ const BASE_URL = `http://localhost:${PORT}`
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
-  reporter: 'list',
+  reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
   use: {
     baseURL: BASE_URL,
     reducedMotion: 'reduce',
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'mobile-chromium', use: { ...devices['Pixel 7'] } },
   ],
   webServer: {
     // verify builds immediately before E2E; test the deployable artifact, not Vite dev.
