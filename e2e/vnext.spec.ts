@@ -12,6 +12,13 @@ async function mocks(page:Page,calls:string[],mode:'covered'|'nomatch'|'safety'=
  if(n==='lumen_s2_list_sanctuary')return ok(route,[{entry_id:'s1',entry_kind:'reflection',title:'Algo mío',content:'Una idea que quiero conservar.',source_help_id:null,created_at:new Date().toISOString()}])
  if(n==='lumen_s5_snapshot')return ok(route,[{space_id:'c1',name:'Círculo de presencia',purpose:'Compartir y acompañar.',role:'member',member_count:8,contributions:[]}])
  if(n==='lumen_s6_snapshot')return ok(route,{proactive_allowed:false,settings:{quiet_start_hour:22,quiet_end_hour:8,timezone:'America/Buenos_Aires',custody_blocked:false},followups:[]})
+ if(n==='lumen_living_map_snapshot')return ok(route,{territory:[{area_key:'wellbeing'}],direction:[{faro_id:'t1',text:'Cuidar lo que importa'}],potential:[{resource_id:'r1',help_id:practice.help_id,user_confirmed:true}],conditions:[{confidence:.9}],realization:[{effect:'helped',applied:true}],epistemic_note:'Mapa vivo, parcial, contextual y corregible.'})
+ if(n==='lumen_consent_state')return ok(route,{memory:true,proactivity:false,evidence_use:true,sharing:true})
+ if(n==='lumen_set_consent')return ok(route,{ok:true})
+ if(n==='lumen_s5_create_invite')return ok(route,{invite_token:'LUMEN-TEST'})
+ if(n==='lumen_s5_share_help')return ok(route,{contribution_id:'co1'})
+ if(n==='lumen_s5_leave_circle')return ok(route,{left:true})
+ if(n==='lumen_s5_report_circle')return ok(route,{reported:true})
  if(n==='lumen_s1_accompany_moment')return ok(route,mode==='safety'?scene('covered','elevated'):mode==='nomatch'?scene('no_match','clear'):scene())
  if(n==='lumen_s1_moment_constellation')return ok(route,{episode_id:scene().episode_id,moment_id:scene().moment_id,decision_run_id:scene().decision_run_id,capacity_keys:['regulation'],area_keys:['wellbeing'],trace_id:'x',items:source})
  if(n==='lumen_s1_select_help')return ok(route,{selection_id:'sel',episode_id:scene().episode_id,action:'selected',help:practice,trace_id:'x'})
@@ -37,3 +44,45 @@ test('VNext completes Moment to Map to Faro to constellation to lived return and
 test('VNext exposes longitudinal reuse, Tejido and sovereign settings',async({page})=>{const calls:string[]=[];await session(page);await mocks(page,calls);await page.goto('/?vnext=1');await page.getByText('Mi Vida',{exact:true}).click();await expect(page.getByText('RECURSO PROPIO · VOLVER A USAR')).toBeVisible();await page.getByText('RECURSO PROPIO · VOLVER A USAR').click();await expect(page.getByRole('heading',{name:'Llegar al cuerpo'})).toBeVisible();await page.getByRole('button',{name:'Salir cuando quieras'}).click();await page.getByText('Tejido',{exact:true}).click();await expect(page.getByRole('heading',{name:'La vida también se vive con otros.'})).toBeVisible();await expect(page.getByText('Círculo de presencia')).toBeVisible();await page.locator('.vx-account').click();await expect(page.getByRole('heading',{name:'Vos decidís qué recuerda LUMEN.'})).toBeVisible();await page.getByText('Memoria',{exact:true}).click();expect(calls).toContain('lumen_s2_reuse_repertoire');expect(calls).toContain('lumen_s5_snapshot')})
 
 test('VNext fails honestly on no-match and safety states',async({page})=>{await session(page);await mocks(page,[],'nomatch');await page.goto('/?vnext=1');await page.getByPlaceholder('Cuéntame en qué momento estás...').fill('Algo sin cobertura');await page.getByRole('button',{name:'→'}).click();await expect(page.getByText('HONESTIDAD · NO MATCH')).toBeVisible()})
+
+
+test('VNext Source is a real discovery surface with filters and executable content',async({page})=>{
+ const calls:string[]=[];await mocks(page,calls);await page.goto('/?vnext=1');
+ await page.getByText('Fuente',{exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Sabiduría y experiencias para la vida.'})).toBeVisible();
+ await expect(page.getByText(/posibilidades disponibles/)).toBeVisible();
+ await expect(page.getByRole('button',{name:'Práctica'})).toBeVisible();
+ await page.getByPlaceholder('Buscar por tema, autor o fuente…').fill('cuerpo');
+ await expect(page.getByRole('button').filter({hasText:'Llegar al cuerpo'})).toBeVisible();
+ await page.getByRole('button').filter({hasText:'Llegar al cuerpo'}).click();
+ await expect(page.getByRole('heading',{name:'Llegar al cuerpo'})).toBeVisible();
+ await page.screenshot({path:'test-results/source-experience-mobile.png',fullPage:true});
+ expect(calls).toContain('lumen_source_discover')
+})
+
+test('VNext shortcuts execute comprehension instead of only filling the composer',async({page})=>{
+ const calls:string[]=[];await session(page);await mocks(page,calls);await page.goto('/?vnext=1');
+ await page.getByRole('button',{name:'Necesito claridad para decidir'}).click();
+ await expect(page.getByRole('heading',{name:'¿Qué estás viviendo hoy?'})).toBeVisible();
+ expect(calls).toContain('lumen_s1_accompany_moment');
+ expect(calls).toContain('lumen_s1_moment_constellation')
+})
+
+test('VNext core PREMIUM surfaces keep cinematic image treatment on mobile',async({page})=>{
+ await session(page);await mocks(page,[]);await page.goto('/?vnext=1');
+ for(const target of ['Fuente','Tejido']){
+   await page.getByText(target,{exact:true}).click();
+   await expect(page.locator('.vx-image-header')).toBeVisible();
+   const bg=await page.locator('.vx-image-header').evaluate(el=>getComputedStyle(el).backgroundImage);
+   expect(bg).not.toBe('none');
+ }
+ await page.locator('.vx-account').click();
+ await expect(page.locator('.vx-image-header')).toBeVisible();
+ await page.screenshot({path:'test-results/premium-secondary-surfaces.png',fullPage:true})
+})
+
+test('VNext has no inert visible buttons in the unauthenticated discovery shell',async({page})=>{
+ await mocks(page,[]);await page.goto('/?vnext=1');
+ const buttons=page.locator('button:visible');const count=await buttons.count();
+ for(let i=0;i<count;i++){const b=buttons.nth(i);await expect(b).toBeEnabled()}
+})
