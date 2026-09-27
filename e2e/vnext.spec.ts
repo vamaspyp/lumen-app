@@ -13,7 +13,7 @@ async function mocks(page:Page,calls:string[],mode:'covered'|'nomatch'|'safety'=
  if(n==='lumen_s5_snapshot')return ok(route,[{space_id:'c1',name:'Círculo de presencia',purpose:'Compartir y acompañar.',role:'member',member_count:8,contributions:[]}])
  if(n==='lumen_s6_snapshot')return ok(route,{proactive_allowed:false,settings:{quiet_start_hour:22,quiet_end_hour:8,timezone:'America/Buenos_Aires',custody_blocked:false},followups:[]})
  if(n==='lumen_living_map_snapshot')return ok(route,{territory:[{area_key:'wellbeing'}],direction:[{faro_id:'t1',text:'Cuidar lo que importa'}],potential:[{resource_id:'r1',help_id:practice.help_id,user_confirmed:true}],conditions:[{confidence:.9}],realization:[{effect:'helped',applied:true}],epistemic_note:'Mapa vivo, parcial, contextual y corregible.'})
- if(n==='lumen_consent_state')return ok(route,{memory:true,proactivity:false,evidence_use:true,sharing:true})
+ if(n==='lumen_get_consent_state')return ok(route,{person_id:'p',preferences:{proactive_allowed:false,memory_allowed:true,evidence_use_allowed:true,sharing_allowed:true,revision:1},grants:{}})
  if(n==='lumen_set_consent')return ok(route,{ok:true})
  if(n==='lumen_s5_create_invite')return ok(route,{invite_token:'LUMEN-TEST'})
  if(n==='lumen_s5_share_help')return ok(route,{contribution_id:'co1'})
@@ -51,7 +51,7 @@ test('VNext Source is a real discovery surface with filters and executable conte
  await page.getByText('Fuente',{exact:true}).click();
  await expect(page.getByRole('heading',{name:'Sabiduría y experiencias para la vida.'})).toBeVisible();
  await expect(page.getByText(/posibilidades disponibles/)).toBeVisible();
- await expect(page.getByRole('button',{name:'Práctica'})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Práctica',exact:true})).toBeVisible();
  await page.getByPlaceholder('Buscar por tema, autor o fuente…').fill('cuerpo');
  await expect(page.getByRole('button').filter({hasText:'Llegar al cuerpo'})).toBeVisible();
  await page.getByRole('button').filter({hasText:'Llegar al cuerpo'}).click();
@@ -81,8 +81,8 @@ test('VNext core PREMIUM surfaces keep cinematic image treatment on mobile',asyn
  await page.screenshot({path:'test-results/premium-secondary-surfaces.png',fullPage:true})
 })
 
-test('VNext has no inert visible buttons in the unauthenticated discovery shell',async({page})=>{
+test('VNext composer enables its primary action only when there is an actionable Moment',async({page})=>{
  await mocks(page,[]);await page.goto('/?vnext=1');
- const buttons=page.locator('button:visible');const count=await buttons.count();
- for(let i=0;i<count;i++){const b=buttons.nth(i);await expect(b).toBeEnabled()}
+ const submit=page.getByRole('button',{name:'→'});await expect(submit).toBeDisabled();
+ await page.getByPlaceholder('Cuéntame en qué momento estás...').fill('Necesito claridad');await expect(submit).toBeEnabled()
 })
