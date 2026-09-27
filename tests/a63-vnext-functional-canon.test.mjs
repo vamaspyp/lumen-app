@@ -5,6 +5,7 @@ import fs from 'node:fs'
 const read=(p)=>fs.readFileSync(p,'utf8')
 const vnext=read('src/app/PremiumVNext.tsx')
 const experience=read('src/app/Experience.tsx')
+const lumi=read('src/app/LumiPresence.tsx')
 const moment=read('src/greenfield/application/moment.ts')
 const embryo=read('src/greenfield/application/embryo.ts')
 const accessibility=read('src/app/accessibility.css')
@@ -46,4 +47,14 @@ test('A63 VNext reuses existing organism contracts instead of inventing a parall
   for(const rpc of ['lumen_s2_snapshot','lumen_s5_snapshot','lumen_s6_snapshot','lumen_s2_list_sanctuary']) assert.match(embryo,new RegExp(rpc))
   const review=new Set(custody.review_sets.source_experience_increment)
   for(const id of ['C0','C1','C2','C3','C7','C8']) assert.ok(review.has(id),'missing '+id)
+})
+
+
+test('A63 VNext keeps LUMI globally available and contextually connected to Santuario',()=>{
+  assert.match(vnext,/import \{ LumiPresence \}/)
+  assert.match(vnext,/<LumiPresence onNavigate=\{lumiNavigate\}/)
+  assert.match(vnext,/scene==='santuario'\?'sanctuary'/)
+  assert.match(lumi,/SANTUARIO/)
+  assert.match(lumi,/Esto es tuyo\./)
+  assert.match(lumi,/onNavigate/)
 })
