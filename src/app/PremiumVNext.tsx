@@ -3,7 +3,7 @@ import { getAuthSnapshot, requestEmailOtp, verifyEmailOtp } from '../greenfield/
 import { bootstrapPerson, getConsentState, setConsent, type ConsentState } from '../greenfield/application/consent'
 import { accompanyMoment, primaryHelpFromScene, recordOutcome, selectHelp, type HelpPossibility, type S1Scene } from '../greenfield/application/s1'
 import { composeMomentConstellation } from '../greenfield/application/moment'
-import { createTrajectory, discoverSource, listSanctuary, saveSanctuary, deleteSanctuary, exportSanctuary, getContinuitySnapshot, getTissueSnapshot, getProactivitySnapshot, setMemory, setProactivity, scheduleFollowup, reuseRepertoire, recordLongitudinalSignal, createCircle, createCircleInvite, joinCircle, leaveCircle, reportCircle, shareHelp, type SanctuaryEntry, type SourceItem, type ContinuitySnapshot, type Circle, type ProactivitySnapshot } from '../greenfield/application/embryo'
+import { createTrajectory, discoverSource, listSanctuary, saveSanctuary, deleteSanctuary, exportSanctuary, getContinuitySnapshot, getTissueSnapshot, getProactivitySnapshot, setMemory, setProactivity, reuseRepertoire, recordLongitudinalSignal, createCircle, createCircleInvite, joinCircle, leaveCircle, reportCircle, shareHelp, type SanctuaryEntry, type SourceItem, type ContinuitySnapshot, type Circle, type ProactivitySnapshot } from '../greenfield/application/embryo'
 import { getLifeMap } from '../greenfield/application/life-map'
 import './premium-vnext.css'
 type LifeMapSnapshot={direction:Array<{faro_id?:string,text?:string}>,potential:Array<Record<string,unknown>>,conditions:Array<Record<string,unknown>>,realization:Array<Record<string,unknown>>,territory?:Array<Record<string,unknown>>,epistemic_note?:string}
