@@ -111,8 +111,6 @@ function PremiumAudioPlayer({ src }: { src:string }) {
   const [duration,setDuration]=useState(0)
   const [rate,setRate]=useState(1)
 
-  useEffect(()=>{setPlaying(false);setCurrent(0);setDuration(0)},[src])
-
   const toggle=async()=>{
     const audio=audioRef.current
     if(!audio)return
