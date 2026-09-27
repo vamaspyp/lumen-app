@@ -10,11 +10,13 @@ import './app/a63-source-consistency.css'
 import './app/premium-source.css'
 import './app/premium-field-v5.css'
 import App from './app/App'
+import PremiumVNext from './app/PremiumVNext'
 import { LumiPresence } from './app/LumiPresence'
+
+const vnext = new URLSearchParams(window.location.search).get('vnext') === '1'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
-    <LumiPresence />
+    {vnext ? <PremiumVNext /> : <><App /><LumiPresence /></>}
   </StrictMode>,
 )
