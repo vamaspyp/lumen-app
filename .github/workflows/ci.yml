@@ -1,4 +1,5 @@
 name: CI
+# A63 certification also runs on the isolated Premium VNext implementation branch.
 
 on:
   pull_request:
