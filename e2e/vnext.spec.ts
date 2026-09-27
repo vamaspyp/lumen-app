@@ -37,18 +37,18 @@ async function mocks(page:Page,calls:string[],mode:'covered'|'nomatch'|'safety'=
  return ok(route,{})
 })}
 
-test('VNext renders the approved Premium home and canonical navigation',async({page})=>{await mocks(page,[]);await page.goto('/?vnext=1');await expect(page.getByRole('heading',{name:'Una vida más tuya.'})).toBeVisible();await expect(page.getByText('Mi Vida',{exact:true})).toBeVisible();await expect(page.getByText('Tejido',{exact:true})).toBeVisible();await page.screenshot({path:'test-results/cleanroom-home.png',fullPage:true})})
+test('VNext renders the approved Premium home and canonical navigation',async({page})=>{await mocks(page,[]);await page.goto('/?vnext=1');await expect(page.getByRole('heading',{name:'Una vida más tuya.'})).toBeVisible();await expect(page.getByText('Mi Vida',{exact:true})).toBeVisible();await expect(page.getByText('Comunidad',{exact:true})).toBeVisible();await expect(page.getByText('Santuario',{exact:true})).toBeVisible();await page.screenshot({path:'test-results/cleanroom-home.png',fullPage:true})})
 
 test('VNext completes Moment to Map to Faro to constellation to lived return and Sanctuary',async({page})=>{const calls:string[]=[];await session(page);await mocks(page,calls);await page.goto('/?vnext=1');await page.getByPlaceholder('Cuéntame en qué momento estás...').fill('Estoy saturado y quiero volver a estar presente.');await page.getByRole('button',{name:'→'}).click();await expect(page.getByRole('heading',{name:'¿Qué estás viviendo hoy?'})).toBeVisible();await page.getByRole('button',{name:'Ver lo que empieza a aparecer'}).click();await expect(page.getByText('MI MAPA VIVO')).toBeVisible();await expect(page.getByText('Potencial',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Orientar este Momento'}).click();await expect(page.getByText('MI FARO',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Guardar mi Faro y abrir posibilidades'}).click();await expect(page.getByText('TU CONSTELACIÓN')).toBeVisible();await page.getByRole('button').filter({hasText:'Llegar al cuerpo'}).click();await expect(page.getByRole('heading',{name:'Llegar al cuerpo'})).toBeVisible();await page.getByRole('button',{name:'Seguir'}).click();await page.getByRole('button',{name:'Seguir'}).click();await page.getByRole('button',{name:'Terminé'}).click();await page.getByRole('button',{name:'Me ayudó',exact:true}).click();await expect(page.getByRole('heading',{name:'¿Cómo fue?'})).toBeVisible();await page.getByRole('button',{name:'Guardar en mi Santuario'}).click();await expect(page.getByText('MI SANTUARIO')).toBeVisible();for(const n of ['lumen_s1_accompany_moment','lumen_s1_moment_constellation','lumen_s2_create_trajectory','lumen_s1_select_help','lumen_s1_record_outcome'])expect(calls).toContain(n)})
 
-test('VNext exposes longitudinal reuse, Tejido and sovereign settings',async({page})=>{const calls:string[]=[];await session(page);await mocks(page,calls);await page.goto('/?vnext=1');await page.getByText('Mi Vida',{exact:true}).click();await expect(page.getByText('RECURSO PROPIO · VOLVER A USAR')).toBeVisible();await page.getByText('RECURSO PROPIO · VOLVER A USAR').click();await expect(page.getByRole('heading',{name:'Llegar al cuerpo'})).toBeVisible();await page.getByRole('button',{name:'Salir cuando quieras'}).click();await page.getByText('Tejido',{exact:true}).click();await expect(page.getByRole('heading',{name:'La vida también se vive con otros.'})).toBeVisible();await expect(page.getByText('Círculo de presencia')).toBeVisible();await page.locator('.vx-account').click();await expect(page.getByRole('heading',{name:'Vos decidís qué recuerda LUMEN.'})).toBeVisible();await page.getByText('Memoria',{exact:true}).click();expect(calls).toContain('lumen_s2_reuse_repertoire');expect(calls).toContain('lumen_s5_snapshot')})
+test('VNext exposes longitudinal reuse, Tejido and sovereign settings',async({page})=>{const calls:string[]=[];await session(page);await mocks(page,calls);await page.goto('/?vnext=1');await page.getByText('Mi Vida',{exact:true}).click();await expect(page.getByText('RECURSO PROPIO · VOLVER A USAR')).toBeVisible();await page.getByText('RECURSO PROPIO · VOLVER A USAR').click();await expect(page.getByRole('heading',{name:'Llegar al cuerpo'})).toBeVisible();await page.getByRole('button',{name:'Salir cuando quieras'}).click();await page.getByText('Comunidad',{exact:true}).click();await expect(page.getByRole('heading',{name:'La vida también se vive con otros.'})).toBeVisible();await expect(page.getByText('Círculo de presencia')).toBeVisible();await page.locator('.vx-account').click();await expect(page.getByRole('heading',{name:'Vos decidís qué recuerda LUMEN.'})).toBeVisible();await page.getByText('Memoria',{exact:true}).click();expect(calls).toContain('lumen_s2_reuse_repertoire');expect(calls).toContain('lumen_s5_snapshot')})
 
 test('VNext fails honestly on no-match and safety states',async({page})=>{await session(page);await mocks(page,[],'nomatch');await page.goto('/?vnext=1');await page.getByPlaceholder('Cuéntame en qué momento estás...').fill('Algo sin cobertura');await page.getByRole('button',{name:'→'}).click();await expect(page.getByText('HONESTIDAD · NO MATCH')).toBeVisible()})
 
 
 test('VNext Source is a real discovery surface with filters and executable content',async({page})=>{
  const calls:string[]=[];await mocks(page,calls);await page.goto('/?vnext=1');
- await page.getByText('Fuente',{exact:true}).click();
+ await page.getByText('Explorar',{exact:true}).click();await page.getByRole('button').first().click();
  await expect(page.getByRole('heading',{name:'Sabiduría y experiencias para la vida.'})).toBeVisible();
  await expect(page.getByText(/posibilidades disponibles/)).toBeVisible();
  await expect(page.getByRole('button',{name:'Práctica',exact:true})).toBeVisible();
@@ -70,7 +70,7 @@ test('VNext shortcuts execute comprehension instead of only filling the composer
 
 test('VNext core PREMIUM surfaces keep cinematic image treatment on mobile',async({page})=>{
  await session(page);await mocks(page,[]);await page.goto('/?vnext=1');
- for(const target of ['Fuente','Tejido']){
+ for(const target of ['Comunidad']){
    await page.getByText(target,{exact:true}).click();
    await expect(page.locator('.vx-image-header')).toBeVisible();
    const bg=await page.locator('.vx-image-header').evaluate(el=>getComputedStyle(el).backgroundImage);
@@ -85,4 +85,20 @@ test('VNext composer enables its primary action only when there is an actionable
  await mocks(page,[]);await page.goto('/?vnext=1');
  const submit=page.getByRole('button',{name:'→'});await expect(submit).toBeDisabled();
  await page.getByPlaceholder('Cuéntame en qué momento estás...').fill('Necesito claridad');await expect(submit).toBeEnabled()
+})
+
+test('A63 approved storyboard keeps the ten canonical scenes and central flow visible',async({page})=>{
+ const calls:string[]=[];await session(page);await mocks(page,calls);await page.goto('/?vnext=1');
+ await expect(page.getByRole('heading',{name:'Una vida más tuya.'})).toBeVisible();
+ await page.getByPlaceholder('Cuéntame en qué momento estás...').fill('Quiero estar más presente con mi familia');await page.getByRole('button',{name:'→'}).click();
+ await expect(page.getByText('TU MOMENTO')).toBeVisible();await page.getByRole('button',{name:'→'}).click();
+ await expect(page.getByText('MI MAPA VIVO')).toBeVisible();await page.getByRole('button',{name:'Ver mi Faro'}).click();
+ await expect(page.getByText('MI FARO',{exact:true})).toBeVisible();await page.getByRole('button',{name:/Abrir una constelación/}).click();
+ await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible();
+ await page.getByRole('button').filter({hasText:'Llegar al cuerpo'}).click();await expect(page.getByRole('heading',{name:'Llegar al cuerpo'})).toBeVisible();
+ await page.getByRole('button',{name:'Seguir'}).click();await page.getByRole('button',{name:'Seguir'}).click();await page.getByRole('button',{name:'Terminé'}).click();
+ await page.getByRole('button',{name:'Me ayudó',exact:true}).click();await expect(page.getByRole('heading',{name:'¿Cómo fue?'})).toBeVisible();await page.getByRole('button',{name:'Guardar en mi Santuario'}).click();
+ await expect(page.getByRole('heading',{name:'Mi Santuario'})).toBeVisible();await page.getByText('Explorar',{exact:true}).click();await expect(page.getByText('EXPLORAR EL TERRITORIO')).toBeVisible();
+ await page.getByText('Comunidad',{exact:true}).click();await page.getByRole('button',{name:'Cómo aprendemos juntos'}).click();await expect(page.getByRole('heading',{name:'Impacto y Aprendizaje'})).toBeVisible();
+ await page.screenshot({path:'test-results/a63-approved-storyboard-final.png',fullPage:true})
 })
