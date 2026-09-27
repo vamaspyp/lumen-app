@@ -19,7 +19,7 @@ const CONTEXT: Record<Space, { label:string; title:string; body:string; tip:stri
     tip:'Podés partir de lo que está presente o volver a algo que ya venías cuidando.',
   },
   life: {
-    label:'MI PROCESO',
+    label:'MI VIDA',
     title:'Tu continuidad, sin presión.',
     body:'Acá viven tus Faros, Caminos y recursos propios. Una dirección puede cambiar, pausarse o dejar de importar.',
     tip:'Si querés, puedo acercarte Fuente, Santuario o Tejido alrededor de lo que elegiste cuidar.',
@@ -90,7 +90,7 @@ export function LumiPresence({ onNavigate }: { onNavigate?: (target: string) => 
   const actions = useMemo(() => {
     if(space === 'home') return [
       ['Contarme qué está presente','moment'],
-      ['Volver a algo mío','Mi proceso'],
+      ['Volver a algo mío','Mi Vida'],
       ['Explorar posibilidades','Explorar'],
     ] as const
     if(space === 'life') return [
@@ -100,22 +100,22 @@ export function LumiPresence({ onNavigate }: { onNavigate?: (target: string) => 
     ] as const
     if(space === 'explore') return [
       ['Ver lo relacionado con mi Faro','related'],
-      ['Volver a mi vida','Mi proceso'],
+      ['Volver a mi vida','Mi Vida'],
       ['Buscar presencia humana','Tejido'],
     ] as const
     if(space === 'sanctuary') return [
-      ['Volver a mi Faro','Mi proceso'],
+      ['Volver a mi Faro','Mi Vida'],
       ['Explorar posibilidades','Explorar'],
       ['Buscar presencia humana','Tejido'],
     ] as const
     if(space === 'tissue') return [
-      ['Volver a mi Faro','Mi proceso'],
+      ['Volver a mi Faro','Mi Vida'],
       ['Explorar posibilidades','Explorar'],
       ['Volver a mi Santuario','Santuario'],
     ] as const
     return [
       ['Volver al Inicio','Inicio'],
-      ['Volver a mi vida','Mi proceso'],
+      ['Volver a mi vida','Mi Vida'],
       ['Explorar posibilidades','Explorar'],
     ] as const
   }, [space])
