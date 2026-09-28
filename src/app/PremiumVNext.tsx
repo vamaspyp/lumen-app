@@ -1,4 +1,6 @@
 import {useEffect,useState} from 'react'
+import { getAuthSnapshot, requestEmailOtp, verifyEmailOtp } from '../greenfield/application/auth'
+import { bootstrapPerson } from '../greenfield/application/consent'
 import { accompanyMoment, selectHelp, recordOutcome, type OutcomeEffect } from '../greenfield/application/s1'
 import { composeMomentConstellation } from '../greenfield/application/moment'
 import { createTrajectoryFromMoment, listSanctuary, saveSanctuary, discoverSource, type SourceItem, type SanctuaryEntry } from '../greenfield/application/embryo'
@@ -45,9 +47,18 @@ export default function PremiumVNext(){
  const [sanctuaryEntries,setSanctuaryEntries]=useState<SanctuaryEntry[]>([])
  const [note,setNote]=useState('')
  const [busy,setBusy]=useState(false)
+ const [authenticated,setAuthenticated]=useState(false)
+ const [authOpen,setAuthOpen]=useState(false)
+ const [email,setEmail]=useState('')
+ const [otp,setOtp]=useState('')
+ const [otpSent,setOtpSent]=useState(false)
+ const [pendingAction,setPendingAction]=useState<null|(()=>Promise<void>)>(null)
  const [error,setError]=useState('')
- useEffect(()=>{void listSanctuary().then(setSanctuaryEntries).catch(()=>undefined)},[])
- const submitMoment=async()=>{setBusy(true);setError('');try{const s=await accompanyMoment(moment);if(!s.episode_id||!s.moment_id)throw new Error('Momento incompleto');setEpisodeId(s.episode_id);setMomentId(s.moment_id);setCapacityKeys(s.interpretation?.capacity_keys||[]);const constellation=await composeMomentConstellation(s.episode_id,s.interpretation?.capacity_keys||[]);setLiveResources(constellation.items||[]);go('mapa')}catch(e){setError(e instanceof Error?e.message:'No pudimos procesar este momento')}finally{setBusy(false)}}
+ useEffect(()=>{void getAuthSnapshot().then(async a=>{if(a.session){setAuthenticated(true);await bootstrapPerson();setSanctuaryEntries(await listSanctuary())}}).catch(()=>undefined)},[])
+ const requireAuth=(action:()=>Promise<void>)=>{if(authenticated){void action();return}setPendingAction(()=>action);setAuthOpen(true)}
+ const sendOtp=async()=>{setBusy(true);setError('');try{await requestEmailOtp(email);setOtpSent(true)}catch(e){setError(e instanceof Error?e.message:'No pudimos enviar el código')}finally{setBusy(false)}}
+ const confirmOtp=async()=>{setBusy(true);setError('');try{const a=await verifyEmailOtp(email,otp);if(!a.session)throw new Error('No se pudo iniciar sesión');await bootstrapPerson();setAuthenticated(true);setAuthOpen(false);setOtpSent(false);setSanctuaryEntries(await listSanctuary());const action=pendingAction;setPendingAction(null);if(action)await action()}catch(e){setError(e instanceof Error?e.message:'Código inválido')}finally{setBusy(false)}}
+ const submitMoment=async()=>{if(!authenticated){requireAuth(submitMoment);return}setBusy(true);setError('');try{const s=await accompanyMoment(moment);if(!s.episode_id||!s.moment_id)throw new Error('Momento incompleto');setEpisodeId(s.episode_id);setMomentId(s.moment_id);setCapacityKeys(s.interpretation?.capacity_keys||[]);const constellation=await composeMomentConstellation(s.episode_id,s.interpretation?.capacity_keys||[]);setLiveResources(constellation.items||[]);go('mapa')}catch(e){setError(e instanceof Error?e.message:'No pudimos procesar este momento')}finally{setBusy(false)}}
  const openConstellation=async()=>{if(momentId)void createTrajectoryFromMoment('Estar presente con mi familia, viviendo un trabajo significativo, cuidando mi bienestar.',capacityKeys,momentId).catch(()=>undefined);go('constelacion')}
  const chooseHelp=async(item:SourceItem)=>{setChosen(item);if(episodeId)await selectHelp(episodeId,item.help_id,'selected');go('vivir')}
  const finish=()=>go('retorno')
@@ -65,5 +76,5 @@ export default function PremiumVNext(){
  else if(scene==='santuario') body=<section className="gm-screen gm-list gm-sanctuary"><header style={{backgroundImage:`linear-gradient(0deg,rgba(14,21,18,.64),rgba(14,21,18,.08)),url(${art.moment})`}}><h1>Mi Santuario</h1><p>Tu espacio personal de lo significativo y propio.</p></header><div className="gm-san-tabs"><b>Recursos</b><span>Experiencias</span><span>Reflexiones</span><span>Notas</span></div><div className="gm-resources">{(sanctuaryEntries.length?sanctuaryEntries.map(r=>[r.title||'Reflexión','Guardado en tu Santuario',r.content,'♡',art.calm] as const):sanctuary).map(r=><article key={r[0]}><img src={r[4]}/><span><b>{r[0]}</b><em>{r[1]}</em><small>{r[2]}</small></span><i>{r[3]}</i></article>)}</div></section>
  else if(scene==='territorio') body=<section className="gm-screen gm-territory" style={{backgroundImage:`linear-gradient(0deg,rgba(14,21,18,.62),rgba(14,21,18,.14)),url(${art.map})`}}><h1>Explorar el Territorio</h1><p>Áreas de la vida para inspirarte y orientar tu camino.</p><div className="gm-areas">{areas.map((a,i)=><button key={a} onClick={()=>void exploreArea()} style={{backgroundImage:`linear-gradient(0deg,rgba(15,23,19,.58),rgba(15,23,19,.04)),url(${[art.calm,art.faro,art.family,art.hero,art.moment,art.map][i%6]})`}}>{a}</button>)}</div></section>
  else body=<section className="gm-screen gm-impact" style={{backgroundImage:`linear-gradient(0deg,rgba(13,20,17,.72),rgba(13,20,17,.18)),url(${art.family})`}}><div><h1>Impacto y Aprendizaje</h1><p>Tu experiencia contribuye. Juntos hacemos que LUMEN evolucione para servir mejor a todos.</p>{[['Vidas reales','Personas que comparten sus experiencias.'],['Aprendizaje colectivo','Identificamos patrones que realmente ayudan.'],['Mejores acompañamientos','LUMEN evoluciona para servir mejor.']].map(x=><article key={x[0]}><b>{x[0]}</b><span>{x[1]}</span></article>)}<blockquote>“Tu camino no solo transforma tu vida. También ilumina el camino de otros.”</blockquote></div></section>
- return <Chrome scene={scene} go={go} back={scene==='momento'?()=>go('inicio'):undefined}>{body}</Chrome>
+ return <><Chrome scene={scene} go={go} back={scene==='momento'?()=>go('inicio'):undefined}>{body}</Chrome>{authOpen&&<div className="gm-auth" role="dialog" aria-modal="true" aria-label="Entrar a LUMEN"><div><button className="gm-auth-close" aria-label="Cerrar" onClick={()=>setAuthOpen(false)}>×</button><b>LUMEN</b><h2>Entrá para continuar tu camino</h2><p>Tu Momento, Mapa Vivo y Santuario son personales.</p><input aria-label="Email" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="tu@email.com"/>{otpSent&&<input aria-label="Código" inputMode="numeric" value={otp} onChange={e=>setOtp(e.target.value)} placeholder="Código recibido"/>}{error&&<small className="gm-error">{error}</small>}<button className="gm-primary" disabled={busy} onClick={()=>void(otpSent?confirmOtp():sendOtp())}>{busy?'…':otpSent?'Entrar':'Enviar código'}</button></div></div>}</>
 }
