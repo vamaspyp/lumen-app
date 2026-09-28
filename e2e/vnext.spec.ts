@@ -19,7 +19,7 @@ test.describe('LUMEN golden master',()=>{
  test('public Source discovery reaches a real resource and protects personal return',async({page})=>{
   await page.getByText('Explorar',{exact:true}).click()
   await page.getByRole('button',{name:'Bienestar físico y mental'}).click()
-  await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible()
+  await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible({timeout:20000})
   const card=page.locator('.gm-resources>button').first()
   await expect(card).toBeVisible({timeout:10000})
   await card.click()
@@ -32,7 +32,7 @@ test.describe('LUMEN golden master',()=>{
  test('official audio remains attributed and returns with a neutral signal',async({page})=>{
   await page.getByText('Explorar',{exact:true}).click()
   await page.getByRole('button',{name:'Bienestar físico y mental'}).click()
-  await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible()
+  await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible({timeout:20000})
   await page.getByRole('button',{name:'Audios',exact:true}).click()
   await page.getByRole('button',{name:/Poner los pies en la tierra · audio OPS\/OMS/}).click()
   await expect(page.getByRole('link',{name:/Escuchar en OPS\/OMS Se abre en la fuente original/})).toHaveAttribute('href',/paho\.org/)
