@@ -235,7 +235,7 @@ function PremiumSourceExperience({ help,premium,onExit,onFinish }: { help:Help; 
         <AfterCard text={after}/>
       </>}
 
-      <div className="experience-finish-row"><button className="ghost" type="button" onClick={onFinish}>Volver a la constelación</button></div>
+      <div className="experience-finish-row"><button className="ghost" type="button" onClick={onFinish}>Terminé de explorar</button></div>
     </main>
   </div>
 }
