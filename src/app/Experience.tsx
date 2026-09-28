@@ -240,7 +240,7 @@ function PremiumSourceExperience({ help,premium,onExit,onFinish }: { help:Help; 
   </div>
 }
 
-export function Experience({ help, onExit, onFeedback }: { help: Help; onExit: () => void; onFeedback?: (effect: OutcomeEffect) => void | Promise<void> }) {
+export function Experience({ help, onExit, onFeedback, onComplete }: { help: Help; onExit: () => void; onFeedback?: (effect: OutcomeEffect) => void | Promise<void>; onComplete?: () => void }) {
   const kind = useMemo(() => kindOf(help), [help])
   const content = contentOf(help)
   const [step, setStep] = useState(0)
@@ -269,7 +269,7 @@ export function Experience({ help, onExit, onFeedback }: { help: Help; onExit: (
     return () => { cancelled = true }
   }, [help.help_id, parentOwnsOutcome])
 
-  const finish = () => (onFeedback || !parentOwnsOutcome) ? setReflecting(true) : onExit()
+  const finish = () => onComplete ? onComplete() : (onFeedback || !parentOwnsOutcome) ? setReflecting(true) : onExit()
   const feedback = async (effect: OutcomeEffect) => {
     setSending(true)
     try {

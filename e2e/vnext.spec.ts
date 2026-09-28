@@ -23,7 +23,7 @@ test.describe('LUMEN golden master',()=>{
   const card=page.locator('.gm-resources>button').first()
   await expect(card).toBeVisible({timeout:10000})
   await card.click()
-  await expect(page.locator('.gm-live h1')).toBeVisible()
+  await expect(page.locator('.experience h1').first()).toBeVisible()
   await page.getByRole('button',{name:'Marcar como realizada'}).click()
   await expect(page.getByRole('heading',{name:'¿Cómo fue?'})).toBeVisible()
   await page.getByRole('button',{name:'Guardar en mi Santuario'}).click()
