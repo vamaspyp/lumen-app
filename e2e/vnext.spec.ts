@@ -6,7 +6,7 @@ test.describe('LUMEN golden master',()=>{
   await page.getByText('Cuéntame en qué momento estás...').click()
   await expect(page.getByRole('heading',{name:'¿Qué estás viviendo hoy?'})).toBeVisible()
   await expect(page.locator('textarea')).toContainText('Estoy agotado.')
-  await page.getByRole('button',{name:'→'}).click()
+  await page.getByRole('button',{name:'Continuar'}).click()
   await expect(page.getByRole('heading',{name:'Mi Mapa Vivo'})).toBeVisible()
   for(const x of ['Dirección','Potencial','Condiciones','Realización']) await expect(page.getByText(x,{exact:true}).first()).toBeVisible()
   await page.getByRole('button',{name:'Ver mi Faro'}).click()
