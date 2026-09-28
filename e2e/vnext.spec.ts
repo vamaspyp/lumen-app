@@ -5,6 +5,7 @@ test.describe('LUMEN golden master',()=>{
   await expect(page.getByRole('heading',{name:'Una vida más tuya.'})).toBeVisible()
   await page.getByText('Cuéntame en qué momento estás...').click()
   await expect(page.getByRole('heading',{name:'¿Qué estás viviendo hoy?'})).toBeVisible()
+  await page.getByLabel('Contá tu momento').fill('Quiero cuidar mi descanso y entender qué necesito hoy.')
   await page.getByRole('button',{name:'Continuar'}).click()
   await expect(page.getByRole('dialog',{name:'Entrar a LUMEN'})).toBeVisible()
   await expect(page.getByLabel('Email')).toBeVisible()
