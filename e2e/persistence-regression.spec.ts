@@ -39,6 +39,7 @@ async function backend(page:Page, signedIn=false){
 }
 async function momentToReturn(page:Page){
  await page.getByText('Cuéntame en qué momento estás...').click()
+ await page.locator('.gm-moment textarea').fill('Mi trabajo me agota y quiero cultivar calma al volver a casa.')
  await page.getByRole('button',{name:'Continuar'}).click()
  await page.getByRole('button',{name:'Ver mi Faro'}).click()
  await page.getByRole('button',{name:'Abrir una constelación para avanzar'}).click()
@@ -50,6 +51,7 @@ test('OTP completion resumes the pending Momento once',async({page})=>{
  const b=await backend(page)
  await page.goto('/?vnext=1')
  await page.getByText('Cuéntame en qué momento estás...').click()
+ await page.locator('.gm-moment textarea').fill('Mi trabajo me agota y quiero cultivar calma al volver a casa.')
  await page.getByRole('button',{name:'Continuar'}).click()
  await page.getByLabel('Email',{exact:true}).fill('regression@example.invalid')
  await page.getByRole('button',{name:'Enviar código',exact:true}).click()

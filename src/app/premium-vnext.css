@@ -7,6 +7,8 @@
 .gm-san-tabs button.on{border-bottom:2px solid #31463b;font-weight:700}
 .gm-video video{width:100%;height:100%;object-fit:cover}
 .gm-video audio{position:absolute;left:18px;right:18px;bottom:18px;width:calc(100% - 36px)}
+.gm-video>span{left:18px;right:18px;bottom:18px;width:calc(100% - 36px);padding:12px;border-radius:12px;background:#17382fdb;font-size:11px}
+.gm-steps{padding-left:22px;margin:15px 0;color:#40544a;font-size:12px;line-height:1.5}.gm-steps li{margin:8px 0}
 .gm-external{display:block;margin:8px 0 12px;text-align:center;color:#31463b;font-size:9px;text-decoration:none}
 .gm-empty{padding:18px 10px;text-align:center;color:#6d756f;font-size:9px}
 .gm-faro-main textarea{width:100%;min-height:92px;border:1px solid #ffffff66;border-radius:14px;padding:12px;background:#f7f2e8e8;color:#26342d;font:17px/1.2 var(--serif);resize:none}
