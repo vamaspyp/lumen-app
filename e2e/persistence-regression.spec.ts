@@ -2,7 +2,7 @@ import {test,expect,type Page} from '@playwright/test'
 
 // Regression double only: this suite never certifies live identity or persistence.
 // All Auth and RPC calls are intercepted; live certification remains a separate gate.
-async function backend(page:Page, signedIn=false){
+async function backend(page:Page, signedIn=false, clarification=false){
  const origin='https://vbuixagaguasejputubp.supabase.co'
  const calls: string[]=[]
  let memory=false
@@ -24,7 +24,7 @@ async function backend(page:Page, signedIn=false){
    data=entries
   }
   else if(name==='lumen_living_map_snapshot')data={memory_allowed:memory,direction:memory&&faro?[{faro_id:faro.trajectory_id,text:faro.faro_text,status:'active'}]:[],potential:[],conditions:[],realization:[],epistemic_note:memory?'Mapa de prueba, parcial y corregible.':'El Mapa Vivo requiere memoria consentida.'}
-  else if(name==='lumen_s1_accompany_moment')data={episode_id:'episode-test',moment_id:'moment-test',interpretation:{capacity_keys:[]}}
+  else if(name==='lumen_s1_accompany_moment')data={scene_id:clarification?'moment.clarify':'moment.help',episode_id:'episode-test',moment_id:'moment-test',interpretation:{capacity_keys:[]}}
   else if(name==='lumen_s1_moment_constellation')data={items:[resource]}
   else if(name==='lumen_s2_create_trajectory'||name==='lumen_s2_create_trajectory_from_moment'){faro={trajectory_id:'faro-test',faro_text:p.p_faro_text,status:'active',path:[]};data=faro}
   else if(name==='lumen_s2_update_trajectory'){if(faro)faro.faro_text=p.p_faro_text.trim();data={updated:true}}
@@ -42,6 +42,10 @@ async function momentToReturn(page:Page){
  await page.locator('.gm-moment textarea').fill('Mi trabajo me agota y quiero cultivar calma al volver a casa.')
  await page.getByRole('button',{name:'Continuar'}).click()
  await page.getByRole('button',{name:'Ver mi Faro'}).click()
+ await page.getByRole('button',{name:'Editar mi Faro'}).click()
+ await page.locator('.gm-faro-main textarea').fill('Cultivar calma al volver a casa')
+ await page.getByRole('button',{name:'Guardar mi Faro'}).click()
+ await expect(page.getByRole('button',{name:'Editar mi Faro'})).toBeVisible()
  await page.getByRole('button',{name:'Abrir una constelación para avanzar'}).click()
  await page.getByText('Pausa real de prueba',{exact:true}).click()
  await page.getByRole('button',{name:'Marcar como realizada'}).click()
@@ -60,6 +64,16 @@ test('OTP completion resumes the pending Momento once',async({page})=>{
  await expect(page.getByRole('heading',{name:'Mi Mapa Vivo'})).toBeVisible()
  await expect(page.getByRole('dialog')).toHaveCount(0)
  expect(b.calls.filter(n=>n==='lumen_s1_accompany_moment')).toHaveLength(1)
+})
+test('an uncertain Momento asks for context without inventing a constellation',async({page})=>{
+ const b=await backend(page,true,true)
+ await page.goto('/?vnext=1')
+ await page.getByText('Cuéntame en qué momento estás...').click()
+ await page.locator('.gm-moment textarea').fill('Quiero cambiar algo.')
+ await page.getByRole('button',{name:'Continuar'}).click()
+ await expect(page.getByText(/contanos un poco más sobre el área/)).toBeVisible()
+ await expect(page.getByRole('heading',{name:'Mi Mapa Vivo'})).toHaveCount(0)
+ expect(b.calls).not.toContain('lumen_s1_moment_constellation')
 })
 test('Faro can be created without a Momento and reread after reload',async({page})=>{
  const b=await backend(page,true)

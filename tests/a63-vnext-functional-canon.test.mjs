@@ -7,7 +7,7 @@ test('A63 golden master contains the ten approved surfaces',()=>{
  for(const x of ['Una vida más tuya.','¿Qué estás viviendo hoy?','Mi Mapa Vivo','Mi Faro','Tu Constelación','chosen?.title','¿Cómo fue?','Mi Santuario','Explorar el Territorio','Impacto y Aprendizaje']) assert.ok(v.includes(x),x)
 })
 test('A63 golden master preserves approved canonical sequence and navigation',()=>{
- for(const x of ["go('momento')","go('mapa')","go('faro')","go('constelacion')","go('vivir')","go('retorno')","go('santuario')"]) assert.ok(v.includes(x),x)
+ for(const x of ["go('momento')","go('mapa')","go('faro')","setScene('constelacion')","go('vivir')","go('retorno')","go('santuario')"]) assert.ok(v.includes(x),x)
  for(const x of ['Inicio','Explorar','Mi Vida','Comunidad','Biblioteca']) assert.ok(v.includes(x),x)
 })
 test('A63 golden master carries approved copy and live Source resources',()=>{
