@@ -3,7 +3,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [main, greenfield-v04-embryo, greenfield-a63-v19-hifi-es]
+    branches: [main, greenfield-v04-embryo, greenfield-a63-v19-hifi-es, greenfield-a64-premium-vnext]
   push:
     branches: [main, greenfield-v04-s0, greenfield-v04-s1, greenfield-v04-embryo, greenfield-a63-embryo-complete, greenfield-a63-premium-cleanroom, greenfield-a64-premium-vnext]
 
