@@ -257,7 +257,7 @@ export function Experience({ help, onExit, onFeedback, onComplete }: { help: Hel
   const phone = str(content.phone)
   const availability = str(content.availability)
   const access = str(content.access)
-  const parentOwnsOutcome = 'help_version_id' in help
+  const parentOwnsOutcome = Boolean(onComplete) || 'help_version_id' in help
   const directEpisodeId = directEpisode?.helpId === help.help_id ? directEpisode.episodeId : null
 
   useEffect(() => {
