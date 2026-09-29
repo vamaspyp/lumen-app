@@ -43,4 +43,17 @@ test.describe('LUMEN PREMIUM V57 · public doors',()=>{
   await page.setViewportSize({width:390,height:844})
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
  })
+ test('Fuente exposes a real attributed audio rather than an empty first page',async({page})=>{
+  await page.locator('.gm-nav').getByText('Explorar').click()
+  await page.getByRole('button',{name:'Audios',exact:true}).click()
+  await expect(page.getByText('Poner los pies en la tierra · audio OPS/OMS',{exact:true})).toBeVisible({timeout:20000})
+  await page.getByText('Poner los pies en la tierra · audio OPS/OMS',{exact:true}).click()
+  await expect(page.getByRole('link',{name:/Escuchar en OPS\/OMS/})).toHaveAttribute('href',/paho\.org/)
+ })
+ test('Tejido offers a real human service with attribution',async({page})=>{
+  await page.locator('.gm-nav').getByText('Tejido').click()
+  await expect(page.getByText('Orientación profesional en salud mental · Argentina',{exact:true})).toBeVisible({timeout:20000})
+  await page.getByText('Orientación profesional en salud mental · Argentina',{exact:true}).click()
+  await expect(page.getByRole('heading',{name:'Orientación profesional en salud mental · Argentina'})).toBeVisible()
+ })
 })

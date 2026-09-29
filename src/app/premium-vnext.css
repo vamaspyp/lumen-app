@@ -41,3 +41,5 @@
 .gm-areas{grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}.gm-areas button{height:145px;font-size:16px;padding:14px}.gm-territory .gm-secondary{margin-top:22px}.gm-impact{padding:clamp(24px,5vw,58px)}.gm-impact>div{max-width:700px}.gm-impact>div>p,.gm-impact article span{font-size:16px}.gm-impact article b{font-size:22px}
 .gm-clarify{background:#f7f2e8;color:#243b2d;border-radius:12px;padding:10px;margin-bottom:8px}.gm-clarify button{border:0;background:transparent;text-decoration:underline;color:#244f3a}
 @media(max-width:520px){.gm-phone{width:100%;height:100dvh}.gm-nav{height:64px;flex-basis:64px}.gm-nav small{font-size:10px}.gm-list>header{height:200px}.gm-home{align-items:flex-end;padding:23px}.gm-home-copy h1{font-size:48px}.gm-home-copy>p{font-size:15px}.gm-home-entry textarea{min-height:75px}.gm-entry{min-height:46px}.gm-map-memory{margin:15px 0 10px}.gm-faces small{font-size:9px}.gm-faces button{min-height:65px}}
+
+.gm-map-expressed{margin:10px 0;padding:16px;border-radius:16px;background:#f9f6ed;color:#263d32;font:clamp(18px,3vw,24px)/1.35 var(--serif)}
