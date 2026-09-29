@@ -28,6 +28,10 @@ async function backend(page:Page, signedIn=false, clarification=false){
   else if(name==='lumen_s1_moment_constellation')data={items:[resource]}
   else if(name==='lumen_s2_create_trajectory'||name==='lumen_s2_create_trajectory_from_moment'){faro={trajectory_id:'faro-test',faro_text:p.p_faro_text,status:'active',path:[]};data=faro}
   else if(name==='lumen_s2_update_trajectory'){if(faro)faro.faro_text=p.p_faro_text.trim();data={updated:true}}
+  else if(name==='lumen_source_taxonomy')data={areas:[{key:'wellbeing',label:'Bienestar'}],capacities:[],taxonomy_version:'life-taxonomy.v1'}
+  else if(name==='lumen_source_discover')data=[resource]
+  else if(name==='lumen_s2_update_sanctuary'){const entry=entries.find(e=>e.entry_id===p.p_entry_id);if(entry){entry.title=p.p_title;entry.content=p.p_content};data={entry_id:p.p_entry_id,updated:true}}
+  else if(name==='lumen_s2_delete_sanctuary'){const index=entries.findIndex(e=>e.entry_id===p.p_entry_id);if(index>=0)entries.splice(index,1);data={deleted:true}}
   else if(name==='lumen_s2_set_memory'){memory=p.p_enabled;data={memory_allowed:memory}}
   else if(name==='lumen_s2_save_sanctuary'){
    if(!memory){await route.fulfill({status:403,json:{message:'memory consent required'}});return}
@@ -121,13 +125,55 @@ test('retry after failed reread does not duplicate return or sanctuary entry',as
  await page.getByRole('button',{name:'Registrar y conservar en Santuario'}).click()
  b.failRead()
  await page.getByRole('button',{name:'Activar memoria y guardar'}).click()
- await expect(page.getByText(/No pudimos verificar|Lectura temporalmente no disponible/)).toBeVisible()
+ await expect(page.locator('.gm-return .gm-error')).toBeVisible()
  await expect(page.getByRole('heading',{name:'¿Cómo fue?'})).toBeVisible()
  expect(b.entries).toHaveLength(1)
  await page.getByRole('button',{name:'Registrar y conservar en Santuario'}).click()
  await expect(page.getByRole('heading',{name:'Mi Santuario'})).toBeVisible()
  expect(b.entries).toHaveLength(1)
  expect(b.calls.filter(n=>n==='lumen_s1_record_outcome')).toHaveLength(1)
+})
+test('effect alone never saves a personal entry or enables memory',async({page})=>{
+ const b=await backend(page,true)
+ await page.goto('/')
+ await momentToReturn(page)
+ await page.locator('.gm-return textarea').fill('')
+ await page.getByRole('button',{name:'Registrar mi señal'}).click()
+ await expect(page.getByRole('heading',{name:'Mi Mapa Vivo'})).toBeVisible()
+ expect(b.calls.filter(n=>n==='lumen_s1_record_outcome')).toHaveLength(1)
+ expect(b.calls).not.toContain('lumen_s2_set_memory')
+ expect(b.entries).toHaveLength(0)
+})
+test('a saved personal note can be corrected and removed with rereading',async({page})=>{
+ const b=await backend(page,true)
+ await page.goto('/')
+ await page.getByRole('button',{name:/Santuario/}).first().click()
+ await page.getByLabel('Nota para mi Santuario').fill('Primera versión')
+ await page.getByRole('button',{name:'Conservar en mi Santuario'}).click()
+ await page.getByRole('button',{name:'Activar memoria y guardar'}).click()
+ await page.getByText('Primera versión',{exact:true}).click()
+ await page.getByRole('button',{name:'Editar',exact:true}).click()
+ await page.getByLabel('Editar contenido').fill('Versión corregida')
+ await page.getByRole('button',{name:'Guardar cambios'}).click()
+ await expect(page.getByText('Versión corregida',{exact:true}).last()).toBeVisible()
+ await page.getByRole('button',{name:'Quitar de mi Santuario'}).click()
+ await expect(page.getByText('Versión corregida',{exact:true})).toHaveCount(0)
+ expect(b.entries).toHaveLength(0)
+})
+test('exploring Source does not replace the contextual constellation',async({page})=>{
+ await backend(page,true)
+ await page.goto('/')
+ await page.getByRole('button',{name:'Comenzar un Momento'}).click()
+ await page.getByLabel('Contá tu momento').fill('Mi trabajo me agota y quiero cultivar calma al volver a casa.')
+ await page.getByRole('button',{name:'Continuar'}).click()
+ await page.getByRole('button',{name:'Ver mi Faro'}).click()
+ await page.getByRole('button',{name:'Abrir mi Constelación'}).click()
+ await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible()
+ await page.getByRole('button',{name:'Explorar otras posibilidades'}).click()
+ await expect(page.getByRole('heading',{name:'Explorar',exact:true})).toBeVisible()
+ await page.getByRole('button',{name:'Volver a mi selección contextual'}).click()
+ await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible()
+ await expect(page.getByText('Pausa real de prueba',{exact:true})).toBeVisible()
 })
 test('Santuario is directly reachable and a personal note survives rereading',async({page})=>{
  const b=await backend(page,true)
