@@ -171,7 +171,7 @@ test('exploring Source does not replace the contextual constellation',async({pag
  await page.getByRole('button',{name:'Ver mi Faro'}).click()
  await page.getByRole('button',{name:'Abrir mi Constelación'}).click()
  await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible()
- await page.getByRole('button',{name:'Explorar otras posibilidades'}).click()
+ await page.getByRole('button',{name:'Explorar y agregar posibilidades'}).click()
  await expect(page.getByRole('heading',{name:'Explorar',exact:true})).toBeVisible()
  await page.getByRole('button',{name:'Volver a mi selección contextual'}).click()
  await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible()

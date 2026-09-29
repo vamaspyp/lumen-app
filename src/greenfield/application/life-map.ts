@@ -4,7 +4,7 @@ export type LifeMapSnapshot = {
  direction: Array<{faro_id: string; text: string; status: string}>
  potential: Array<{resource_id: string; help_id: string; user_confirmed: boolean}>
  conditions: Array<{features: Record<string, unknown>; confidence: number | null}>
- realization: Array<{outcome_id: string; help_id: string; effect: string; applied: boolean}>
+ realization: Array<{outcome_id: string; help_id: string; effect: string; applied: boolean; signal_kind?: string; lived_at?: string}>
  epistemic_note: string
 }
 export async function getLifeMap(): Promise<LifeMapSnapshot>{

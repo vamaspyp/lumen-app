@@ -77,8 +77,8 @@
       "role": "autoridad_fuente_premium"
     },
     {
-      "id": "V57",
-      "version": "1.0",
+      "id": "V58",
+      "version": "1.1",
       "role": "instrumento_constructivo_A63_subordinado"
     }
   ],
@@ -92,7 +92,7 @@
     "EVIDENCIA",
     "CIERRE"
   ],
-  "construction_rule": "A63 preserva lo vigente, ajusta lo necesario y reemplaza lo incompatible; bridges permanentes prohibidos. Materializa V57 como instrumento constructivo subordinado a V46/V51/V52/V53/V55/V56. Cinco puertas persistentes Inicio, Mi Vida, Explorar, Tejido y Santuario. Mapa Vivo humano y simple; cuatro lentes sólo al aportar claridad. Constelación contextual diferenciada de Explorar/Fuente. Sin Camino/Trayectoria ni Repertorio como pantalla u órgano visible. Experiencias por familia, media real, consentimiento, persistencia y relectura auténticos. HUMAN/EXPERIENCE PASS sobre runtime exacto es requisito de cierre; ningún PASS técnico lo sustituye.",
+  "construction_rule": "A63 preserva lo vigente, ajusta lo necesario y reemplaza lo incompatible; bridges permanentes prohibidos. A63 materializa V58 como instrumento constructivo subordinado a V46/V51/V52/V53/V55/V56. Una Vida singular y presente dominante; continuidad legítima que modifica futuras propuestas, recupera lo propio antes de novedad y se retira al ganar autonomía. Cinco puertas Inicio, Mi Vida, Explorar, Tejido y Santuario; Constelación contextual Fuente+Santuario+Tejido editable, sin pantalla Repertorio ni anatomía nueva. Media real, consentimiento, persistencia y relectura auténticos. HUMAN/EXPERIENCE PASS sobre runtime exacto permanece requisito de cierre.",
   "fail_closed": true,
-  "updated_at": "2026-09-29T00:30:11-03:00"
+  "updated_at": "2026-09-29T21:02:55.341Z"
 }

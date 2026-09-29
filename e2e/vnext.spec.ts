@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test'
 
-test.describe('LUMEN PREMIUM V57 · public doors',()=>{
+test.describe('LUMEN PREMIUM V58 · public doors',()=>{
  test.beforeEach(async({page})=>{await page.goto('/')})
  test('present Momento protects personal persistence behind identity',async({page})=>{
   await expect(page.getByRole('heading',{name:'Una vida más tuya.'})).toBeVisible()

@@ -43,3 +43,18 @@
 @media(max-width:520px){.gm-phone{width:100%;height:100dvh}.gm-nav{height:64px;flex-basis:64px}.gm-nav small{font-size:10px}.gm-list>header{height:200px}.gm-home{align-items:flex-end;padding:23px}.gm-home-copy h1{font-size:48px}.gm-home-copy>p{font-size:15px}.gm-home-entry textarea{min-height:75px}.gm-entry{min-height:46px}.gm-map-memory{margin:15px 0 10px}.gm-faces small{font-size:9px}.gm-faces button{min-height:65px}}
 
 .gm-map-expressed{margin:10px 0;padding:16px;border-radius:16px;background:#f9f6ed;color:#263d32;font:clamp(18px,3vw,24px)/1.35 var(--serif)}
+
+/* V58 · continuity stays inside the same quiet field. */
+.gm-continuity-cue{max-width:520px;padding:14px 16px;margin:12px 0;border:1px solid #ffffff88;border-radius:16px;background:#15291fa8;color:#fff}
+.gm-continuity-cue small{letter-spacing:.04em}.gm-continuity-cue p{margin:5px 0 8px}.gm-continuity-cue button{border:0;border-bottom:1px solid #fff9;background:none;padding:2px 0;color:#fff;cursor:pointer}
+.gm-map-expressed blockquote{margin:0 0 8px}.gm-map-expressed p{font:14px/1.4 var(--sans)}.gm-map-expressed button{border:0;background:none;padding:0;color:#17382f;text-decoration:underline;cursor:pointer}
+.gm-context-note{max-width:800px;margin:0 0 12px;color:#435a49;line-height:1.45}
+.gm-context-card{border:1px solid #d9d2c6;border-radius:16px;background:#fffdf8;overflow:hidden}
+.gm-context-card>button:first-child{display:grid;grid-template-columns:1fr 24px;gap:12px;width:100%;border:0;background:none;padding:16px;text-align:left;color:var(--ink);cursor:pointer}
+.gm-context-card>button:first-child>span{display:flex;flex-direction:column;gap:4px}.gm-context-card b{font:clamp(18px,3vw,23px)/1.15 var(--serif)}
+.gm-context-card small,.gm-context-card em{font:12px/1.4 var(--sans);color:#657267}.gm-context-card em{font-style:normal}.gm-context-card i{font-style:normal;align-self:center}
+.gm-context-reason{margin-top:6px;color:#365741;font:13px/1.4 var(--sans)}
+.gm-context-card .gm-remove{margin:0 16px 12px;border:0;border-bottom:1px solid #829485;background:none;padding:2px 0;color:#3b5845;cursor:pointer}
+.gm-cultivation{display:grid;gap:7px;margin:14px 0;padding:13px;border:1px solid #d9d2c6;border-radius:15px;color:#354d3c}
+.gm-cultivation legend{padding:0 6px;font-size:14px}.gm-cultivation label{display:flex;gap:8px;align-items:center}.gm-cultivation input{accent-color:#17382f}
+.gm-cultivation button{justify-self:start;border:0;background:none;padding:3px 0;color:#3b5845;text-decoration:underline;cursor:pointer}

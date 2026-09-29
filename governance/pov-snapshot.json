@@ -4,7 +4,7 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "verified_at": "2026-09-29T03:30:11Z",
+    "verified_at": "2026-09-29T21:02:55.339Z",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {
@@ -96,8 +96,8 @@
       "state": "VIGENTE"
     },
     {
-      "id": "V57",
-      "name": "Especificación Funcional Detallada del Embrión PREMIUM · A63 V1.0",
+      "id": "V58",
+      "name": "Especificación Funcional Detallada del Embrión · Una Vida singular en movimiento · V1.1",
       "state": "VIGENTE"
     }
   ],
@@ -139,6 +139,6 @@
     "fail_closed": true,
     "snapshot_max_age_hours": 72,
     "v56_version": "1.1",
-    "v57_constructive_spec_v1": true
+    "v58_constructive_spec_v11": true
   }
 }
