@@ -48,7 +48,7 @@ test.describe('LUMEN PREMIUM V57 · public doors',()=>{
   await page.getByRole('button',{name:'Audios',exact:true}).click()
   await expect(page.getByText('Poner los pies en la tierra · audio OPS/OMS',{exact:true})).toBeVisible({timeout:20000})
   await page.getByText('Poner los pies en la tierra · audio OPS/OMS',{exact:true}).click()
-  await expect(page.getByRole('link',{name:/Escuchar en OPS\/OMS/})).toHaveAttribute('href',/paho\.org/)
+  await expect(page.getByRole('link',{name:'Escuchar en OPS/OMS',exact:true})).toHaveAttribute('href',/paho\.org/)
  })
  test('Tejido offers a real human service with attribution',async({page})=>{
   await page.locator('.gm-nav').getByText('Tejido').click()
