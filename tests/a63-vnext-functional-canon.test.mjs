@@ -3,22 +3,25 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 const v=fs.readFileSync('src/app/PremiumVNext.tsx','utf8')
 const css=fs.readFileSync('src/app/premium-vnext.css','utf8')
-test('A63 golden master contains the ten approved surfaces',()=>{
- for(const x of ['Una vida más tuya.','¿Qué estás viviendo hoy?','Mi Mapa Vivo','Mi Faro','Tu Constelación','chosen?.title','¿Cómo fue?','Mi Santuario','Explorar el Territorio','Impacto y Aprendizaje']) assert.ok(v.includes(x),x)
+test('V57 offers five persistent human doors and distinct contextual experiences',()=>{
+ const nav=v.match(/const nav=\[(.*?)\] as const/s)?.[1]||''
+ for(const name of ['Inicio','Mi Vida','Explorar','Tejido','Santuario']) assert.ok(nav.includes(name),name)
+ assert.equal((nav.match(/\['/g)||[]).length,5)
+ for(const scene of ["scene==='momento'","scene==='mapa'","scene==='faro'","scene==='constelacion'","scene==='explorar'","scene==='vivir'","scene==='retorno'","scene==='santuario'","scene==='territorio'","scene==='tejido'"]) assert.ok(v.includes(scene),scene)
+ assert.match(v,/discoverConstellation/)
+ assert.match(v,/composeMomentConstellation/)
+ assert.match(v,/discoverSource/)
+ assert.match(v,/constellationItems/)
 })
-test('A63 golden master preserves approved canonical sequence and navigation',()=>{
- for(const x of ["go('momento')","go('mapa')","go('faro')","setScene('constelacion')","go('vivir')","go('retorno')","go('santuario')"]) assert.ok(v.includes(x),x)
- for(const x of ['Inicio','Explorar','Mi Vida','Comunidad','Biblioteca']) assert.ok(v.includes(x),x)
-})
-test('A63 golden master carries approved copy and live Source resources',()=>{
- for(const x of ['Lo que importa','Lo que puedes desplegar','Lo que habilita o restringe','Lo que vives hoy','Próximos pasos sugeridos','Guardar en mi Santuario','Tu camino no solo transforma tu vida. También ilumina el camino de otros.']) assert.ok(v.includes(x),x)
- assert.ok(v.includes('liveResources.filter('))
+test('V57 makes effect and personal retention separate, editable and verifiable',()=>{
+ assert.match(v,/feedback&&!*outcomeRecorded/)
+ assert.match(v,/note\.trim\(\)\|\|keepResource/)
+ assert.match(v,/setFeedback\(''\)/)
+ for(const contract of ['deleteSanctuary','updateSanctuary','getContinuitySnapshot','listSanctuary','integrateHelp','reuseRepertoire']) assert.ok(v.includes(contract),contract)
  assert.doesNotMatch(v,/const resources=\[/)
 })
-test('A63 clean slate does not reintroduce rejected ambient or legacy UI',()=>{
- assert.doesNotMatch(v,/LumiPresence|Mi proceso|CapabilityPicker|RECURSO PROPIO/)
-})
-test('A63 stylesheet is a single golden-master grammar',()=>{
- for(const x of ['.gm-phone','.gm-home','.gm-moment','.gm-map','.gm-faro','.gm-list','.gm-live','.gm-return','.gm-territory','.gm-impact']) assert.ok(css.includes(x),x)
- assert.doesNotMatch(css,/\\.vx-/)
+test('V57 field is responsive and readable',()=>{
+ for(const x of ['.gm-phone','.gm-home','.gm-map','.gm-faro','.gm-list','.gm-return','.gm-territory','.gm-impact']) assert.ok(css.includes(x),x)
+ assert.match(css,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/)
+ assert.match(css,/height:100dvh/)
 })
