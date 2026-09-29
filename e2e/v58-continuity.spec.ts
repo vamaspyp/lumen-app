@@ -80,6 +80,7 @@ test('V58 remembers a voluntary return and puts a relevant own resource before n
  await expect(cards.first()).toContainText('Pausa que puedo recuperar')
  await expect(cards.first()).toContainText('Lo reconociste como propio')
  await page.locator('.gm-nav').getByText('Santuario').click()
+ await page.getByText('Recursos que reconocí útiles').click()
  await page.getByRole('button',{name:'Dejar de reconocer como propio'}).click()
  await expect(page.getByRole('button',{name:'Dejar de reconocer como propio'})).toHaveCount(0)
  await page.reload()
