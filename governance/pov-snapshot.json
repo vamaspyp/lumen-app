@@ -4,7 +4,7 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "verified_at": "2026-09-29T21:02:55.339Z",
+    "verified_at": "2026-09-30T03:33:48.042414Z",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {
@@ -98,6 +98,21 @@
     {
       "id": "V58",
       "name": "Especificación Funcional Detallada del Embrión · Una Vida singular en movimiento · V1.1",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V59",
+      "name": "LUMEN · Modelo de Interfaz del Embrión (1)",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V60",
+      "name": "VA+LUMEN · Especificación Funcional de Interfaz del Embrión · V1.0",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V61",
+      "name": "LUMEN Y LA VIDA",
       "state": "VIGENTE"
     }
   ],

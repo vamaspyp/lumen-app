@@ -5,7 +5,7 @@ import type { SourceItem } from '../greenfield/application/embryo'
 import { premiumFamily, sourceUrl } from './premium-source'
 
 type Help = HelpPossibility | SourceItem
-type Kind = 'editorial'|'practice'|'audio'|'video'|'external'|'human'|'group'|'action'|'quiet'
+type Kind = 'editorial'|'practice'|'audio'|'video'|'external'|'human'|'group'|'action'|'event'|'material'|'quiet'
 type DirectEpisode = Readonly<{ helpId: string; episodeId: string }>
 type Obj = Record<string, unknown>
 
@@ -33,6 +33,8 @@ const EXPERIENCE_IMAGE: Record<Kind,string> = {
   external:'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1800&q=90',
   human:'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1800&q=90',
   group:'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1800&q=90',
+  event:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=90',
+  material:'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1800&q=90',
   action:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=90',
   quiet:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=1800&q=90',
 }
@@ -53,6 +55,8 @@ function kindOf(help: Help): Kind {
   if (type.includes('quiet') || type.includes('silence') || type.includes('stillness') || type.includes('no_content')) return 'quiet'
   if (type.includes('practice') || type.includes('breath') || type.includes('meditation') || type.includes('exercise')) return 'practice'
   if (type.includes('circle') || type.includes('group') || type.includes('community')) return 'group'
+  if(type.includes('material')||type.includes('institutional')||type.includes('public_help'))return 'material'
+  if(type.includes('event')||type.includes('place')||type.includes('service'))return 'event'
   if (type.includes('person') || type.includes('mentor') || type.includes('professional') || type.includes('human_support')) return 'human'
   if (type.includes('conversation') || type.includes('action') || type.includes('event') || type.includes('place') || type.includes('service') || type.includes('material')) return 'action'
   if (externalUrl(help) || type.includes('resource') || type.includes('book') || type.includes('work')) return 'external'
@@ -110,11 +114,12 @@ function PremiumAudioPlayer({ src }: { src:string }) {
   const [current,setCurrent]=useState(0)
   const [duration,setDuration]=useState(0)
   const [rate,setRate]=useState(1)
+  const [mediaError,setMediaError]=useState(false)
 
   const toggle=async()=>{
     const audio=audioRef.current
     if(!audio)return
-    if(audio.paused){await audio.play();setPlaying(true)}else{audio.pause();setPlaying(false)}
+    if(audio.paused){try{await audio.play();setPlaying(true);setMediaError(false)}catch{setMediaError(true)}}else{audio.pause();setPlaying(false)}
   }
   const changeRate=()=>{
     const audio=audioRef.current
@@ -130,17 +135,19 @@ function PremiumAudioPlayer({ src }: { src:string }) {
   }
 
   return <div className="premium-audio-player">
-    <audio ref={audioRef} src={src} preload="metadata" onLoadedMetadata={(e)=>setDuration(e.currentTarget.duration||0)} onTimeUpdate={(e)=>setCurrent(e.currentTarget.currentTime)} onPause={()=>setPlaying(false)} onPlay={()=>setPlaying(true)} onEnded={()=>setPlaying(false)}/>
+    <audio ref={audioRef} src={src} preload="metadata" onError={()=>setMediaError(true)} onLoadedMetadata={(e)=>setDuration(e.currentTarget.duration||0)} onTimeUpdate={(e)=>setCurrent(e.currentTarget.currentTime)} onPause={()=>setPlaying(false)} onPlay={()=>setPlaying(true)} onEnded={()=>setPlaying(false)}/>
     <button type="button" className="audio-play" onClick={()=>void toggle()} aria-label={playing?'Pausar':'Reproducir'}><PlayIcon pause={playing}/></button>
     <div className="audio-track">
       <div className="audio-wave" aria-hidden="true">{Array.from({length:38},(_,index)=><i key={index} style={{height:`${12+((index*17)%27)}px`}}/>)}</div>
       <input aria-label="Progreso del audio" type="range" min="0" max={duration||1} step="0.1" value={Math.min(current,duration||1)} onChange={(e)=>seek(Number(e.target.value))}/>
       <div className="audio-time"><span>{formatTime(current)}</span><span>−{formatTime(Math.max(0,duration-current))}</span></div>
     </div>
-    <button type="button" className="audio-rate" onClick={changeRate} aria-label="Velocidad de reproducción">{rate}×</button>
+    {mediaError&&<p role="alert">No pudimos reproducir el audio. Podés abrirlo en su fuente original o reintentar.</p>}<button type="button" className="audio-rate" onClick={changeRate} aria-label="Velocidad de reproducción">{rate}×</button>
   </div>
 }
 
+function OriginalVideo({url,title}:{url:string;title:string}){const [opened,setOpened]=useState(false);return opened?<iframe title={title} src={url} allow="encrypted-media; picture-in-picture" allowFullScreen loading="lazy" style={{width:'100%',aspectRatio:'16/9',border:0}}/>:<button className="primary" onClick={()=>setOpened(true)}>Reproducir video original</button>}
+function SourceText({help}:{help:Help}){const url=str(contentOf(help).source_text_url);return url?<a className="source-text-link" href={url} target="_blank" rel="noreferrer">Leer el texto en la fuente original ↗</a>:null}
 function SourceMediaLaunch({ kind='audio',destination,cta }: { kind?:'audio'|'video'|'practice'; destination:string|null; cta:string }) {
   if(!destination)return <div className="media-boundary">La fuente todavía no ofrece un acceso directo utilizable desde esta experiencia. LUMEN no simula un reproductor inexistente.</div>
   return <a className={`source-media-launch ${kind}`} href={destination} target="_blank" rel="noreferrer">
@@ -192,7 +199,7 @@ function PremiumSourceExperience({ help,premium,onExit,onFinish }: { help:Help; 
         <section className="experience-media-card audio-source-card">
           {directAudio?<PremiumAudioPlayer src={directAudio}/>:<SourceMediaLaunch kind="audio" destination={destination} cta={cta}/>}
         </section>
-        <FindList items={find}/>
+        <SourceText help={help}/><FindList items={find}/>
         <SourcePanel sourceName={sourceName} sourceLabel={sourceLabel} rights={rights} destination={destination} cta={cta}/>
         <AfterCard label="PARA DESPUÉS" text={after}/>
       </>}
@@ -200,7 +207,7 @@ function PremiumSourceExperience({ help,premium,onExit,onFinish }: { help:Help; 
       {premium==='contemplative_reading_audio'&&<>
         <section className="contemplative-intro"><span className="quiet-mark" aria-hidden="true">◌</span><p>{str(experience.opening)||deck}</p></section>
         <SourceMediaLaunch kind="practice" destination={destination} cta={cta}/>
-        <FindList items={find}/>
+        <SourceText help={help}/><FindList items={find}/>
         <SourcePanel sourceName={sourceName} sourceLabel={sourceLabel} rights={rights} destination={destination} cta={cta}/>
         <AfterCard text={after}/>
       </>}
@@ -214,9 +221,9 @@ function PremiumSourceExperience({ help,premium,onExit,onFinish }: { help:Help; 
 
       {premium==='video_or_audio_visual_sequence'&&<>
         <section className="experience-media-card video-card">
-          {directVideo?<video controls playsInline src={directVideo}/>:<SourceMediaLaunch kind="video" destination={destination} cta={cta}/>}
+          {str(content.video_embed_url)?<OriginalVideo url={str(content.video_embed_url)!} title={help.title}/>:directVideo?<video controls playsInline src={directVideo}/>:<SourceMediaLaunch kind="video" destination={destination} cta={cta}/>}
         </section>
-        {str(experience.primary_source)&&<p className="source-focus">{str(experience.primary_source)}</p>}
+        <SourceText help={help}/>{str(experience.primary_source)&&<p className="source-focus">{str(experience.primary_source)}</p>}
         <SourcePanel sourceName={sourceName} sourceLabel={sourceLabel} rights={rights} destination={destination} cta={cta}/>
         <AfterCard text={after}/>
       </>}
@@ -230,7 +237,7 @@ function PremiumSourceExperience({ help,premium,onExit,onFinish }: { help:Help; 
       </>}
 
       {!['illustrated_guide','audio_practice','contemplative_reading_audio','classic_reading','video_or_audio_visual_sequence','health_reference'].includes(premium)&&<>
-        <FindList items={find}/>
+        <SourceText help={help}/><FindList items={find}/>
         <SourcePanel sourceName={sourceName} sourceLabel={sourceLabel} rights={rights} destination={destination} cta={cta}/>
         <AfterCard text={after}/>
       </>}
@@ -240,10 +247,11 @@ function PremiumSourceExperience({ help,premium,onExit,onFinish }: { help:Help; 
   </div>
 }
 
-export function Experience({ help, onExit, onFeedback, onComplete }: { help: Help; onExit: () => void; onFeedback?: (effect: OutcomeEffect) => void | Promise<void>; onComplete?: () => void }) {
+export function Experience({ help, onExit, onFeedback, onComplete, initialStep=0, onProgress }: { help: Help; onExit: () => void; onFeedback?: (effect: OutcomeEffect) => void | Promise<void>; onComplete?: () => void; initialStep?: number; onProgress?: (step:number)=>void }) {
   const kind = useMemo(() => kindOf(help), [help])
   const content = contentOf(help)
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(initialStep)
+  useEffect(()=>{onProgress?.(step)},[step,onProgress])
   const [reflecting, setReflecting] = useState(false)
   const [sending, setSending] = useState(false)
   const [directEpisode, setDirectEpisode] = useState<DirectEpisode | null>(null)
@@ -298,6 +306,8 @@ export function Experience({ help, onExit, onFeedback, onComplete }: { help: Hel
 
     {kind === 'action' && <div className="experience-premium-page"><ExperienceHero kind={kind} premium={null} eyebrow="ACCIÓN EN LA VIDA" title={help.title} deck={help.summary} onExit={onExit} sourceName={provider(help)}/><div className="experience-premium-body"><section className="human-premium-card">{prompt && <p>{prompt}</p>}{steps.length > 0 && <ol className="action-steps">{steps.map((item) => <li key={item}>{item}</li>)}</ol>}{(phone || availability || access) && <div className="help-meta">{phone && <span>{phone}</span>}{availability && <span>{availability}</span>}{access && <span>{access}</span>}</div>}<p className="media-boundary">Lo importante ocurre fuera de la pantalla.</p><div className="button-row center">{destination && <a className="primary as-link" href={destination} target="_blank" rel="noreferrer">Abrir acceso ↗</a>}{phone && <a className="ghost as-link" href={`tel:${phone.replace(/[^+\d]/g, '')}`}>Llamar</a>}<button className={destination || phone ? 'ghost' : 'primary'} type="button" onClick={finish}>{destination || phone ? 'Volver' : 'Salir a vivirlo'}</button></div></section></div></div>}
 
+    {kind==='event'&&<div className="experience-premium-page"><ExperienceHero kind={kind} premium={null} eyebrow="UN LUGAR PARA VIVIRLO" title={help.title} deck={help.summary} onExit={onExit} sourceName={provider(help)}/><div className="experience-premium-body"><section className="event-place-card"><h2>Antes de ir</h2>{str(content.location)&&<p>{str(content.location)}</p>}{availability&&<p>{availability}</p>}{access&&<p>{access}</p>}{str(content.cost)&&<p>{str(content.cost)}</p>}{!availability&&<p>Consultá la disponibilidad con quien ofrece esta experiencia.</p>}{destination&&<a className="primary as-link" href={destination} target="_blank" rel="noreferrer">Consultar en la fuente original ↗</a>}<button className="ghost" onClick={finish}>Volver después de vivirlo</button></section></div></div>}
+    {kind==='material'&&<div className="experience-premium-page"><ExperienceHero kind={kind} premium={null} eyebrow="AYUDA PARA TU SITUACIÓN" title={help.title} deck={help.summary} onExit={onExit} sourceName={provider(help)}/><div className="experience-premium-body"><section className="material-help-card"><h2>Cómo pedir ayuda</h2>{prompt&&<p>{prompt}</p>}{access&&<p>{access}</p>}{availability&&<p>{availability}</p>}{str(content.eligibility)&&<p>{str(content.eligibility)}</p>}<p>La entidad que ofrece esta ayuda confirma las condiciones. LUMEN no garantiza acceso ni reemplaza su atención.</p>{destination&&<a className="primary as-link" href={destination} target="_blank" rel="noreferrer">Consultar cómo acceder ↗</a>}{phone&&<a className="ghost as-link" href={`tel:${phone.replace(/[^+\d]/g,'')}`}>Llamar</a>}<button className="ghost" onClick={finish}>Volver a LUMEN</button></section></div></div>}
     {kind === 'quiet' && <div className="experience-center quiet"><span className="orb quiet-orb"/><p className="eyebrow">QUIETUD</p><h1>{help.title}</h1><p>{help.summary}</p><button className="ghost" type="button" onClick={finish}>Cuando quieras, volver</button></div>}
   </section>
 }

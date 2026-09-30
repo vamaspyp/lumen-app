@@ -26,7 +26,7 @@ async function simulatedLife(page:Page){
   else if(name==='lumen_s2_list_sanctuary')data=entries
   else if(name==='lumen_living_map_snapshot')data={memory_allowed:true,direction:[{faro_id:'faro-1',text:'Cuidar mi calma',status:'active'}],potential:repertoire().map(r=>({resource_id:r.repertoire_id,help_id:r.help_id,user_confirmed:true})),conditions:[],realization:[...returns].reverse(),epistemic_note:'Mapa parcial y corregible.'}
   else if(name==='lumen_s1_accompany_moment'){momentCount++;data={scene_id:'moment.help',episode_id:`episode-${momentCount}`,moment_id:`moment-${momentCount}`,interpretation:{area_keys:['wellbeing'],capacity_keys:['regulation']}}}
-  else if(name==='lumen_s1_moment_constellation')data={items:[newSource,ownSource]}
+  else if(name==='lumen_s1_moment_constellation'){const saved=entries.some(e=>e.source_help_id==='help-own');data={items:(own?[ownSource,newSource,humanSource]:[newSource,ownSource,humanSource]).map(item=>({...item,context_origin:item.help_id==='help-own'&&own?'propio':item.help_id==='help-own'&&saved?'santuario':item.help_id==='help-human'?'tejido':'fuente',context_reason:item.help_id==='help-own'&&own?'Lo reconociste como propio y se relaciona con lo que expresaste hoy.':item.help_id==='help-own'&&saved?'Elegiste conservarlo y puede volver a servirte ahora.':'Una posibilidad relacionada con este Momento.'}))}}
   else if(name==='lumen_source_discover')data=p.p_help_type==='professional_support'?[humanSource]:p.p_help_type?[ ]:[newSource,ownSource,humanSource]
   else if(name==='lumen_s1_select_help'){selected=p.p_help_id;data={selection_id:`selection-${momentCount}`,episode_id:p.p_episode_id,help:{help_id:selected}}}
   else if(name==='lumen_s1_record_outcome'){returns.push({outcome_id:`outcome-${returns.length+1}`,help_id:selected,effect:p.p_effect,applied:true,signal_kind:'HELPED_NOW'});data={effect:p.p_effect}}
@@ -40,12 +40,10 @@ async function simulatedLife(page:Page){
 }
 
 async function reachConstellation(page:Page){
- await page.locator('.gm-nav').getByText('Inicio').click()
+ await page.goto('/')
  await page.getByLabel('¿Qué está vivo hoy?').fill('Me siento saturado y quiero bajar un cambio.')
  await page.getByRole('button',{name:'Continuar mi Momento'}).click()
- await page.getByRole('button',{name:'Continuar',exact:true}).click()
- await page.getByRole('button',{name:'Ver mi Faro'}).click()
- await page.getByRole('button',{name:'Abrir mi Constelación'}).click()
+ await page.getByRole('button',{name:'Ver mis posibilidades'}).click()
  await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible()
 }
 
@@ -58,8 +56,11 @@ test('V58 remembers a voluntary return and puts a relevant own resource before n
  await page.getByText('Pausa que puedo recuperar',{exact:true}).click()
  await page.getByRole('button',{name:'Marcar como realizada'}).click()
  await page.getByRole('button',{name:'Me ayudó',exact:true}).click()
- await page.getByRole('checkbox',{name:'Conservar también este recurso en mi Santuario'}).check()
- await page.getByRole('button',{name:'Registrar y conservar en Santuario'}).click()
+ await page.getByRole('button',{name:'Registrar mi señal'}).click()
+ await page.getByText('Conservar algo de esta experiencia',{exact:true}).click()
+ await page.getByRole('checkbox',{name:'Conservar este recurso en mi Santuario'}).check()
+ await page.getByRole('button',{name:'Conservar en mi Santuario'}).click()
+ await page.getByRole('button',{name:'Abrir mi Santuario'}).click()
  await expect(page.getByRole('heading',{name:'Mi Santuario'})).toBeVisible()
  expect(life.returns).toHaveLength(1)
  expect(life.entries).toHaveLength(1)
@@ -70,18 +71,17 @@ test('V58 remembers a voluntary return and puts a relevant own resource before n
  await page.getByText('Pausa que puedo recuperar',{exact:true}).click()
  await page.getByRole('button',{name:'Marcar como realizada'}).click()
  await page.getByRole('button',{name:'Me ayudó',exact:true}).click()
- await page.getByRole('radio',{name:'Lo repetí'}).check()
- await page.getByRole('checkbox',{name:/lo reconozco como propio/}).check()
- await page.getByRole('button',{name:'Registrar y conservar en Santuario'}).click()
- await expect(page.getByRole('heading',{name:'Mi Santuario'})).toBeVisible()
- await expect(page.getByRole('heading',{name:'Pausa que puedo recuperar'})).toHaveCount(0)
+ await page.getByRole('button',{name:'Registrar mi señal'}).click()
+ await page.getByText('Reconocerlo como propio',{exact:true}).click()
+ await page.getByRole('button',{name:'Reconozco este recurso como propio'}).click()
+ await expect(page.getByText('Reconocido como propio.',{exact:false})).toBeVisible()
  expect(life.returns).toHaveLength(2)
- expect(life.returns[1].signal_kind).toBe('REPEATED')
  await page.reload()
  await reachConstellation(page)
  const cards=page.locator('.gm-context-card')
  await expect(cards.first()).toContainText('Pausa que puedo recuperar')
  await expect(cards.first()).toContainText('Lo reconociste como propio')
+ await page.getByRole('button',{name:'Dejarlo aquí',exact:true}).click()
  await page.locator('.gm-nav').getByText('Santuario').click()
  await page.getByText('Recursos que reconocí útiles').click()
  await page.getByRole('button',{name:'Dejar de reconocer como propio'}).click()

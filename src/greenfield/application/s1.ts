@@ -29,6 +29,7 @@ export type SceneAction = {
 }
 
 export type S1Scene = {
+  understanding?: string
   scene_id: string
   scene_version: string
   presence_mode: PresenceMode

@@ -6,9 +6,6 @@ test.describe('LUMEN PREMIUM V58 · public doors',()=>{
   await expect(page.getByRole('heading',{name:'Una vida más tuya.'})).toBeVisible()
   await page.getByLabel('¿Qué está vivo hoy?').fill('Quiero descansar y entender qué necesito hoy.')
   await page.getByRole('button',{name:'Continuar mi Momento'}).click()
-  await expect(page.getByRole('heading',{name:'¿Qué estás viviendo hoy?'})).toBeVisible()
-  await expect(page.getByLabel('Contá tu momento')).toHaveValue(/Quiero descansar/)
-  await page.getByRole('button',{name:'Continuar'}).click()
   await expect(page.getByRole('dialog',{name:'Entrar a LUMEN'})).toBeVisible()
  })
  test('five doors are distinct and Santuario is reachable',async({page})=>{

@@ -21,6 +21,7 @@ export type PathItem = Readonly<{
 export type Trajectory = Readonly<{
   trajectory_id: string
   faro_text: string
+  history?: Array<{text:string;until:string}>
   status: 'active' | 'paused' | 'closed'
   capability_keys?: string[]
   origin_moment_id?: string | null
@@ -64,6 +65,8 @@ export type SanctuaryExport = Readonly<{
 }>
 
 export type SourceItem = Readonly<{
+  context_origin?: 'fuente'|'propio'|'santuario'|'tejido'
+  context_reason?: string
   help_id: string
   help_version_id?: string
   canonical_code: string
