@@ -298,6 +298,10 @@ export function integrateHelp(helpId: string) {
   return rpc('lumen_s2_add_repertoire', { p_help_id: helpId, p_trace_id: newTraceId() })
 }
 
+export function releaseOwnResource(repertoireId: string): Promise<{repertoire_id:string;released:boolean}> {
+  return rpc('lumen_s2_release_repertoire', { p_repertoire_id: repertoireId, p_trace_id: newTraceId() })
+}
+
 export function reuseRepertoire(repertoireId: string, move: Exclude<CultivationMove, 'CONTINUE_PATH'>): Promise<CultivationScene> {
   return rpc('lumen_s2_reuse_repertoire', {
     p_repertoire_id: repertoireId,

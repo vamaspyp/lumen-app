@@ -235,12 +235,12 @@ function PremiumSourceExperience({ help,premium,onExit,onFinish }: { help:Help; 
         <AfterCard text={after}/>
       </>}
 
-      <div className="experience-finish-row"><button className="ghost" type="button" onClick={onFinish}>Volver a la constelación</button></div>
+      <div className="experience-finish-row"><button className="ghost" type="button" onClick={onFinish}>Terminé de explorar</button></div>
     </main>
   </div>
 }
 
-export function Experience({ help, onExit, onFeedback }: { help: Help; onExit: () => void; onFeedback?: (effect: OutcomeEffect) => void | Promise<void> }) {
+export function Experience({ help, onExit, onFeedback, onComplete }: { help: Help; onExit: () => void; onFeedback?: (effect: OutcomeEffect) => void | Promise<void>; onComplete?: () => void }) {
   const kind = useMemo(() => kindOf(help), [help])
   const content = contentOf(help)
   const [step, setStep] = useState(0)
@@ -257,7 +257,7 @@ export function Experience({ help, onExit, onFeedback }: { help: Help; onExit: (
   const phone = str(content.phone)
   const availability = str(content.availability)
   const access = str(content.access)
-  const parentOwnsOutcome = 'help_version_id' in help
+  const parentOwnsOutcome = Boolean(onComplete) || 'help_version_id' in help
   const directEpisodeId = directEpisode?.helpId === help.help_id ? directEpisode.episodeId : null
 
   useEffect(() => {
@@ -269,7 +269,7 @@ export function Experience({ help, onExit, onFeedback }: { help: Help; onExit: (
     return () => { cancelled = true }
   }, [help.help_id, parentOwnsOutcome])
 
-  const finish = () => (onFeedback || !parentOwnsOutcome) ? setReflecting(true) : onExit()
+  const finish = () => onComplete ? onComplete() : (onFeedback || !parentOwnsOutcome) ? setReflecting(true) : onExit()
   const feedback = async (effect: OutcomeEffect) => {
     setSending(true)
     try {

@@ -40,7 +40,7 @@ test('A63 premium Source uses family renderers and preserves external authorship
   }
   assert.match(exp,/GUÍA ESENCIAL · FUENTE ORIGINAL/)
   assert.match(exp,/LUMEN contextualiza; no sustituye ni reescribe la fuente/)
-  assert.match(exp,/Volver a la constelación/)
+  assert.match(exp,/Terminé de explorar/)
   assert.match(exp,/Abrir en su fuente/)
 })
 

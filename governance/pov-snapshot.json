@@ -4,7 +4,7 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "verified_at": "2026-09-26T15:09:00Z",
+    "verified_at": "2026-09-29T21:02:55.339Z",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {
@@ -94,6 +94,11 @@
       "id": "V56",
       "name": "VA+LUMEN · Fuente LUMEN · Estándar Canónico del Embrión V1.1",
       "state": "VIGENTE"
+    },
+    {
+      "id": "V58",
+      "name": "Especificación Funcional Detallada del Embrión · Una Vida singular en movimiento · V1.1",
+      "state": "VIGENTE"
     }
   ],
   "superseded_authorities": [
@@ -133,6 +138,7 @@
     "prelaunch_reset_required": true,
     "fail_closed": true,
     "snapshot_max_age_hours": 72,
-    "v56_version": "1.1"
+    "v56_version": "1.1",
+    "v58_constructive_spec_v11": true
   }
 }
