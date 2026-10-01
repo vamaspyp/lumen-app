@@ -113,8 +113,8 @@ export default function PremiumVNext(){
   setMovement(motion)
   if(resume.state==='success'&&resume.help_id){const items=await discoverSource(null,null,null,'es-AR',100);const item=items.find(r=>r.help_id===resume.help_id);if(item){setChosen(item);setEpisodeId(resume.episode_id||null);setProgress(p=>({...p,[item.help_id]:resume.position?.step||0}));if(resume.position?.finished)setPendingReturn(true);else setResumeItem(item)}}
   const active=continuity.trajectories.find(t=>t.status==='active')
-  if(active){setFaroHistory(active.history||[]);setFaro(active.faro_text);setTrajectoryId(active.trajectory_id);setFaroStatus(active.status);setCapacityKeys(active.capability_keys||[])}
-  else if(continuity.trajectories.length){const latest=continuity.trajectories[0];setFaro(latest.faro_text);setTrajectoryId(latest.trajectory_id);setFaroStatus(latest.status)}
+  if(active){setFaroReady('yes');setFaroHistory(active.history||[]);setFaro(active.faro_text);setTrajectoryId(active.trajectory_id);setFaroStatus(active.status);setCapacityKeys(active.capability_keys||[])}
+  else if(continuity.trajectories.length){const latest=continuity.trajectories[0];setFaroHistory(latest.history||[]);setCapacityKeys(latest.capability_keys||[]);setFaroReady(latest.status==='active'?'yes':'not_yet');setFaro(latest.faro_text);setTrajectoryId(latest.trajectory_id);setFaroStatus(latest.status)}
   if(!continuity.trajectories.length){setFaro('');setTrajectoryId(null);setFaroHistory([])}
   setContinuityResources(continuity.repertoire)
   setMemoryAllowed(continuity.memory_allowed)

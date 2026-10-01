@@ -1,9 +1,9 @@
 import {test,expect,type Page} from '@playwright/test'
-async function personalBackend(page:Page){
+async function personalBackend(page:Page,paused=false){
  const origin='https://vbuixagaguasejputubp.supabase.co'
  const session={access_token:'regression-only-token',refresh_token:'regression-only-refresh',token_type:'bearer',expires_in:3600,expires_at:Math.floor(Date.now()/1000)+3600,user:{id:'regression-user',aud:'authenticated',role:'authenticated',email:'regression@example.invalid',app_metadata:{},user_metadata:{},created_at:'2026-09-30T00:00:00Z'}}
  await page.addInitScript(s=>localStorage.setItem('sb-vbuixagaguasejputubp-auth-token',JSON.stringify(s)),session)
- const prefs={memory_allowed:false,evidence_use_allowed:false,proactive_allowed:false,sharing_allowed:false,revision:1}
+ const prefs={memory_allowed:paused,evidence_use_allowed:false,proactive_allowed:false,sharing_allowed:false,revision:1}
  const calls:string[]=[]
  const resources=Array.from({length:3},(_,i)=>({help_id:`help-${i}`,canonical_code:`source-${i}`,help_type:'practice',detail:{renderer_family:'practice'},title:`Posibilidad ${i+1}`,summary:'Una práctica para probar el contrato de interfaz.',content:{steps:['Primer paso.','Segundo paso.']},provider:{name:'Fuente de regresión'},duration_minutes:2,context_reason:'Se relaciona con lo que expresaste hoy.',context_origin:'fuente'}))
  const circles:Array<{space_id:string;name:string;purpose:string;role:string;contributions:Array<{contribution_id:string;help_id:string;title:string}>}>=[]
@@ -13,7 +13,7 @@ async function personalBackend(page:Page){
   if(name==='lumen_s2_resume_experience'){await r.fulfill({json:{state:'empty'}});return}
 
  if(name==='lumen_bootstrap_person'||name==='lumen_get_consent_state')data={person_id:'p',preferences:prefs,grants:{}}
- else if(name==='lumen_s2_snapshot')data={memory_allowed:prefs.memory_allowed,trajectories:[],repertoire:[],sanctuary_count:0}
+ else if(name==='lumen_s2_snapshot')data={memory_allowed:prefs.memory_allowed,trajectories:paused?[{trajectory_id:'paused-faro',faro_text:'Quiero cuidar mi descanso.',status:'paused',capability_keys:['regulation'],history:[{text:'Quiero vivir con menos apuro.',until:'2026-09-30'}]}]:[],repertoire:[],sanctuary_count:0}
  else if(name==='lumen_s2_list_sanctuary')data=[]
  else if(name==='lumen_living_map_snapshot')data={memory_allowed:prefs.memory_allowed,direction:[],potential:[],realization:[],conditions:[]}
  else if(name==='lumen_source_discover')data=resources
@@ -53,4 +53,8 @@ test('V60 offline keeps draft and safety precedes all possibilities',async({page
 })
 test('V60 LUMI conversation is invoked and withdrawal stays in context; browser back returns to door',async({page})=>{
  await personalBackend(page);await page.goto('/');await expect(page.getByRole('dialog',{name:'LUMI'})).toHaveCount(0);await page.getByRole('button',{name:'Conversar con LUMI'}).click();await expect(page.getByRole('dialog',{name:'LUMI'})).toBeVisible();await page.getByRole('button',{name:'Prefiero seguir sin LUMI'}).click();await expect(page.getByRole('button',{name:'Conversar con LUMI'})).toHaveCount(0);await page.locator('.gm-nav').getByText('Mi Vida',{exact:true}).click();await page.getByRole('button',{name:'Ver mi Faro'}).click();await page.goBack();await expect(page.getByRole('heading',{name:'Mi Mapa Vivo'})).toBeVisible()
+})
+
+test('V62 paused Faro keeps its history and willingness after reload',async({page})=>{
+ await personalBackend(page,true);await page.goto('/mi-vida/faro');await page.getByText('Cómo fue cambiando mi Faro',{exact:true}).click();await expect(page.getByText('Quiero vivir con menos apuro.',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Editar mi Faro'}).click();await expect(page.getByRole('radio',{name:'Todavía no'})).toBeChecked();await page.reload();await page.getByRole('button',{name:'Editar mi Faro'}).click();await expect(page.getByRole('radio',{name:'Todavía no'})).toBeChecked()
 })
