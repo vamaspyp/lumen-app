@@ -283,3 +283,7 @@
 [data-lumen-theme="light"] .gm-phone .gm-screen p,[data-lumen-theme="light"] .gm-phone .gm-home-entry,[data-lumen-theme="light"] .gm-phone .gm-secondary,[data-lumen-theme="light"] .gm-lumi-hint{color:#5F5A50!important}
 [data-lumen-theme="light"] .gm-lumi-sheet{background:#FBF7EE;color:#1E1D1A}[data-lumen-theme="light"] .gm-lumi-sheet p,[data-lumen-theme="light"] .gm-lumi-sheet button{color:#2F4A3A}
 .gm-phone .gm-tools button{width:auto;min-height:44px;border-radius:24px;padding:12px 20px;font-size:15px}
+
+@media(prefers-color-scheme:dark){.gm-lumi-orb{border-color:#dfbf93}.gm-lumi-orb:focus-visible{outline-color:#dfbf93}}
+[data-lumen-theme="dark"] .gm-lumi-orb{border-color:#dfbf93}[data-lumen-theme="dark"] .gm-lumi-orb:focus-visible{outline-color:#dfbf93}
+[data-lumen-theme="light"] .gm-lumi-orb{border-color:#8A5A36}[data-lumen-theme="light"] .gm-lumi-orb:focus-visible{outline-color:#2F4A3A}
