@@ -33,6 +33,12 @@ begin
  s:=public.lumen_s1_accompany_moment('Me siento desbordado por el trabajo y necesito bajar un cambio.','es-AR','es','web',gen_random_uuid());
  c:=public.lumen_s1_moment_constellation((s->>'episode_id')::uuid,'es-AR',3,gen_random_uuid(),null);
  assert not exists(select 1 from jsonb_array_elements(c->'items') x where (x->>'help_id')::uuid=own),'stopped help repeated unchanged';
+ perform public.lumen_s1_correct_moment_context((s->>'episode_id')::uuid,5);
+ c:=public.lumen_s1_moment_constellation((s->>'episode_id')::uuid,'es-AR',3,gen_random_uuid(),null);
+ assert not exists(select 1 from jsonb_array_elements(c->'items') x where coalesce((x->>'duration_minutes')::numeric,0)>5),'available time ignored';
+ assert not (public.lumen_s2_movement_snapshot()->>'withdrawn')::boolean,'new context did not reopen accompaniment';
+ assert not exists(select 1 from pg_tables where schemaname in ('gf_private','gf_ledger') and not rowsecurity),'private RLS missing';
+ assert not exists(select 1 from pg_tables t where schemaname in ('gf_private','gf_ledger') and (has_table_privilege('anon',format('%I.%I',schemaname,tablename),'SELECT') or has_table_privilege('authenticated',format('%I.%I',schemaname,tablename),'SELECT'))),'private data publicly readable';
  perform public.lumen_s2_set_life_context('Reservar un rato sin pantallas.','La carga de trabajo de otros.','Puedo pedir ayuda.');
  assert public.lumen_s2_movement_snapshot()->'context'->>'adjustable'='Reservar un rato sin pantallas.';
  perform public.lumen_s2_set_memory(false,gen_random_uuid());
