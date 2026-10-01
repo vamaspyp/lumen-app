@@ -3,7 +3,7 @@ import {test,expect} from '@playwright/test'
 test.describe('LUMEN PREMIUM V58 · public doors',()=>{
  test.beforeEach(async({page})=>{await page.goto('/')})
  test('present Momento protects personal persistence behind identity',async({page})=>{
-  await expect(page.getByRole('heading',{name:'Una vida más tuya.'})).toBeVisible()
+  await expect(page.getByRole('heading',{name:'¿Qué está pasando en tu vida ahora?'})).toBeVisible()
   await page.getByLabel('¿Qué está vivo hoy?').fill('Quiero descansar y entender qué necesito hoy.')
   await page.getByRole('button',{name:'Continuar mi Momento'}).click()
   await expect(page.getByRole('dialog',{name:'Entrar a LUMEN'})).toBeVisible()

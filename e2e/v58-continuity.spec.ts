@@ -67,7 +67,7 @@ test('V58 remembers a voluntary return and puts a relevant own resource before n
  await expect(page.getByRole('heading',{name:'Mi Santuario'})).toBeVisible()
  expect(life.returns).toHaveLength(1)
  expect(life.entries).toHaveLength(1)
- await page.getByRole('button',{name:/Recurso conservado Pausa que puedo recuperar/}).click()
+ await page.locator('.gm-resources').getByRole('button',{name:/Pausa que puedo recuperar/}).click()
  await expect(page.getByRole('heading',{name:'Pausa que puedo recuperar'})).toBeVisible()
  await reachConstellation(page)
  await expect(page.getByText(/Elegiste conservarlo/)).toBeVisible()
