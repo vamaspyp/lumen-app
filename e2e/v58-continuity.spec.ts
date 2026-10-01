@@ -45,8 +45,8 @@ async function simulatedLife(page:Page){
 async function reachConstellation(page:Page){
  await page.goto('/')
  await page.getByLabel('¿Qué está vivo hoy?').fill('Me siento saturado y quiero bajar un cambio.')
- await page.getByRole('button',{name:'Continuar mi Momento'}).click()
- await page.getByRole('button',{name:'Ver mis posibilidades'}).click()
+ await page.getByRole('button',{name:'Contar'}).click()
+ await page.getByRole('button',{name:'Ver qué puede ayudar'}).click()
  await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible()
 }
 
@@ -59,7 +59,7 @@ test('V58 remembers a voluntary return and puts a relevant own resource before n
  await page.getByText('Pausa que puedo recuperar',{exact:true}).click()
  await page.getByRole('button',{name:'Marcar como realizada'}).click()
  await page.getByRole('button',{name:'Me ayudó',exact:true}).click()
- await page.getByRole('button',{name:'Registrar mi señal'}).click()
+ await page.getByRole('button',{name:'Listo'}).click()
  await page.getByText('Conservar algo de esta experiencia',{exact:true}).click()
  await page.getByRole('checkbox',{name:'Conservar este recurso en mi Santuario'}).check()
  await page.getByRole('button',{name:'Conservar en mi Santuario'}).click()
@@ -74,7 +74,7 @@ test('V58 remembers a voluntary return and puts a relevant own resource before n
  await page.getByText('Pausa que puedo recuperar',{exact:true}).click()
  await page.getByRole('button',{name:'Marcar como realizada'}).click()
  await page.getByRole('button',{name:'Me ayudó',exact:true}).click()
- await page.getByRole('button',{name:'Registrar mi señal'}).click()
+ await page.getByRole('button',{name:'Listo'}).click()
  await page.getByText('Reconocerlo como propio',{exact:true}).click()
  await page.getByRole('button',{name:'Reconozco este recurso como propio'}).click()
  await expect(page.getByText('Reconocido como propio.',{exact:false})).toBeVisible()
@@ -94,3 +94,4 @@ test('V58 remembers a voluntary return and puts a relevant own resource before n
  await expect(page.getByText(/Lo reconociste como propio/)).toHaveCount(0)
  expect(life.calls).toContain('lumen_s2_release_repertoire')
 })
+

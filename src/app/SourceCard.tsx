@@ -7,7 +7,8 @@ export function SourceCard({item,onOpen,reason,primary=false,busy=false,children
  return <article className={`gm-context-card ${primary?'gm-for-now':''}`}>
   {primary&&<p className="gm-for-now-label">Para ahora</p>}
   <button className="gm-source-open" disabled={busy} onClick={onOpen}>
-   <span><small>{sourceLabel(item)}{item.duration_minutes?` · ${item.duration_minutes} min`:''}</small><b>{item.title}</b><em>{item.summary}</em>{reason&&<span className="gm-context-reason">{reason}</span>}<small>{item.provider?.name||'Fuente LUMEN'}</small></span><i aria-hidden="true">›</i>
+   <span><small>{sourceLabel(item)}{item.duration_minutes?` · ${item.duration_minutes} min`:''}</small><b>{item.title}</b><em>{item.summary}</em>{reason&&<span className="gm-context-reason">{reason}</span>}<small>{item.provider?.name||'Fuente LUMEN'}</small></span><i aria-hidden="true">{primary?'Empezar →':'›'}</i>
   </button>{children}
  </article>
 }
+

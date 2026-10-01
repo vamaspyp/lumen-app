@@ -46,12 +46,12 @@ async function backend(page:Page, signedIn=false, clarification=false){
 }
 async function momentToReturn(page:Page){
  await page.getByLabel('¿Qué está vivo hoy?').fill('Mi trabajo me agota y quiero cultivar calma al volver a casa.')
- await page.getByRole('button',{name:'Continuar mi Momento'}).click()
- await page.getByRole('button',{name:'Ver mis posibilidades'}).click()
+ await page.getByRole('button',{name:'Contar'}).click()
+ await page.getByRole('button',{name:'Ver qué puede ayudar'}).click()
  await page.getByText('Pausa real de prueba',{exact:true}).click()
  await page.getByRole('button',{name:'Marcar como realizada'}).click()
  await page.getByRole('button',{name:'Más o menos',exact:true}).click()
- await page.getByRole('button',{name:'Registrar mi señal'}).click()
+ await page.getByRole('button',{name:'Listo'}).click()
  await page.getByText('Conservar algo de esta experiencia',{exact:true}).click()
  await page.locator('.gm-return textarea').fill('Reflexión única de regresión')
 }
@@ -59,7 +59,7 @@ test('OTP completion resumes the pending Momento once',async({page})=>{
  const b=await backend(page)
  await page.goto('/')
  await page.getByLabel('¿Qué está vivo hoy?').fill('Mi trabajo me agota y quiero cultivar calma al volver a casa.')
- await page.getByRole('button',{name:'Continuar mi Momento'}).click()
+ await page.getByRole('button',{name:'Contar'}).click()
  await page.getByLabel('Email',{exact:true}).fill('regression@example.invalid')
  await page.getByRole('button',{name:'Enviar código',exact:true}).click()
  await page.getByLabel('Código',{exact:true}).fill('123456')
@@ -72,9 +72,9 @@ test('an uncertain Momento asks for context without inventing a constellation',a
  const b=await backend(page,true,true)
  await page.goto('/')
  await page.getByLabel('¿Qué está vivo hoy?').fill('Quiero cambiar algo.')
- await page.getByRole('button',{name:'Continuar mi Momento'}).click()
+ await page.getByRole('button',{name:'Contar'}).click()
  await expect(page.getByText(/Necesitamos un poco más de contexto/)).toBeVisible()
- await expect(page.getByRole('heading',{name:'Mi Mapa Vivo'})).toHaveCount(0)
+ await expect(page.getByRole('heading',{name:'Mi Vida'})).toHaveCount(0)
  expect(b.calls).not.toContain('lumen_s1_moment_constellation')
 })
 test('Faro can be created without a Momento and reread after reload',async({page})=>{
@@ -161,8 +161,8 @@ test('exploring Source does not replace the contextual constellation',async({pag
  await backend(page,true)
  await page.goto('/')
  await page.getByLabel('¿Qué está vivo hoy?').fill('Mi trabajo me agota y quiero cultivar calma al volver a casa.')
- await page.getByRole('button',{name:'Continuar mi Momento'}).click()
- await page.getByRole('button',{name:'Ver mis posibilidades'}).click()
+ await page.getByRole('button',{name:'Contar'}).click()
+ await page.getByRole('button',{name:'Ver qué puede ayudar'}).click()
  await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible()
  await page.getByRole('button',{name:'Explorar otras posibilidades'}).click()
  await expect(page.getByRole('heading',{name:'Explorar',exact:true})).toBeVisible()
@@ -202,3 +202,4 @@ test('a selected resource is conserved only by choice and reread as a resource',
  await page.locator('.gm-nav').getByText('Santuario',{exact:true}).click()
  await expect(page.getByText('Pausa real de prueba',{exact:true})).toBeVisible()
 })
+

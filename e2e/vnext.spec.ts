@@ -5,7 +5,7 @@ test.describe('LUMEN PREMIUM V58 · public doors',()=>{
  test('present Momento protects personal persistence behind identity',async({page})=>{
   await expect(page.getByRole('heading',{name:'¿Qué está pasando en tu vida ahora?'})).toBeVisible()
   await page.getByLabel('¿Qué está vivo hoy?').fill('Quiero descansar y entender qué necesito hoy.')
-  await page.getByRole('button',{name:'Continuar mi Momento'}).click()
+  await page.getByRole('button',{name:'Contar'}).click()
   await expect(page.getByRole('dialog',{name:'Entrar a LUMEN'})).toBeVisible()
  })
  test('five doors are distinct and Santuario is reachable',async({page})=>{
@@ -17,7 +17,7 @@ test.describe('LUMEN PREMIUM V58 · public doors',()=>{
   await expect(page.getByRole('dialog',{name:'Entrar a LUMEN'})).toBeVisible()
   await page.getByRole('button',{name:'Cerrar'}).click()
   await page.locator('.gm-nav').getByText('Mi Vida').click()
-  await expect(page.getByRole('heading',{name:'Mi Mapa Vivo'})).toBeVisible()
+  await expect(page.getByRole('heading',{name:'Mi Vida'})).toBeVisible()
   await page.getByText('Mirar con más detalle').click()
   await page.getByRole('button',{name:'Potencial',exact:true}).click()
   await expect(page.getByRole('button',{name:'Potencial',exact:true})).toHaveClass(/on/)
@@ -29,7 +29,7 @@ test.describe('LUMEN PREMIUM V58 · public doors',()=>{
  test('Faro is editable and the contextual boundary is honest',async({page})=>{
   await page.locator('.gm-nav').getByText('Mi Vida').click()
   await page.getByRole('button',{name:'Ver mi Faro'}).click()
-  await page.getByRole('button',{name:'Abrir mi Constelación'}).click()
+  await page.getByRole('button',{name:'Ver posibilidades para este Faro'}).click()
   await expect(page.getByText(/contanos primero qué está vivo ahora/)).toBeVisible()
   await page.getByRole('button',{name:'Editar mi Faro'}).click()
   await page.getByLabel('Orientación de mi Faro').fill('Cuidar mi descanso')
@@ -54,3 +54,4 @@ test.describe('LUMEN PREMIUM V58 · public doors',()=>{
   await expect(page.getByRole('heading',{name:'Orientación profesional en salud mental · Argentina'})).toBeVisible()
  })
 })
+
