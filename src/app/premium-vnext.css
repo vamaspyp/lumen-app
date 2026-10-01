@@ -177,3 +177,5 @@
  .gm-phone .gm-home-entry textarea::placeholder{color:#c5cdbd!important;}
  .gm-phone .gm-home .gm-entry:disabled{background:#455849;color:#f6f0e4;}
 }
+
+.gm-phone.gm-vivir{grid-template-rows:minmax(0,1fr);}

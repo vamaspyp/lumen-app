@@ -35,7 +35,7 @@ test('V60 understanding is correctable; three possibilities; scenes withdraw doo
  await personalBackend(page);await page.goto('/');await page.getByLabel('¿Qué está vivo hoy?').fill('Necesito bajar un cambio.')
  await page.getByRole('button',{name:'Continuar mi Momento'}).click();await expect(page.getByRole('heading',{name:'¿Te representa?'})).toBeVisible();await expect(page.locator('.gm-nav')).toHaveCount(0)
  await page.getByRole('button',{name:'Ver mis posibilidades'}).click();await expect(page.locator('.gm-context-card')).toHaveCount(3);await expect(page.getByText('Para ahora',{exact:true})).toHaveCount(1)
- await page.getByText('Posibilidad 1',{exact:true}).click();await expect(page.locator('.gm-nav')).toHaveCount(0);await page.getByRole('button',{name:'Seguir',exact:true}).click();await expect(page.getByRole('heading',{name:'Segundo paso.'})).toBeVisible();await page.getByRole('button',{name:'Salir cuando quieras'}).click()
+ await page.getByText('Posibilidad 1',{exact:true}).click();await expect(page.locator('.gm-nav')).toHaveCount(0);await expect(page.locator('.gm-top')).toHaveCount(0);await page.getByRole('button',{name:'Seguir',exact:true}).click();await expect(page.getByRole('heading',{name:'Segundo paso.'})).toBeVisible();await page.getByRole('button',{name:'Salir cuando quieras'}).click()
  await page.getByRole('button',{name:'Dejarlo aquí'}).click();await page.getByRole('button',{name:'Retomar: Posibilidad 1'}).click();await expect(page.getByRole('heading',{name:'Segundo paso.'})).toBeVisible()
  await page.screenshot({path:`test-results/v60-live-${test.info().project.name}.png`,fullPage:true})
 })
