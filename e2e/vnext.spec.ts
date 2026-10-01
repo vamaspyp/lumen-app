@@ -42,6 +42,7 @@ test.describe('LUMEN PREMIUM V58 · public doors',()=>{
  })
  test('Fuente exposes a real attributed audio rather than an empty first page',async({page})=>{
   await page.locator('.gm-nav').getByText('Explorar').click()
+  await page.getByText('Filtros de esta búsqueda',{exact:true}).click()
   await page.getByRole('button',{name:'Audios',exact:true}).click()
   await expect(page.getByText('Poner los pies en la tierra · audio OPS/OMS',{exact:true})).toBeVisible({timeout:20000})
   await page.getByText('Poner los pies en la tierra · audio OPS/OMS',{exact:true}).click()
@@ -49,6 +50,7 @@ test.describe('LUMEN PREMIUM V58 · public doors',()=>{
  })
  test('Tejido offers a real human service with attribution',async({page})=>{
   await page.locator('.gm-nav').getByText('Tejido').click()
+  await page.getByText('Necesito acompañamiento humano',{exact:true}).click()
   await expect(page.getByText('Orientación profesional en salud mental · Argentina',{exact:true})).toBeVisible({timeout:20000})
   await page.getByText('Orientación profesional en salud mental · Argentina',{exact:true}).click()
   await expect(page.getByRole('heading',{name:'Orientación profesional en salud mental · Argentina'})).toBeVisible()

@@ -249,3 +249,5 @@
 .gm-lumi-hint{position:absolute;z-index:10;font:12px/1.3 var(--sans);color:#5F5A50;pointer-events:none;max-width:150px;text-align:right;}.gm-lumi-hint.at-door{right:86px;bottom:100px;}.gm-lumi-hint.at-scene{top:23px;right:80px;}.gm-lumi-hint.at-home{top:144px;right:calc(50% - 90px);max-width:180px;width:180px;text-align:center;}.gm-phone .gm-home-orb-space{height:98px;}
 @media(min-width:1024px){.gm-lumi-hint.at-home{top:185px;right:calc(50% - 142px)}.gm-lumi-hint.at-door:not(.at-home){bottom:37px}}
 @media(prefers-color-scheme:dark){.gm-lumi-hint{color:#e6ddcb}}
+@media(min-width:1024px){.gm-phone{display:grid;}.gm-phone .gm-nav{min-height:100%;height:100%;}.gm-phone:not(:has(.gm-nav)){grid-template-columns:minmax(0,1fr)}.gm-phone:not(:has(.gm-nav)) .gm-top,.gm-phone:not(:has(.gm-nav)) .gm-content{grid-column:1}.gm-phone .gm-home-copy{margin:40px auto;}}
+.gm-lumi-orb{z-index:60;}
