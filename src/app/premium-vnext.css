@@ -164,3 +164,16 @@
  .gm-home-entry textarea::placeholder{color:#c5cdbd}.gm-home .gm-entry{background:#f6f0e4;color:#304e3a}
  .gm-home .gm-continuity-cue button,.gm-learn button{color:#f6f0e4}
 }
+/* Keep the master entrance readable above the older photographic home rules. */
+.gm-phone .gm-top{color:#263d31;background:#f7f2e8;}
+.gm-phone .gm-top b,.gm-phone .gm-top button{color:#263d31!important;}
+.gm-phone .gm-home-entry textarea{background:#fbf8f1!important;color:#1e2b23!important;border-color:#b5a68d!important;}
+.gm-phone .gm-home-entry textarea::placeholder{color:#626a60!important;opacity:1!important;}
+.gm-phone .gm-home .gm-entry:disabled{opacity:1;background:#697d67;color:#fff;}
+@media(prefers-color-scheme:dark){
+ .gm-phone .gm-top,.gm-phone .gm-nav{background:#1e2b23;color:#f6f0e4;}
+ .gm-phone .gm-top b,.gm-phone .gm-top button,.gm-phone .gm-nav button,.gm-phone .gm-nav button.on,.gm-phone .gm-nav small{color:#f6f0e4!important;}
+ .gm-phone .gm-home-entry textarea{background:#2b382e!important;color:#f6f0e4!important;border-color:#b6c1a9!important;}
+ .gm-phone .gm-home-entry textarea::placeholder{color:#c5cdbd!important;}
+ .gm-phone .gm-home .gm-entry:disabled{background:#455849;color:#f6f0e4;}
+}
