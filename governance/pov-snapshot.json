@@ -4,7 +4,7 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "verified_at": "2026-09-30T03:33:48.042414Z",
+    "verified_at": "2026-10-01T01:43:36.996745+00:00",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {
@@ -113,6 +113,11 @@
     {
       "id": "V61",
       "name": "LUMEN Y LA VIDA",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V62",
+      "name": "Documento Maestro de Construcción del Embrión V1.0",
       "state": "VIGENTE"
     }
   ],

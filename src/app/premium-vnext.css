@@ -120,3 +120,47 @@
 .gm-phone .gm-nav{height:auto}.gm-nav button{padding:8px 3px;overflow-wrap:anywhere}
 .gm-phone .source-text-link{display:block;margin:16px 0;color:#294536;text-decoration:underline;min-height:44px;padding:10px}
 .gm-faro-main .gm-map-detail{background:#f7f2e8;color:#263d31;padding:15px;border-radius:12px;text-align:left}
+
+/* V62 · the house is quiet; immersion belongs to the experience. */
+.gm-home{background:#f3eddf;color:#1e2b23;justify-content:flex-start;padding:32px 28px 28px;min-height:100%;}
+.gm-home-copy{padding:0;width:100%;max-width:460px;margin:auto;}
+.gm-home-copy h1{font-family:Georgia,serif;font-size:34px;line-height:1.12;text-align:center;margin:20px 0 16px;max-width:none;color:inherit;}
+.gm-home-copy>p{text-align:center;color:#485448;font-size:15px;line-height:1.65;margin-bottom:24px;}
+.gm-presence-orb{display:block;width:62px;height:62px;border-radius:50%;margin:0 auto;background:radial-gradient(circle at 30% 23%,#f7e3bd,#c29764 62%,#9a714a);box-shadow:0 12px 35px #ac805234;}
+.gm-home-entry{color:#344c3d;font-size:13px;}
+.gm-home-entry textarea{background:#fbf8f1;color:#1e2b23;border:1px solid #d8c8af;min-height:148px;border-radius:16px;padding:18px;}
+.gm-home-entry textarea::placeholder{color:#626a60;}
+.gm-home .gm-entry{display:flex;background:#304e3a;color:#fff;justify-content:center;border-radius:30px;width:auto;margin:12px 0 18px auto;min-height:46px;padding:12px 28px;}
+.gm-home .gm-secondary{color:#304e3a;background:transparent;border:0;text-align:center;width:100%;min-height:44px;text-decoration:underline;}
+.gm-home .gm-continuity-cue{background:#fbf8f1;color:#1e2b23;border:1px solid #d8c8af;border-radius:14px;padding:16px;margin:16px 0;}
+.gm-home .gm-continuity-cue button{color:#304e3a;}
+.gm-home .gm-error{color:#8b2d24;background:#fff7ec;}
+.gm-movement{background:#fbf8f1;color:#25362b;border-radius:16px;padding:18px;margin:20px 0;}
+.gm-movement details+details{margin-top:18px;}
+.gm-movement summary{min-height:44px;cursor:pointer;font-family:Georgia,serif;font-size:21px;display:flex;align-items:center;}
+.gm-movement p{font-size:15px;line-height:1.65;color:#38493b;}
+.gm-movement label{display:block;font-size:15px;color:#25362b;margin:16px 0;}
+.gm-movement textarea{display:block;width:100%;min-height:100px;background:#fffdf8;color:#25362b;border:1px solid #a5b09f;border-radius:12px;padding:12px;margin-top:8px;}
+.gm-movement button,.gm-learn button{min-height:44px;border:1px solid #a5b09f;border-radius:24px;color:#304e3a;background:transparent;padding:10px 16px;margin:6px 4px 6px 0;}
+.gm-learn{background:#f3eddf;color:#25362b;padding:30px 26px;}
+.gm-learn h1{font-family:Georgia,serif;font-size:36px;line-height:1.15;}
+.gm-learn h2{font-family:Georgia,serif;font-size:24px;margin:28px 0 10px;}
+.gm-learn p{font-size:16px;line-height:1.65;color:#38493b;}
+.gm-learn-consent{display:flex;align-items:center;gap:14px;padding:20px 0;line-height:1.5;}
+.gm-learn-consent input{min-width:24px;min-height:24px;}
+.gm-time-choice{display:block;margin:22px 0;color:#344c3d;font-size:15px;}
+.gm-time-choice select{display:block;width:100%;min-height:46px;background:#fbf8f1;color:#25362b;border:1px solid #a5b09f;border-radius:12px;padding:12px;margin-top:8px;}
+.gm-faro-readiness{border:1px solid #e9e1cf;border-radius:12px;padding:16px;margin-top:16px;}
+.gm-faro-readiness legend{font-size:16px;}
+.gm-faro-readiness label{display:flex;align-items:center;gap:10px;min-height:44px;color:#fff8ed;}
+.gm-continuity-explanation{padding:18px;background:#edf1e7;color:#2e4534;border-radius:14px;line-height:1.6;}
+.gm-continuity-explanation button{display:block;min-height:44px;background:transparent;color:#304e3a;border:0;text-decoration:underline;}
+@media(min-width:800px){.gm-home{padding:50px 70px}.gm-home-copy h1{font-size:42px}}
+@media(prefers-color-scheme:dark){
+ .gm-top,.gm-nav{background:#1e2b23;color:#f6f0e4}.gm-top button,.gm-nav button,.gm-nav .on{color:#f6f0e4}
+ .gm-home,.gm-settings,.gm-understanding,.gm-learn{background:#1e2b23;color:#f6f0e4}
+ .gm-home-copy>p,.gm-home-entry,.gm-home .gm-secondary,.gm-settings p,.gm-learn p{color:#e6ddcb}
+ .gm-home-entry textarea,.gm-home .gm-continuity-cue{background:#2b382e;color:#f6f0e4;border-color:#7c896f}
+ .gm-home-entry textarea::placeholder{color:#c5cdbd}.gm-home .gm-entry{background:#f6f0e4;color:#304e3a}
+ .gm-home .gm-continuity-cue button,.gm-learn button{color:#f6f0e4}
+}

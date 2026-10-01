@@ -12,11 +12,14 @@ async function backend(page:Page, signedIn=false, clarification=false){
  const session={access_token:'regression-only-token',refresh_token:'regression-only-refresh',token_type:'bearer',expires_in:3600,expires_at:Math.floor(Date.now()/1000)+3600,user:{id:'regression-user',aud:'authenticated',role:'authenticated',email:'regression@example.invalid',app_metadata:{},user_metadata:{},created_at:'2026-09-28T00:00:00Z'}}
  if(signedIn)await page.addInitScript(s=>localStorage.setItem('sb-vbuixagaguasejputubp-auth-token',JSON.stringify(s)),session)
  await page.route(`${origin}/auth/v1/**`,async route=>{await route.fulfill({json:route.request().url().includes('/verify')?session:{}})})
- const resource={help_id:'help-1',help_type:'practice',title:'Pausa real de prueba',summary:'Una pausa de prueba',content:{steps:['Detenete un momento.']},duration_minutes:2,areas:[],capacities:[]}
+ const resource={help_id:'help-1',help_type:'practice',detail:{renderer_family:'practice'},title:'Pausa real de prueba',summary:'Una pausa de prueba',content:{steps:['Detenete un momento.']},duration_minutes:2,areas:[],capacities:[]}
  await page.route(`${origin}/rest/v1/rpc/**`,async route=>{
   const name=route.request().url().split('/').pop()!;calls.push(name)
   const p=route.request().postDataJSON()||{}
   let data:unknown={}
+  if(name==='lumen_s2_movement_snapshot'){await route.fulfill({json:{state:'success',items:[],changes:[],context:{},withdrawn:false}});return}
+  if(name==='lumen_s2_resume_experience'){await route.fulfill({json:{state:'empty'}});return}
+
   if(name==='lumen_bootstrap_person')data={person_id:'person-test',preferences:{memory_allowed:memory}}
   else if(name==='lumen_s2_snapshot')data={memory_allowed:memory,trajectories:faro?[faro]:[],repertoire:[],sanctuary_count:entries.length}
   else if(name==='lumen_s2_list_sanctuary'){

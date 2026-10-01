@@ -1,0 +1,50 @@
+-- Integration proof on the canonical database. Every fixture is rolled back.
+begin;
+do $$
+declare u uuid:=gen_random_uuid();person uuid;s jsonb;c jsonb;rep jsonb;motion jsonb;own uuid;ep uuid;i integer;
+begin
+ insert into auth.users(id,instance_id,aud,role,email,created_at,updated_at) values(u,'00000000-0000-0000-0000-000000000000','authenticated','authenticated',u::text||'@example.invalid',now(),now());
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated','is_anonymous',false)::text,true);
+ perform public.lumen_bootstrap_person(gen_random_uuid());person:=gf_core.current_person_id();
+ perform public.lumen_s2_set_memory(true,gen_random_uuid());
+ s:=public.lumen_s1_accompany_moment('Me siento desbordado por el trabajo y necesito bajar un cambio.','es-AR','es','web',gen_random_uuid());
+ c:=public.lumen_s1_moment_constellation((s->>'episode_id')::uuid,'es-AR',3,gen_random_uuid(),null);
+ assert jsonb_array_length(c->'items')>1,'representative constellation missing';
+ own:=(c->'items'->1->>'help_id')::uuid;
+ for i in 1..2 loop
+  s:=public.lumen_s1_accompany_moment('Me siento desbordado por el trabajo y necesito bajar un cambio.','es-AR','es','web',gen_random_uuid());ep:=(s->>'episode_id')::uuid;
+  perform public.lumen_s1_moment_constellation(ep,'es-AR',3,gen_random_uuid(),null);
+  perform public.lumen_s1_select_help(ep,own,'selected',gen_random_uuid());
+  perform public.lumen_s1_record_outcome(ep,'helped',true,gen_random_uuid());
+ end loop;
+ rep:=public.lumen_s2_add_repertoire(own,gen_random_uuid());assert (rep->>'user_confirmed')::boolean;
+ s:=public.lumen_s1_accompany_moment('Me siento desbordado por el trabajo y necesito bajar un cambio.','es-AR','es','web',gen_random_uuid());ep:=(s->>'episode_id')::uuid;
+ c:=public.lumen_s1_moment_constellation(ep,'es-AR',3,gen_random_uuid(),null);
+ assert c->>'decision_kind'='REUSE_REPERTOIRE','own resource did not change the decision';
+ assert (c->'items'->0->>'help_id')::uuid=own,'own resource was not first';
+ assert jsonb_array_length(c->'items')=1 and (c->>'lumi_withdrawn')::boolean,'mediation not reduced';
+ motion:=public.lumen_s2_movement_snapshot();assert jsonb_array_length(motion->'changes')>0,'ledger projection missing';
+ assert exists(select 1 from gf_core.decision_runs where decision_run_id=(c->>'decision_run_id')::uuid and continuity_context->'experiment'->>'version'='continuity.shadow.v1'),'comparison missing';
+ perform public.lumen_s1_select_help(ep,own,'selected',gen_random_uuid());
+ perform public.lumen_s2_save_experience_position(ep,1,false);
+ assert (public.lumen_s2_resume_experience()->'position'->>'step')::integer=1,'position lost';
+ perform public.lumen_s2_record_longitudinal_signal(ep,'STOPPED_HELPING',gen_random_uuid());
+ update gf_core.outcomes_feedback set created_at=clock_timestamp() where person_id=person and signal_kind='STOPPED_HELPING';
+ s:=public.lumen_s1_accompany_moment('Me siento desbordado por el trabajo y necesito bajar un cambio.','es-AR','es','web',gen_random_uuid());
+ c:=public.lumen_s1_moment_constellation((s->>'episode_id')::uuid,'es-AR',3,gen_random_uuid(),null);
+ assert not exists(select 1 from jsonb_array_elements(c->'items') x where (x->>'help_id')::uuid=own),'stopped help repeated unchanged';
+ perform public.lumen_s2_set_life_context('Reservar un rato sin pantallas.','La carga de trabajo de otros.','Puedo pedir ayuda.');
+ assert public.lumen_s2_movement_snapshot()->'context'->>'adjustable'='Reservar un rato sin pantallas.';
+ perform public.lumen_s2_set_memory(false,gen_random_uuid());
+ assert public.lumen_s2_movement_snapshot()->>'state'='without_memory','memory revocation failed';
+ s:=public.lumen_s1_accompany_moment('Me siento desbordado por el trabajo y necesito bajar un cambio.','es-AR','es','web',gen_random_uuid());
+ c:=public.lumen_s1_moment_constellation((s->>'episode_id')::uuid,'es-AR',3,gen_random_uuid(),null);
+ assert not exists(select 1 from jsonb_array_elements(c->'items') x where x->>'context_origin' in ('propio','santuario')),'memory used without consent';
+ perform public.lumen_privacy_forget_personal_memory(true);
+ assert not exists(select 1 from gf_core.moments where person_id=person),'originals or derived context survived forgetting';
+ assert not exists(select 1 from gf_private.life_context where person_id=person),'life context survived forgetting';
+ perform public.lumen_s2_set_memory(true,gen_random_uuid());
+ assert jsonb_array_length(public.lumen_s2_movement_snapshot()->'items')=0,'old ledger resurrected memory';
+ raise notice 'A63 V62 backend longitudinal proof PASS (rollback fixtures; not HUMAN PASS)';
+end $$;
+rollback;

@@ -5,10 +5,13 @@ async function personalBackend(page:Page){
  await page.addInitScript(s=>localStorage.setItem('sb-vbuixagaguasejputubp-auth-token',JSON.stringify(s)),session)
  const prefs={memory_allowed:false,evidence_use_allowed:false,proactive_allowed:false,sharing_allowed:false,revision:1}
  const calls:string[]=[]
- const resources=Array.from({length:3},(_,i)=>({help_id:`help-${i}`,canonical_code:`source-${i}`,help_type:'practice',title:`Posibilidad ${i+1}`,summary:'Una práctica para probar el contrato de interfaz.',content:{steps:['Primer paso.','Segundo paso.']},provider:{name:'Fuente de regresión'},duration_minutes:2,context_reason:'Se relaciona con lo que expresaste hoy.',context_origin:'fuente'}))
+ const resources=Array.from({length:3},(_,i)=>({help_id:`help-${i}`,canonical_code:`source-${i}`,help_type:'practice',detail:{renderer_family:'practice'},title:`Posibilidad ${i+1}`,summary:'Una práctica para probar el contrato de interfaz.',content:{steps:['Primer paso.','Segundo paso.']},provider:{name:'Fuente de regresión'},duration_minutes:2,context_reason:'Se relaciona con lo que expresaste hoy.',context_origin:'fuente'}))
  const circles:Array<{space_id:string;name:string;purpose:string;role:string;contributions:Array<{contribution_id:string;help_id:string;title:string}>}>=[]
  await page.route(`${origin}/auth/v1/**`,r=>r.fulfill({json:session}))
  await page.route(`${origin}/rest/v1/rpc/**`,async r=>{const name=r.request().url().split('/').pop()!;calls.push(name);const p=r.request().postDataJSON()||{};let data:unknown={}
+  if(name==='lumen_s2_movement_snapshot'){await r.fulfill({json:{state:'success',items:[],changes:[],context:{},withdrawn:false}});return}
+  if(name==='lumen_s2_resume_experience'){await r.fulfill({json:{state:'empty'}});return}
+
  if(name==='lumen_bootstrap_person'||name==='lumen_get_consent_state')data={person_id:'p',preferences:prefs,grants:{}}
  else if(name==='lumen_s2_snapshot')data={memory_allowed:prefs.memory_allowed,trajectories:[],repertoire:[],sanctuary_count:0}
  else if(name==='lumen_s2_list_sanctuary')data=[]

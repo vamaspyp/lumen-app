@@ -104,6 +104,10 @@ export type MomentConstellation = Readonly<{
   episode_id: string
   moment_id: string
   decision_run_id: string
+  decision_kind?:string
+  lumi_withdrawn?:boolean
+  continuity_message?:string|null
+  evidence_event_id?:string
   items: SourceItem[]
   capacity_keys: string[]
   area_keys: string[]

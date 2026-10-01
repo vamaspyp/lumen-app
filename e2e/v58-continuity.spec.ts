@@ -10,7 +10,7 @@ async function simulatedLife(page:Page){
  let own=false
  const returns:{outcome_id:string;help_id:string;effect:string;applied:boolean;signal_kind:string}[]=[]
  const entries:{entry_id:string;entry_kind:string;title:string;content:string;source_help_id:string}[]=[]
- const source=(id:string,title:string,type='practice')=>({help_id:id,help_type:type,title,summary:'Una posibilidad real de prueba',content:{steps:['Una pausa breve.']},duration_minutes:2,capacities:['regulation'],provider:{name:'Fuente de prueba'}})
+ const source=(id:string,title:string,type='practice')=>({help_id:id,help_type:type,detail:{renderer_family:type==='practice'?'practice':'human'},title,summary:'Una posibilidad real de prueba',content:{steps:['Una pausa breve.']},duration_minutes:2,capacities:['regulation'],provider:{name:'Fuente de prueba'}})
  const ownSource=source('help-own','Pausa que puedo recuperar')
  const newSource=source('help-new','Otra forma de hacer una pausa')
  const humanSource=source('help-human','Orientación humana para este momento','professional_support')
@@ -21,6 +21,9 @@ async function simulatedLife(page:Page){
   const name=route.request().url().split('/').pop()!;calls.push(name)
   const p=route.request().postDataJSON()||{}
   let data:unknown={}
+  if(name==='lumen_s2_movement_snapshot'){await route.fulfill({json:{state:'success',items:[],changes:[],context:{},withdrawn:false}});return}
+  if(name==='lumen_s2_resume_experience'){await route.fulfill({json:{state:'empty'}});return}
+
   if(name==='lumen_bootstrap_person')data={person_id:'person-test',preferences:{memory_allowed:true}}
   else if(name==='lumen_s2_snapshot')data={memory_allowed:true,trajectories:[{trajectory_id:'faro-1',faro_text:'Cuidar mi calma',status:'active',capability_keys:['regulation'],path:[]}],repertoire:repertoire(),sanctuary_count:entries.length}
   else if(name==='lumen_s2_list_sanctuary')data=entries

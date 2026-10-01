@@ -48,19 +48,9 @@ function premiumHeroImage(kind:Kind,premium:string|null):string {
   return EXPERIENCE_IMAGE[kind]
 }
 
-function kindOf(help: Help): Kind {
-  const type = help.help_type.toLowerCase().replace(/[-\s]+/g, '_')
-  if (type.includes('audio') || mediaUrl(help, 'audio')) return 'audio'
-  if (type.includes('video') || type.includes('film') || mediaUrl(help, 'video')) return 'video'
-  if (type.includes('quiet') || type.includes('silence') || type.includes('stillness') || type.includes('no_content')) return 'quiet'
-  if (type.includes('practice') || type.includes('breath') || type.includes('meditation') || type.includes('exercise')) return 'practice'
-  if (type.includes('circle') || type.includes('group') || type.includes('community')) return 'group'
-  if(type.includes('material')||type.includes('institutional')||type.includes('public_help'))return 'material'
-  if(type.includes('event')||type.includes('place')||type.includes('service'))return 'event'
-  if (type.includes('person') || type.includes('mentor') || type.includes('professional') || type.includes('human_support')) return 'human'
-  if (type.includes('conversation') || type.includes('action') || type.includes('event') || type.includes('place') || type.includes('service') || type.includes('material')) return 'action'
-  if (externalUrl(help) || type.includes('resource') || type.includes('book') || type.includes('work')) return 'external'
-  return 'editorial'
+function kindOf(help:Help):Kind {
+ const family=help.detail?.renderer_family
+ return typeof family==='string'&&['editorial','practice','audio','video','external','human','group','action','event','material','quiet'].includes(family)?family as Kind:'external'
 }
 
 function BackIcon() {
