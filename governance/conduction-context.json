@@ -1,24 +1,115 @@
 {
   "schema_version": "1.1",
-  "system": {"id":"V3","spreadsheet_id":"1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM","role":"POV"},
-  "focus": {"id":"F6","name":"Nacimiento del Embrión y primeras vidas reales"},
-  "act": {"id":"A46","name":"Certificación final de exposición real · Organismo + Experiencia + Fuente","status":"EN CURSO"},
+  "system": {
+    "id": "V3",
+    "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
+    "role": "POV"
+  },
+  "focus": {
+    "id": "F6",
+    "name": "Nacimiento del Embrión y primeras vidas reales"
+  },
+  "act": {
+    "id": "A63",
+    "name": "LUMEN WORLD CLASS · elevar experiencia integral antes de Pauli",
+    "status": "EN CURSO"
+  },
   "authorities": [
-    {"id":"V46","role":"autoridad_conceptual_integral"},
-    {"id":"V51","role":"autoridad_canonica_complementaria_norte"},
-    {"id":"V52","role":"autoridad_funcional"},
-    {"id":"V53","role":"autoridad_tecnico_funcional"},
-    {"id":"V40","role":"autoridad_tecnica_complementaria"},
-    {"id":"V41","role":"autoridad_transversal"},
-    {"id":"V42","version":"1.2","role":"gobierno_de_agentes"},
-    {"id":"V43","role":"autoridad_experiencial"},
-    {"id":"V44","role":"runtime_greenfield"},
-    {"id":"V45","version":"0.2","role":"infraestructura_de_gobierno"},
-    {"id":"V50","role":"activo_tecnico_descriptivo_as_built_pre_v51"},
-    {"id":"V54","version":"1.0","role":"infraestructura_de_custodia_sincronica"}
+    {
+      "id": "V46",
+      "role": "autoridad_conceptual_integral"
+    },
+    {
+      "id": "V51",
+      "role": "autoridad_canonica_complementaria_norte"
+    },
+    {
+      "id": "V52",
+      "role": "autoridad_funcional"
+    },
+    {
+      "id": "V53",
+      "role": "autoridad_tecnico_funcional"
+    },
+    {
+      "id": "V40",
+      "role": "autoridad_tecnica_complementaria"
+    },
+    {
+      "id": "V41",
+      "role": "autoridad_transversal"
+    },
+    {
+      "id": "V42",
+      "version": "1.2",
+      "role": "gobierno_de_agentes"
+    },
+    {
+      "id": "V43",
+      "role": "autoridad_experiencial_base"
+    },
+    {
+      "id": "V44",
+      "role": "runtime_greenfield"
+    },
+    {
+      "id": "V45",
+      "version": "0.2",
+      "role": "infraestructura_de_gobierno"
+    },
+    {
+      "id": "V50",
+      "role": "activo_tecnico_descriptivo_as_built_pre_v51"
+    },
+    {
+      "id": "V54",
+      "version": "1.0",
+      "role": "infraestructura_de_custodia_sincronica"
+    },
+    {
+      "id": "V55",
+      "version": "1.6",
+      "role": "autoridad_experience_sensation_field_integral_no_regresiva"
+    },
+    {
+      "id": "V56",
+      "version": "1.1",
+      "role": "autoridad_fuente_premium"
+    },
+    {
+      "id": "V58",
+      "version": "1.1",
+      "role": "instrumento_constructivo_A63_subordinado"
+    },
+    {
+      "id": "V59",
+      "role": "referencia_estructural_interfaz_A63"
+    },
+    {
+      "id": "V60",
+      "role": "instrumento_funcional_interfaz_A63"
+    },
+    {
+      "id": "V61",
+      "role": "intencion_y_criterio_producto_A63"
+    },
+    {
+      "id": "V62",
+      "version": "1.0",
+      "role": "instrumento_maestro_construccion_A63"
+    }
   ],
-  "required_sequence":["POV_ACTIVOS","FOCO","ACTO_DOD","AUTORIDAD_VIGENTE","REALIDAD_TECNICA","EJECUCION","EVIDENCIA","CIERRE"],
-  "construction_rule":"A46 vuelve a ser el ACTO vigente de exposición humana. El Embrión llega PAULI-READY tras A60 (integración y capacidad propia), A61 (Custodia Sincrónica V54) y A62 (Fuente + Experiencia world-class), todos cerrados y certificados. No se agrega nueva construcción por anticipación: ante una fricción material observada por Pauli, preservar lo correcto, ajustar sólo el delta responsable y reemplazar cualquier pieza que induzca semántica vieja o duplicación. Todo cambio debe preservar V46/V51/V52/V53/V54, canonical_integrity v7 / embryo.v53.1, No Regresión + Evolución Limpia y custodia fail-closed. Bridges permanentes, aliases legacy, scores, programas coercitivos, tabla Constelación, capas paralelas y PRELAUNCH RESET anticipado siguen prohibidos; el reset sólo ocurre tras GO humano e inmediatamente antes de primeras vidas reales.",
-  "fail_closed":true,
-  "updated_at":"2026-09-12T15:58:00-03:00"
+  "required_sequence": [
+    "POV_ACTIVOS",
+    "FOCO",
+    "ACTO_DOD",
+    "AUTORIDAD_VIGENTE",
+    "REALIDAD_TECNICA",
+    "EJECUCION",
+    "EVIDENCIA",
+    "CIERRE"
+  ],
+  "construction_rule": "A63 preserva lo vigente, ajusta lo necesario y reemplaza lo incompatible; bridges permanentes prohibidos. A63 materializa V58 como instrumento constructivo subordinado a V46/V51/V52/V53/V55/V56. Una Vida singular y presente dominante; continuidad legítima que modifica futuras propuestas, recupera lo propio antes de novedad y se retira al ganar autonomía. Cinco puertas Inicio, Mi Vida, Explorar, Tejido y Santuario; Constelación contextual Fuente+Santuario+Tejido editable, sin pantalla Repertorio ni anatomía nueva. Media real, consentimiento, persistencia y relectura auténticos. HUMAN/EXPERIENCE PASS sobre runtime exacto permanece requisito de cierre. V59/V60 gobiernan la interfaz subordinada; excepción explícita del usuario: se difiere uso sin registro y se conserva OTP. No se declara AC01 ni HUMAN PASS cumplido por tests. V62, admitido 2026-09-30, integra V59/V60/V61 y rige los deltas de construcción. Tres posibilidades por defecto, editables sin tope artificial. Continuidad §13 y AC19–27 requieren backend y evidencia real; no se inventa HUMAN PASS. A63 2026-10-03: implementar el contrato de UX del adjunto lumen-embrion-prototipo.zip bajo V58 §22.10–22.11; acuerdo Faro–Potenciales versionado y consentido, sin convertir capacity_terms en catálogo de Potencial ni activar relaciones editoriales candidatas. Publicación de revisión, sin cierre de A63 ni HUMAN PASS inferido.",
+  "fail_closed": true,
+  "updated_at": "2026-10-03T15:03:54.217554+00:00"
 }

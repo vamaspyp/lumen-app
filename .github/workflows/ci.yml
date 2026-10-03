@@ -1,10 +1,11 @@
 name: CI
+# A63 certification also runs on the isolated Premium VNext implementation branch.
 
 on:
   pull_request:
-    branches: [main, greenfield-v04-embryo]
+    branches: [main, greenfield-v04-embryo, greenfield-a63-v19-hifi-es, greenfield-a64-premium-vnext]
   push:
-    branches: [main, greenfield-v04-s0, greenfield-v04-s1, greenfield-v04-embryo]
+    branches: [main, greenfield-v04-s0, greenfield-v04-s1, greenfield-v04-embryo, greenfield-a63-embryo-complete, greenfield-a63-premium-cleanroom, greenfield-a64-premium-vnext]
 
 jobs:
   conduction-gate:
@@ -47,5 +48,14 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Architecture + unit + custody + lint + build + embryo regression
         run: npm run verify
+      - name: Preserve clean-room visual QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cleanroom-visual-qa
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
       - name: Certify live greenfield backend
         run: npm run test:live

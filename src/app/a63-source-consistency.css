@@ -1,0 +1,104 @@
+/* A63 · Source consistency deltas only. No redesign. */
+
+.explore-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+}
+
+.source-filter-control {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.filter-toggle {
+  min-height: 42px;
+  padding: 0 15px;
+  border: 1px solid rgba(40,50,46,.12);
+  border-radius: 999px;
+  background: rgba(250,247,240,.92);
+  color: #4f5a55;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.filter-toggle.active {
+  background: #dfe3d7;
+  color: #26372e;
+}
+
+.source-filter-panel {
+  position: absolute;
+  z-index: 30;
+  top: 50px;
+  right: 0;
+  width: min(680px, calc(100vw - 48px));
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  border: 1px solid rgba(40,50,46,.10);
+  border-radius: 18px;
+  background: rgba(252,250,245,.98);
+  box-shadow: 0 16px 44px rgba(52,43,31,.12);
+  backdrop-filter: blur(18px);
+}
+
+.source-filter-panel label {
+  display: grid;
+  gap: 6px;
+  font-size: 10px;
+  color: #66706d;
+}
+
+.source-filter-panel select {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid rgba(40,50,46,.10);
+  border-radius: 12px;
+  background: #f6f1e8;
+  color: #26312d;
+  font-size: 11px;
+}
+
+.source-filter-panel .filter-check {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.source-filter-panel .filter-check input {
+  width: 15px;
+  height: 15px;
+}
+
+.source-filter-panel .text-action {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+.moment-support-copy {
+  max-width: 760px;
+}
+
+.moment-section-heading {
+  margin-top: 26px;
+}
+
+.moment-source-grid {
+  margin-bottom: 18px;
+}
+
+.source-card .ghost.small.active {
+  background: #dfe3d7;
+  color: #26372e;
+}
+
+@media (max-width: 760px) {
+  .explore-toolbar { grid-template-columns: 1fr; }
+  .source-filter-control { justify-content: flex-start; }
+  .source-filter-panel { left: 0; right: auto; grid-template-columns: 1fr; }
+}

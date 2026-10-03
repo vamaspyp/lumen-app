@@ -8,13 +8,17 @@ const BASE_URL = `http://localhost:${PORT}`
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
-  reporter: 'list',
+  reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
   use: {
     baseURL: BASE_URL,
+    proxy:process.env.PLAYWRIGHT_PROXY_SERVER?{server:process.env.PLAYWRIGHT_PROXY_SERVER,bypass:'localhost,127.0.0.1'}:undefined,
     reducedMotion: 'reduce',
+    ignoreHTTPSErrors:Boolean(process.env.PLAYWRIGHT_PROXY_SERVER),
+    launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? {executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE} : {},
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'mobile-chromium', use: { ...devices['Pixel 7'] } },
   ],
   webServer: {
     // verify builds immediately before E2E; test the deployable artifact, not Vite dev.

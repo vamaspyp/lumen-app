@@ -29,6 +29,7 @@ export type SceneAction = {
 }
 
 export type S1Scene = {
+  understanding?: string
   scene_id: string
   scene_version: string
   presence_mode: PresenceMode
@@ -103,6 +104,7 @@ export async function accompanyMoment(
     p_locale: locale,
     p_language: language,
     p_surface: 'web',
+    p_review_first: true,
     p_trace_id: newTraceId(),
   })
   return assertRpcData<S1Scene>(data, error)
