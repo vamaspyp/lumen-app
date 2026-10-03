@@ -11,3 +11,5 @@ export const getExperienceResume=()=>call<ExperienceResume>('lumen_s2_resume_exp
 export const saveExperiencePosition=(episodeId:string,step:number,finished=false)=>call<{state:string}>('lumen_s2_save_experience_position',{p_episode_id:episodeId,p_step:step,p_finished:finished})
 
 export const correctMomentContext=(episodeId:string,minutes:number)=>call('lumen_s1_correct_moment_context',{p_episode_id:episodeId,p_available_minutes:minutes})
+
+export const reviewMoment=(episodeId:string,understanding:string,areaKeys:string[],minutes:number)=>call('lumen_s1_review_moment',{p_episode_id:episodeId,p_understanding:understanding,p_area_keys:areaKeys,p_available_minutes:minutes})

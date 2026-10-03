@@ -26,3 +26,19 @@
 [data-lumen-theme="dark"] .gm-stage .gm-phone .gm-potential{background:#344234!important}[data-lumen-theme="dark"] .gm-stage .gm-phone .gm-nav button.on{background:#3d4b3c!important}
 @media(prefers-color-scheme:dark){:root:not([data-lumen-theme="light"]){--gm-paper:#1f2a24;--gm-ink:#f6f0e4;--gm-green:#b7c5aa}.gm-stage .gm-phone .gm-nav small{color:#f6f0e4!important}.gm-stage .gm-phone .gm-nav{background:#27352c!important}.gm-stage .gm-phone .gm-nav button.on{background:#3d4b3c!important}}
 .gm-stage .gm-phone .gm-top b{color:#2b3a31!important}
+
+/* Images are elements: inherited flat-screen backgrounds cannot silently remove them. */
+.gm-stage .gm-phone .gm-list>header{position:relative!important;overflow:hidden!important;isolation:isolate;background:#263d31!important;border-radius:0 0 28px 28px}
+.gm-stage .gm-phone .gm-list>header .gm-header-image{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;z-index:-2!important}
+.gm-stage .gm-phone .gm-list>header:after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#15291dcc,#15291d05);z-index:-1}
+.gm-stage .gm-phone .gm-organ-image{position:relative;height:225px;margin:-28px -24px 24px!important;width:calc(100% + 48px);border-radius:0 0 28px 28px;overflow:hidden}
+.gm-stage .gm-phone .gm-organ-image img{width:100%;height:100%;object-fit:cover}
+.gm-stage .gm-phone .gm-map>.gm-organ-image,.gm-stage .gm-phone .gm-faro>.gm-organ-image{height:240px}
+.gm-stage .gm-phone .gm-reviewed-reading{display:block;margin:18px 0;font-size:13px;color:var(--gm-ink)}
+.gm-stage .gm-phone .gm-reviewed-reading textarea{display:block;min-height:110px;font-size:17px;line-height:1.45;margin-top:10px}
+.gm-stage .gm-phone .gm-review-areas{margin:20px 0;padding:16px;border:1px solid #d5d8c8;border-radius:18px;min-width:0}
+.gm-stage .gm-phone .gm-review-areas legend{font-size:13px;padding:0 6px;color:var(--gm-ink)}
+.gm-stage .gm-phone .gm-review-areas p{font-size:13px!important;margin:0 0 12px}
+.gm-stage .gm-phone .gm-area-choice label{min-height:44px;color:var(--gm-ink)!important;font-size:14px!important}
+.gm-stage .gm-phone .gm-area-choice input{width:18px!important;height:18px!important;min-height:0!important;accent-color:var(--gm-green);flex-shrink:0}
+.gm-stage .gm-phone .gm-potential button{margin-right:6px}

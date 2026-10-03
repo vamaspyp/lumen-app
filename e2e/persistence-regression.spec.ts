@@ -73,7 +73,7 @@ test('an uncertain Momento asks for context without inventing a constellation',a
  await page.goto('/')
  await page.getByLabel('¿Qué está vivo hoy?').fill('Quiero cambiar algo.')
  await page.getByRole('button',{name:'Contar'}).click()
- await expect(page.getByText(/Necesitamos un poco más de contexto/)).toBeVisible()
+ await expect(page.getByText(/Me falta contexto/)).toBeVisible()
  await expect(page.getByRole('heading',{name:'Mi Vida'})).toHaveCount(0)
  expect(b.calls).not.toContain('lumen_s1_moment_constellation')
 })

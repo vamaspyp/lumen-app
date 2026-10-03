@@ -46,6 +46,7 @@ async function reachConstellation(page:Page){
  await page.goto('/')
  await page.getByLabel('¿Qué está vivo hoy?').fill('Me siento saturado y quiero bajar un cambio.')
  await page.getByRole('button',{name:'Contar'}).click()
+ await expect(page.getByRole('heading',{name:'¿Te representa?'})).toBeVisible()
  await page.getByRole('button',{name:'Ver qué puede ayudar'}).click()
  await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible()
 }
