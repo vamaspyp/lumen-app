@@ -1,12 +1,12 @@
-import {test,expect,type Page} from '@playwright/test'
+import {test,expect,type Page} from './fixtures'
 
 // Regression double only: this suite never certifies live identity or persistence.
 // All Auth and RPC calls are intercepted; live certification remains a separate gate.
-async function backend(page:Page, signedIn=false, clarification=false){
+async function backend(page:Page, signedIn=false, clarification=false, rememberedWithoutConsent=false){
  const origin='https://vbuixagaguasejputubp.supabase.co'
  const calls: string[]=[]
  let memory=false
- let faro: {trajectory_id:string;faro_text:string;status:string;path:unknown[]} | null=null
+ let faro: {trajectory_id:string;faro_text:string;status:string;path:unknown[]} | null=rememberedWithoutConsent?{trajectory_id:'old-faro',faro_text:'Privado de otra sesión',status:'active',path:[]}:null
  const entries: {entry_id:string;entry_kind:string;title:string;content:string;source_help_id:string}[]=[]
  let failNextRead=false
  const session={access_token:'regression-only-token',refresh_token:'regression-only-refresh',token_type:'bearer',expires_in:3600,expires_at:Math.floor(Date.now()/1000)+3600,user:{id:'regression-user',aud:'authenticated',role:'authenticated',email:'regression@example.invalid',app_metadata:{},user_metadata:{},created_at:'2026-09-28T00:00:00Z'}}
@@ -83,10 +83,11 @@ test('Faro can be created without a Momento and reread after reload',async({page
  await expect.poll(()=>b.calls.includes('lumen_living_map_snapshot')).toBe(true)
  await page.getByText('Mi Vida',{exact:true}).click()
  await page.getByRole('button',{name:'Ver mi Faro'}).click()
- await page.getByRole('button',{name:'Editar mi Faro'}).click()
+ await page.getByRole('button',{name:'Revisar y ajustar'}).click()
  await page.locator('.gm-faro-main textarea').fill('Cuidar mi tiempo con calma')
- await page.getByRole('button',{name:'Guardar mi Faro'}).click()
- await expect(page.getByRole('button',{name:'Editar mi Faro'})).toBeVisible()
+ await page.getByRole('button',{name:'Guardar el Faro y seguir después'}).click()
+ await page.getByRole('button',{name:'Activar memoria y guardar'}).click()
+ await expect(page.getByRole('button',{name:'Revisar y ajustar'})).toBeVisible()
  expect(b.calls.filter(n=>n==='lumen_s2_create_trajectory')).toHaveLength(1)
  await page.reload()
  await expect(page.locator('.gm-faro-main blockquote')).toHaveText('Cuidar mi tiempo con calma')
@@ -203,3 +204,5 @@ test('a selected resource is conserved only by choice and reread as a resource',
  await expect(page.getByText('Pausa real de prueba',{exact:true})).toBeVisible()
 })
 
+
+test('revoked memory does not surface a previously stored Faro in the personal projection',async({page})=>{const b=await backend(page,true,false,true);await page.goto('/');await expect.poll(()=>b.calls.includes('lumen_living_map_snapshot')).toBe(true);await page.locator('.gm-nav').getByText('Mi Vida',{exact:true}).click();await expect(page.getByText('Privado de otra sesión',{exact:false})).toHaveCount(0);await expect(page.getByRole('button',{name:'Ver mi Faro'})).toBeVisible();await page.getByRole('button',{name:'Ver mi Faro'}).click();await expect(page.locator('.gm-faro-main blockquote')).toContainText('No necesitás definirlo');expect(b.calls).not.toContain('lumen_faro_agreement_snapshot')})

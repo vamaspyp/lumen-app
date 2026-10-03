@@ -1,10 +1,10 @@
-import {test,expect} from '@playwright/test'
+import {test,expect} from './fixtures'
 
 test('V62 home follows master; transient scenes return to their actual predecessor',async({page})=>{
  await page.route('**/rest/v1/rpc/**',r=>r.fulfill({json:r.request().url().endsWith('lumen_source_discover')?[]:{areas:[]}}))
- await page.goto('/');await expect(page.getByRole('heading',{name:'¿Qué está pasando en tu vida ahora?'})).toBeVisible()
+ await page.goto('/');await expect(page.getByRole('heading',{name:'¿Qué te trae por aquí hoy?'})).toBeVisible()
  await expect(page.getByRole('button',{name:'Contar'})).toContainText('Contar')
- await expect(page.getByLabel('¿Qué está vivo hoy?')).toHaveCSS('background-color','rgb(251, 248, 241)');await expect(page.locator('.gm-top b')).toHaveCSS('color','rgb(38, 61, 49)')
+ await expect(page.getByLabel('¿Qué está vivo hoy?')).toHaveCSS('background-color','rgb(255, 253, 245)');await expect(page.locator('.gm-top b')).toHaveCSS('color','rgb(43, 58, 49)')
  await page.screenshot({path:`test-results/v62-home-light-${test.info().project.name}.png`,fullPage:true})
  await page.emulateMedia({colorScheme:'dark'});await expect(page.locator('.gm-nav small').first()).toHaveCSS('color','rgb(246, 240, 228)');await page.screenshot({path:`test-results/v62-home-dark-${test.info().project.name}.png`,fullPage:true})
  await page.emulateMedia({colorScheme:'light'});await page.locator('.gm-nav').getByText('Mi Vida',{exact:true}).click();await page.getByRole('button',{name:'Ver mi Faro'}).click();await page.getByRole('button',{name:'Volver',exact:true}).click();await expect(page.getByRole('heading',{name:'Mi Vida'})).toBeVisible()

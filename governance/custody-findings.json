@@ -2,15 +2,64 @@
   "schema_version": "1.0",
   "current_review": {
     "act_id": "A63",
-    "review_set": ["C0","C1","C2","C3","C7","C8"],
+    "review_set": [
+      "C0",
+      "C1",
+      "C2",
+      "C3",
+      "C7",
+      "C8"
+    ],
     "status": "IN_PROGRESS"
   },
   "findings": [
-    {"id":"A63-C0","custodian_id":"C0","result":"GAP","severity":"WARN","status":"OPEN","evidence":"A63 V58 composes current Moment with consented, relevant own and saved resources plus actual human Source; longitudinal returns can change the next composition. No new organ or table was added. Exact-head real OTP and two-occasion persistence still require integral user-session certification. Active circles remain zero and collective evidence→policy change→rollback is not yet demonstrated with sufficient governed evidence; Pauli's human end-to-end judgment remains required before A63 closure or production promotion."},
-    {"id":"A63-C1","custodian_id":"C1","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"Source remains the existing greenfield reservoir and existing discover/constellation contracts are reused. The UI now preserves help_type semantics and provenance instead of flattening all possibilities into one card experience. Premium editorial/source curation is explicitly deferred to the next Source-focused act and is not falsely claimed here."},
-    {"id":"A63-C2","custodian_id":"C2","result":"GAP","severity":"WARN","status":"OPEN","evidence":"The root PREMIUM Vivir scene uses the existing differentiated Experience renderer: editorial, practice, audio, video, external, human, group, action and quiet. Live Source contains institution-hosted audio and video destinations but no directly hosted audio/video media payload. Access, playback and full family-by-family experience need Pauli's judgment on the exact deployed runtime; EXPERIENCE/HUMAN PASS stays open."},
-    {"id":"A63-C3","custodian_id":"C3","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"V58 uses the existing trajectory, outcome, repertoire and Sanctuary anatomy: explicit movement signals, repeated helpful returns before own recognition, reversible release, contextual recovery before novelty, and voluntary Faro continuity. No separate Repertoire screen, score, streak or prescribed program was introduced."},
-    {"id":"A63-C7","custodian_id":"C7","result":"PASS","severity":"INFO","status":"RESOLVED","evidence":"Existing safety referral, honest NO_MATCH, authentication boundary, private original retention/export/delete, Sanctuary consent, proactivity custody and human-support boundaries are preserved. The experience layer does not bypass those contracts."},
-    {"id":"A63-C8","custodian_id":"C8","result":"GAP","severity":"WARN","status":"OPEN","evidence":"Conduction, Custody, verify, desktop/mobile E2E and live backend run successfully for PR #30. The public root now serves PREMIUM directly, without a query-selected second product entry. GitHub ruleset 22462598 protects only greenfield-v04-embryo, not active greenfield-a64-premium-vnext; Code Owner review and required checks are not mechanically enforced on this target. The ruleset requires an administrator to extend it before a strong governance PASS."}
+    {
+      "id": "A63-C0",
+      "custodian_id": "C0",
+      "result": "GAP",
+      "severity": "WARN",
+      "status": "OPEN",
+      "evidence": "A63 2026-10-03: live POV F6/A63 and V58 22.10–22.11 grounded; chosen prototype implemented on the existing runtime. New private normalized agreement versions/items implement an explicit governed gap, without a new Source ontology. Source relations remain candidates and HUMAN/EXPERIENCE judgment, real OTP and two lived occasions remain open. See a63-prototype-validation.md."
+    },
+    {
+      "id": "A63-C1",
+      "custodian_id": "C1",
+      "result": "GAP",
+      "severity": "WARN",
+      "status": "OPEN",
+      "evidence": "A63 2026-10-03: reviewed-only Faro–Potential matching excludes all 169 candidate relations; no closed sample catalogue or legacy capacity alias is activated. Honest longitudinal NO_MATCH is verified against live DB. Real public Source, attributed audio and human service remain available. Admission/coverage and rights review are not claimed completed."
+    },
+    {
+      "id": "A63-C2",
+      "custodian_id": "C2",
+      "result": "GAP",
+      "severity": "WARN",
+      "status": "OPEN",
+      "evidence": "A63 2026-10-03: selected prototype images/palette/mobile field and five doors implemented; optional Source detail, existing differentiated Vivir, contextual Lumi and keyboard/focus maintained. Desktop/mobile E2E and captures inspected. Full family media and world-class human experience judgment remain open."
+    },
+    {
+      "id": "A63-C3",
+      "custodian_id": "C3",
+      "result": "PASS",
+      "severity": "INFO",
+      "status": "RESOLVED",
+      "evidence": "A63 2026-10-03: chosen voluntary Faro, private N:M agreement, immutable versions, original Moment linkage, personal open terms, explicit reformulation/withdrawal/regeneration and unchanged-confirm idempotence; no scores or obligatory taxonomy. Live rollback tests cover lifecycle gate and history. A relabel never implicitly aliases an editorial concept."
+    },
+    {
+      "id": "A63-C7",
+      "custodian_id": "C7",
+      "result": "PASS",
+      "severity": "INFO",
+      "status": "RESOLVED",
+      "evidence": "A63 2026-10-03: live agreement tests verify authenticated ownership for read/write, consent, conflict/stale gate, RLS/direct ACL denial, export and deletion cascade. Events omit private expressions. Revoked memory hides prior Faros; dedicated desktop/mobile regression passes. Existing safety, consent separation and honest NO_MATCH preserved."
+    },
+    {
+      "id": "A63-C8",
+      "custodian_id": "C8",
+      "result": "GAP",
+      "severity": "WARN",
+      "status": "OPEN",
+      "evidence": "A63 2026-10-03: 89 unit tests, verify with 60 E2E, 2 additional privacy E2E, build/lint, live backend and SQL transaction checks pass. Typed application RPCs and security-definer functions reuse existing anatomy; no second dispatcher/runtime/catalogue. Human custody and target-branch mechanical protection remain an open governance boundary; no A63 closure or production promotion."
+    }
   ]
 }

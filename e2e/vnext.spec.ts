@@ -1,9 +1,9 @@
-import {test,expect} from '@playwright/test'
+import {test,expect} from './fixtures'
 
 test.describe('LUMEN PREMIUM V58 · public doors',()=>{
  test.beforeEach(async({page})=>{await page.goto('/')})
  test('present Momento protects personal persistence behind identity',async({page})=>{
-  await expect(page.getByRole('heading',{name:'¿Qué está pasando en tu vida ahora?'})).toBeVisible()
+  await expect(page.getByRole('heading',{name:'¿Qué te trae por aquí hoy?'})).toBeVisible()
   await page.getByLabel('¿Qué está vivo hoy?').fill('Quiero descansar y entender qué necesito hoy.')
   await page.getByRole('button',{name:'Contar'}).click()
   await expect(page.getByRole('dialog',{name:'Entrar a LUMEN'})).toBeVisible()
@@ -29,11 +29,11 @@ test.describe('LUMEN PREMIUM V58 · public doors',()=>{
  test('Faro is editable and the contextual boundary is honest',async({page})=>{
   await page.locator('.gm-nav').getByText('Mi Vida').click()
   await page.getByRole('button',{name:'Ver mi Faro'}).click()
-  await page.getByRole('button',{name:'Ver posibilidades para este Faro'}).click()
-  await expect(page.getByText(/contanos primero qué está vivo ahora/)).toBeVisible()
-  await page.getByRole('button',{name:'Editar mi Faro'}).click()
+  await page.getByRole('button',{name:/^Revisar lo que quiero nutrir/}).click()
+  await expect(page.getByText(/Primero elegí y conservá tu Faro/)).toBeVisible()
+  await page.getByRole('button',{name:'Revisar y ajustar'}).click()
   await page.getByLabel('Orientación de mi Faro').fill('Cuidar mi descanso')
-  await page.getByRole('button',{name:'Guardar mi Faro'}).click()
+  await page.getByRole('button',{name:'Guardar el Faro y seguir después'}).click()
   await expect(page.getByRole('dialog',{name:'Entrar a LUMEN'})).toBeVisible()
  })
  test('mobile has no horizontal overflow',async({page})=>{
@@ -45,7 +45,10 @@ test.describe('LUMEN PREMIUM V58 · public doors',()=>{
   await page.getByText('Filtros de esta búsqueda',{exact:true}).click()
   await page.getByRole('button',{name:'Audios',exact:true}).click()
   await expect(page.getByText('Poner los pies en la tierra · audio OPS/OMS',{exact:true})).toBeVisible({timeout:20000})
-  await page.getByText('Poner los pies en la tierra · audio OPS/OMS',{exact:true}).click()
+  await page.locator('.gm-context-card').filter({hasText:'Poner los pies en la tierra · audio OPS/OMS'}).getByRole('button',{name:'Conocer esta posibilidad'}).click()
+  await expect(page.getByRole('heading',{name:'Poner los pies en la tierra · audio OPS/OMS'})).toBeVisible()
+  await expect(page.locator('.gm-nav')).toHaveCount(0)
+  await page.getByRole('button',{name:'Empezar',exact:true}).click()
   await expect(page.getByRole('link',{name:'Escuchar en OPS/OMS',exact:true})).toHaveAttribute('href',/paho\.org/)
  })
  test('Tejido offers a real human service with attribution',async({page})=>{

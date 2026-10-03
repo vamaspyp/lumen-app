@@ -1,4 +1,4 @@
-import {test,expect,type Page} from '@playwright/test'
+import {test,expect,type Page} from './fixtures'
 
 // Browser contract regression. Real database grants and live RPC health are checked separately.
 async function simulatedLife(page:Page){

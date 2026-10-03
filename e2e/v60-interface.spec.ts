@@ -1,4 +1,4 @@
-import {test,expect,type Page} from '@playwright/test'
+import {test,expect,type Page} from './fixtures'
 async function personalBackend(page:Page,paused=false){
  const origin='https://vbuixagaguasejputubp.supabase.co'
  const session={access_token:'regression-only-token',refresh_token:'regression-only-refresh',token_type:'bearer',expires_in:3600,expires_at:Math.floor(Date.now()/1000)+3600,user:{id:'regression-user',aud:'authenticated',role:'authenticated',email:'regression@example.invalid',app_metadata:{},user_metadata:{},created_at:'2026-09-30T00:00:00Z'}}
@@ -56,6 +56,6 @@ test('Master LUMI remains available; contextual sheet and conversation are invok
 })
 
 test('V62 paused Faro keeps its history and willingness after reload',async({page})=>{
- await personalBackend(page,true);await page.goto('/mi-vida/faro');await page.getByText('Cómo fue cambiando mi Faro',{exact:true}).click();await expect(page.getByText('Quiero vivir con menos apuro.',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Editar mi Faro'}).click();await expect(page.getByRole('radio',{name:'Todavía no'})).toBeChecked();await page.reload();await page.getByRole('button',{name:'Editar mi Faro'}).click();await expect(page.getByRole('radio',{name:'Todavía no'})).toBeChecked()
+ await personalBackend(page,true);await page.goto('/mi-vida/faro');await page.getByText('Cómo fue cambiando mi Faro',{exact:true}).click();await expect(page.getByText('Quiero vivir con menos apuro.',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Revisar y ajustar'}).click();await expect(page.getByRole('radio',{name:'Todavía no'})).toBeChecked();await page.reload();await page.getByRole('button',{name:'Revisar y ajustar'}).click();await expect(page.getByRole('radio',{name:'Todavía no'})).toBeChecked()
 })
 
