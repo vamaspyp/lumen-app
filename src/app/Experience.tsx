@@ -25,27 +25,18 @@ function formatTime(seconds: number) {
   return `${minutes}:${rest}`
 }
 
+// Photographs supplied in the approved prototype; shared visual field, no remote stock dependency.
 const EXPERIENCE_IMAGE: Record<Kind,string> = {
-  editorial:'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1800&q=90',
-  practice:'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1800&q=90',
-  audio:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=1800&q=90',
-  video:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=90',
-  external:'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1800&q=90',
-  human:'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1800&q=90',
-  group:'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1800&q=90',
-  event:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=90',
-  material:'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1800&q=90',
-  action:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=90',
-  quiet:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=1800&q=90',
+ editorial:'/embryo/sit.jpg', practice:'/embryo/lake.jpg', audio:'/embryo/lake.jpg',
+ video:'/embryo/manback.jpg', external:'/embryo/sit.jpg', human:'/embryo/family.jpg',
+ group:'/embryo/family.jpg', event:'/embryo/manback.jpg', material:'/embryo/family.jpg',
+ action:'/embryo/manback.jpg', quiet:'/embryo/lake.jpg',
 }
-
 function premiumHeroImage(kind:Kind,premium:string|null):string {
-  if (premium==='audio_practice') return 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=1800&q=90'
-  if (premium==='contemplative_reading_audio') return EXPERIENCE_IMAGE.practice
-  if (premium==='classic_reading'||premium==='illustrated_guide') return EXPERIENCE_IMAGE.editorial
-  if (premium==='video_or_audio_visual_sequence') return EXPERIENCE_IMAGE.video
-  if (premium==='health_reference') return 'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=1800&q=90'
-  return EXPERIENCE_IMAGE[kind]
+ if(premium==='audio_practice'||premium==='contemplative_reading_audio')return EXPERIENCE_IMAGE.audio
+ if(premium==='classic_reading'||premium==='illustrated_guide')return EXPERIENCE_IMAGE.editorial
+ if(premium==='video_or_audio_visual_sequence')return EXPERIENCE_IMAGE.video
+ return EXPERIENCE_IMAGE[kind]
 }
 
 function kindOf(help:Help):Kind {
@@ -292,7 +283,9 @@ export function Experience({ help, onExit, onFeedback, onComplete, initialStep=0
 
     {kind === 'external' && <div className="experience-premium-page"><ExperienceHero kind={kind} premium={null} eyebrow="OBRA / RECURSO EXTERNO" title={help.title} deck={help.summary} onExit={onExit} sourceName={provider(help)}/><div className="experience-premium-body"><SourcePanel sourceName={provider(help)} sourceLabel={str(content.source_label)} rights={str(content.rights_note)} destination={destination}/><div className="experience-finish-row"><button className="ghost" type="button" onClick={finish}>Volver a LUMEN</button></div></div></div>}
 
-    {(kind === 'human' || kind === 'group') && <div className="experience-premium-page"><ExperienceHero kind={kind} premium={null} eyebrow={kind === 'human' ? 'ENCUENTRO HUMANO' : 'CÍRCULO / GRUPO'} title={help.title} deck={help.summary} onExit={onExit} sourceName={provider(help)}/><div className="experience-premium-body"><section className="human-premium-card"><div className="human-symbol">{help.title.slice(0,1).toUpperCase()}</div>{(phone || availability || access) && <div className="help-meta">{phone && <span>{phone}</span>}{availability && <span>{availability}</span>}{access && <span>{access}</span>}</div>}{prompt && <p>{prompt}</p>}<p className="media-boundary">Cuando empieza el encuentro, LUMEN se corre. La otra vida ocupa el centro.</p><div className="button-row center">{destination && <a className="primary as-link" href={destination} target="_blank" rel="noreferrer">Ver cómo acceder ↗</a>}{phone && <a className="ghost as-link" href={`tel:${phone.replace(/[^+\d]/g, '')}`}>Llamar</a>}<button className="ghost" type="button" onClick={finish}>Volver</button></div></section></div></div>}
+    {kind === 'human' && <div className="experience-premium-page"><ExperienceHero kind={kind} premium={null} eyebrow="ENCUENTRO HUMANO" title={help.title} deck={help.summary} onExit={onExit} sourceName={provider(help)}/><div className="experience-premium-body"><section className="human-premium-card"><div className="human-symbol">{help.title.slice(0,1).toUpperCase()}</div>{(phone || availability || access) && <div className="help-meta">{phone && <span>{phone}</span>}{availability && <span>{availability}</span>}{access && <span>{access}</span>}</div>}{prompt && <p>{prompt}</p>}<p className="media-boundary">Cuando empieza el encuentro, LUMEN se corre. La otra vida ocupa el centro.</p><div className="button-row center">{destination && <a className="primary as-link" href={destination} target="_blank" rel="noreferrer">Ver cómo acceder ↗</a>}{phone && <a className="ghost as-link" href={`tel:${phone.replace(/[^+\d]/g, '')}`}>Llamar</a>}<button className="ghost" type="button" onClick={finish}>Volver</button></div></section></div></div>}
+
+    {kind === 'group' && <div className="experience-premium-page"><ExperienceHero kind={kind} premium={null} eyebrow="UN CÍRCULO PARA ENCONTRARSE" title={help.title} deck={help.summary} onExit={onExit} sourceName={provider(help)}/><div className="experience-premium-body"><section className="group-experience"><h2>El propósito del encuentro</h2><p>{prompt||help.summary}</p>{str(content.facilitator)&&<p>Facilita: {str(content.facilitator)}</p>}{arr(content.agreements).length>0&&<><h3>Acuerdos de cuidado</h3><ul>{arr(content.agreements).map(a=><li key={a}>{a}</li>)}</ul></>}{availability&&<p>{availability}</p>}{access&&<p>{access}</p>}<p>Vos elegís participar y podés retirarte. Confirmá condiciones y disponibilidad con quien facilita.</p><SourcePanel sourceName={provider(help)} sourceLabel={str(content.source_label)} rights={str(content.rights_note)} destination={destination} cta="Consultar cómo participar"/><button className="ghost" onClick={finish}>Volver después del encuentro</button></section></div></div>}
 
     {kind === 'action' && <div className="experience-premium-page"><ExperienceHero kind={kind} premium={null} eyebrow="ACCIÓN EN LA VIDA" title={help.title} deck={help.summary} onExit={onExit} sourceName={provider(help)}/><div className="experience-premium-body"><section className="human-premium-card">{prompt && <p>{prompt}</p>}{steps.length > 0 && <ol className="action-steps">{steps.map((item) => <li key={item}>{item}</li>)}</ol>}{(phone || availability || access) && <div className="help-meta">{phone && <span>{phone}</span>}{availability && <span>{availability}</span>}{access && <span>{access}</span>}</div>}<p className="media-boundary">Lo importante ocurre fuera de la pantalla.</p><div className="button-row center">{destination && <a className="primary as-link" href={destination} target="_blank" rel="noreferrer">Abrir acceso ↗</a>}{phone && <a className="ghost as-link" href={`tel:${phone.replace(/[^+\d]/g, '')}`}>Llamar</a>}<button className={destination || phone ? 'ghost' : 'primary'} type="button" onClick={finish}>{destination || phone ? 'Volver' : 'Salir a vivirlo'}</button></div></section></div></div>}
 

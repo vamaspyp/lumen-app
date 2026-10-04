@@ -10,6 +10,7 @@ type Props = {
 }
 const keyOf=(i:FaroPotential)=>i.concept_id||i.label.trim().toLocaleLowerCase()
 export function FaroAgreement({trajectoryId,faro,expression,areas,initialAreaKeys=[],onConstellation,onChanged,onExplore,onPointHelp,draft=false,onConfirmDraft,pending=false,initialDraft,onDraftChange}:Props) {
+ const [visibleAreas]=useState(initialAreaKeys)
  const initial=useRef({expression,faro,initialAreaKeys,draft:initialDraft})
  const [agreement,setAgreement]=useState<Agreement|null>(initialDraft?.agreement||null)
  const [items,setItems]=useState<FaroPotential[]>(initialDraft?.items||[])
@@ -68,7 +69,7 @@ export function FaroAgreement({trajectoryId,faro,expression,areas,initialAreaKey
    {(agreement?.state==='stale'||(agreement&&agreement.faro_text!==faro))&&<p className="gm-notice">Tu Faro cambió. Revisá el acuerdo antes de componer nuevas posibilidades.</p>}
    {agreement?.version?<p className="gm-meta">Acuerdo · versión {agreement.version}</p>:null}
    {editing?<>
-    {areas.length>0&&<fieldset className="gm-review-areas"><legend>Áreas que toca · hipótesis revisables</legend><p>Podés quitar, sumar o dejar ninguna.</p><div className="gm-area-choice">{areas.map(a=><label key={a.key}><input disabled={busy} type="checkbox" checked={areaKeys.includes(a.key)} onChange={e=>setAreaKeys(xs=>e.target.checked?[...xs,a.key]:xs.filter(x=>x!==a.key))}/>{a.label}</label>)}</div></fieldset>}
+    {areas.length>0&&<fieldset className="gm-review-areas"><legend>Áreas que toca · hipótesis revisables</legend><p>Podés quitar, sumar o dejar ninguna.</p><div className="gm-area-choice">{areas.filter(a=>visibleAreas.includes(a.key)).map(a=><label key={a.key}><input disabled={busy} type="checkbox" checked={areaKeys.includes(a.key)} onChange={e=>setAreaKeys(xs=>e.target.checked?[...xs,a.key]:xs.filter(x=>x!==a.key))}/>{a.label}</label>)}</div><details><summary>Revisar otros ámbitos</summary><div className="gm-area-choice">{areas.filter(a=>!visibleAreas.includes(a.key)).map(a=><label key={a.key}><input disabled={busy} type="checkbox" checked={areaKeys.includes(a.key)} onChange={e=>setAreaKeys(xs=>e.target.checked?[...xs,a.key]:xs.filter(k=>k!==a.key))}/>{a.label}</label>)}</div></details></fieldset>}
     {proposalFor&&proposalFor!==faro&&<p className="gm-notice">Cambiaste tu Faro. Podés pedir una nueva lectura; lo que ya aceptaste se conserva.</p>}
     <button disabled={busy||!faro.trim()} className="gm-secondary" onClick={()=>void propose()}>Proponer o regenerar desde mis palabras</button>
     {items.map(i=><article className={`gm-potential ${i.status==='withdrawn'?'is-withdrawn':''}`} key={i.identity_id}>

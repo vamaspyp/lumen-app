@@ -4,7 +4,7 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "verified_at": "2026-10-03T15:03:54.217554+00:00",
+    "verified_at": "2026-10-04T03:20:00Z",
     "verified_by": "codex_with_live_google_drive_read"
   },
   "focus": {
@@ -118,6 +118,11 @@
     {
       "id": "V62",
       "name": "Documento Maestro de Construcción del Embrión V1.0",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V63",
+      "name": "Contrato técnico-funcional consolidado con ANEXO OPERATIVO B1–B6",
       "state": "VIGENTE"
     }
   ],
