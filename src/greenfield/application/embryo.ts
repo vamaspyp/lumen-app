@@ -48,6 +48,7 @@ export type ContinuitySnapshot = Readonly<{
 
 export type SanctuaryEntry = Readonly<{
   entry_id: string
+  composition?: import('./cultivation').ConservedComposition | null
   entry_kind: 'treasure' | 'reflection' | 'note'
   title: string | null
   content: string

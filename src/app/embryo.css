@@ -48,3 +48,8 @@
 .gm-stage .gm-phone .gm-review-areas details{margin-top:12px}
 .gm-stage .gm-phone .gm-review-areas summary{font-size:14px;cursor:pointer;min-height:44px;padding:12px 0}
 .gm-stage .gm-phone .gm-tabs{flex-wrap:wrap;gap:4px}
+.gm-composition,.gm-recurring,.gm-recurring-threads article,.gm-composition-note{background:var(--gm-paper);color:var(--gm-ink);border:1px solid #d8d9ca;border-radius:18px;padding:18px;margin:18px 0}
+.gm-composition h2,.gm-recurring-threads h3{font-family:Georgia,serif;font-weight:400;margin:4px 0 12px}.gm-composition p,.gm-recurring p,.gm-recurring-threads p{font-size:15px;line-height:1.5}.gm-composition summary,.gm-recurring summary,.gm-recurring-threads summary{padding:10px 0;min-height:44px;cursor:pointer}.gm-recurring form,.gm-recurring label,.gm-recurring-threads label{display:grid;gap:8px}.gm-recurring form{gap:18px}.gm-recurring input,.gm-recurring select,.gm-recurring-threads input,.gm-recurring-threads select{max-width:100%;min-width:0;padding:10px;border:1px solid #b5beae;border-radius:10px;font:inherit}.gm-recurring input[type=checkbox]{width:22px;height:22px}.gm-recurring-threads button,.gm-composition-note button{min-height:44px;margin:4px;padding:8px 12px}.gm-reorder{display:flex;gap:8px}.gm-reorder button{min-width:44px;min-height:44px}.gm-recurring-threads{margin-bottom:20px}.gm-home .gm-recurring-threads article{background:#f5f3e8ed;color:#2c4536}
+/* Reading contrast for the explicit, correctable limits of Mi Vida. */
+.gm-stage .gm-phone .gm-map-note{color:#34483a!important}
+.gm-stage .gm-phone .gm-empty{color:#34483a!important}

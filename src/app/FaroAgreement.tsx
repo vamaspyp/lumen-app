@@ -10,7 +10,7 @@ type Props = {
 }
 const keyOf=(i:FaroPotential)=>i.concept_id||i.label.trim().toLocaleLowerCase()
 export function FaroAgreement({trajectoryId,faro,expression,areas,initialAreaKeys=[],onConstellation,onChanged,onExplore,onPointHelp,draft=false,onConfirmDraft,pending=false,initialDraft,onDraftChange}:Props) {
- const [visibleAreas]=useState(initialAreaKeys)
+ const [visibleAreas,setVisibleAreas]=useState(initialAreaKeys)
  const initial=useRef({expression,faro,initialAreaKeys,draft:initialDraft})
  const [agreement,setAgreement]=useState<Agreement|null>(initialDraft?.agreement||null)
  const [items,setItems]=useState<FaroPotential[]>(initialDraft?.items||[])
@@ -24,7 +24,7 @@ export function FaroAgreement({trajectoryId,faro,expression,areas,initialAreaKey
   const load=async()=>{
    try {
     if(initial.current.draft){setLoaded(true);return}
-    if(trajectoryId){const a=await getFaroAgreement(trajectoryId);if(current){setAgreement(a);setItems(a.items||[]);setAreaKeys(a.area_keys||[]);setEditing(draft||a.state!=='validated')}}
+    if(trajectoryId){const a=await getFaroAgreement(trajectoryId);if(current){setAgreement(a);setItems(a.items||[]);setAreaKeys(a.area_keys||[]);setVisibleAreas(a.area_keys||[]);setEditing(draft||a.state!=='validated')}}
     else if(draft&&initial.current.faro.trim()){
      const p=await proposeFaroPotentials(initial.current.expression,initial.current.faro)
      if(current){setItems(p.items.map(i=>({...i,proposed:true})));setMessage(p.message);setProposalFor(initial.current.faro)}
@@ -59,7 +59,7 @@ export function FaroAgreement({trajectoryId,faro,expression,areas,initialAreaKey
   }catch(e){setError(e instanceof Error?e.message:'No pudimos confirmar el acuerdo.')}
   finally{setBusy(false)}
  }
- const change=(id:string,field:'label'|'contextual_meaning',value:string)=>setItems(xs=>xs.map(x=>x.identity_id===id?{...x,[field]:value,...(field==='label'?{concept_id:null,origin:'person' as const,definition:'',source_status:null}:{}),status:'reformulated',proposed:false}:x))
+ const change=(id:string,field:'label'|'definition'|'contextual_meaning',value:string)=>setItems(xs=>xs.map(x=>x.identity_id===id?{...x,[field]:value,...(field==='label'||field==='definition'?{concept_id:null,origin:'person' as const,...(field==='label'?{definition:''}:{}),source_status:null}:{}),status:'reformulated',proposed:false}:x))
  const choose=(id:string,status:'accepted'|'withdrawn')=>setItems(xs=>xs.map(x=>x.identity_id===id?{...x,status,proposed:false}:x))
  const add=()=>{if(!own.trim())return;setItems(xs=>[...xs,{identity_id:crypto.randomUUID(),concept_id:null,label:own.trim(),definition:'',contextual_meaning:'',origin:'person',status:'accepted'}]);setOwn('');setEditing(true)}
  return <section className="gm-agreement" aria-label="Acuerdo Faro y Potenciales">
@@ -76,7 +76,7 @@ export function FaroAgreement({trajectoryId,faro,expression,areas,initialAreaKey
      {i.status==='withdrawn'?<><p>{i.label} · retirado de esta versión</p><button disabled={busy} onClick={()=>choose(i.identity_id,'accepted')}>Volver a incluir</button></>:<>
       <p className="gm-meta">{i.proposed?'Hipótesis de LUMI · aún sin aceptar':i.status==='reformulated'?'Ajustado por vos':i.origin==='person'?'Lo nombraste vos':'Aceptado por vos'}</p>
       <label>Potencial<input disabled={busy} maxLength={120} value={i.label} onChange={e=>change(i.identity_id,'label',e.target.value)}/></label>
-      {i.definition&&<p>{i.definition}</p>}
+      <label>Qué significa este potencial<textarea disabled={busy} maxLength={1000} value={i.definition} onChange={e=>change(i.identity_id,'definition',e.target.value)}/></label>
       <label>Para este Faro significa<textarea disabled={busy} maxLength={1000} value={i.contextual_meaning} onChange={e=>change(i.identity_id,'contextual_meaning',e.target.value)} placeholder="Qué significa para vos, en tu vida…"/></label>
       {i.reason&&<details><summary>Por qué te lo propongo</summary><p>{i.reason}</p></details>}
       {i.proposed&&<button disabled={busy} onClick={()=>choose(i.identity_id,'accepted')}>Aceptar {i.label}</button>}

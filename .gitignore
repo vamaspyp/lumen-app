@@ -30,3 +30,6 @@ dist-ssr
 # Playwright
 /test-results/
 /playwright-report/
+# Local QA evidence and Supabase CLI metadata
+/cf-runtime-evidence/
+/supabase/.temp/
