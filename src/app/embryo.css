@@ -53,3 +53,4 @@
 /* Reading contrast for the explicit, correctable limits of Mi Vida. */
 .gm-stage .gm-phone .gm-map-note{color:#34483a!important}
 .gm-stage .gm-phone .gm-empty{color:#34483a!important}
+.gm-stage .gm-phone .gm-meta,.gm-stage .gm-phone .gm-resources em{color:var(--gm-ink)!important}
