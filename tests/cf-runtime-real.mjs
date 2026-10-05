@@ -35,13 +35,19 @@ try{
  await capture('01-inicio-real')
  const original='Mi trabajo va bien. Quiero aprender a pintar y compartirlo con mi familia.'
  await page.getByLabel('¿Qué está vivo hoy?').fill(original);await page.getByRole('button',{name:'Contar',exact:true}).click()
- await expect(page.getByRole('heading',{name:'¿Te representa?'})).toBeVisible();await capture('02-comprension-real')
+ await expect(page.getByRole('heading',{name:'¿Te representa?'})).toBeVisible()
+ await expect(page.getByRole('heading',{name:'Potenciales que podrías nutrir'})).toBeVisible()
+ await page.getByLabel('Agregar uno con mis palabras').fill('Dar lugar a mi creatividad');await page.getByRole('button',{name:'Agregar potencial',exact:true}).click()
+ const earlyPotential=page.locator('.gm-potential').last()
+ await earlyPotential.getByLabel('Qué significa este potencial').fill('Crear sin apuro, con curiosidad')
+ await earlyPotential.getByLabel('Para este Momento significa').fill('Pintar un momento posible y compartirlo')
+ await capture('02-comprension-real')
  await page.getByRole('button',{name:'Cuidar esto como un Faro'}).click()
  await page.getByLabel('Orientación de mi Faro').fill('Aprender a crear y compartir con calma')
- await page.getByLabel('Agregar uno con mis palabras').fill('Dar lugar a mi creatividad');await page.getByRole('button',{name:'Agregar potencial',exact:true}).click()
  const potential=page.locator('.gm-potential').last()
- await potential.getByLabel('Qué significa este potencial').fill('Crear sin apuro, con curiosidad')
- await potential.getByLabel('Para este Faro significa').fill('Pintar un momento posible y compartirlo')
+ await expect(potential.getByLabel('Potencial',{exact:true})).toHaveValue('Dar lugar a mi creatividad')
+ await expect(potential.getByLabel('Qué significa este potencial')).toHaveValue('Crear sin apuro, con curiosidad')
+ await expect(potential.getByLabel('Para este Faro significa')).toHaveValue('Pintar un momento posible y compartirlo')
  await capture('03-faro-area-potenciales-real')
  await page.getByRole('button',{name:'Confirmar lo que quiero nutrir'}).click()
  await expect(page.getByRole('dialog',{name:'Memoria personal'}).or(page.getByRole('heading',{name:'Tu Constelación'}))).toBeVisible()
@@ -52,6 +58,8 @@ try{
  await expect(page.getByText('Composición conservada · versión 1')).toBeVisible()
  let entries=await rpc('lumen_s2_list_sanctuary');const conserved=entries.find(e=>e.composition);assert(conserved)
  assert.equal(conserved.composition.versions[0].agreement.original_expression,original)
+ assert.equal(conserved.composition.versions[0].agreement.items[0].label,'Dar lugar a mi creatividad')
+ assert.equal(conserved.composition.versions[0].agreement.items[0].contextual_meaning,'Pintar un momento posible y compartirlo')
  await capture('04-no-match-conservacion-real')
  await page.getByRole('button',{name:'Enriquecer desde Explorar'}).click()
  await page.getByLabel('Buscar una posibilidad').fill(practice.title)
@@ -78,7 +86,7 @@ try{
  await page.getByText('Versiones que conservé',{exact:true}).click();await page.getByRole('button',{name:'Recuperar versión 1',exact:true}).click()
  await expect(page.getByText('Composición conservada · versión 3')).toBeVisible();await expect(page.locator('.gm-context-card')).toHaveCount(0)
  await capture('10-restauracion-sin-perdida-real')
- for(const label of ['Mi Vida','Explorar','Tejido','Santuario']){await page.goto((process.env.CF_TEST_URL||'http://localhost:5183/').replace(/\?.*$/,'')+({'Mi Vida':'mi-vida','Explorar':'explorar','Tejido':'tejido','Santuario':'santuario'}[label]));await expect(page.getByRole('button',{name:'Cuenta',exact:true})).toBeEnabled();await expect(page.locator('.gm-nav')).toBeVisible();await capture('puerta-'+label.replace(' ','-'))}
+ for(const label of ['Mi Vida','Explorar','Tejido','Santuario']){await page.goto((process.env.CF_TEST_URL||'http://localhost:5183/').replace(/\?.*$/,'')+({'Mi Vida':'mi-vida','Explorar':'explorar','Tejido':'tejido','Santuario':'santuario'}[label]));await expect(page.getByRole('button',{name:'Cuenta',exact:true})).toBeEnabled();await expect(page.locator('.gm-nav')).toBeVisible();if(label==='Mi Vida'){const ib=await page.locator('.gm-map-hero img').boundingBox(),hb=await page.locator('.gm-map-hero h1').boundingBox();assert(ib&&hb&&hb.y>=ib.y&&hb.y+hb.height<=ib.y+ib.height,'Mi Vida title must be over the image')};await capture('puerta-'+label.replace(' ','-'))}
  const coreErrorCount=errors.length
  const media=[]
  if(process.env.CF_MEDIA){

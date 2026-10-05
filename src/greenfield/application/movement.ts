@@ -1,3 +1,4 @@
+import type {FaroPotential} from './faro-agreement'
 import {getGreenfieldSupabase} from '../adapters/supabase/client'
 
 export type MovementFact={event_id:string;help_id:string|null;at:string;text:string}
@@ -12,4 +13,4 @@ export const saveExperiencePosition=(episodeId:string,step:number,finished=false
 
 export const correctMomentContext=(episodeId:string,minutes:number)=>call('lumen_s1_correct_moment_context',{p_episode_id:episodeId,p_available_minutes:minutes})
 
-export const reviewMoment=(episodeId:string,understanding:string,areaKeys:string[],minutes:number)=>call('lumen_s1_review_moment',{p_episode_id:episodeId,p_understanding:understanding,p_area_keys:areaKeys,p_available_minutes:minutes})
+export const reviewMoment=(episodeId:string,understanding:string,areaKeys:string[],minutes:number,potentials:FaroPotential[]=[])=>call('lumen_s1_review_moment',{p_episode_id:episodeId,p_understanding:understanding,p_area_keys:areaKeys,p_available_minutes:minutes,p_potential_items:potentials.map(({proposed,reason,source_status,...item})=>{void proposed;void reason;void source_status;return item})})

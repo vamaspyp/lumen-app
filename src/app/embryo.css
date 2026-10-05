@@ -54,3 +54,10 @@
 .gm-stage .gm-phone .gm-map-note{color:#34483a!important}
 .gm-stage .gm-phone .gm-empty{color:#34483a!important}
 .gm-stage .gm-phone .gm-meta,.gm-stage .gm-phone .gm-resources em{color:var(--gm-ink)!important}
+.gm-stage .gm-phone .gm-map-hero{position:relative;isolation:isolate;overflow:hidden;min-height:240px;margin:-28px -24px 24px;padding:100px 24px 28px;box-sizing:border-box;border-radius:0 0 28px 28px;background:#24372b}
+.gm-stage .gm-phone .gm-map-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.gm-stage .gm-phone .gm-map-hero:after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#14271ef0,#14271e10);z-index:-1}
+.gm-stage .gm-phone .gm-map-hero h1,.gm-stage .gm-phone .gm-map-hero p{color:#fff!important;text-shadow:0 1px 12px #0005}
+.gm-stage .gm-phone .gm-map-hero h1{margin:0 0 10px!important}
+.gm-stage .gm-phone .gm-direction-review{display:block;margin:20px 0;font-size:13px}
+.gm-stage .gm-phone .gm-direction-review input{display:block;width:100%;box-sizing:border-box;margin-top:8px}
