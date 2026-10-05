@@ -16,7 +16,7 @@
 .gm-screen h3{font:20px/1.3 var(--serif)}
 .gm-screen p{font:16px/1.55 var(--sans);color:var(--gm-muted)}
 .gm-screen button,.gm-screen input,.gm-screen textarea,.gm-screen select{font:15px/1.4 var(--sans)}
-.gm-phone button{min-height:44px;cursor:pointer}
+.gm-phone button{min-height:44px;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}
 .gm-phone button:disabled{cursor:default;opacity:.6}
 .gm-phone button:focus-visible,.gm-phone input:focus-visible,.gm-phone textarea:focus-visible,.gm-phone select:focus-visible,.gm-phone summary:focus-visible{outline:3px solid var(--gm-green);outline-offset:3px}
 .gm-screen button{color:var(--gm-ink);border:1px solid var(--gm-line);background:var(--gm-card);border-radius:12px;padding:10px 14px}

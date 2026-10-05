@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright'
 import {test,expect} from './fixtures'
 import {personalBackend} from './support/personal-backend'
 import {disclose} from './experience-actions'
@@ -27,4 +28,14 @@ test('Finishing offers return before feedback and keeping remains an independent
  await page.getByRole('button',{name:'Volver a mi Constelación',exact:true}).click()
  await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible()
  expect(b.calls).not.toContain('lumen_s1_record_outcome')
+})
+
+// Selected labels keep contrast during an immediate mode change, without waiting for animation.
+test('Explore selection maintains contrast while changing entries',async({page})=>{
+ await personalBackend(page);await page.goto('/explorar')
+ for(const mode of ['Por potencial','Por área','Por momento','Libre']){
+  await page.getByRole('button',{name:mode,exact:true}).click()
+  const ax=await new AxeBuilder({page}).include('.gm-explore-modes').withRules(['color-contrast']).analyze()
+  expect(ax.violations).toEqual([])
+ }
 })
