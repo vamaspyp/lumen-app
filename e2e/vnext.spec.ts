@@ -3,7 +3,7 @@ import {test,expect} from './fixtures'
 test.describe('LUMEN PREMIUM V58 · public doors',()=>{
  test.beforeEach(async({page})=>{await page.goto('/')})
  test('present Momento protects personal persistence behind identity',async({page})=>{
-  await expect(page.getByRole('heading',{name:'¿Qué te trae por aquí hoy?'})).toBeVisible()
+  await expect(page.getByRole('heading',{name:'Inicio'})).toBeVisible()
   await page.getByLabel('¿Qué está vivo hoy?').fill('Quiero descansar y entender qué necesito hoy.')
   await page.getByRole('button',{name:'Contar'}).click()
   await expect(page.getByRole('dialog',{name:'Entrar a LUMEN'})).toBeVisible()
@@ -17,7 +17,7 @@ test.describe('LUMEN PREMIUM V58 · public doors',()=>{
   await expect(page.getByRole('dialog',{name:'Entrar a LUMEN'})).toBeVisible()
   await page.getByRole('button',{name:'Cerrar'}).click()
   await page.locator('.gm-nav').getByText('Mi Vida').click()
-  await expect(page.getByRole('heading',{name:'Mi Vida'})).toBeVisible()
+  await expect(page.getByRole('heading',{name:'Mi Vida',exact:true})).toBeVisible()
   await page.getByText('Mirar con más detalle').click()
   await page.getByRole('button',{name:'Potencial',exact:true}).click()
   await expect(page.getByRole('button',{name:'Potencial',exact:true})).toHaveClass(/on/)
@@ -47,7 +47,7 @@ test.describe('LUMEN PREMIUM V58 · public doors',()=>{
   await expect(page.getByText('Poner los pies en la tierra · audio OPS/OMS',{exact:true})).toBeVisible({timeout:20000})
   await page.locator('.gm-context-card').filter({hasText:'Poner los pies en la tierra · audio OPS/OMS'}).getByRole('button',{name:'Conocer esta posibilidad'}).click()
   await expect(page.getByRole('heading',{name:'Poner los pies en la tierra · audio OPS/OMS'})).toBeVisible()
-  await expect(page.locator('.gm-nav')).toHaveCount(0)
+  await expect(page.locator('.gm-nav')).toBeVisible()
   await page.getByRole('button',{name:'Empezar',exact:true}).click()
   await expect(page.getByRole('link',{name:'Escuchar en OPS/OMS',exact:true})).toHaveAttribute('href',/paho\.org/)
  })

@@ -76,9 +76,9 @@ export function FaroAgreement({trajectoryId,faro,expression,areas,initialAreaKey
      {i.status==='withdrawn'?<><p>{i.label} · retirado de esta versión</p><button disabled={busy} onClick={()=>choose(i.identity_id,'accepted')}>Volver a incluir</button></>:<>
       <p className="gm-meta">{i.proposed?'Hipótesis de LUMI · aún sin aceptar':i.status==='reformulated'?'Ajustado por vos':i.origin==='person'?'Lo nombraste vos':'Aceptado por vos'}</p>
       <label>Potencial<input disabled={busy} maxLength={120} value={i.label} onChange={e=>change(i.identity_id,'label',e.target.value)}/></label>
-      <label>Qué significa este potencial<textarea disabled={busy} maxLength={1000} value={i.definition} onChange={e=>change(i.identity_id,'definition',e.target.value)}/></label>
+      <details className="gm-potential-meaning" open={i.origin==='person'||undefined}><summary>Significado y contexto de {i.label}</summary><label>Qué significa este potencial<textarea disabled={busy} maxLength={1000} value={i.definition} onChange={e=>change(i.identity_id,'definition',e.target.value)}/></label>
       <label>{momentReview?"Para este Momento significa":"Para este Faro significa"}<textarea disabled={busy} maxLength={1000} value={i.contextual_meaning} onChange={e=>change(i.identity_id,'contextual_meaning',e.target.value)} placeholder="Qué significa para vos, en tu vida…"/></label>
-      {i.reason&&<details><summary>Por qué te lo propongo</summary><p>{i.reason}</p></details>}
+      {i.reason&&<p>{i.reason}</p>}</details>
       {i.proposed&&<button disabled={busy} onClick={()=>choose(i.identity_id,'accepted')}>Aceptar {i.label}</button>}
       <button disabled={busy} onClick={()=>choose(i.identity_id,'withdrawn')}>Quitar {i.label}</button>
      </>}

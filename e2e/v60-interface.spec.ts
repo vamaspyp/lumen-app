@@ -31,17 +31,17 @@ async function personalBackend(page:Page,paused=false){
  await r.fulfill({json:data})})
  return{calls,prefs}
 }
-test('V60 understanding is correctable; three possibilities; scenes withdraw doors and resume progress',async({page})=>{
+test('V60 understanding is correctable; three possibilities; persistent doors and immersive experiences resume progress',async({page})=>{
  await personalBackend(page);await page.goto('/');await page.getByLabel('¿Qué está vivo hoy?').fill('Necesito bajar un cambio.')
- await page.getByRole('button',{name:'Contar'}).click();await expect(page.getByRole('heading',{name:'¿Te representa?'})).toBeVisible();await expect(page.locator('.gm-nav')).toHaveCount(0)
+ await page.getByRole('button',{name:'Contar'}).click();await expect(page.getByRole('heading',{name:'¿Te representa?'})).toBeVisible();await expect(page.locator('.gm-nav')).toBeVisible()
  await page.getByRole('button',{name:'Ver qué puede ayudar'}).click();await expect(page.locator('.gm-context-card')).toHaveCount(3);await expect(page.getByText('Para ahora',{exact:true})).toHaveCount(1)
  await page.getByText('Posibilidad 1',{exact:true}).click();await expect(page.locator('.gm-nav')).toHaveCount(0);await expect(page.locator('.gm-top')).toHaveCount(0);await page.getByRole('button',{name:'Seguir',exact:true}).click();await expect(page.getByRole('heading',{name:'Segundo paso.'})).toBeVisible();await page.getByRole('button',{name:'Salir cuando quieras'}).click()
  await page.getByRole('button',{name:'Dejarlo aquí'}).click();await page.getByRole('button',{name:'Retomar: Posibilidad 1'}).click();await expect(page.getByRole('heading',{name:'Segundo paso.'})).toBeVisible()
  await page.screenshot({path:`test-results/v60-live-${test.info().project.name}.png`,fullPage:true})
 })
-test('V60 privacy grants are independent, revoked and reread; no doors in settings',async({page})=>{
+test('V60 privacy grants are independent, revoked and reread; five doors in settings',async({page})=>{
  const state=await personalBackend(page);await page.goto('/mi-vida');await page.getByRole('button',{name:'Privacidad y ritmo'}).click()
- const switches=page.getByRole('switch');await expect(switches).toHaveCount(3);for(let i=0;i<3;i++)await expect(switches.nth(i)).not.toBeChecked();await switches.nth(0).click();await expect(switches.nth(0)).toBeChecked();await expect(switches.nth(1)).not.toBeChecked();await expect(switches.nth(2)).not.toBeChecked();await switches.nth(0).click();await expect(switches.nth(0)).not.toBeChecked();expect(state.prefs.memory_allowed).toBe(false);await expect(page.locator('.gm-nav')).toHaveCount(0)
+ const switches=page.getByRole('switch');await expect(switches).toHaveCount(3);for(let i=0;i<3;i++)await expect(switches.nth(i)).not.toBeChecked();await switches.nth(0).click();await expect(switches.nth(0)).toBeChecked();await expect(switches.nth(1)).not.toBeChecked();await expect(switches.nth(2)).not.toBeChecked();await switches.nth(0).click();await expect(switches.nth(0)).not.toBeChecked();expect(state.prefs.memory_allowed).toBe(false);await expect(page.locator('.gm-nav')).toBeVisible()
  await page.screenshot({path:`test-results/v60-privacy-${test.info().project.name}.png`,fullPage:true})
 })
 test('V60 Tissue creates real-contract circle, explicit sharing, contribution, invitation and exit',async({page})=>{
