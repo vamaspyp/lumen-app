@@ -21,28 +21,29 @@ const browser=await chromium.launch({headless:true,executablePath:process.env.PL
 const server=process.env.CF_TEST_URL?null:spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--port','5183','--strictPort'],{stdio:'ignore'})
 if(server){for(let i=0;i<30;i++){try{if((await fetch('http://localhost:5183/')).ok)break}catch{}await new Promise(r=>setTimeout(r,300))}}
 const results=[]
+const disclose=async(page,selector)=>{const d=page.locator(selector).first();await d.waitFor({state:'attached'});if(!await d.evaluate(e=>e.open))await d.locator(':scope > summary').click()}
 try{
  const context=await browser.newContext({viewport:process.env.CF_MOBILE?{width:390,height:844}:{width:1440,height:900},ignoreHTTPSErrors:true});const page=await context.newPage()
  await page.route(/https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com)\//,r=>r.abort())
  await page.addInitScript(session=>localStorage.setItem('sb-vbuixagaguasejputubp-auth-token',JSON.stringify(session)),auth.session)
  const errors=[];page.on('pageerror',e=>errors.push(e.message))
  const accessibility=[]
- const capture=async(name)=>{const ax=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();accessibility.push({scene:name,violations:ax.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)}))});await page.locator('.gm-content').evaluate(el=>{el.scrollTop=0});await page.screenshot({path:out+'/'+name+'.png',fullPage:true});results.push(name)}
+ const capture=async(name)=>{if(await page.getByRole('button',{name:'Cuenta',exact:true}).count())await expect(page.getByRole('button',{name:'Cuenta',exact:true})).toBeEnabled();for(const label of ['Leyendo tus palabras…','Leyendo tus preferencias…','Abriendo Fuente…'])await expect(page.getByText(label,{exact:true})).toHaveCount(0);const ax=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();accessibility.push({scene:name,violations:ax.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)}))});await page.locator('.gm-content').evaluate(el=>{el.scrollTop=0});await page.screenshot({path:out+'/'+name+'.png',fullPage:true});results.push(name)}
  const {expect:baseExpect}=await import('@playwright/test');const expect=baseExpect.configure({timeout:30000})
  page.on('requestfailed',r=>console.log(JSON.stringify({request_failed:new URL(r.url()).pathname,error:r.failure()?.errorText})))
  page.on('response',r=>{if(r.url().includes('/rpc/'))console.log(JSON.stringify({rpc:new URL(r.url()).pathname.split('/').pop(),status:r.status()}))})
  await page.goto(process.env.CF_TEST_URL||'http://localhost:5183/');await expect(page.getByRole('button',{name:'Cuenta',exact:true})).toBeEnabled()
  await capture('01-inicio-real')
  const original='Mi trabajo va bien. Quiero aprender a pintar y compartirlo con mi familia.'
- await page.getByLabel('¿Qué está vivo hoy?').fill(original);await page.getByRole('button',{name:'Contar',exact:true}).click()
+ await page.getByLabel('¿Qué está vivo hoy?').fill(original);await page.getByRole('button',{name:'Continuar',exact:true}).click()
  await expect(page.getByRole('heading',{name:'¿Te representa?'})).toBeVisible()
  await expect(page.getByRole('heading',{name:'Potenciales que podrías nutrir'})).toBeVisible()
- await page.getByLabel('Agregar uno con mis palabras').fill('Dar lugar a mi creatividad');await page.getByRole('button',{name:'Agregar potencial',exact:true}).click()
+ await expect(page.locator('.gm-reading-areas')).toBeVisible();await capture('02-comprension-nivel1-real');await page.getByRole('button',{name:'Ajustar',exact:true}).click();await disclose(page,'.gm-agreement-adjust');await page.getByLabel('Agregar uno con mis palabras').fill('Dar lugar a mi creatividad');await page.getByRole('button',{name:'Agregar potencial',exact:true}).click()
  const earlyPotential=page.locator('.gm-potential').last()
  await earlyPotential.getByLabel('Qué significa este potencial').fill('Crear sin apuro, con curiosidad')
  await earlyPotential.getByLabel('Para este Momento significa').fill('Pintar un momento posible y compartirlo')
  await capture('02-comprension-real')
- await page.getByRole('button',{name:'Cuidar esto como un Faro'}).click()
+ await disclose(page,'.gm-cultivate-choice');await page.getByRole('button',{name:'Cuidar esto como un Faro'}).click();await disclose(page,'.gm-faro-edit');await disclose(page,'.gm-agreement-adjust')
  await page.getByLabel('Orientación de mi Faro').fill('Aprender a crear y compartir con calma')
  const potential=page.locator('.gm-potential').last()
  await expect(potential.getByLabel('Potencial',{exact:true})).toHaveValue('Dar lugar a mi creatividad')
@@ -54,7 +55,7 @@ try{
  if(await page.getByRole('dialog',{name:'Memoria personal'}).isVisible())await page.getByRole('button',{name:'Activar memoria y guardar'}).click()
  await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible()
  await expect(page.getByText('todavía no tengo una relación de Fuente suficientemente revisada.',{exact:false}).first()).toBeVisible()
- await page.getByRole('button',{name:'Conservar esta composición en Santuario'}).click()
+ await capture('04-no-match-nivel1-real');await disclose(page,'.gm-compose-options');await page.getByRole('button',{name:'Conservar esta composición en Santuario'}).click()
  await expect(page.getByText('Composición conservada · versión 1')).toBeVisible()
  let entries=await rpc('lumen_s2_list_sanctuary');const conserved=entries.find(e=>e.composition);assert(conserved)
  assert.equal(conserved.composition.versions[0].agreement.original_expression,original)
@@ -65,7 +66,7 @@ try{
  await page.getByLabel('Buscar una posibilidad').fill(practice.title)
  const card=page.locator('.gm-context-card').filter({hasText:practice.title}).first()
  await card.getByRole('button',{name:'Elegir para mi Constelación'}).click()
- await page.getByRole('button',{name:'Conservar una nueva versión'}).click()
+ await disclose(page,'.gm-compose-options');await page.getByRole('button',{name:'Conservar una nueva versión'}).click()
  await expect(page.getByText('Composición conservada · versión 2')).toBeVisible();await capture('05-enriquecida-real')
  entries=await rpc('lumen_s2_list_sanctuary');const version2=entries.find(e=>e.entry_id===conserved.entry_id);assert.equal(version2.composition.versions.length,2);assert.equal(version2.composition.versions[1].items[0].help_id,practice.help_id)
  await page.locator('.gm-context-card').filter({hasText:practice.title}).getByRole('button').first().click()
@@ -73,7 +74,7 @@ try{
  for(let i=0;i<20&&page.url().includes('/vivir');i++){
   const next=page.getByRole('button',{name:'Seguir',exact:true});if(await next.isVisible())await next.click();else{const done=page.getByRole('button',{name:/Marcar como realizada|Terminar|Volver a LUMEN|Volver después|Finalizar/}).first();if(await done.isVisible())await done.click();else{await page.getByRole('button',{name:'Salir cuando quieras'}).click();break}}
  }
- if(!page.url().includes('/retorno')){await page.goto(process.env.CF_TEST_URL||'http://localhost:5183/');const resume=page.getByRole('button',{name:new RegExp('Revisar lo que viví')});await resume.click()}
+ await expect(page.getByRole('heading',{name:'Terminaste.'})).toBeVisible();await capture('07-terminada-sin-feedback-real');await expect(page.getByRole('button',{name:'Me ayudó',exact:true})).toHaveCount(0);await disclose(page,'.gm-finished > details');await disclose(page,'.gm-finished .gm-return-save');await page.getByRole('checkbox',{name:'Conservar este recurso en mi Santuario'}).check();await page.getByRole('button',{name:'Conservar en mi Santuario'}).click();await expect(page.getByText('Conservado en tu Santuario y verificado.',{exact:false})).toBeVisible();assert.equal((await rpc('lumen_living_map_snapshot')).realization.length,0,'saving must not imply feedback');await capture('07-guardar-sin-feedback-real');await page.getByRole('button',{name:'Contarle a LUMEN cómo me fue'}).click()
  await page.getByRole('button',{name:'Me ayudó',exact:true}).click();await page.getByRole('button',{name:'Listo',exact:true}).click();await expect(page.getByText('Tu señal quedó registrada.')).toBeVisible()
  await capture('07-retorno-real')
  await page.getByText('¿Quiero volver a practicarlo?',{exact:true}).click()
@@ -81,12 +82,19 @@ try{
  await page.getByRole('button',{name:'Acordar mi práctica',exact:true}).click();await expect(page.getByText('Quedó acordado.',{exact:false})).toBeVisible();await capture('08-ritmo-consentido-real')
  const practices=await rpc('lumen_recurring_practice_snapshot');assert(practices.some(p=>p.help_id===practice.help_id))
  await page.getByRole('button',{name:'Abrir mi Santuario',exact:true}).click()
- await page.getByText('Aprender a crear y compartir con calma',{exact:true}).first().click();await page.getByRole('button',{name:'Recuperar mi composición'}).click()
- await expect(page.getByText('Composición conservada · versión 2')).toBeVisible();await capture('09-recuperacion-real')
+ await page.getByRole('button',{name:'Constelaciones conservadas',exact:true}).click();await page.getByText('Aprender a crear y compartir con calma',{exact:true}).first().click();await capture('09-santuario-composicion-viva-real');await page.getByRole('button',{name:'Recuperar mi composición'}).click()
+ await disclose(page,'.gm-compose-options');await expect(page.getByText('Composición conservada · versión 2')).toBeVisible();await capture('09-recuperacion-real')
  await page.getByText('Versiones que conservé',{exact:true}).click();await page.getByRole('button',{name:'Recuperar versión 1',exact:true}).click()
  await expect(page.getByText('Composición conservada · versión 3')).toBeVisible();await expect(page.locator('.gm-context-card')).toHaveCount(0)
  await capture('10-restauracion-sin-perdida-real')
- for(const label of ['Mi Vida','Explorar','Tejido','Santuario']){await page.goto((process.env.CF_TEST_URL||'http://localhost:5183/').replace(/\?.*$/,'')+({'Mi Vida':'mi-vida','Explorar':'explorar','Tejido':'tejido','Santuario':'santuario'}[label]));await expect(page.getByRole('button',{name:'Cuenta',exact:true})).toBeEnabled();await expect(page.locator('.gm-nav')).toBeVisible();if(label==='Mi Vida'){const ib=await page.locator('.gm-map-hero img').boundingBox(),hb=await page.locator('.gm-map-hero h1').boundingBox();assert(ib&&hb&&hb.y>=ib.y&&hb.y+hb.height<=ib.y+ib.height,'Mi Vida title must be over the image')};await capture('puerta-'+label.replace(' ','-'))}
+ for(const label of ['Mi Vida','Explorar','Tejido','Santuario']){await page.goto((process.env.CF_TEST_URL||'http://localhost:5183/').replace(/\?.*$/,'')+({'Mi Vida':'mi-vida','Explorar':'explorar','Tejido':'tejido','Santuario':'santuario'}[label]));await expect(page.getByRole('button',{name:'Cuenta',exact:true})).toBeEnabled();await expect(page.locator('.gm-nav')).toBeVisible();if(label==='Mi Vida'){await expect(page.locator('.gm-area-grid button').first()).toBeVisible();const ib=await page.locator('.gm-map-hero img').boundingBox(),hb=await page.locator('.gm-map-hero h1').boundingBox();assert(ib&&hb&&hb.y>=ib.y&&hb.y+hb.height<=ib.y+ib.height,'Mi Vida title must be over the image')};await capture('puerta-'+label.replace(' ','-'));await page.locator('.gm-content').evaluate(el=>{el.scrollTop=el.scrollHeight});await page.screenshot({path:out+'/puerta-'+label.replace(' ','-')+'-inferior.png'});results.push('puerta-'+label.replace(' ','-')+'-inferior')}
+ const base=(process.env.CF_TEST_URL||'http://localhost:5183/').replace(/\?.*$/,'')
+ await page.goto(base+'mi-vida');await expect(page.getByRole('button',{name:'Cuenta',exact:true})).toBeEnabled();await expect(page.locator('.gm-area-grid button').first()).toBeVisible();await page.locator('.gm-area-grid button').first().click();await capture('area-mi-vida-real')
+ await page.goto(base+'explorar');for(const mode of ['Por potencial','Por área','Por momento','Libre']){await page.getByRole('button',{name:mode,exact:true}).click();await capture('explorar-'+mode.replaceAll(' ','-')+'-real')}
+ for(const kind of ['Piezas guardadas','Experiencias vividas','Reflexiones','Constelaciones conservadas','Lo propio']){await page.goto(base+'santuario');await expect(page.getByRole('button',{name:'Cuenta',exact:true})).toBeEnabled();await expect(page.getByRole('button',{name:kind,exact:true})).toBeVisible();await page.getByRole('button',{name:kind,exact:true}).click();await capture('santuario-'+kind.replaceAll(' ','-')+'-real')}
+ await page.goto(base+'mi-vida');await expect(page.getByRole('button',{name:'Cuenta',exact:true})).toBeEnabled();await page.getByRole('button',{name:'LUMI: opciones y ayuda de este espacio'}).click();await capture('lumi-contextual-real');await page.getByRole('button',{name:'Hablar con LUMI',exact:true}).click();await capture('lumi-conversacion-invocada-real');await page.getByRole('button',{name:'Cerrar LUMI'}).click()
+ await page.goto(base+'ajustes');await expect(page.getByLabel('Atmósfera',{exact:true})).toBeVisible();await capture('ajustes-real')
+ await page.goto(base+'aprender');await expect(page.getByRole('switch')).toBeVisible();await capture('aprendizaje-real')
  const coreErrorCount=errors.length
  const media=[]
  if(process.env.CF_MEDIA){

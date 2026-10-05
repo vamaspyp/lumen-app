@@ -1,5 +1,5 @@
 /* A63 semantic controls. Presentation belongs to premium-vnext.css, without successive layout overrides. */
-.gm-agreement{border:1px solid var(--gm-line);border-radius:16px;padding:18px;background:var(--gm-card);margin:20px 0}
+.gm-agreement{padding:0;border:0;margin:28px 0;background:transparent}
 .gm-agreement h2{margin:5px 0 10px}
 .gm-kicker{font-size:12px;letter-spacing:.06em;color:var(--gm-muted)}
 .gm-agreement>p{font-size:14px}

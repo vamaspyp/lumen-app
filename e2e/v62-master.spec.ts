@@ -1,13 +1,14 @@
+import {editFaro} from './experience-actions'
 import {test,expect} from './fixtures'
 
 test('V62 home follows master; transient scenes return to their actual predecessor',async({page})=>{
  await page.route('**/rest/v1/rpc/**',r=>r.fulfill({json:r.request().url().endsWith('lumen_source_discover')?[]:{areas:[]}}))
- await page.goto('/');await expect(page.getByRole('heading',{name:'Inicio'})).toBeVisible()
- await expect(page.getByRole('button',{name:'Contar'})).toContainText('Contar')
+ await page.goto('/');await expect(page.getByRole('heading',{name:'¿Qué está pasando ahora?'})).toBeVisible()
+ await expect(page.getByRole('button',{name:'Continuar'})).toContainText('Continuar')
  await expect(page.getByLabel('¿Qué está vivo hoy?')).toHaveCSS('background-color','rgb(255, 253, 249)');await expect(page.locator('.gm-top b')).toHaveCSS('color','rgb(22, 38, 75)')
  await page.screenshot({path:`test-results/v62-home-light-${test.info().project.name}.png`,fullPage:true})
  await page.emulateMedia({colorScheme:'dark'});await expect(page.locator('.gm-top b')).toHaveCSS('color','rgb(240, 244, 252)');await page.screenshot({path:`test-results/v62-home-dark-${test.info().project.name}.png`,fullPage:true})
- await page.emulateMedia({colorScheme:'light'});await page.locator('.gm-nav').getByText('Mi Vida',{exact:true}).click();await page.getByRole('button',{name:'Ver mi Faro'}).click();await page.getByRole('button',{name:'Volver',exact:true}).click();await expect(page.getByRole('heading',{name:'Mi Vida',exact:true})).toBeVisible()
+ await page.emulateMedia({colorScheme:'light'});await page.locator('.gm-nav').getByText('Mi Vida',{exact:true}).click();await page.getByRole('button',{name:'Elegir un Faro'}).click();await editFaro(page);await page.getByRole('button',{name:'Volver',exact:true}).click();await expect(page.getByRole('heading',{name:'Mi Vida',exact:true})).toBeVisible()
 })
 
 test('V62 learning is opt-in and private data is explicitly excluded',async({page})=>{

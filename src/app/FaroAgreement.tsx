@@ -3,13 +3,13 @@ import { getFaroAgreement, proposeFaroPotentials, validateFaroAgreement, type Fa
 
 export type FaroReviewDraft={trajectoryId:string|null;agreement:Agreement|null;items:FaroPotential[];areaKeys:string[];editing:boolean;proposalFor:string}
 type Props = {
- momentReview?:boolean;initialDraft?:FaroReviewDraft|null;onDraftChange?:(draft:FaroReviewDraft)=>void;
+ adjusting?:boolean;momentReview?:boolean;initialDraft?:FaroReviewDraft|null;onDraftChange?:(draft:FaroReviewDraft)=>void;
  trajectoryId: string|null; faro: string; expression: string; areas: Array<{key:string;label:string}>; initialAreaKeys?: string[]
  onConstellation: (a:Agreement)=>void; onChanged?:()=>void; onExplore:()=>void; onPointHelp:()=>void
  draft?:boolean; pending?:boolean; onConfirmDraft?:(items:FaroPotential[],areas:string[],expected:Agreement|null)=>void
 }
 const keyOf=(i:FaroPotential)=>i.concept_id||i.label.trim().toLocaleLowerCase()
-export function FaroAgreement({trajectoryId,faro,expression,areas,initialAreaKeys=[],onConstellation,onChanged,onExplore,onPointHelp,draft=false,onConfirmDraft,pending=false,initialDraft,onDraftChange,momentReview=false}:Props) {
+export function FaroAgreement({adjusting=false,trajectoryId,faro,expression,areas,initialAreaKeys=[],onConstellation,onChanged,onExplore,onPointHelp,draft=false,onConfirmDraft,pending=false,initialDraft,onDraftChange,momentReview=false}:Props) {
  const [visibleAreas,setVisibleAreas]=useState(initialAreaKeys)
  const initial=useRef({expression,faro,initialAreaKeys,draft:initialDraft})
  const [agreement,setAgreement]=useState<Agreement|null>(initialDraft?.agreement||null)
@@ -47,12 +47,14 @@ export function FaroAgreement({trajectoryId,faro,expression,areas,initialAreaKey
  }
  const chosen=items.filter(i=>!i.proposed)
  const active=chosen.filter(i=>i.status!=='withdrawn')
- const confirm=async()=>{
-  if(draft&&onConfirmDraft){onConfirmDraft(chosen,areaKeys,agreement);return}
+ const confirm=async(acceptReading=false)=>{
+  const confirmed=acceptReading?items.filter(i=>i.status!=='withdrawn').map(i=>({...i,proposed:false,status:i.proposed?'accepted' as const:i.status})):chosen
+  if(acceptReading){setItems(confirmed);setEditing(false)}
+  if(draft&&onConfirmDraft){onConfirmDraft(confirmed,areaKeys,agreement);return}
   if(!trajectoryId)return
   setBusy(true);setError('')
   try{
-   const a=await validateFaroAgreement(trajectoryId,faro,chosen.map(({proposed,reason,source_status,...item})=>{void proposed;void reason;void source_status;return item}),areaKeys,agreement?.version||0)
+   const a=await validateFaroAgreement(trajectoryId,faro,confirmed.map(({proposed,reason,source_status,...item})=>{void proposed;void reason;void source_status;return item}),areaKeys,agreement?.version||0)
    const reread=await getFaroAgreement(trajectoryId)
    if(reread.version!==a.version||reread.state!=='validated')throw new Error('No pudimos verificar el acuerdo. Volvé a abrirlo.')
    setAgreement(reread);setItems(reread.items);setEditing(false);setMessage('Quedó confirmado. Podés revisarlo cuando quieras.');onChanged?.()
@@ -64,11 +66,15 @@ export function FaroAgreement({trajectoryId,faro,expression,areas,initialAreaKey
  const add=()=>{if(!own.trim())return;setItems(xs=>[...xs,{identity_id:crypto.randomUUID(),concept_id:null,label:own.trim(),definition:'',contextual_meaning:'',origin:'person',status:'accepted'}]);setOwn('');setEditing(true)}
  return <section className="gm-agreement" aria-label={momentReview?"Potenciales de este Momento":"Acuerdo Faro y Potenciales"}>
   {!draft&&agreement?.original_expression&&<details><summary>Lo que dijiste</summary><blockquote>{agreement.original_expression}</blockquote></details>}
-  <div className="gm-kicker">Hipótesis revisables</div><h2>{momentReview?"Potenciales que podrías nutrir":"Lo que quiero nutrir"}</h2><p>{momentReview?"Aspectos de vos que podrían ayudarte en lo que contaste. Podés aceptar, cambiar, quitar o agregar; no necesitás crear un Faro.":"Aspectos que podés cultivar para este Faro. Aceptá, ajustá o quitá cada propuesta."}</p>
+  <h2>{momentReview?"Potenciales que podrías nutrir":"Lo que quiero nutrir"}</h2><p className="gm-sr-only">{momentReview?"Aspectos de vos que podrían ayudarte en lo que contaste. Podés aceptar, cambiar, quitar o agregar; no necesitás crear un Faro.":"Aspectos que podés cultivar para este Faro. Aceptá, ajustá o quitá cada propuesta."}</p>
   {!trajectoryId&&!draft?<p>Primero elegí y conservá tu Faro. Podés recibir una guía puntual sin hacerlo.</p>:!loaded?<p role="status">Leyendo tus palabras…</p>:agreement?.state==='without_memory'?<p>Activá la memoria si querés conservar este acuerdo. La guía puntual sigue disponible.</p>:<>
    {(agreement?.state==='stale'||(agreement&&agreement.faro_text!==faro))&&<p className="gm-notice">Tu Faro cambió. Revisá el acuerdo antes de componer nuevas posibilidades.</p>}
    {agreement?.version?<p className="gm-meta">Acuerdo · versión {agreement.version}</p>:null}
-   {editing?<>
+   {adjusting||editing||draft||momentReview?<>
+    <div className="gm-reading-areas"><small>Esto toca principalmente</small><p>{areaKeys.length?areaKeys.map(k=>areas.find(a=>a.key===k)?.label||k).join(' · '):'Podemos dejar el área abierta.'}</p></div>
+    <div className="gm-potential-readout">{items.filter(i=>i.status!=='withdrawn').map(i=><article key={i.identity_id}><h3>{i.label}</h3><p>{i.contextual_meaning||i.definition||'Podés poner su significado en tus palabras.'}</p></article>)}</div>
+    <button className="gm-primary" disabled={busy||!faro.trim()} onClick={()=>void confirm(true)}>{busy?'Confirmando…':momentReview?'Está bien':'Confirmar y componer'}</button>
+    <details className="gm-agreement-adjust" open={adjusting||undefined}><summary>Ajustar potenciales y área</summary>
     {areas.length>0&&<fieldset className="gm-review-areas"><legend>Áreas que toca · hipótesis revisables</legend><p>Podés quitar, sumar o dejar ninguna.</p><div className="gm-area-choice">{areas.filter(a=>visibleAreas.includes(a.key)).map(a=><label key={a.key}><input disabled={busy} type="checkbox" checked={areaKeys.includes(a.key)} onChange={e=>setAreaKeys(xs=>e.target.checked?[...xs,a.key]:xs.filter(x=>x!==a.key))}/>{a.label}</label>)}</div><details><summary>Revisar otros ámbitos</summary><div className="gm-area-choice">{areas.filter(a=>!visibleAreas.includes(a.key)).map(a=><label key={a.key}><input disabled={busy} type="checkbox" checked={areaKeys.includes(a.key)} onChange={e=>setAreaKeys(xs=>e.target.checked?[...xs,a.key]:xs.filter(k=>k!==a.key))}/>{a.label}</label>)}</div></details></fieldset>}
     {proposalFor&&proposalFor!==faro&&<p className="gm-notice">Cambiaste tu Faro. Podés pedir una nueva lectura; lo que ya aceptaste se conserva.</p>}
     <button disabled={busy||!faro.trim()} className="gm-secondary" onClick={()=>void propose()}>Proponer o regenerar desde mis palabras</button>
@@ -87,7 +93,7 @@ export function FaroAgreement({trajectoryId,faro,expression,areas,initialAreaKey
     {items.some(i=>i.proposed)&&<p className="gm-meta">Las propuestas sin aceptar quedan fuera del acuerdo.</p>}
     {!momentReview&&<button disabled={busy||active.some(i=>!i.label.trim())||!faro.trim()} className="gm-primary" onClick={()=>void confirm()}>{busy?'Confirmando…':active.length?'Confirmar lo que quiero nutrir':'Seguir sin potenciales'}</button>}
     {agreement?.state==='validated'&&<button className="gm-secondary" disabled={busy} onClick={()=>{setItems(agreement.items);setAreaKeys(agreement.area_keys||[]);setEditing(false)}}>Cancelar cambios</button>}
-   </>:<>
+   </details></>:<>
     {agreement?.area_keys?.length?<p className="gm-meta">Áreas acordadas: {agreement.area_keys.map(k=>areas.find(a=>a.key===k)?.label||k).join(' · ')}</p>:null}
     <div>{active.map(i=><article className="gm-potential" key={i.identity_id}><h3>{i.label}</h3>{i.contextual_meaning&&<p>{i.contextual_meaning}</p>}{i.definition&&<details><summary>Qué significa</summary><p>{i.definition}</p></details>}</article>)}</div>
     <button className="gm-secondary" onClick={()=>setEditing(true)}>Revisar este acuerdo</button><button className="gm-primary" disabled={busy||agreement?.state!=='validated'} onClick={()=>agreement&&onConstellation(agreement)}>Ver mi Constelación</button>
@@ -95,6 +101,6 @@ export function FaroAgreement({trajectoryId,faro,expression,areas,initialAreaKey
    {!!agreement?.history?.length&&<details><summary>Cómo fue cambiando lo que acordamos</summary>{agreement.history.map(h=><div key={h.version}><h3>Versión {h.version}</h3><p>{h.faro_text}</p>{h.items.map((i,n)=><p key={n}>{i.label}{i.status==='withdrawn'?' · retirado':''}</p>)}</div>)}</details>}
   </>}
   {message&&<p role="status">{message}</p>}{error&&<p className="gm-error" role="alert">{error}</p>}
-  {!momentReview&&<div className="gm-flow-alternatives"><button onClick={onPointHelp}>Prefiero una guía puntual</button><button onClick={onExplore}>Explorar por mi cuenta</button></div>}
+  {!momentReview&&<div className="gm-flow-alternatives"><details><summary>Otros caminos</summary><button onClick={onPointHelp}>Prefiero una guía puntual</button><button onClick={onExplore}>Explorar por mi cuenta</button></details></div>}
  </section>
 }

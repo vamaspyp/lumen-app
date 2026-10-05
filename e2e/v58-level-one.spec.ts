@@ -19,7 +19,7 @@ test('V58 RV04: the four entries preserve one Source, area navigation and recove
  await expect(page.locator('.gm-context-card')).toHaveCount(2)
  await page.locator('.gm-nav').getByRole('button',{name:'Mi Vida',exact:true}).click()
  await page.locator('.gm-area-grid').getByRole('button',{name:'Aprendizaje',exact:true}).click()
- await expect(page.getByRole('combobox',{name:'Área de la vida',exact:true})).toHaveValue('learning')
+ await expect(page.getByRole('heading',{name:'Aprendizaje',exact:true})).toBeVisible();await page.getByRole('button',{name:'Posibilidades para esta área'}).click();await expect(page.getByRole('combobox',{name:'Área de la vida',exact:true})).toHaveValue('learning')
  await expect(page.locator('.gm-context-card')).toHaveCount(1)
  await expect(page.getByText('Otra perspectiva',{exact:true})).toBeVisible()
 })

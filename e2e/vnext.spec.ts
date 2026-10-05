@@ -1,11 +1,12 @@
+import {editFaro} from './experience-actions'
 import {test,expect} from './fixtures'
 
 test.describe('LUMEN PREMIUM V58 · public doors',()=>{
  test.beforeEach(async({page})=>{await page.goto('/')})
  test('present Momento protects personal persistence behind identity',async({page})=>{
-  await expect(page.getByRole('heading',{name:'Inicio'})).toBeVisible()
+  await expect(page.getByRole('heading',{name:'¿Qué está pasando ahora?'})).toBeVisible()
   await page.getByLabel('¿Qué está vivo hoy?').fill('Quiero descansar y entender qué necesito hoy.')
-  await page.getByRole('button',{name:'Contar'}).click()
+  await page.getByRole('button',{name:'Continuar'}).click()
   await expect(page.getByRole('dialog',{name:'Entrar a LUMEN'})).toBeVisible()
  })
  test('five doors are distinct and Santuario is reachable',async({page})=>{
@@ -28,10 +29,9 @@ test.describe('LUMEN PREMIUM V58 · public doors',()=>{
  })
  test('Faro is editable and the contextual boundary is honest',async({page})=>{
   await page.locator('.gm-nav').getByText('Mi Vida').click()
-  await page.getByRole('button',{name:'Ver mi Faro'}).click()
-  await page.getByRole('button',{name:/^Revisar lo que quiero nutrir/}).click()
-  await expect(page.getByText(/Primero elegí y conservá tu Faro/)).toBeVisible()
-  await page.getByRole('button',{name:'Revisar y ajustar'}).click()
+  await page.getByRole('button',{name:'Elegir un Faro'}).click();await editFaro(page)
+  await expect(page.getByRole('heading',{name:'Mi Faro'})).toBeVisible()
+  if(await page.getByRole('button',{name:'Revisar y ajustar'}).isVisible())await page.getByRole('button',{name:'Revisar y ajustar'}).click()
   await page.getByLabel('Orientación de mi Faro').fill('Cuidar mi descanso')
   await page.getByRole('button',{name:'Guardar el Faro y seguir después'}).click()
   await expect(page.getByRole('dialog',{name:'Entrar a LUMEN'})).toBeVisible()

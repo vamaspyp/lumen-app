@@ -1,17 +1,18 @@
+import {disclose,adjustReading,chooseFaro} from './experience-actions'
 import {test,expect} from './fixtures'
 import {personalBackend} from './support/personal-backend'
 test('Listening returns editable potentials before choosing a Faro and preserves them into its agreement',async({page})=>{
  const b=await personalBackend(page,{proposals:true});await page.goto('/')
  const words='Quiero escuchar a mis hijos y cuidar nuestro vínculo.'
- await page.getByLabel('¿Qué está vivo hoy?').fill(words);await page.getByRole('button',{name:'Contar',exact:true}).click()
+ await page.getByLabel('¿Qué está vivo hoy?').fill(words);await page.getByRole('button',{name:'Continuar',exact:true}).click()
  await expect(page.getByRole('heading',{name:'¿Te representa?'})).toBeVisible()
  await expect(page.getByRole('heading',{name:'Potenciales que podrías nutrir'})).toBeVisible()
- await page.getByRole('button',{name:'Aceptar Escuchar con presencia'}).click()
+ await disclose(page,'.gm-agreement-adjust');await page.getByRole('button',{name:'Aceptar Escuchar con presencia'}).click()
  await page.getByText('Significado y contexto de Escuchar con presencia',{exact:true}).click()
  await page.getByLabel('Para este Momento significa').fill('Escuchar sin el teléfono')
- await page.getByLabel('Dirección posible').fill('Cuidar la conversación en casa')
+ await adjustReading(page);await page.getByLabel('Dirección posible').fill('Cuidar la conversación en casa')
  expect(b.calls).not.toContain('lumen_faro_review_confirm')
- await page.getByRole('button',{name:'Cuidar esto como un Faro'}).click()
+ await chooseFaro(page)
  await expect(page.getByLabel('Orientación de mi Faro')).toHaveValue('Cuidar la conversación en casa')
  await page.getByText('Significado y contexto de Escuchar con presencia',{exact:true}).click()
  await expect(page.getByLabel('Para este Faro significa')).toHaveValue('Escuchar sin el teléfono')
@@ -23,8 +24,8 @@ test('Listening returns editable potentials before choosing a Faro and preserves
 test('Punctual review sends only accepted potentials and creates no Faro',async({page})=>{
  const b=await personalBackend(page,{proposals:true});const reviews:Array<Record<string,unknown>>=[]
  await page.route('**/rest/v1/rpc/lumen_s1_review_moment',async r=>{reviews.push(r.request().postDataJSON());await r.fulfill({json:{state:'reviewed'}})})
- await page.goto('/');await page.getByLabel('¿Qué está vivo hoy?').fill('Quiero escuchar mejor.');await page.getByRole('button',{name:'Contar',exact:true}).click()
- await page.getByRole('button',{name:'Aceptar Escuchar con presencia'}).click();await page.getByRole('button',{name:'Ver qué puede ayudar',exact:true}).click()
+ await page.goto('/');await page.getByLabel('¿Qué está vivo hoy?').fill('Quiero escuchar mejor.');await page.getByRole('button',{name:'Continuar',exact:true}).click()
+ await disclose(page,'.gm-agreement-adjust');await page.getByRole('button',{name:'Aceptar Escuchar con presencia'}).click();await page.getByRole('button',{name:'Está bien',exact:true}).click()
  await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible()
  expect(reviews[0].p_potential_items).toMatchObject([{label:'Escuchar con presencia'}]);expect(b.calls).not.toContain('lumen_faro_review_confirm')
 })

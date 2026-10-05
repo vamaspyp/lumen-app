@@ -1,3 +1,4 @@
+import {offerReturn} from './experience-actions'
 import {test,expect,type Page} from './fixtures'
 
 // Browser contract regression. Real database grants and live RPC health are checked separately.
@@ -45,9 +46,9 @@ async function simulatedLife(page:Page){
 async function reachConstellation(page:Page){
  await page.goto('/')
  await page.getByLabel('¿Qué está vivo hoy?').fill('Me siento saturado y quiero bajar un cambio.')
- await page.getByRole('button',{name:'Contar'}).click()
+ await page.getByRole('button',{name:'Continuar'}).click()
  await expect(page.getByRole('heading',{name:'¿Te representa?'})).toBeVisible()
- await page.getByRole('button',{name:'Ver qué puede ayudar'}).click()
+ await page.getByRole('button',{name:'Está bien'}).click()
  await expect(page.getByRole('heading',{name:'Tu Constelación'})).toBeVisible()
 }
 
@@ -59,7 +60,7 @@ test('V58 remembers a voluntary return and puts a relevant own resource before n
  await expect(page.getByText(/Lo reconociste como propio/)).toHaveCount(0)
  await page.getByText('Pausa que puedo recuperar',{exact:true}).click()
  await page.getByRole('button',{name:'Marcar como realizada'}).click()
- await page.getByRole('button',{name:'Me ayudó',exact:true}).click()
+ await offerReturn(page);await page.getByRole('button',{name:'Me ayudó',exact:true}).click()
  await page.getByRole('button',{name:'Listo'}).click()
  await page.getByText('Conservar algo de esta experiencia',{exact:true}).click()
  await page.getByRole('checkbox',{name:'Conservar este recurso en mi Santuario'}).check()
@@ -68,13 +69,13 @@ test('V58 remembers a voluntary return and puts a relevant own resource before n
  await expect(page.getByRole('heading',{name:'Mi Santuario'})).toBeVisible()
  expect(life.returns).toHaveLength(1)
  expect(life.entries).toHaveLength(1)
- await page.locator('.gm-resources').getByRole('button',{name:/Pausa que puedo recuperar/}).click()
+ await page.getByRole('button',{name:'Piezas guardadas',exact:true}).click();await page.locator('.gm-resources').getByRole('button',{name:/Pausa que puedo recuperar/}).click()
  await expect(page.getByRole('heading',{name:'Pausa que puedo recuperar'})).toBeVisible()
  await reachConstellation(page)
  await expect(page.getByText(/Elegiste conservarlo/)).toBeVisible()
  await page.getByText('Pausa que puedo recuperar',{exact:true}).click()
  await page.getByRole('button',{name:'Marcar como realizada'}).click()
- await page.getByRole('button',{name:'Me ayudó',exact:true}).click()
+ await offerReturn(page);await page.getByRole('button',{name:'Me ayudó',exact:true}).click()
  await page.getByRole('button',{name:'Listo'}).click()
  await page.getByText('Reconocerlo como propio',{exact:true}).click()
  await page.getByRole('button',{name:'Reconozco este recurso como propio'}).click()
@@ -87,7 +88,7 @@ test('V58 remembers a voluntary return and puts a relevant own resource before n
  await expect(cards.first()).toContainText('Lo reconociste como propio')
  await page.getByRole('button',{name:'Dejarlo aquí',exact:true}).click()
  await page.locator('.gm-nav').getByText('Santuario').click()
- await page.getByText('Recursos que reconocí útiles').click()
+ await page.getByRole('button',{name:'Lo propio',exact:true}).click();await page.getByText('Recursos que reconocí útiles').click()
  await page.getByRole('button',{name:'Dejar de reconocer como propio'}).click()
  await expect(page.getByRole('button',{name:'Dejar de reconocer como propio'})).toHaveCount(0)
  await page.reload()
