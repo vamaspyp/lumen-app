@@ -39,3 +39,19 @@ test('Explore selection maintains contrast while changing entries',async({page})
   expect(ax.violations).toEqual([])
  }
 })
+
+// A saved resource and a lived record coexist; opening lived history must not evaluate state before initialization.
+test('Santuario opens all five sections with both saved and lived records',async({page})=>{
+ await personalBackend(page)
+ await page.route('**/rest/v1/rpc/lumen_s2_list_sanctuary',r=>r.fulfill({json:[{entry_id:'saved-test',entry_kind:'treasure',title:'Recurso conservado de contrato',content:'Conservado por elección.',source_help_id:'lived-test'}]}))
+ await page.route('**/rest/v1/rpc/lumen_living_map_snapshot',r=>r.fulfill({json:{memory_allowed:true,direction:[],potential:[],conditions:[],realization:[{outcome_id:'outcome-test',help_id:'lived-test',effect:'helped',applied:true}]}}))
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message))
+ await page.goto('/santuario');await expect(page.getByRole('button',{name:'Cuenta',exact:true})).toBeEnabled()
+ for(const section of ['Piezas guardadas','Experiencias vividas','Reflexiones','Constelaciones conservadas','Lo propio']){
+  await page.getByRole('button',{name:section,exact:true}).click()
+  await expect(page.getByRole('heading',{name:section,exact:true})).toBeVisible()
+  if(section==='Experiencias vividas')await expect(page.locator('.gm-lived-entries .gm-life-row')).toHaveCount(1)
+  await page.getByRole('button',{name:'Volver a mi Santuario',exact:true}).click()
+ }
+ expect(errors).toEqual([])
+})

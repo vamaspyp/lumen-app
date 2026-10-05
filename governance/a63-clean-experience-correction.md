@@ -23,7 +23,7 @@ Corrección sobre PR31 y el backend Greenfield real. Base: `26b5f5d2f93def24406d
 | RV-07 / CF-02,06 | Expresión → lectura provisional → ajuste → composición → Vivir; no stepper rígido; terminar ofrece volver; señal/guardar/continuar separados | Regresiones comprensión/aceptación/regeneración; prueba sin feedback al terminar; capturas `02`–`07` |
 | RV-08 / CF-05,07,08 | Edición/reordenamiento/expansión/versiones/recurrencia/privacidad sólo en segundo nivel; memoria, feedback y propio no se infieren entre sí | E2E persistencia/exclusiones/consentimientos; SQL CAS, pausa/revocación/refutación/rollback; `08`–`10`, ajustes/aprendizaje |
 | RV-09 | Serif/navy/crema/azul y fotos existentes; foco/espacio/disclosures; sin voz ficticia ni autoplay; responsive; estados honestos | Capturas reales 390×844 y 1440×900; axe A/AA; antes/después contra única referencia |
-| RV-10 / CF-09–10 | Pantalla → CTA → estado → contrato → DB → regresión → captura; exacto SHA/preview/CI en manifest de entrega | 89 unidades; 90 regresiones; build/lint/custodia; seis SQL transaccionales; Auth/RPC reales sin mocks personales |
+| RV-10 / CF-09–10 | Pantalla → CTA → estado → contrato → DB → regresión → captura; exacto SHA/preview/CI en manifest de entrega | 89 unidades; 92 regresiones; build/lint/custodia; seis SQL transaccionales; Auth/RPC reales sin mocks personales |
 
 ## Pantallas y deltas comprobados
 

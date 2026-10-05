@@ -26,7 +26,7 @@ try{
  const context=await browser.newContext({viewport:process.env.CF_MOBILE?{width:390,height:844}:{width:1440,height:900},ignoreHTTPSErrors:true});const page=await context.newPage()
  await page.route(/https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com)\//,r=>r.abort())
  await page.addInitScript(session=>localStorage.setItem('sb-vbuixagaguasejputubp-auth-token',JSON.stringify(session)),auth.session)
- const errors=[];page.on('pageerror',e=>errors.push(e.message))
+ const errors=[];page.on('pageerror',e=>{errors.push(e.message);console.log(JSON.stringify({page_error:e.message}))})
  const accessibility=[]
  const capture=async(name)=>{if(await page.getByRole('button',{name:'Cuenta',exact:true}).count())await expect(page.getByRole('button',{name:'Cuenta',exact:true})).toBeEnabled();for(const label of ['Leyendo tus palabras…','Leyendo tus preferencias…','Abriendo Fuente…'])await expect(page.getByText(label,{exact:true})).toHaveCount(0);const ax=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();accessibility.push({scene:name,violations:ax.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)}))});await page.locator('.gm-content').evaluate(el=>{el.scrollTop=0});await page.screenshot({path:out+'/'+name+'.png',fullPage:true});results.push(name)}
  const {expect:baseExpect}=await import('@playwright/test');const expect=baseExpect.configure({timeout:30000})

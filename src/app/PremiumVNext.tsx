@@ -117,7 +117,6 @@ export default function PremiumVNext(){
  const [composeKind,setComposeKind]=useState<'note'|'reflection'>('note')
  const [sanctuaryNote,setSanctuaryNote]=useState('')
  const typeBucket=(item:SourceItem)=>{const family=premiumFamily(item);if(family==='audio_practice'||family==='contemplative_reading_audio')return 'Audios';if(family==='classic_reading'||family==='illustrated_guide'||family==='health_reference')return 'Lecturas';const v=item.help_type.toLowerCase();if(v.includes('audio'))return 'Audios';if(v.includes('read')||v.includes('text')||v.includes('guide')||v.includes('article'))return 'Lecturas';if(v.includes('practice')||v.includes('exercise')||v.includes('ritual')||v.includes('meditation'))return 'Prácticas';return 'Experiencias'}
- const visibleSanctuary=sanctuaryEntries.filter(e=>sanctuarySection==='Constelaciones conservadas'?Boolean(e.composition):sanctuarySection==='Reflexiones'?e.entry_kind==='reflection'||e.entry_kind==='note':sanctuarySection==='Lo propio'?continuityResources.some(r=>r.help_id===e.source_help_id&&r.user_confirmed):sanctuarySection==='Experiencias vividas'?Boolean(e.source_help_id&&lifeMap?.realization.some(r=>r.help_id===e.source_help_id)):e.entry_kind==='treasure'&&!e.composition)
 
  const [busy,setBusy]=useState(false)
  const [authenticated,setAuthenticated]=useState(false)
@@ -129,6 +128,7 @@ export default function PremiumVNext(){
  const [pendingAction,setPendingAction]=useState<null|(()=>Promise<void>)>(null)
  const [error,setError]=useState('')
  const [lifeMap,setLifeMap]=useState<LifeMapSnapshot|null>(null)
+ const visibleSanctuary=sanctuaryEntries.filter(e=>sanctuarySection==='Constelaciones conservadas'?Boolean(e.composition):sanctuarySection==='Reflexiones'?e.entry_kind==='reflection'||e.entry_kind==='note':sanctuarySection==='Lo propio'?continuityResources.some(r=>r.help_id===e.source_help_id&&r.user_confirmed):sanctuarySection==='Experiencias vividas'?Boolean(e.source_help_id&&lifeMap?.realization.some(r=>r.help_id===e.source_help_id)):e.entry_kind==='treasure'&&!e.composition)
  const [memoryOpen,setMemoryOpen]=useState(false)
  const [memoryAction,setMemoryAction]=useState<null|(()=>Promise<void>)>(null)
  const draftConfirmRequest=useRef(crypto.randomUUID())
