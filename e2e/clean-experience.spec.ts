@@ -16,6 +16,8 @@ test('Finishing offers return before feedback and keeping remains an independent
  const b=await personalBackend(page);await page.route('**/rest/v1/rpc/lumen_s1_moment_constellation',r=>r.fulfill({json:{items:[{help_id:'regression-practice',help_type:'practice',detail:{renderer_family:'practice'},title:'Práctica de contrato',summary:'Sólo un testigo de regresión.',content:{steps:['Un gesto.']},provider:{name:'Fixture de contrato'},duration_minutes:2}]}}));await page.goto('/')
  await page.getByLabel('¿Qué está vivo hoy?').fill('Quiero cuidar mi descanso.')
  await page.getByRole('button',{name:'Continuar',exact:true}).click()
+ const area=await page.locator('.gm-reading-areas').boundingBox(),potentials=await page.getByRole('heading',{name:'Potenciales que podrías nutrir',exact:true}).boundingBox()
+ expect(area&&potentials&&area.y+area.height<=potentials.y).toBeTruthy()
  await page.getByRole('button',{name:'Está bien',exact:true}).click()
  await page.locator('.gm-context-card').first().getByRole('button').first().click()
  await page.getByRole('button',{name:'Marcar como realizada'}).click()

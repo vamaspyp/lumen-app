@@ -64,14 +64,16 @@ export function FaroAgreement({adjusting=false,trajectoryId,faro,expression,area
  const change=(id:string,field:'label'|'definition'|'contextual_meaning',value:string)=>setItems(xs=>xs.map(x=>x.identity_id===id?{...x,[field]:value,...(field==='label'||field==='definition'?{concept_id:null,origin:'person' as const,...(field==='label'?{definition:''}:{}),source_status:null}:{}),status:'reformulated',proposed:false}:x))
  const choose=(id:string,status:'accepted'|'withdrawn')=>setItems(xs=>xs.map(x=>x.identity_id===id?{...x,status,proposed:false}:x))
  const add=()=>{if(!own.trim())return;setItems(xs=>[...xs,{identity_id:crypto.randomUUID(),concept_id:null,label:own.trim(),definition:'',contextual_meaning:'',origin:'person',status:'accepted'}]);setOwn('');setEditing(true)}
+ const showReading=Boolean(adjusting||editing||draft||momentReview)
  return <section className="gm-agreement" aria-label={momentReview?"Potenciales de este Momento":"Acuerdo Faro y Potenciales"}>
   {!draft&&agreement?.original_expression&&<details><summary>Lo que dijiste</summary><blockquote>{agreement.original_expression}</blockquote></details>}
-  <h2>{momentReview?"Potenciales que podrías nutrir":"Lo que quiero nutrir"}</h2><p className="gm-sr-only">{momentReview?"Aspectos de vos que podrían ayudarte en lo que contaste. Podés aceptar, cambiar, quitar o agregar; no necesitás crear un Faro.":"Aspectos que podés cultivar para este Faro. Aceptá, ajustá o quitá cada propuesta."}</p>
+  {!showReading&&<h2>{momentReview?"Potenciales que podrías nutrir":"Lo que quiero nutrir"}</h2>}<p className="gm-sr-only">{momentReview?"Aspectos de vos que podrían ayudarte en lo que contaste. Podés aceptar, cambiar, quitar o agregar; no necesitás crear un Faro.":"Aspectos que podés cultivar para este Faro. Aceptá, ajustá o quitá cada propuesta."}</p>
   {!trajectoryId&&!draft?<p>Primero elegí y conservá tu Faro. Podés recibir una guía puntual sin hacerlo.</p>:!loaded?<p role="status">Leyendo tus palabras…</p>:agreement?.state==='without_memory'?<p>Activá la memoria si querés conservar este acuerdo. La guía puntual sigue disponible.</p>:<>
    {(agreement?.state==='stale'||(agreement&&agreement.faro_text!==faro))&&<p className="gm-notice">Tu Faro cambió. Revisá el acuerdo antes de componer nuevas posibilidades.</p>}
    {agreement?.version?<p className="gm-meta">Acuerdo · versión {agreement.version}</p>:null}
-   {adjusting||editing||draft||momentReview?<>
+   {showReading?<>
     <div className="gm-reading-areas"><small>Esto toca principalmente</small><p>{areaKeys.length?areaKeys.map(k=>areas.find(a=>a.key===k)?.label||k).join(' · '):'Podemos dejar el área abierta.'}</p></div>
+    <h2>{momentReview?"Potenciales que podrías nutrir":"Lo que quiero nutrir"}</h2>
     <div className="gm-potential-readout">{items.filter(i=>i.status!=='withdrawn').map(i=><article key={i.identity_id}><h3>{i.label}</h3><p>{i.contextual_meaning||i.definition||'Podés poner su significado en tus palabras.'}</p></article>)}</div>
     <button className="gm-primary" disabled={busy||!faro.trim()} onClick={()=>void confirm(true)}>{busy?'Confirmando…':momentReview?'Está bien':'Confirmar y componer'}</button>
     <details className="gm-agreement-adjust" open={adjusting||undefined}><summary>Ajustar potenciales y área</summary>
