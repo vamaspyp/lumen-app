@@ -18,6 +18,8 @@ test('Finishing offers return before feedback and keeping remains an independent
  await page.getByRole('button',{name:'Continuar',exact:true}).click()
  const area=await page.locator('.gm-reading-areas').boundingBox(),potentials=await page.getByRole('heading',{name:'Potenciales que podrías nutrir',exact:true}).boundingBox()
  expect(area&&potentials&&area.y+area.height<=potentials.y).toBeTruthy()
+ const primary=await page.getByRole('button',{name:'Está bien',exact:true}).boundingBox(),nav=await page.locator('.gm-nav').boundingBox()
+ expect(primary&&nav&&primary.y+primary.height<=nav.y).toBeTruthy()
  await page.getByRole('button',{name:'Está bien',exact:true}).click()
  await page.locator('.gm-context-card').first().getByRole('button').first().click()
  await page.getByRole('button',{name:'Marcar como realizada'}).click()
