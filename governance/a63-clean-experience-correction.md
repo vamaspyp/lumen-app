@@ -47,6 +47,16 @@ Las escenas no dibujadas individualmente en la lámina se contrastan con RV-07�
 
 ## BLOCK reales restantes
 
+### Reejecución material · 2026-10-06
+
+POV y V58 completas recuperadas nuevamente; F6 ACTIVO, A63 EN CURSO y §22.13 sin cambio. Se sincronizó la copia local atrasada con PR31 antes de construir. La entrega previa no se usó como autoridad.
+
+Se corrigió una omisión RV-06/CF-06: Experiencias vividas dependía exclusivamente de outcomes/feedback. El contrato existente `lumen_living_map_snapshot` ahora proyecta, por separado, experiencias terminadas desde posición persistida y retornos explícitos desde los mismos registros. Finalizar no afirma beneficio, guardado ni apropiación; abrir o guardar posición sin finalizar no acredita experiencia vivida. Ownership, memoria consentida, olvido y ACL se preservan. Sin nueva tabla, entidad o motor. Migration real `20261006152214`.
+
+La UI relee ese hilo al entrar en Santuario y muestra «Sin retorno registrado» cuando no hay feedback. La salida de Vivir es inmediata; se estabilizó el callback de progreso para evitar escrituras repetidas por renders ajenos al avance. Se distinguen las composiciones como «Constelación conservada» y LUMI vuelve al origen real de la experiencia, también en Explorar y Tejido.
+
+G98: PRESERVAR persistencia de episodios/selecciones/posición, feedback, guardado y propio; AJUSTAR proyección de lectura y actualización de Santuario; REEMPLAZAR dependencia visual vivido→feedback y retorno contextual incorrecto. Nueva regresión en ambos viewports conserva el vivido sin feedback tras refresh. SQL real transaccional prueba apertura/fin/retorno, independencia, ownership, consentimiento, olvido y ACL; fixtures revertidos. La matriz RV-06/RV-07 agrega `07-vivida-sin-feedback-real` y el contrato `tests/a63-lived-independent-live.sql`. Verificación: 89 unidades y 94 E2E; siete paquetes SQL reales, build/lint y gates. Capturas finales, SHA/preview/CI y comparación íntegra se identifican en el manifest de entrega; las pasadas fallidas no son evidencia final.
+
 - B1 editorial: 86 conceptos y 169 relaciones candidatas, 0 revisadas/admitidas. NO_MATCH longitudinal real; no se acredita cobertura nutrida con fixtures.
 - Reproducción del video externo no demostrada y accesibilidad del iframe del proveedor incompleta; dos audios reales sí reproducidos. No se reemplaza el contenido aprobado por uno inventado.
 - Representantes admitidos/condiciones/derechos completos de las once familias y matching semántico/generalización de conversación no acreditados por esta corrección.

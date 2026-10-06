@@ -55,3 +55,16 @@ test('Santuario opens all five sections with both saved and lived records',async
  }
  expect(errors).toEqual([])
 })
+
+test('Santuario recovers a completed experience without feedback, keeping or appropriation',async({page})=>{
+ await personalBackend(page)
+ await page.route('**/rest/v1/rpc/lumen_living_map_snapshot',r=>r.fulfill({json:{memory_allowed:true,direction:[],potential:[],conditions:[],realization:[],lived_experiences:[{episode_id:'completed-without-return',help_id:'completed-test',finished:true,effect:null,lived_at:'2026-10-06T12:00:00Z'}]}}))
+ await page.goto('/santuario');await expect(page.getByRole('button',{name:'Cuenta',exact:true})).toBeEnabled()
+ await page.getByRole('button',{name:'Experiencias vividas',exact:true}).click()
+ await expect(page.locator('.gm-lived-entries .gm-life-row')).toHaveCount(1)
+ await expect(page.getByText('Sin retorno registrado',{exact:true})).toBeVisible()
+ await expect(page.getByText('Te ayudó',{exact:true})).toHaveCount(0)
+ await page.reload();await expect(page.getByRole('button',{name:'Cuenta',exact:true})).toBeEnabled()
+ await page.getByRole('button',{name:'Experiencias vividas',exact:true}).click()
+ await expect(page.locator('.gm-lived-entries .gm-life-row')).toHaveCount(1)
+})
