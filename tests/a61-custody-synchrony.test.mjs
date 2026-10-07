@@ -34,7 +34,7 @@ test('custodian topology covers organism and every critical organ without duplic
 })
 
 test('custody evaluates synchrony instead of isolated local quality', () => {
-  assert.deepEqual(registry.synchrony_dimensions.map((x) => x.id), ['NORTE','FISIOLOGIA','PERSONA','ORGANISMO','EVOLUCION'])
+  assert.deepEqual(registry.synchrony_dimensions.map((x) => x.id), ['NORTE','FISIOLOGIA','PERSONA','ORGANISMO','EVOLUCION','EXCELENCIA'])
   const integral = registry.custodians.find((x) => x.id === 'C0')
   assert.ok(integral.invariants.includes('no_local_optimization_harming_whole'))
   assert.ok(integral.invariants.includes('north_alignment'))

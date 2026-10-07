@@ -1,11 +1,18 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
-import './worldclass.css'
-import App from './App.tsx'
+import './app/styles.css'
+import './app/a63-continuity.css'
+import './app/accessibility.css'
+import './app/premium-v4.css'
+import './app/premium-v4-ci.css'
+import './app/premium-v4-feedback.css'
+import './app/a63-source-consistency.css'
+import './app/premium-source.css'
+import './app/premium-field-v5.css'
+import PremiumVNext from './app/PremiumVNext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <PremiumVNext />
   </StrictMode>,
 )

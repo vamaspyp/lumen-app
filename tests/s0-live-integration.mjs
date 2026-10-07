@@ -74,7 +74,7 @@ assert.equal(sourceError, null, `Public Source discovery failed: ${sourceError?.
 assert.ok(Array.isArray(source), 'Source discovery must return an array')
 assert.equal(source.length, 50, 'Broad discovery should reach the public hard cap')
 
-const allowedSourceKeys = new Set(['help_id', 'canonical_code', 'help_type', 'lifecycle', 'risk_class', 'evidence_class', 'title', 'summary', 'content', 'duration_minutes', 'energy', 'accessibility', 'provider', 'areas', 'capacities', 'taxonomy_version', 'localization_provenance'])
+const allowedSourceKeys = new Set(['help_id', 'canonical_code', 'help_type', 'lifecycle', 'risk_class', 'evidence_class', 'title', 'summary', 'content', 'duration_minutes', 'energy', 'detail', 'accessibility', 'provider', 'areas', 'capacities', 'taxonomy_version', 'localization_provenance'])
 for (const item of source) {
   for (const field of Object.keys(item ?? {})) assert.ok(allowedSourceKeys.has(field), `Unexpected public Source field: ${field}`)
   assert.equal(Object.hasOwn(item ?? {}, 'person_id'), false, 'Public Source must never expose person_id')

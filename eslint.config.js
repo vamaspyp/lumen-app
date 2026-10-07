@@ -13,14 +13,14 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
   {
-    // App is still the transitional semantic shell. React synchronization with
-    // Supabase is intentional here. A60 moved Path writes into CultivationPanel;
-    // keep the one historical binding tolerated until App is split, while ESLint
-    // remains the single owner of unused-symbol enforcement for the project.
-    files: ['src/App.tsx'],
+    // The clean-room App shell is the composition boundary between the Premium
+    // Experience Field and the canonical greenfield application API. On mount it
+    // synchronizes remote Supabase snapshots (auth, Fuente, continuity and Tejido)
+    // into presentation state. The exception is intentionally limited to this
+    // orchestration shell; leaf components remain under the default hooks rule.
+    files: ['src/app/App.tsx'],
     rules: {
       'react-hooks/set-state-in-effect': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^addPathItem$' }],
     },
   },
 ])

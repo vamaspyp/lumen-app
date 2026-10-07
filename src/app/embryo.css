@@ -1,0 +1,33 @@
+/* A63 semantic controls. Presentation belongs to premium-vnext.css, without successive layout overrides. */
+.gm-agreement{padding:0;border:0;margin:28px 0;background:transparent}
+.gm-agreement h2{margin:5px 0 10px}
+.gm-kicker{font-size:12px;letter-spacing:.06em;color:var(--gm-muted)}
+.gm-agreement>p{font-size:14px}
+.gm-review-areas{margin:18px 0;border:1px solid var(--gm-line);border-radius:12px;padding:14px;min-width:0}
+.gm-review-areas p{font-size:14px}
+.gm-review-areas legend{font-size:14px}
+.gm-area-choice{display:flex;flex-wrap:wrap;gap:8px}
+.gm-area-choice label{display:flex;align-items:center;gap:8px;min-height:44px;padding:6px 10px;border-radius:10px;background:var(--gm-paper);font-size:14px}
+.gm-potential{background:var(--gm-paper);border:1px solid var(--gm-line);border-radius:12px;padding:14px;margin:12px 0}
+.gm-potential h3{margin:0}
+.gm-potential .gm-meta{margin:0 0 8px}
+.gm-potential label,.gm-agreement form label{display:block;font-size:14px}
+.gm-potential textarea{min-height:84px}
+.gm-potential button{margin:8px 8px 0 0}
+.gm-potential-meaning{margin-top:8px}
+.gm-potential-meaning summary{font-size:14px;color:var(--gm-muted)}
+.gm-agreement form{margin:20px 0}
+.gm-agreement form button{margin-top:10px}
+.gm-agreement>.gm-secondary{margin:8px 0}
+.gm-flow-alternatives{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.gm-faro-readiness{border:1px solid var(--gm-line);border-radius:12px;padding:14px;margin:16px 0}
+.gm-faro-readiness label{display:flex;align-items:center;gap:10px;min-height:44px}
+.gm-original blockquote{font-size:16px;line-height:1.5}
+.gm-composition,.gm-recurring,.gm-composition-note,.gm-recurring-threads article{background:var(--gm-card);border:1px solid var(--gm-line);border-radius:14px;padding:18px;margin:18px 0;color:var(--gm-ink)}
+.gm-composition h2,.gm-recurring-threads h3{margin:0 0 10px}
+.gm-recurring form,.gm-recurring label,.gm-recurring-threads label{display:grid;gap:8px}
+.gm-recurring form{gap:16px}
+.gm-recurring button,.gm-composition button,.gm-recurring-threads button{margin:8px 6px 6px 0}
+.gm-recurring input[type=checkbox]{width:22px;height:22px}
+.gm-recurring-threads p{margin:8px 0}
+.gm-is-withdrawn{opacity:.75}

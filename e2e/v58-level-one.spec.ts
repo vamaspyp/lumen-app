@@ -1,0 +1,25 @@
+import {test,expect} from './fixtures'
+
+test('V58 RV04: the four entries preserve one Source, area navigation and recoverable no results',async({page})=>{
+ const items=[{help_id:'practice-a',title:'Crear con calma',summary:'Una práctica breve',area_key:'wellbeing',areas:['wellbeing'],help_type:'practice',duration_minutes:4,provider:{name:'Fuente de prueba'}},{help_id:'reading-b',title:'Otra perspectiva',summary:'Una lectura',area_key:'learning',areas:['learning'],help_type:'reading',provider:{name:'Fuente de prueba'}}]
+ await page.route('**/rest/v1/rpc/**',r=>r.fulfill({json:r.request().url().endsWith('lumen_source_discover')?items:r.request().url().endsWith('lumen_source_taxonomy')?{areas:[{key:'wellbeing',label:'Bienestar'},{key:'learning',label:'Aprendizaje'}]}:{}}))
+ await page.goto('/explorar')
+ await expect(page.locator('.gm-context-card')).toHaveCount(2)
+ for(const name of ['Por potencial','Por área','Por momento','Libre'])await expect(page.getByRole('button',{name,exact:true})).toBeVisible()
+ await page.getByRole('button',{name:'Por área',exact:true}).click()
+ await page.getByRole('combobox',{name:'Área de la vida',exact:true}).selectOption('wellbeing')
+ await expect(page.locator('.gm-context-card')).toHaveCount(1)
+ await expect(page.getByText('Crear con calma',{exact:true})).toBeVisible()
+ await page.getByRole('button',{name:'Por potencial',exact:true}).click()
+ await expect(page.getByText('Buscá con tus palabras en los títulos y descripciones de Fuente.',{exact:false})).toBeVisible()
+ await page.getByLabel('Buscar una posibilidad').fill('Sin coincidencias')
+ await expect(page.getByText('No hay resultados para esta búsqueda.',{exact:false})).toBeVisible()
+ await expect(page.getByRole('button',{name:'Ver otras posibilidades'})).toHaveCount(0)
+ await page.getByRole('button',{name:'Mirar todas las posibilidades'}).click()
+ await expect(page.locator('.gm-context-card')).toHaveCount(2)
+ await page.locator('.gm-nav').getByRole('button',{name:'Mi Vida',exact:true}).click()
+ await page.locator('.gm-area-grid').getByRole('button',{name:'Aprendizaje',exact:true}).click()
+ await expect(page.getByRole('heading',{name:'Aprendizaje',exact:true})).toBeVisible();await page.getByRole('button',{name:'Posibilidades para esta área'}).click();await expect(page.getByRole('combobox',{name:'Área de la vida',exact:true})).toHaveValue('learning')
+ await expect(page.locator('.gm-context-card')).toHaveCount(1)
+ await expect(page.getByText('Otra perspectiva',{exact:true})).toBeVisible()
+})

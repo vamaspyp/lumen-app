@@ -1,0 +1,11 @@
+import {getGreenfieldSupabase} from '../adapters/supabase/client'
+import type {FaroAgreement} from './faro-agreement'
+export type CompositionReference={help_id?:string;help_version_id?:string;entry_id?:string;origin:string;reason:string}
+export type CompositionVersion={version:number;saved_at:string;agreement:FaroAgreement;items:CompositionReference[];restored_from?:number|null}
+export type ConservedComposition={trajectory_id:string;version:number;versions:CompositionVersion[]}
+export type RecurringPractice={followup_id:string;help_id:string;trajectory_id:string|null;title:string;due_at:string;status:string;relevant:boolean;reminder_allowed:boolean;recurrence:{days:number;local_time:string;timezone:string;conditions:string;composition_entry_id:string|null;paused:boolean;revoked:boolean}}
+async function call<T>(name:string,params:Record<string,unknown>={}):Promise<T>{const {data,error}=await getGreenfieldSupabase().rpc(name,params);if(error)throw new Error(error.code==='40001'?'Esta composición o su acuerdo cambió. Volvé a abrirlo antes de guardar.':error.message);return data as T}
+export const conserveComposition=(trajectory:string,agreementVersion:number,items:CompositionReference[],entryId:string|null,version:number,restore:number|null=null)=>call<{entry_id:string;composition:ConservedComposition}>('lumen_faro_composition_save',{p_trajectory_id:trajectory,p_agreement_version:agreementVersion,p_items:items,p_entry_id:entryId,p_expected_version:version,p_restore_version:restore})
+export const bindCultivation=(episode:string,trajectory:string,entry:string|null)=>call('lumen_cultivation_bind_experience',{p_episode_id:episode,p_trajectory_id:trajectory,p_entry_id:entry})
+export const getRecurringPractices=async()=>{const items=await call<RecurringPractice[]>('lumen_recurring_practice_snapshot');return Array.isArray(items)?items:[]}
+export const setRecurringPractice=(help:string,days:number,time:string,timezone:string,conditions:string,trajectory:string|null,entry:string|null,followup:string|null=null,action='schedule')=>call('lumen_recurring_practice_set',{p_help_id:help,p_days:days,p_local_time:time,p_timezone:timezone,p_conditions:conditions,p_trajectory_id:trajectory,p_entry_id:entry,p_followup_id:followup,p_action:action})

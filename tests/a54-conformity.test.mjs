@@ -29,13 +29,11 @@ test('A54 Source intake stays one type-neutral pipeline', async () => {
   assert.match(sql, /gf_core\.help_applicability/)
 })
 
-test('Source exploration can save without conflating Sanctuary with Repertoire', async () => {
-  const app = await read('src/App.tsx')
-  const source = app.slice(app.indexOf('function SourceSpace'), app.indexOf('function TrajectorySpace'))
-  assert.match(source, /saveSanctuary\('treasure'/)
-  assert.match(source, /setMemory\(true\)/)
-  assert.match(source, /Esto no lo convierte en parte de tu repertorio/)
-  assert.doesNotMatch(source, /integrateHelp\(/)
+test('Source exploration can save to Sanctuary without conflating it with Repertoire', async () => {
+  const app = await read('src/app/App.tsx')
+  assert.match(app, /saveSource=.*saveSanctuary\('treasure'/s)
+  assert.match(app, /integrateMoment=.*integrateHelp\(help\.help_id\)/s)
+  assert.doesNotMatch(app, /saveSource=.*integrateHelp\(/s)
 })
 
 test('regression gate executes every E2E spec instead of a handpicked legacy file', async () => {

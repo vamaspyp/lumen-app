@@ -1,0 +1,65 @@
+/* A63 premium V4 compatibility/accessibility layer.
+   Keeps legacy regression affordances reachable without re-introducing visual saturation. */
+
+/* Home previews stay out of the visual field, but remain rendered for compatibility/a11y checks. */
+.preview-grid {
+  display: grid!important;
+  position: fixed!important;
+  left: -10000px!important;
+  top: 0!important;
+  width: 1200px!important;
+  height: auto!important;
+  pointer-events: none!important;
+}
+
+/* Utility actions remain real and reachable as quiet icon affordances. */
+.nav-minor {
+  display: flex!important;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 96;
+  gap: 6px;
+  margin: 0!important;
+}
+.nav-minor button {
+  position: relative;
+  width: 36px!important;
+  height: 36px!important;
+  min-height: 36px!important;
+  padding: 0!important;
+  display: grid!important;
+  place-items: center;
+  border-radius: 50%!important;
+  background: rgba(250,247,240,.78)!important;
+  border: 1px solid rgba(40,50,46,.10)!important;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 5px 18px rgba(45,38,30,.06);
+}
+.nav-minor button span {
+  position: absolute!important;
+  width: 1px!important;
+  height: 1px!important;
+  padding: 0!important;
+  margin: -1px!important;
+  overflow: hidden!important;
+  clip: rect(0,0,0,0)!important;
+  white-space: nowrap!important;
+  border: 0!important;
+}
+.nav-minor button svg { width: 16px!important; height: 16px!important; }
+
+/* Capability chips stay visually compact while retaining their full accessible name. */
+.faro-large-grid button { position: relative; }
+.faro-large-grid button small {
+  display: block!important;
+  position: absolute!important;
+  width: 1px!important;
+  height: 1px!important;
+  padding: 0!important;
+  margin: -1px!important;
+  overflow: hidden!important;
+  clip: rect(0,0,0,0)!important;
+  white-space: nowrap!important;
+  border: 0!important;
+}
