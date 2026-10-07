@@ -30,7 +30,7 @@ PASS significa verificación técnica acotada por la evidencia indicada. GAP sig
 | Conservación integral, orden, enriquecimiento y recuperación | PASS | SQL CF y browser real v1 → v2 → restauración como v3 sin borrar historia. |
 | Vivir, retornar, guardar, propio y continuidad independientes | PASS | SQL `a63-lived-independent-live`; browser real de fin sin feedback y guardado independiente. |
 | B4: recuperación de video y teclado del host | PASS | Nueva regresión en ambos viewports: opt-in, origen/referrer, altura, desmontaje, foco, fuente externa, reintento y salida sin terminar. |
-| B4: reproducción real del video original | NO VERIFICADO | Cargar iframe no es reproducción. Se requiere avance de tiempo real y evidencia del proveedor; cualquier fallo queda explícito en `result.json`. |
+| B4: reproducción real del video original | GAP | El reproductor real no demostró avance de tiempo en este entorno; registró errores de red del proveedor. Cargar iframe no es reproducción. El fallo y la salida independiente quedan explícitos en `result.json`. |
 | B4: accesibilidad interna del iframe | GAP | Adaptador host corregido; el documento externo no está bajo control del host. Auditoría real y juicio humano pendientes para el contenido interno. |
 | B4: audio real | PASS | Dos fuentes OPS/OMS existentes; prueba runtime registra avance real y pausa, sin sustituir audio. |
 | B4: representantes reales de once familias | GAP | Fuente actual: práctica 24, editorial 28, externa 18, acción 14, audio 2, video 1, humano 1, material 1; grupo/evento/silencio 0. Once renderers no equivalen a once representantes admitidos. |

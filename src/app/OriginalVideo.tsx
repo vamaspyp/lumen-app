@@ -25,6 +25,6 @@ export function OriginalVideo({url,title,destination}:{url:string;title:string;d
    {unavailable&&<p role="status">Podés abrir la fuente original o volver cuando quieras.</p>}
    <button ref={launch} className="primary" type="button" disabled={!src} onClick={()=>{setUnavailable(false);setOpened(true)}}>{unavailable?'Reintentar video':'Reproducir video original'}</button>
   </>}
-  {destination&&<a className="source-text-link" href={destination} target="_blank" rel="noopener noreferrer">Ver en la fuente original ↗</a>}
+  {destination&&<a className="source-text-link" style={{display:'block',marginTop:12,padding:'8px 0'}} href={destination} target="_blank" rel="noopener noreferrer">Ver en la fuente original ↗</a>}
  </div>
 }
