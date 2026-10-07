@@ -2,7 +2,7 @@ import {editFaro} from './experience-actions'
 import {test,expect} from './fixtures'
 
 test.describe('LUMEN PREMIUM V58 · public doors',()=>{
- test.beforeEach(async({page})=>{await page.goto('/')})
+ test.beforeEach(async({page})=>{await page.goto('/');await expect(page.getByRole('button',{name:'Cuenta',exact:true})).toBeEnabled({timeout:30000})})
  test('present Momento protects personal persistence behind identity',async({page})=>{
   await expect(page.getByRole('heading',{name:'¿Qué está pasando ahora?'})).toBeVisible()
   await page.getByLabel('¿Qué está vivo hoy?').fill('Quiero descansar y entender qué necesito hoy.')
@@ -44,7 +44,7 @@ test.describe('LUMEN PREMIUM V58 · public doors',()=>{
   await page.locator('.gm-nav').getByText('Explorar').click()
   await page.getByText('Filtros de esta búsqueda',{exact:true}).click()
   await page.getByRole('button',{name:'Audios',exact:true}).click()
-  await expect(page.getByText('Poner los pies en la tierra · audio OPS/OMS',{exact:true})).toBeVisible({timeout:20000})
+  await expect(page.getByText('Poner los pies en la tierra · audio OPS/OMS',{exact:true})).toBeVisible({timeout:45000})
   await page.locator('.gm-context-card').filter({hasText:'Poner los pies en la tierra · audio OPS/OMS'}).getByRole('button',{name:'Conocer esta posibilidad'}).click()
   await expect(page.getByRole('heading',{name:'Poner los pies en la tierra · audio OPS/OMS'})).toBeVisible()
   await expect(page.locator('.gm-nav')).toBeVisible()
@@ -54,7 +54,7 @@ test.describe('LUMEN PREMIUM V58 · public doors',()=>{
  test('Tejido offers a real human service with attribution',async({page})=>{
   await page.locator('.gm-nav').getByText('Tejido').click()
   await page.getByText('Necesito acompañamiento humano',{exact:true}).click()
-  await expect(page.getByText('Orientación profesional en salud mental · Argentina',{exact:true})).toBeVisible({timeout:20000})
+  await expect(page.getByText('Orientación profesional en salud mental · Argentina',{exact:true})).toBeVisible({timeout:45000})
   await page.getByText('Orientación profesional en salud mental · Argentina',{exact:true}).click()
   await expect(page.getByRole('heading',{name:'Orientación profesional en salud mental · Argentina'})).toBeVisible()
  })

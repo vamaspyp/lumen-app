@@ -110,6 +110,14 @@ try{
    await page.getByRole('button',{name:'Reproducir video original'}).click()
    try{const frame=page.frameLocator('iframe');await frame.getByRole('button',{name:/Play|Reproducir/}).first().click({timeout:15000});await frame.locator('video').evaluate(v=>v.play());await expect.poll(async()=>frame.locator('video').evaluate(v=>v.currentTime)).toBeGreaterThan(0);media.push({help_id:item.help_id,type:'video',result:'PASS actual playback'})}catch(e){media.push({help_id:item.help_id,type:'video',result:'BLOCK playback not demonstrated',reason:String(e.message).slice(0,250)})}
    await capture('media-'+item.canonical_code)
+   if(media.at(-1).result.startsWith('BLOCK')){
+    await page.getByRole('button',{name:'El reproductor no funciona',exact:true}).click()
+    await expect(page.locator('iframe')).toHaveCount(0)
+    await expect(page.getByRole('button',{name:'Reintentar video',exact:true})).toBeFocused()
+    await expect(page.getByRole('heading',{name:'Terminaste.',exact:true})).toHaveCount(0)
+    await expect(page.getByRole('link',{name:'Ver en la fuente original',exact:false}).first()).toHaveAttribute('href',/^https:/)
+    await capture('media-'+item.canonical_code+'-salida-independiente')
+   }
   }
  }
  assert.equal(coreErrorCount,0,errors.slice(0,coreErrorCount).join('\n'))

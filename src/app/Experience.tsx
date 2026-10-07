@@ -3,6 +3,7 @@ import { recordOutcome, type HelpPossibility, type OutcomeEffect } from '../gree
 import { beginDirectSourceExperience } from '../greenfield/application/source-feedback'
 import type { SourceItem } from '../greenfield/application/embryo'
 import { premiumFamily, sourceUrl } from './premium-source'
+import { OriginalVideo } from './OriginalVideo'
 
 type Help = HelpPossibility | SourceItem
 type Kind = 'editorial'|'practice'|'audio'|'video'|'external'|'human'|'group'|'action'|'event'|'material'|'quiet'
@@ -127,7 +128,6 @@ function PremiumAudioPlayer({ src }: { src:string }) {
   </div>
 }
 
-function OriginalVideo({url,title}:{url:string;title:string}){const [opened,setOpened]=useState(false);return opened?<iframe title={title} src={url} allow="encrypted-media; picture-in-picture" allowFullScreen loading="lazy" style={{width:'100%',aspectRatio:'16/9',border:0}}/>:<button className="primary" onClick={()=>setOpened(true)}>Reproducir video original</button>}
 function SourceText({help}:{help:Help}){const url=str(contentOf(help).source_text_url);return url?<a className="source-text-link" href={url} target="_blank" rel="noreferrer">Leer el texto en la fuente original ↗</a>:null}
 function SourceMediaLaunch({ kind='audio',destination,cta }: { kind?:'audio'|'video'|'practice'; destination:string|null; cta:string }) {
   if(!destination)return <div className="media-boundary">La fuente todavía no ofrece un acceso directo utilizable desde esta experiencia. LUMEN no simula un reproductor inexistente.</div>
@@ -202,7 +202,7 @@ function PremiumSourceExperience({ help,premium,onExit,onFinish }: { help:Help; 
 
       {premium==='video_or_audio_visual_sequence'&&<>
         <section className="experience-media-card video-card">
-          {str(content.video_embed_url)?<OriginalVideo url={str(content.video_embed_url)!} title={help.title}/>:directVideo?<video controls playsInline src={directVideo}/>:<SourceMediaLaunch kind="video" destination={destination} cta={cta}/>}
+          {str(content.video_embed_url)?<OriginalVideo key={str(content.video_embed_url)!} url={str(content.video_embed_url)!} title={help.title} destination={destination}/>:directVideo?<video controls playsInline src={directVideo}/>:<SourceMediaLaunch kind="video" destination={destination} cta={cta}/>}
         </section>
         <SourceText help={help}/>{str(experience.primary_source)&&<p className="source-focus">{str(experience.primary_source)}</p>}
         <SourcePanel sourceName={sourceName} sourceLabel={sourceLabel} rights={rights} destination={destination} cta={cta}/>
