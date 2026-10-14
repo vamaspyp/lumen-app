@@ -47,6 +47,8 @@ jobs:
       - run: node --test tests/a69-conformity.test.mjs
       - name: Validate POV live probe script
         run: node --check scripts/check-live-pov.mjs
+      - name: Fail closed without POV credentials
+        run: node --test tests/a69-live-pov.test.mjs
       - name: Independent adversarial auditor
         run: node scripts/check-independent-audit.mjs
       - name: Adversarial audit mutation tests
