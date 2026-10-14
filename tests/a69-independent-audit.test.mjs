@@ -16,3 +16,5 @@ function run(mutate){
 test('unverified inventory is never interpreted as certified',()=>assert.equal(run(()=>{}),true));
 test('independent auditor rejects false certification',()=>assert.equal(run(c=>c.certification='CERTIFIED'),false));
 test('independent auditor rejects self-approved PASS',()=>assert.equal(run(c=>{const r=c.requirements[0];r.status='PASS';r.tests=['x'];r.evidence=['x'];r.implementation=['x'];r.review={reviewer:'agent',builder:'agent',decision:'APPROVED'}}),false));
+
+test('rejects machine-only certification without human release authorization',()=>assert.equal(run(c=>{c.certification='CERTIFIED';c.release_authorization={actor_type:'agent'}}),false));
