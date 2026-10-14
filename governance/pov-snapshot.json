@@ -4,7 +4,7 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "verified_at": "2026-10-14T11:48:45-03:00",
+    "verified_at": "2026-10-14T20:19:29.465911+00:00",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {
@@ -23,127 +23,177 @@
     {
       "id": "V1",
       "name": "Canon",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "2 · AUTORIDAD DE CONOCIMIENTO/Canon",
+      "verified": "2026-09-03"
     },
     {
       "id": "V3",
       "name": "Sistema de Conducción",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "POV: https://docs.google.com/spreadsheets/d/1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM/edit · Modelo estable V1.1: https://docs.google.com/document/d/1kvu7SW5rlNqBh0Mi_YbTzlv1ysatlnqcpYbZAEpdcbk/edit",
+      "verified": "2026-10-14"
     },
     {
       "id": "V38",
       "name": "Mapeo Final de Integridad Fundacional V1.0",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/1J4iXKISnqUrPx5g34mPQ7SQkKDGglM83CnLzPp1NTEo",
+      "verified": "2026-09-03"
     },
     {
       "id": "V40",
       "name": "Arquitectura Greenfield del Embrión V0.1",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/1uTcG0mbKW0b1HdSrzdt4Zp0uOwGglwGjkN0h98tAk-4",
+      "verified": "2026-09-11"
     },
     {
       "id": "V41",
       "name": "Constitución Operativa y Guardrails Transversales V1.0",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/1Xa171cHkPwa6iIAXX6VtOmuZeMOzhgAneSEZv-Ivs-I",
+      "verified": "2026-09-08"
     },
     {
       "id": "V42",
       "name": "Ficha Transversal · Guardrails Obligatorios para Todo Agente · V1.2",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/1OApUiAE1uyIHDK5mN7G6XQoHtmX4uSALlVGR1nZ7gak",
+      "verified": "2026-09-10"
     },
     {
       "id": "V43",
       "name": "Diseño Canónico de Experiencia y Comportamiento del Embrión V1.0",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/1yzy2iC1yk4iuaMc0SNYs2g8SWSUTVYaYr0sw3EOYYI4",
+      "verified": "2026-09-11"
     },
     {
       "id": "V44",
       "name": "Runtime Greenfield S0",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "Supabase vbuixagaguasejputubp · GitHub greenfield-v04-s0 · Vercel Preview branch",
+      "verified": "2026-09-04"
     },
     {
       "id": "V45",
       "name": "Conduction Gate v0.2",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "GitHub greenfield-v04-embryo · governance/CONDUCTION_GATE.md · governance/conduction-context.json · governance/pov-snapshot.json · scripts/check-conduction-gate.mjs · .github/CODEOWNERS · .github/workflows/ci.yml · agent entrypoints",
+      "verified": "2026-09-07"
     },
     {
       "id": "V46",
       "name": "Modelo Canónico Integral Definitivo V1.0",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/1CaFsm8QXSUDswOjFoB1Ee7fTKjdng4P899WtIv4Nu_c/edit?usp=drivesdk",
+      "verified": "2026-09-11"
     },
     {
       "id": "V50",
       "name": "Especificación As-Built del Embrión Certificado V1.0",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/126EfKarNeHmVV8Lu4FAwdBPwjHv2tQMAyt3KZZl32V4/edit",
+      "verified": "2026-09-11"
     },
     {
       "id": "V51",
       "name": "Precisión Canónica de Norte, Visión y Misión · V1.1",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/1u0fPCjtXAWi-iVmZkZisxNhGsUZQu1ompqQndFtoAso/edit?usp=drivesdk",
+      "verified": "2026-09-12"
     },
     {
       "id": "V56",
       "name": "VA+LUMEN · Fuente LUMEN · Estándar Canónico del Embrión V1.1",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/1UVqvDYVKBRpi5zrgveTzTxkiyK2fXNM-MsnZFzvqQXo/edit",
+      "verified": "18/09/2026"
     },
     {
       "id": "V53",
       "name": "Especificación Técnico-Funcional del Embrión V1.1 · Integración y Capacidad Propia",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/1YHC1DTDKJ_cpb2VJukDSfsxoOGjGRa8tj8f48NLaCZY/edit",
+      "verified": "2026-09-12"
     },
     {
       "id": "V54",
       "name": "Sistema de Custodia Sincrónica del Organismo · V1.0",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/1BNeh9WJMk8Wd6UXzryarHhEMj-TrHiUcOVRAinFevzw/edit?usp=drivesdk",
+      "verified": "2026-09-12"
     },
     {
       "id": "V52",
       "name": "Especificación Funcional del Embrión V1.1 · Integración y Capacidad Propia",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/1ELjT7x7QgKstLjZj-dT_L2rg4_NxmHTxm2Gy4CZuBtE/edit",
+      "verified": "2026-09-18"
     },
     {
       "id": "V55",
       "name": "LUMEN Experience & Sensation Field · Especificación Canónica V1.6",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/1vNjpSPhKgATOln5KqEPLQFfaHJx_PRud5QssPSFnSGc/edit",
+      "verified": "2026-09-18"
     },
     {
       "id": "V58",
       "name": "Especificación Funcional Detallada del Embrión · Una Vida singular en movimiento · V1.1",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "verified": "2026-10-02"
     },
     {
       "id": "V59",
       "name": "LUMEN · Modelo de Interfaz del Embrión (1)",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://drive.google.com/file/d/1k7FLML8RFrl9h0MflBICFs1kkEm8w3_a/view",
+      "verified": "2026-09-29"
     },
     {
       "id": "V60",
       "name": "VA+LUMEN · Especificación Funcional de Interfaz del Embrión · V1.0",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://drive.google.com/file/d/1VT_opCdtNzrMKo4G6hkHbrBjbKw_TTQE/view",
+      "verified": "2026-09-29"
     },
     {
       "id": "V61",
       "name": "LUMEN Y LA VIDA",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/1mIhrYfTf3E5B5YNC4JNbbNCXM3pX_Gl56-U8d2DO6SM/edit",
+      "verified": "2026-09-29"
     },
     {
       "id": "V62",
       "name": "VA+LUMEN · Documento Maestro de Construcción del Embrión · V1.0",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "verified": "2026-09-30"
     },
     {
       "id": "V63",
       "name": "A63 · Contrato técnico-funcional consolidado · Derivación nativa V1",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://docs.google.com/document/d/1rDbXDHospjUIW1kxOTDGwA1Juh6wHWuN9D2rulhbBrc/edit",
+      "verified": "2026-10-04"
     },
     {
       "id": "V64",
       "name": "Mapa Canónico de Documentos Esenciales de LUMEN · V1.0",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "Sistema de Conducción · ACTIVOS (esta fila)",
+      "verified": "2026-10-07"
     },
     {
       "id": "V65",
       "name": "Matriz de Integridad Vertical LUMEN · V64 → Especificación → Construcción · 2026-10-07",
-      "state": "VIGENTE"
+      "state": "VIGENTE",
+      "location": "https://github.com/vamaspyp/lumen-app/blob/1f74703e87552fa3058f2568ea910aeb2292d53d/governance/a63-v65-execution.md",
+      "verified": "2026-10-07"
     }
   ],
   "superseded_authorities": [

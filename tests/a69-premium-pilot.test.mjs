@@ -6,3 +6,6 @@ test('premium false PASS blocked',()=>assert.equal(run(c=>{c.requirements[0].sta
 test('premium false CERTIFIED blocked',()=>assert.equal(run(c=>{c.certification='CERTIFIED'}),false));
 test('premium release blocked while unresolved',()=>assert.equal(run(()=>{},{REQUIRE_CONFORMITY_PASS:'true'}),false));
 test('premium missing requirement blocked',()=>assert.equal(run(c=>c.requirements=[]),false));
+
+test('premium missing one requirement blocks',()=>assert.equal(run(c=>c.requirements.pop()),false));
+test('premium invented proof blocks',()=>assert.equal(run(c=>{c.requirements[0].status='PASS';c.requirements[0].tests=['invented'];c.requirements[0].evidence=['invented'];c.requirements[0].review={decision:'APPROVED'}}),false));

@@ -4,6 +4,8 @@
   "application_domain": "FUENTE_PREMIUM",
   "certification": "IN_PROGRESS",
   "authority_refs": [
+    "V56",
+    "V55",
     "V58",
     "V62",
     "V64",
@@ -14,38 +16,47 @@
     {
       "id": "FP-01",
       "name": "Fidelidad a fuente y procedencia",
-      "authority": "V58",
-      "source_section": "V58 · Explorar/Fuente",
+      "authority": "V56",
+      "source_section": "V56 §10",
       "status": "NO_VERIFICADO",
       "tests": [],
-      "evidence": []
+      "evidence": [],
+      "source_url": "https://docs.google.com/document/d/1UVqvDYVKBRpi5zrgveTzTxkiyK2fXNM-MsnZFzvqQXo/edit",
+      "requirement_text": "Cada Posibilidad debe conservar procedencia suficiente según su naturaleza: autor, tradición, institución, profesional, fuente original, fecha/versionado, evidencia disponible, nivel de consenso, controversias relevantes, derechos, condiciones de uso, riesgos y vigencia."
     },
     {
       "id": "FP-02",
       "name": "Derechos y legitimidad de uso",
-      "authority": "V58",
-      "source_section": "V58 §22.14 LV-05",
+      "authority": "V56",
+      "source_section": "V56 §15 · ORIGEN",
       "status": "NO_VERIFICADO",
       "tests": [],
-      "evidence": []
+      "evidence": [],
+      "source_url": "https://docs.google.com/document/d/1UVqvDYVKBRpi5zrgveTzTxkiyK2fXNM-MsnZFzvqQXo/edit",
+      "requirement_text": "ORIGEN — ¿Es auténtica, digna, trazable y legalmente utilizable?"
     },
     {
       "id": "FP-03",
       "name": "Experiencia premium funcional y representativa",
-      "authority": "V62",
-      "source_section": "V62 §10.2 AC-10",
+      "authority": "V56",
+      "source_section": "V56 §§6, 12–15",
       "status": "NO_VERIFICADO",
       "tests": [],
-      "evidence": []
+      "evidence": [],
+      "source_url": "https://docs.google.com/document/d/1UVqvDYVKBRpi5zrgveTzTxkiyK2fXNM-MsnZFzvqQXo/edit",
+      "requirement_text": "EXPERIENCIA — ¿Su presentación alcanza el estándar editorial/sensorial de LUMEN?"
     },
     {
       "id": "FP-04",
       "name": "Ausencia de contenido ficticio o engañoso",
-      "authority": "V58",
-      "source_section": "V58 §22.14 LV-05",
+      "authority": "V56",
+      "source_section": "V56 §10",
       "status": "NO_VERIFICADO",
       "tests": [],
-      "evidence": []
+      "evidence": [],
+      "source_url": "https://docs.google.com/document/d/1UVqvDYVKBRpi5zrgveTzTxkiyK2fXNM-MsnZFzvqQXo/edit",
+      "requirement_text": "LUMEN debe distinguir conocimiento científico, tradición sapiencial, experiencia humana, interpretación editorial y creación propia."
     }
-  ]
+  ],
+  "scope_limit": "Cuatro controles de protocolo; no representan cobertura integral de V56, recursos reales ni certificación editorial/experiencial. A64–A68 conservan sus dependencias y estados POV."
 }

@@ -1,3 +1,4 @@
+import { validateInventory } from './conformity-proof.mjs';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 const fail = (why) => { console.error('INDEPENDENT_AUDIT_BLOCK: '+why); process.exitCode=1; };
@@ -6,6 +7,8 @@ const context=JSON.parse(fs.readFileSync('governance/conduction-context.json','u
 const snapshot=JSON.parse(fs.readFileSync('governance/pov-snapshot.json','utf8'));
 if(contract.act_id!=='A69'||context.act.id!=='A69'||snapshot.act.id!=='A69') fail('governance conflict');
 const req=contract.requirements||[];
+const expected=[['LV',11],['RV',10],['CF',10],['AC',27]].flatMap(([p,n])=>Array.from({length:n},(_,i)=>p+'-'+String(i+1).padStart(2,'0')));
+validateInventory(contract,expected,new Set((snapshot.active_authorities||[]).filter(x=>x.state==='VIGENTE').map(x=>x.id)),process.env.CONFORMITY_TARGET_SHA);
 for(const r of req){
  if(r.status==='PASS'){
    if(!r.authority||!r.tests?.length||!r.evidence?.length||!r.implementation?.length) fail('unsupported implementation proof '+r.id);

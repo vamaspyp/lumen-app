@@ -18,3 +18,9 @@
 /scripts/check-premium-pilot.mjs @vamaspyp
 /tests/a69-premium-pilot.test.mjs @vamaspyp
 /tests/a69-live-pov.test.mjs @vamaspyp
+
+# Every A69 verifier, proof validator, report and mutation test has human custody.
+/scripts/conformity-proof.mjs @vamaspyp
+/scripts/report-conformity.mjs @vamaspyp
+/scripts/check-a69-cross-domain.mjs @vamaspyp
+/tests/a69-*.test.mjs @vamaspyp

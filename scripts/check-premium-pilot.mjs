@@ -1,3 +1,4 @@
+import { validateInventory } from './conformity-proof.mjs';
 import fs from 'node:fs';
 const fail=m=>{throw Error('PREMIUM_CONFORMITY_BLOCK: '+m)};
 const c=JSON.parse(fs.readFileSync(process.env.PREMIUM_CONTRACT_FILE||'governance/a69-source-premium-pilot.json','utf8'));
@@ -5,6 +6,7 @@ const pov=JSON.parse(fs.readFileSync('governance/pov-snapshot.json','utf8'));
 if(c.act_id!==pov.act?.id || c.application_domain!=='FUENTE_PREMIUM')fail('wrong governed pilot');
 if(!Array.isArray(c.requirements)||c.requirements.length===0)fail('no coverage inventory');
 const ids=new Set(),active=new Set((pov.active_authorities||[]).filter(a=>a.state==='VIGENTE').map(a=>a.id));
+validateInventory(c,['FP-01','FP-02','FP-03','FP-04'],active,process.env.CONFORMITY_TARGET_SHA);
 for(const r of c.requirements){
  if(!r.id||ids.has(r.id))fail('duplicate/missing id');ids.add(r.id);
  if(!active.has(r.authority))fail('obsolete authority '+r.id);

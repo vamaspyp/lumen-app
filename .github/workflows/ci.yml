@@ -38,10 +38,16 @@ jobs:
 
   conformity-gate:
     name: Conformity Gate
+    env:
+      CONFORMITY_TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     needs: conduction-gate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Verify checked-out evidence SHA
+        run: test "$(git rev-parse HEAD)" = "$CONFORMITY_TARGET_SHA"
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -49,8 +55,20 @@ jobs:
         env:
           CONFORMITY_TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       - run: node --test tests/a69-conformity.test.mjs
+      - name: Validate POV live probe script
+        run: node --check scripts/check-live-pov.mjs
+      - name: Fail closed without POV credentials
+        run: node --test tests/a69-live-pov.test.mjs
+      - name: Independent adversarial auditor
+        run: node scripts/check-independent-audit.mjs
+      - name: Adversarial audit mutation tests
+        run: node --test tests/a69-independent-audit.test.mjs tests/a69-proof.test.mjs
+      - name: Source PREMIUM reusable contract pilot
+        run: node scripts/check-premium-pilot.mjs && node --test tests/a69-premium-pilot.test.mjs
+      - name: Verify A69 cross-domain invariants
+        run: node scripts/check-a69-cross-domain.mjs && node --test tests/a69-cross-domain.test.mjs
       - name: Google keyless auth for POV check
-        if: github.event_name == 'push' && github.ref == 'refs/heads/acto/A69-conformidad-ejecutable'
+        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
         uses: google-github-actions/auth@v2
         id: pov-auth
         with:
@@ -59,22 +77,9 @@ jobs:
           token_format: access_token
           access_token_scopes: https://www.googleapis.com/auth/spreadsheets.readonly
       - name: Read live POV with federated identity
-        if: github.event_name == 'push' && github.ref == 'refs/heads/acto/A69-conformidad-ejecutable'
         run: node scripts/check-live-pov.mjs
         env:
           POV_GOOGLE_ACCESS_TOKEN: ${{ steps.pov-auth.outputs.access_token }}
-      - name: Validate POV live probe script
-        run: node --check scripts/check-live-pov.mjs
-      - name: Fail closed without POV credentials
-        run: node --test tests/a69-live-pov.test.mjs
-      - name: Independent adversarial auditor
-        run: node scripts/check-independent-audit.mjs
-      - name: Adversarial audit mutation tests
-        run: node --test tests/a69-independent-audit.test.mjs
-      - name: Source PREMIUM reusable contract pilot
-        run: node scripts/check-premium-pilot.mjs && node --test tests/a69-premium-pilot.test.mjs
-      - name: Verify A69 cross-domain invariants
-        run: node scripts/check-a69-cross-domain.mjs && node --test tests/a69-cross-domain.test.mjs
       - name: Emit truthful conformity report
         if: always()
         run: node scripts/report-conformity.mjs
@@ -83,22 +88,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: a69-conformity-report
-          path: test-results/a69-conformity-report.*
+          path: |
+            test-results/a69-conformity-report.*
+            test-results/a69-live-pov.json
           if-no-files-found: error
-      - name: Authenticate Google for governed release
-        if: github.event_name == 'pull_request' && github.base_ref == 'main'
-        uses: google-github-actions/auth@v2
-        id: release-pov-auth
-        with:
-          workload_identity_provider: projects/526634587021/locations/global/workloadIdentityPools/va-lumen-github/providers/github-actions
-          service_account: lumen-pov-reader@va-lumen-governance.iam.gserviceaccount.com
-          token_format: access_token
-          access_token_scopes: https://www.googleapis.com/auth/spreadsheets.readonly
-      - name: Verify live Google POV for release
-        if: github.event_name == 'pull_request' && github.base_ref == 'main'
-        run: node scripts/check-live-pov.mjs
-        env:
-          POV_GOOGLE_ACCESS_TOKEN: ${{ steps.release-pov-auth.outputs.access_token }}
       - name: Block release without complete conformity
         if: github.event_name == 'pull_request' && github.base_ref == 'main'
         run: node scripts/check-conformity.mjs

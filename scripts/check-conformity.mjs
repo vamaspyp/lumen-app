@@ -1,3 +1,4 @@
+import { validatePass } from './conformity-proof.mjs';
 import fs from 'node:fs';
 const contractPath = process.env.CONFORMITY_FILE || 'governance/a69-a63-conformity.json';
 const c = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
@@ -21,6 +22,7 @@ for(const r of c.requirements){
  if(!r.authority || !new Set((pov.active_authorities||[]).filter(x=>x.state==='VIGENTE').map(x=>x.id)).has(r.authority)) reject('noncurrent authority '+r.id);
  if(typeof r.requirement_text!=='string' || r.requirement_text.length<30 || !r.source_section || !r.source_url) reject('missing source text '+r.id);
  if(r.status==='PASS'){
+  validatePass(r,process.env.CONFORMITY_TARGET_SHA);
   if(!r.authority || !Array.isArray(r.tests)||r.tests.length===0||!Array.isArray(r.evidence)||r.evidence.length===0) reject('unsupported PASS '+r.id);
   for(const p of r.tests) if(!fs.existsSync(p)) reject('missing test '+p);
   for(const e of r.evidence) {
