@@ -1,0 +1,414 @@
+{
+  "schema_version": 1,
+  "act_id": "A69",
+  "application_act": "A63",
+  "certification": "IN_PROGRESS",
+  "requirements": [
+    {
+      "id": "LV-01",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "LV-02",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "LV-03",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "LV-04",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "LV-05",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "LV-06",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "LV-07",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "LV-08",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "LV-09",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "LV-10",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "LV-11",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "RV-01",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "RV-02",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "RV-03",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "RV-04",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "RV-05",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "RV-06",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "RV-07",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "RV-08",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "RV-09",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "RV-10",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "CF-01",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "CF-02",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "CF-03",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "CF-04",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "CF-05",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "CF-06",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "CF-07",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "CF-08",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "CF-09",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "CF-10",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-01",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-02",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-03",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-04",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-05",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-06",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-07",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-08",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-09",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-10",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-11",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-12",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-13",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-14",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-15",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-16",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-17",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-18",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-19",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-20",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-21",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-22",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-23",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-24",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-25",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-26",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "AC-27",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    }
+  ]
+}
