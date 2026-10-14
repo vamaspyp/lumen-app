@@ -49,6 +49,12 @@ jobs:
         run: node scripts/check-independent-audit.mjs
       - name: Adversarial audit mutation tests
         run: node --test tests/a69-independent-audit.test.mjs
+      - name: Block release without complete conformity
+        if: github.event_name == 'pull_request' && github.base_ref == 'main'
+        run: node scripts/check-conformity.mjs
+        env:
+          REQUIRE_CONFORMITY_PASS: 'true'
+          CONFORMITY_TARGET_SHA: ${{ github.event.pull_request.head.sha }}
 
   verify:
     needs: [conduction-gate, custody-gate, conformity-gate]
