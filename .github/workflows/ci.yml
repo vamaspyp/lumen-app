@@ -55,6 +55,8 @@ jobs:
         run: node --test tests/a69-independent-audit.test.mjs
       - name: Source PREMIUM reusable contract pilot
         run: node scripts/check-premium-pilot.mjs && node --test tests/a69-premium-pilot.test.mjs
+      - name: Verify A69 cross-domain invariants
+        run: node scripts/check-a69-cross-domain.mjs
       - name: Emit truthful conformity report
         if: always()
         run: node scripts/report-conformity.mjs
