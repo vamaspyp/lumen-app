@@ -9,3 +9,7 @@
 /tests/a61-custody-synchrony.test.mjs @vamaspyp
 /AGENTS.md @vamaspyp
 /CLAUDE.md @vamaspyp
+
+# A69 conformity contract, verifier and mutation suite require independent human custody.
+/scripts/check-conformity.mjs @vamaspyp
+/tests/a69-conformity.test.mjs @vamaspyp
