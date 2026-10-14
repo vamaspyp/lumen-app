@@ -19,6 +19,7 @@ for(const r of c.requirements){
  rows.set(r.id,r);
  if(!['PASS','GAP','CONTRADICCION','NO_VERIFICADO'].includes(r.status)) reject('invalid status '+r.id);
  if(!r.authority || !new Set((pov.active_authorities||[]).filter(x=>x.state==='VIGENTE').map(x=>x.id)).has(r.authority)) reject('noncurrent authority '+r.id);
+ if(typeof r.requirement_text!=='string' || r.requirement_text.length<30 || !r.source_section || !r.source_url) reject('missing source text '+r.id);
  if(r.status==='PASS'){
   if(!r.authority || !Array.isArray(r.tests)||r.tests.length===0||!Array.isArray(r.evidence)||r.evidence.length===0) reject('unsupported PASS '+r.id);
   for(const p of r.tests) if(!fs.existsSync(p)) reject('missing test '+p);
