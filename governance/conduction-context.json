@@ -10,71 +10,110 @@
     "name": "Nacimiento del Embrión y primeras vidas reales"
   },
   "act": {
-    "id": "A63",
-    "name": "LUMEN WORLD CLASS · elevar experiencia integral antes de Pauli",
+    "id": "A69",
+    "name": "Instrumentar conformidad ejecutable transversal y certificar pipeline",
     "status": "EN CURSO"
   },
   "authorities": [
     {
-      "id": "V46",
-      "role": "autoridad_conceptual_integral"
+      "id": "V1",
+      "role": "autoridad_o_activo_vigente_pov"
     },
     {
-      "id": "V51",
-      "role": "autoridad_canonica_complementaria_norte"
+      "id": "V3",
+      "role": "autoridad_o_activo_vigente_pov"
     },
     {
-      "id": "V52",
-      "role": "autoridad_funcional"
-    },
-    {
-      "id": "V53",
-      "role": "autoridad_tecnico_funcional"
+      "id": "V38",
+      "role": "autoridad_o_activo_vigente_pov"
     },
     {
       "id": "V40",
-      "role": "autoridad_tecnica_complementaria"
+      "role": "autoridad_o_activo_vigente_pov"
     },
     {
       "id": "V41",
-      "role": "autoridad_transversal"
+      "role": "autoridad_o_activo_vigente_pov"
     },
     {
       "id": "V42",
-      "version": "1.2",
-      "role": "gobierno_de_agentes"
+      "role": "autoridad_o_activo_vigente_pov"
     },
     {
       "id": "V43",
-      "role": "autoridad_experiencial_base"
+      "role": "autoridad_o_activo_vigente_pov"
     },
     {
       "id": "V44",
-      "role": "runtime_greenfield"
+      "role": "autoridad_o_activo_vigente_pov"
     },
     {
       "id": "V45",
-      "version": "0.2",
-      "role": "infraestructura_de_gobierno"
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V46",
+      "role": "autoridad_o_activo_vigente_pov"
     },
     {
       "id": "V50",
-      "role": "activo_tecnico_descriptivo_as_built_pre_v51"
+      "role": "autoridad_o_activo_vigente_pov"
     },
     {
-      "id": "V54",
-      "version": "1.0",
-      "role": "infraestructura_de_custodia_sincronica"
-    },
-    {
-      "id": "V55",
-      "version": "1.6",
-      "role": "autoridad_experience_sensation_field_integral_no_regresiva"
+      "id": "V51",
+      "role": "autoridad_o_activo_vigente_pov"
     },
     {
       "id": "V56",
-      "version": "1.1",
-      "role": "autoridad_fuente_y_render_premium"
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V53",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V54",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V52",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V55",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V58",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V59",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V60",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V61",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V62",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V63",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V64",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V65",
+      "role": "autoridad_o_activo_vigente_pov"
     }
   ],
   "required_sequence": [
@@ -87,7 +126,7 @@
     "EVIDENCIA",
     "CIERRE"
   ],
-  "construction_rule": "A63 preserva por mérito lo vigente, ajusta sólo lo que la autoridad y la evidencia exigen y reemplaza lo que induzca legacy, degradación experiencial o contradicción; bridges permanentes están prohibidos. A63 profundiza detalle sin reabrir la naturaleza validada. V55 V1.6 exige continuidad perceptual: Fuente, Territorio propio y Tejido son modulaciones del mismo Experience & Sensation Field, nunca universos visuales autónomos, micrositios, dashboards o cambio de producto. Territorio aumenta intimidad sin cambiar sistema; Fuente aumenta amplitud sin catálogo; Tejido aumenta humanidad y reduce protagonismo tecnológico sin red social. LUMI permanece disponible de forma ubicua y no invasiva y baja a P0/P1 cuando experiencia u otra Vida toman el centro. Deben existir expresiones navegables distintas para perspectiva, práctica, audio, video, obra/recurso, acción real, persona/profesional, círculo, lugar/evento, ayuda material/profesional y quietud; y detalle de Faro, Camino, Santuario, Repertorio, hitos, 1:1, círculo, encuentro y Derrame. Mantener autonomía de movimiento, matriz V53 F1–F12, no regresión, órganos invisibles, salida soberana, procedencia/condiciones/riesgos/costo sólo cuando materialmente relevantes, accesibilidad y custodia fail-closed. Ningún PASS técnico sustituye revisión humana/visual. V56 V1.1 gobierna la materialización PREMIUM de Constelaciones: no existe renderer universal; cada familia conserva su gramática y la referencia visual aprobada funciona como piso cualitativo, no como plantilla rígida.",
+  "construction_rule": "A69 instrumenta únicamente conformidad ejecutable y controles de CI bajo V3/V41/V42/V45/V54/V64/V65; no altera runtime, fuente ni autoridad. A63 sigue EN CURSO y será primer caso de certificación. No merge/promotion antes de los gates aplicables.",
   "fail_closed": true,
-  "updated_at": "2026-09-18T17:24:05-03:00"
+  "updated_at": "2026-10-14T11:48:45-03:00"
 }
