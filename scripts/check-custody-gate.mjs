@@ -28,7 +28,15 @@ if (context.act?.id !== snapshot.act?.id) fail('context and POV must agree on cu
 
 const currentReview = findings.current_review ?? null
 if (currentReview?.status === 'IN_PROGRESS' && currentReview.act_id !== context.act?.id) {
-  fail(`active custody review belongs to ${currentReview.act_id}, not current ACTO ${context.act?.id ?? '?'}`)
+  // A69 instruments verification for A63 without replacing or certifying A63's
+  // ongoing custody review. The explicit governed bridge is read-only.
+  const isA69Tooling = context.act?.id === 'A69' &&
+    snapshot.act?.id === 'A69' &&
+    currentReview.act_id === 'A63' &&
+    readJson('governance/a69-a63-conformity.json').application_act === 'A63'
+  if (!isA69Tooling) {
+    fail(`active custody review belongs to ${currentReview.act_id}, not current ACTO ${context.act?.id ?? '?'}`)
+  }
 }
 
 for (const custodian of registry.custodians ?? []) {
