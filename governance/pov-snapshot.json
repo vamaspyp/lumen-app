@@ -4,7 +4,7 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "verified_at": "2026-09-18T20:24:05Z",
+    "verified_at": "2026-10-14T11:48:45-03:00",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {
@@ -13,16 +13,26 @@
     "status": "ACTIVO"
   },
   "act": {
-    "id": "A63",
-    "name": "LUMEN WORLD CLASS · elevar experiencia integral antes de Pauli",
+    "id": "A69",
+    "name": "Instrumentar conformidad ejecutable transversal y certificar pipeline",
     "status": "EN CURSO",
-    "purpose": "Materializar en el runtime real la fisiología integral del Embrión definida por V55, preservando la continuidad del Experience & Sensation Field y elevando cada familia de experiencia a una expresión inequívocamente LUMEN. El Atlas Premium A63 funciona como referencia material subordinada —no nueva autoridad— para navegación, presencia, transiciones, inmersión y quality bar por arquetipo; world-class es piso, no techo. No se copia mecánicamente el prototipo: se conserva su naturaleza y se evoluciona con criterio limpio.",
-    "dod": "A63 sólo cierra cuando: (1) Especificación funcional/V55, Atlas Premium, modelo de datos y React están mapeados sin omisiones materiales; (2) el runtime real materializa familias diferenciadas —perspectiva/lectura editorial, práctica, audio, video, obra/recurso externo, acción real, persona/mentor/profesional, círculo/grupo, evento/lugar/servicio, ayuda material/pública/profesional y quietud/no contenido— sin renderer universal; (3) cada familia representativa supera Quality Bar LUMEN: experiencia propia, fullscreen/inmersiva por default cuando corresponda, dirección de arte y ritmo adecuados a su naturaleza, procedencia/condiciones/riesgos/costo/disponibilidad sólo cuando sean materialmente necesarios, entrada/salida/retorno cuidados y LUMI P0–P2 coherente; (4) audio/video cuentan con contenido o asset real representativo, no sólo simulación visual; (5) Fuente/Territorio/Tejido conservan el mismo Field sin convertirse en catálogo/dashboard/red social; (6) FUNCTIONAL + ARCHITECTURE + DATA + CUSTODY + EXPERIENCE + HUMAN PASS, con C0+C1+C2+C3+C7+C8 sin BLOCK, CI/backend/visual QA PASS y revisión humana sobre runtime real. Tests verdes no sustituyen Experience PASS."
+    "purpose": "Convertir V3/V45/V54/V64/V65 y Modelo Estable V1.1 en capacidad única de ejecución verificable, primero sobre A63 y después reusable por Fuente PREMIUM sin gobierno paralelo.",
+    "dod": "Contrato trazable requisito→diseño→código/datos→tests/evidencia por SHA; auditoría independiente; gate CI bloqueante de cobertura y evidencia, con controles protegidos; pruebas de incumplimientos sembrados PASS (rechazados); no regresión de V45/V54; aplicación piloto LV-01..LV-11/RV/CF/AC con clasificación honesta; readback POV y evidencia en PR; límites HUMAN/EXPERIENCE explícitos. Sin merge/promoción automática."
   },
   "active_authorities": [
     {
+      "id": "V1",
+      "name": "Canon",
+      "state": "VIGENTE"
+    },
+    {
       "id": "V3",
       "name": "Sistema de Conducción",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V38",
+      "name": "Mapeo Final de Integridad Fundacional V1.0",
       "state": "VIGENTE"
     },
     {
@@ -47,7 +57,7 @@
     },
     {
       "id": "V44",
-      "name": "Runtime Greenfield",
+      "name": "Runtime Greenfield S0",
       "state": "VIGENTE"
     },
     {
@@ -71,8 +81,8 @@
       "state": "VIGENTE"
     },
     {
-      "id": "V52",
-      "name": "Especificación Funcional del Embrión V1.1 · Integración y Capacidad Propia",
+      "id": "V56",
+      "name": "VA+LUMEN · Fuente LUMEN · Estándar Canónico del Embrión V1.1",
       "state": "VIGENTE"
     },
     {
@@ -86,13 +96,53 @@
       "state": "VIGENTE"
     },
     {
+      "id": "V52",
+      "name": "Especificación Funcional del Embrión V1.1 · Integración y Capacidad Propia",
+      "state": "VIGENTE"
+    },
+    {
       "id": "V55",
       "name": "LUMEN Experience & Sensation Field · Especificación Canónica V1.6",
       "state": "VIGENTE"
     },
     {
-      "id": "V56",
-      "name": "VA+LUMEN · Fuente LUMEN · Estándar Canónico del Embrión V1.1",
+      "id": "V58",
+      "name": "Especificación Funcional Detallada del Embrión · Una Vida singular en movimiento · V1.1",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V59",
+      "name": "LUMEN · Modelo de Interfaz del Embrión (1)",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V60",
+      "name": "VA+LUMEN · Especificación Funcional de Interfaz del Embrión · V1.0",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V61",
+      "name": "LUMEN Y LA VIDA",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V62",
+      "name": "VA+LUMEN · Documento Maestro de Construcción del Embrión · V1.0",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V63",
+      "name": "A63 · Contrato técnico-funcional consolidado · Derivación nativa V1",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V64",
+      "name": "Mapa Canónico de Documentos Esenciales de LUMEN · V1.0",
+      "state": "VIGENTE"
+    },
+    {
+      "id": "V65",
+      "name": "Matriz de Integridad Vertical LUMEN · V64 → Especificación → Construcción · 2026-10-07",
       "state": "VIGENTE"
     }
   ],
