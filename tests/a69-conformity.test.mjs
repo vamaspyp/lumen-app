@@ -25,3 +25,6 @@ test('duplicate requirement blocks',()=>assert.equal(check(c=>c.requirements.pus
 test('unexpected requirement blocks',()=>assert.equal(check(c=>c.requirements.push({id:'X-99',authority:'V58',status:'NO_VERIFICADO',tests:[],evidence:[]})).ok,false));
 test('missing evidence path blocks',()=>assert.equal(check(c=>{c.requirements[0].status='PASS';c.requirements[0].tests=['tests/a69-conformity.test.mjs'];c.requirements[0].evidence=[{path:'not-real.json',sha:'a'.repeat(40)}]}).ok,false));
 test('contradiction prevents release',()=>assert.equal(check(c=>{c.requirements[0].status='CONTRADICCION'},{REQUIRE_CONFORMITY_PASS:'true'}).ok,false));
+
+test('foreign SHA evidence blocks PASS',()=>assert.equal(check(c=>{const r=c.requirements[0];r.status='PASS';r.tests=['tests/a69-conformity.test.mjs'];r.evidence=[{path:'governance/a69-a63-conformity.json',sha:'a'.repeat(40)}]},{CONFORMITY_TARGET_SHA:'b'.repeat(40)}).ok,false));
+test('uncertified release cannot bypass target SHA',()=>assert.equal(check(()=>{},{REQUIRE_CONFORMITY_PASS:'true',CONFORMITY_TARGET_SHA:''}).ok,false));
