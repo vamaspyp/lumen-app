@@ -45,6 +45,8 @@ jobs:
         env:
           CONFORMITY_TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       - run: node --test tests/a69-conformity.test.mjs
+      - name: Validate POV live probe script
+        run: node --check scripts/check-live-pov.mjs
       - name: Independent adversarial auditor
         run: node scripts/check-independent-audit.mjs
       - name: Adversarial audit mutation tests
