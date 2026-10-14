@@ -14,3 +14,7 @@
 /scripts/check-conformity.mjs @vamaspyp
 /tests/a69-conformity.test.mjs @vamaspyp
 /scripts/check-independent-audit.mjs @vamaspyp
+/scripts/check-live-pov.mjs @vamaspyp
+/scripts/check-premium-pilot.mjs @vamaspyp
+/tests/a69-premium-pilot.test.mjs @vamaspyp
+/tests/a69-live-pov.test.mjs @vamaspyp
