@@ -4,6 +4,10 @@ const c = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
 const reject = m => { throw new Error('CONFORMITY_BLOCK: ' + m); };
 if (c.act_id !== 'A69' || c.application_act !== 'A63') reject('ACTO mismatch');
 if (!Array.isArray(c.requirements)) reject('requirements absent');
+if (!['IN_PROGRESS','CERTIFIED'].includes(c.certification)) reject('invalid certification state');
+if (!process.env.CONFORMITY_TARGET_SHA || !/^[a-f0-9]{40}$/.test(process.env.CONFORMITY_TARGET_SHA)) {
+ if (c.certification === 'CERTIFIED' || process.env.REQUIRE_CONFORMITY_PASS === 'true') reject('validated target SHA required');
+}
 const expected = [['LV',11],['RV',10],['CF',10],['AC',27]].flatMap(([p,n]) => Array.from({length:n},(_,i)=>p+'-'+String(i+1).padStart(2,'0')));
 const rows = new Map();
 for(const r of c.requirements){
@@ -11,7 +15,7 @@ for(const r of c.requirements){
  rows.set(r.id,r);
  if(!['PASS','GAP','CONTRADICCION','NO_VERIFICADO'].includes(r.status)) reject('invalid status '+r.id);
  if(r.status==='PASS'){
-  if(!Array.isArray(r.tests)||r.tests.length===0||!Array.isArray(r.evidence)||r.evidence.length===0) reject('unsupported PASS '+r.id);
+  if(!r.authority || !Array.isArray(r.tests)||r.tests.length===0||!Array.isArray(r.evidence)||r.evidence.length===0) reject('unsupported PASS '+r.id);
   for(const p of r.tests) if(!fs.existsSync(p)) reject('missing test '+p);
   for(const e of r.evidence) {
    if(!e.path||!fs.existsSync(e.path)||!/^[a-f0-9]{40}$/.test(e.sha||'')) reject('missing evidence or SHA '+r.id);
