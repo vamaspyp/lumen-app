@@ -49,6 +49,20 @@ jobs:
         env:
           CONFORMITY_TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       - run: node --test tests/a69-conformity.test.mjs
+      - name: Google keyless auth for POV check
+        if: github.event_name == 'push' && github.ref == 'refs/heads/acto/A69-conformidad-ejecutable'
+        uses: google-github-actions/auth@v2
+        id: pov-auth
+        with:
+          workload_identity_provider: projects/526634587021/locations/global/workloadIdentityPools/va-lumen-github/providers/github-actions
+          service_account: lumen-pov-reader@va-lumen-governance.iam.gserviceaccount.com
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/spreadsheets.readonly
+      - name: Read live POV with federated identity
+        if: github.event_name == 'push' && github.ref == 'refs/heads/acto/A69-conformidad-ejecutable'
+        run: node scripts/check-live-pov.mjs
+        env:
+          POV_GOOGLE_ACCESS_TOKEN: ${{ steps.pov-auth.outputs.access_token }}
       - name: Validate POV live probe script
         run: node --check scripts/check-live-pov.mjs
       - name: Fail closed without POV credentials
