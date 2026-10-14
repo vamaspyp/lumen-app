@@ -13,3 +13,4 @@
 # A69 conformity contract, verifier and mutation suite require independent human custody.
 /scripts/check-conformity.mjs @vamaspyp
 /tests/a69-conformity.test.mjs @vamaspyp
+/scripts/check-independent-audit.mjs @vamaspyp
