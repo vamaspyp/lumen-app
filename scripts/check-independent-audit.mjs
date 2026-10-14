@@ -9,7 +9,10 @@ const req=contract.requirements||[];
 for(const r of req){
  if(r.status==='PASS'){
    if(!r.authority||!r.tests?.length||!r.evidence?.length||!r.implementation?.length) fail('unsupported implementation proof '+r.id);
-   if(!r.review?.reviewer||r.review.reviewer===r.review.builder) fail('builder reviewed own work '+r.id);
+   if(!r.review?.reviewer||!r.review?.builder||r.review.reviewer===r.review.builder) fail('builder reviewed own work '+r.id);
+   if(!['human','agent'].includes(r.review.reviewer_type)) fail('reviewer type undeclared '+r.id);
+   if(r.review.reviewer_type==='agent' && !r.review.execution_id) fail('agent audit execution missing '+r.id);
+   if(r.review.reviewer_type==='human' && !r.review.approval_url) fail('human approval evidence missing '+r.id);
    if(r.review?.decision!=='APPROVED') fail('no independent approval '+r.id);
    if(!r.requirement_text?.trim()||!r.acceptance_criteria?.length) fail('missing source requirement text '+r.id);
    for(const path of r.implementation) if(typeof path!=='string'||!fs.existsSync(path)) fail('nonexistent implementation '+r.id);
@@ -18,5 +21,7 @@ for(const r of req){
 const unresolved=req.filter(r=>r.status!=='PASS');
 if(contract.certification==='CERTIFIED' && unresolved.length) fail('contract has unresolved requirements');
 if(contract.certification==='CERTIFIED' && req.some(r=>!r.review||r.review.decision!=='APPROVED')) fail('unreviewed certification');
+if(contract.certification==='CERTIFIED' && !contract.release_authorization?.human_actor) fail('human release authorization missing');
+if(contract.certification==='CERTIFIED' && !contract.release_authorization?.approval_url) fail('human release decision evidence missing');
 if(process.env.REQUIRE_CONFORMITY_PASS==='true' && unresolved.length) fail('release blocked');
 if(!process.exitCode)console.log('INDEPENDENT_AUDIT_INVENTORY_PASS: '+req.length+' examined; '+unresolved.length+' unresolved, no completion certified');
