@@ -20,3 +20,8 @@ test('missing requirement blocks',()=>assert.equal(check(c=>c.requirements.splic
 test('false PASS blocks',()=>assert.equal(check(c=>{c.requirements[0].status='PASS'}).ok,false));
 test('false CERTIFIED blocks',()=>assert.equal(check(c=>{c.certification='CERTIFIED'}).ok,false));
 test('release request blocks unresolved contract',()=>assert.equal(check(()=>{},{REQUIRE_CONFORMITY_PASS:'true'}).ok,false));
+
+test('duplicate requirement blocks',()=>assert.equal(check(c=>c.requirements.push(structuredClone(c.requirements[0]))).ok,false));
+test('unexpected requirement blocks',()=>assert.equal(check(c=>c.requirements.push({id:'X-99',authority:'V58',status:'NO_VERIFICADO',tests:[],evidence:[]})).ok,false));
+test('missing evidence path blocks',()=>assert.equal(check(c=>{c.requirements[0].status='PASS';c.requirements[0].tests=['tests/a69-conformity.test.mjs'];c.requirements[0].evidence=[{path:'not-real.json',sha:'a'.repeat(40)}]}).ok,false));
+test('contradiction prevents release',()=>assert.equal(check(c=>{c.requirements[0].status='CONTRADICCION'},{REQUIRE_CONFORMITY_PASS:'true'}).ok,false));
