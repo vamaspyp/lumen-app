@@ -499,63 +499,90 @@
       "authority": "V62",
       "status": "NO_VERIFICADO",
       "tests": [],
-      "evidence": []
+      "evidence": [],
+      "requirement_text": "AC-19 Con memoria consentida, un Momento parecido a uno que ayudó muestra primero lo propio y dice por qué.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
     },
     {
       "id": "AC-20",
       "authority": "V62",
       "status": "NO_VERIFICADO",
       "tests": [],
-      "evidence": []
+      "evidence": [],
+      "requirement_text": "AC-20 Sin consentimiento no aparece ninguna referencia a lo vivido ni mensaje de culpa.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
     },
     {
       "id": "AC-21",
       "authority": "V62",
       "status": "NO_VERIFICADO",
       "tests": [],
-      "evidence": []
+      "evidence": [],
+      "requirement_text": "AC-21 \"Ya es mía\" sólo se registra por acción de la persona y se revierte en un toque desde Santuario.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
     },
     {
       "id": "AC-22",
       "authority": "V62",
       "status": "NO_VERIFICADO",
       "tests": [],
-      "evidence": []
+      "evidence": [],
+      "requirement_text": "AC-22 Tras RECOGNIZED_AS_OWN, el siguiente Momento comparable reduce la presencia de LUMI (menos opciones, sin explicación didáctica) y lo dice.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
     },
     {
       "id": "AC-23",
       "authority": "V62",
       "status": "NO_VERIFICADO",
       "tests": [],
-      "evidence": []
+      "evidence": [],
+      "requirement_text": "AC-23 MiVidaCambio sólo aparece si hay evidencia en el ledger (umbral en OD-15) y cada frase se traza a un evento.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
     },
     {
       "id": "AC-24",
       "authority": "V62",
       "status": "NO_VERIFICADO",
       "tests": [],
-      "evidence": []
+      "evidence": [],
+      "requirement_text": "AC-24 STOPPED_HELPING devuelve propuestas sin reproche y sin repetir la misma fuente sin variación.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
     },
     {
       "id": "AC-25",
       "authority": "V62",
       "status": "NO_VERIFICADO",
       "tests": [],
-      "evidence": []
+      "evidence": [],
+      "requirement_text": "AC-25 Ninguna pantalla muestra racha, contador de uso, porcentaje o puntaje de autonomía (prueba de contenido).",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
     },
     {
       "id": "AC-26",
       "authority": "V62",
       "status": "NO_VERIFICADO",
       "tests": [],
-      "evidence": []
+      "evidence": [],
+      "requirement_text": "AC-26 InicioNadaQueHacer no dispara notificaciones ni insiste; respeta el ritmo acordado.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
     },
     {
       "id": "AC-27",
       "authority": "V62",
       "status": "NO_VERIFICADO",
       "tests": [],
-      "evidence": []
+      "evidence": [],
+      "requirement_text": "AC-27 Existe un experimento brazo vivo contra control que muestra si el segundo acompañamiento mejora.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
     }
   ]
 }
