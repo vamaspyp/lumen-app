@@ -49,6 +49,16 @@ jobs:
         run: node scripts/check-independent-audit.mjs
       - name: Adversarial audit mutation tests
         run: node --test tests/a69-independent-audit.test.mjs
+      - name: Emit truthful conformity report
+        if: always()
+        run: node scripts/report-conformity.mjs
+      - name: Archive conformity evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a69-conformity-report
+          path: test-results/a69-conformity-report.*
+          if-no-files-found: error
       - name: Block release without complete conformity
         if: github.event_name == 'pull_request' && github.base_ref == 'main'
         run: node scripts/check-conformity.mjs
