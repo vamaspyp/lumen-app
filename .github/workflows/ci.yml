@@ -53,6 +53,8 @@ jobs:
         run: node scripts/check-independent-audit.mjs
       - name: Adversarial audit mutation tests
         run: node --test tests/a69-independent-audit.test.mjs
+      - name: Source PREMIUM reusable contract pilot
+        run: node scripts/check-premium-pilot.mjs && node --test tests/a69-premium-pilot.test.mjs
       - name: Emit truthful conformity report
         if: always()
         run: node scripts/report-conformity.mjs
