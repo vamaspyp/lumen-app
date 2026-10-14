@@ -2,9 +2,9 @@ name: CI
 
 on:
   pull_request:
-    branches: [main, greenfield-v04-embryo, greenfield-a63-v19-hifi-es]
+    branches: [main, greenfield-v04-embryo, greenfield-a63-v19-hifi-es, a63-lumen-premium-v21-final]
   push:
-    branches: [main, greenfield-v04-s0, greenfield-v04-s1, greenfield-v04-embryo, greenfield-a63-embryo-complete, greenfield-a63-premium-cleanroom, a63-lumen-premium-v21-final]
+    branches: [main, greenfield-v04-s0, greenfield-v04-s1, greenfield-v04-embryo, greenfield-a63-embryo-complete, greenfield-a63-premium-cleanroom, a63-lumen-premium-v21-final, acto/A69-conformidad-ejecutable]
 
 jobs:
   conduction-gate:
@@ -32,8 +32,20 @@ jobs:
       - name: Verify organism synchrony and custodian contracts
         run: node scripts/check-custody-gate.mjs
 
+  conformity-gate:
+    name: Conformity Gate
+    needs: conduction-gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/check-conformity.mjs
+      - run: node --test tests/a69-conformity.test.mjs
+
   verify:
-    needs: [conduction-gate, custody-gate]
+    needs: [conduction-gate, custody-gate, conformity-gate]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
