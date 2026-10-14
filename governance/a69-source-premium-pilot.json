@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "act_id": "A69",
+  "application_domain": "FUENTE_PREMIUM",
+  "certification": "IN_PROGRESS",
+  "authority_refs": [
+    "V58",
+    "V62",
+    "V64",
+    "V65"
+  ],
+  "description": "Piloto de reusabilidad del mismo contrato de conformidad, sin afirmar cierre de Fuente PREMIUM",
+  "requirements": [
+    {
+      "id": "FP-01",
+      "name": "Fidelidad a fuente y procedencia",
+      "authority": "V58",
+      "source_section": "V58 · Explorar/Fuente",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "FP-02",
+      "name": "Derechos y legitimidad de uso",
+      "authority": "V58",
+      "source_section": "V58 §22.14 LV-05",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "FP-03",
+      "name": "Experiencia premium funcional y representativa",
+      "authority": "V62",
+      "source_section": "V62 §10.2 AC-10",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    },
+    {
+      "id": "FP-04",
+      "name": "Ausencia de contenido ficticio o engañoso",
+      "authority": "V58",
+      "source_section": "V58 §22.14 LV-05",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": []
+    }
+  ]
+}
