@@ -47,6 +47,8 @@ jobs:
       - run: node --test tests/a69-conformity.test.mjs
       - name: Independent adversarial auditor
         run: node scripts/check-independent-audit.mjs
+      - name: Adversarial audit mutation tests
+        run: node --test tests/a69-independent-audit.test.mjs
 
   verify:
     needs: [conduction-gate, custody-gate, conformity-gate]
