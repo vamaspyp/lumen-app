@@ -65,6 +65,8 @@ test('V58 remembers a voluntary return and puts a relevant own resource before n
  await page.getByText('Conservar algo de esta experiencia',{exact:true}).click()
  await page.getByRole('checkbox',{name:'Conservar este recurso en mi Santuario'}).check()
  await page.getByRole('button',{name:'Conservar en mi Santuario'}).click()
+ // Conservation performs async RPCs and a readback; wait for that confirmation before navigating.
+ await expect(page.getByRole('status')).toContainText('Conservado en tu Santuario y verificado.')
  await page.getByRole('button',{name:'Abrir mi Santuario'}).click()
  await expect(page.getByRole('heading',{name:'Mi Santuario'})).toBeVisible()
  expect(life.returns).toHaveLength(1)
