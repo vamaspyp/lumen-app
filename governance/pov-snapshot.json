@@ -4,7 +4,7 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "verified_at": "2026-10-15T12:28:39.577640+00:00",
+    "verified_at": "2026-10-15T12:52:26.986Z",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {
@@ -32,7 +32,7 @@
       "name": "Sistema de Conducción",
       "state": "VIGENTE",
       "location": "POV: https://docs.google.com/spreadsheets/d/1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM/edit · Modelo estable V1.1: https://docs.google.com/document/d/1kvu7SW5rlNqBh0Mi_YbTzlv1ysatlnqcpYbZAEpdcbk/edit",
-      "verified": "2026-10-14"
+      "verified": "2026-10-15"
     },
     {
       "id": "V38",
@@ -80,8 +80,8 @@
       "id": "V45",
       "name": "Conduction Gate v0.2",
       "state": "VIGENTE",
-      "location": "GitHub greenfield-v04-embryo · governance/CONDUCTION_GATE.md · governance/conduction-context.json · governance/pov-snapshot.json · scripts/check-conduction-gate.mjs · .github/CODEOWNERS · .github/workflows/ci.yml · agent entrypoints",
-      "verified": "2026-09-07"
+      "location": "Versión verificada: https://github.com/vamaspyp/lumen-app/tree/f8385566dfa7bf16128eb6bc5056e42b0ad21f20 · PR32 https://github.com/vamaspyp/lumen-app/pull/32 · governance/CONDUCTION_GATE.md · governance/A69_EVIDENCE_PROTOCOL.md · scripts/check-conduction-gate.mjs · scripts/conformity-proof.mjs · .github/CODEOWNERS · .github/workflows/ci.yml · OIDC lumen-pov-reader · ruleset25103079. Integración pendiente.",
+      "verified": "2026-10-15"
     },
     {
       "id": "V46",
