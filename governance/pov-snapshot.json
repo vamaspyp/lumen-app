@@ -4,7 +4,7 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "verified_at": "2026-10-15T12:52:26.986Z",
+    "verified_at": "2026-10-15T13:54:43.880Z",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {
@@ -17,7 +17,7 @@
     "name": "Instrumentar conformidad ejecutable transversal y certificar pipeline",
     "status": "EN CURSO",
     "purpose": "Convertir V3/V45/V54/V64/V65 y Modelo Estable V1.1 en capacidad única de ejecución verificable, primero sobre A63 y después reusable por Fuente PREMIUM sin gobierno paralelo.",
-    "dod": "Contrato trazable requisito→diseño→código/datos→tests/evidencia por SHA; auditoría independiente; gate CI bloqueante de cobertura y evidencia, con controles protegidos; pruebas de incumplimientos sembrados PASS (rechazados); no regresión de V45/V54; aplicación piloto LV-01..LV-11/RV/CF/AC con clasificación honesta; readback POV y evidencia en PR; límites HUMAN/EXPERIENCE explícitos. Sin merge/promoción automática."
+    "dod": "Contrato trazable requisito→diseño→código/datos→tests/evidencia por SHA; auditoría independiente; gate CI bloqueante de cobertura y evidencia, con controles protegidos; pruebas de incumplimientos sembrados PASS (rechazados); no regresión de V45/V54; aplicación piloto LV-01..LV-11/RV/CF/AC con clasificación honesta; readback POV y evidencia en PR; límites HUMAN/EXPERIENCE explícitos. Autorización de Pablo 2026-10-15: integración técnica por agente dentro del ACTO/DoD aprobado, sólo con PR, cuatro checks obligatorios PASS del SHA exacto y auditoría independiente sin BLOCK. No requiere segunda aprobación humana por PR. Sin bypass ordinario, push forzado ni borrado. Control humano de NORTE, OBJETIVOS, SEÑALES, FOCOS, cambios materiales de alcance/autoridad y exposición/promoción a usuarios. Cambios en los propios controles o ampliación de privilegios requieren decisión humana explícita; no equivalen a mantenimiento ordinario."
   },
   "active_authorities": [
     {

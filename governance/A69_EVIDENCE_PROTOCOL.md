@@ -22,14 +22,26 @@ Esta es reutilización trazable de una lectura autenticada, no una nueva consult
 
 ## Fronteras
 
-El reporte no autoemite certificados; un contrato CERTIFIED requiere todas sus pruebas y revisiones y conserva la decisión humana de exposición cuando aplica. El piloto PREMIUM de cuatro controles no equivale a cobertura integral V56. A69 no cierra A63/Fuente, no autoriza merge ni exposición y no reemplaza HUMAN/EXPERIENCE PASS.
+El reporte no autoemite certificados; un contrato CERTIFIED requiere todas sus pruebas y revisiones y conserva la decisión humana de exposición cuando aplica. El piloto PREMIUM de cuatro controles no equivale a cobertura integral V56. A69 no cierra A63/Fuente ni reemplaza HUMAN/EXPERIENCE PASS. La integración técnica se rige por la autorización de responsable único al final de este protocolo; exposición/promoción a usuarios sigue reservada al humano.
 
 ## Integración operativa sobre runtime vigente (2026-10-15)
 
-Candidato construido selectivamente sobre A63 `1f74703e87552fa3058f2568ea910aeb2292d53d`. No modifica `src/`, `supabase/` ni las 96 regresiones E2E del producto. Conserva los cuatro checks, la evidencia completa y la revisión humana.
+Candidato construido selectivamente sobre A63 `1f74703e87552fa3058f2568ea910aeb2292d53d`. No modifica `src/`, `supabase/` ni las 96 regresiones E2E del producto. Conserva los cuatro checks y la evidencia completa. La decisión posterior de responsable único sustituye la aprobación humana rutinaria por PR.
 
 `created_under_act` conserva la procedencia A69 de los contratos. `act_id` identifica el ACTO ejecutor y debe coincidir con contexto y POV; una transición requiere renovar los cuatro documentos desde autoridad vigente, sin eliminar requisitos ni alterar fuentes. Las pruebas de transición aceptan un nuevo ACTO coherente y rechazan el obsoleto, la autoridad retirada y la pérdida de cobertura. Son pruebas de mecanismo, no un cambio real de ACTO en POV.
 
 Los triggers cubren pushes de ramas y PRs; la atestación exige el push del mismo SHA y rama del PR, y ACTO/FOCO iguales al snapshot. Esto no amplía la autorización Google: una rama no autorizada falla cerrada. La única emisora comprobada hasta ahora sigue siendo `acto/A69-conformidad-ejecutable`. No conceder acceso indiscriminado a todas las ramas para obtener checks verdes.
 
-Pendientes para cierre operativo: autorización OIDC verificable para las ramas de trabajo/integración aprobadas; ruleset con Conduction Gate, Custody Gate, Conformity Gate y verify obligatorios sobre el destino real `a63-v60-intuitive` y su integración `greenfield-v04-embryo`; revisión Code Owner elegible, merge humano y ejecución satisfactoria posterior en destino. No declarar instalación efectiva ni A69 cerrado por existir este candidato.
+Pendientes para cierre operativo: autorización OIDC verificable para las ramas de trabajo/integración aprobadas; ruleset con Conduction Gate, Custody Gate, Conformity Gate y verify obligatorios sobre el destino real `a63-v60-intuitive` y su integración `greenfield-v04-embryo`; configuración compatible con responsable único y ejecución satisfactoria posterior a la integración en destino. No declarar instalación efectiva ni A69 cerrado por existir este candidato.
+
+## Responsable único: autorización explícita de Pablo (2026-10-15)
+
+Fuente vigente: V3/POV, LEEME regla 8, ACTO A69/DoD y MEMORIA del 2026-10-15. Pablo autoriza máxima autonomía operativa con control de proyecto. Esta decisión sustituye la anterior prohibición de integración por agente y la exigencia de segunda aprobación humana en cada PR; no es una dispensa de checks.
+
+Durante una ejecución autorizada, el agente puede implementar, verificar e integrar por PR cambios técnicos dentro del ACTO/DoD aprobado cuando Conduction Gate, Custody Gate, Conformity Gate y verify estén SUCCESS sobre el SHA exacto y una auditoría independiente real no tenga BLOCK. Antes del merge relee POV, destino, SHA, checks y auditoría; ante divergencia se detiene. Después comprueba la corrida de destino y registra evidencia/readback. No implica un servicio permanente fuera de las sesiones de ejecución.
+
+Pablo conserva decisión sobre NORTE, OBJETIVOS, SEÑALES, FOCOS, cambios materiales de alcance/autoridad y exposición/promoción a usuarios. Cambiar los controles o ampliar privilegios requiere autorización humana explícita; no se considera mantenimiento ordinario. Una auditoría IA no se presenta como aprobación humana independiente ni como HUMAN/EXPERIENCE PASS.
+
+Configuración autorizada para responsable único: PR obligatorio; cero aprobaciones humanas requeridas; Code Owner review obligatorio desactivado (CODEOWNERS se conserva como responsabilidad); aprobación del último push desactivada; aprobación adicional de cambios no atribuibles desactivada. Mantener cuatro checks obligatorios y actualizados, conversaciones resueltas, sin bypass ordinario, force push ni borrado. Las reglas coincidentes se acumulan: el ruleset antiguo de greenfield también debe dejar de exigir Code Owner review. Estos ajustes requieren permisos administrativos que el conector actual no posee.
+
+GitHub exige mecánicamente PR y checks; la auditoría independiente, el alcance y las decisiones reservadas son además compromisos del protocolo gobernado. No se afirma que GitHub distinga humano/agente cuando comparten identidad ni que esta modalidad equivalga a separación de dos identidades humanas.

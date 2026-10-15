@@ -1,4 +1,4 @@
-# Conduction and custody controls are human-custodied. Branch protection/ruleset must require Code Owner review for these paths.
+# Human custody identifies the owner; single-owner policy (POV 2026-10-15) does not require a second human review per PR.
 /.github/CODEOWNERS @vamaspyp
 /.github/workflows/ @vamaspyp
 /.github/copilot-instructions.md @vamaspyp
