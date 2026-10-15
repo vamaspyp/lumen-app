@@ -128,5 +128,5 @@
   ],
   "construction_rule": "A69 instrumenta únicamente conformidad ejecutable y controles de CI bajo V3/V41/V42/V45/V54/V64/V65; no altera runtime, fuente ni autoridad. A63 sigue EN CURSO y será primer caso de certificación. No merge/promotion antes de los gates aplicables. Preserva lo conforme; ajusta lo defectuoso; reemplaza lo incompatible. Bridges permanentes prohibidos.",
   "fail_closed": true,
-  "updated_at": "2026-10-14T11:48:45-03:00"
+  "updated_at": "2026-10-15T12:22:13.238186+00:00"
 }

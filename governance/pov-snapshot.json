@@ -4,7 +4,7 @@
     "system_id": "V3",
     "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
     "title": "VA+LUMEN · Sistema de Conducción · OPERATIVO",
-    "verified_at": "2026-10-14T20:19:29.465911+00:00",
+    "verified_at": "2026-10-15T12:22:13.238186+00:00",
     "verified_by": "conductor_agent_with_google_drive_read"
   },
   "focus": {
@@ -109,7 +109,7 @@
       "name": "VA+LUMEN · Fuente LUMEN · Estándar Canónico del Embrión V1.1",
       "state": "VIGENTE",
       "location": "https://docs.google.com/document/d/1UVqvDYVKBRpi5zrgveTzTxkiyK2fXNM-MsnZFzvqQXo/edit",
-      "verified": "18/09/2026"
+      "verified": 46283
     },
     {
       "id": "V53",
