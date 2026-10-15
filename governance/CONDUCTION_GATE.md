@@ -46,7 +46,7 @@ La protección no debe depender de que una IA obedezca instrucciones. Por eso:
 
 1. CI expone un job independiente `Conduction Gate` que corre antes del resto de la verificación.
 2. La rama oficial debe estar protegida por ruleset/branch protection y exigir ese check.
-3. Los archivos que pueden debilitar el gate (`governance/`, workflow, script, tests y entrypoints de agentes) tienen custodia humana mediante CODEOWNERS y deben requerir Code Owner review.
+3. Los archivos que pueden debilitar el gate (`governance/`, workflow, script, tests y entrypoints de agentes) conservan custodio humano identificado en CODEOWNERS. Decisión explícita de Pablo del 2026-10-15, registrada en V3/LEEME regla 8 y ACTO A69: responsable único; no se exige una segunda identidad humana para aprobar cada PR. La integración técnica puede ejecutarla el agente con cuatro checks obligatorios PASS por SHA y auditoría independiente sin BLOCK. Cambios de guardas o privilegios requieren decisión humana explícita, como esta modificación. Ver A69_EVIDENCE_PROTOCOL.md.
 4. Push forzado, borrado de rama y bypass de administradores deben quedar deshabilitados salvo recuperación extraordinaria deliberada.
 5. Una mutación que no atraviesa esta frontera no se considera trabajo oficial de VA+LUMEN aunque técnicamente exista.
 

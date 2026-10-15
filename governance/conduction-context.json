@@ -1,24 +1,132 @@
 {
   "schema_version": "1.1",
-  "system": {"id":"V3","spreadsheet_id":"1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM","role":"POV"},
-  "focus": {"id":"F6","name":"Nacimiento del Embrión y primeras vidas reales"},
-  "act": {"id":"A46","name":"Certificación final de exposición real · Organismo + Experiencia + Fuente","status":"EN CURSO"},
+  "system": {
+    "id": "V3",
+    "spreadsheet_id": "1e-G0SlHJqzBsscDcckerxxQ_qwjSBDjokgijuBblhWM",
+    "role": "POV"
+  },
+  "focus": {
+    "id": "F6",
+    "name": "Nacimiento del Embrión y primeras vidas reales"
+  },
+  "act": {
+    "id": "A69",
+    "name": "Instrumentar conformidad ejecutable transversal y certificar pipeline",
+    "status": "EN CURSO"
+  },
   "authorities": [
-    {"id":"V46","role":"autoridad_conceptual_integral"},
-    {"id":"V51","role":"autoridad_canonica_complementaria_norte"},
-    {"id":"V52","role":"autoridad_funcional"},
-    {"id":"V53","role":"autoridad_tecnico_funcional"},
-    {"id":"V40","role":"autoridad_tecnica_complementaria"},
-    {"id":"V41","role":"autoridad_transversal"},
-    {"id":"V42","version":"1.2","role":"gobierno_de_agentes"},
-    {"id":"V43","role":"autoridad_experiencial"},
-    {"id":"V44","role":"runtime_greenfield"},
-    {"id":"V45","version":"0.2","role":"infraestructura_de_gobierno"},
-    {"id":"V50","role":"activo_tecnico_descriptivo_as_built_pre_v51"},
-    {"id":"V54","version":"1.0","role":"infraestructura_de_custodia_sincronica"}
+    {
+      "id": "V1",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V3",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V38",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V40",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V41",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V42",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V43",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V44",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V45",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V46",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V50",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V51",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V52",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V53",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V54",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V55",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V56",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V58",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V59",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V60",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V61",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V62",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V63",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V64",
+      "role": "autoridad_o_activo_vigente_pov"
+    },
+    {
+      "id": "V65",
+      "role": "autoridad_o_activo_vigente_pov"
+    }
   ],
-  "required_sequence":["POV_ACTIVOS","FOCO","ACTO_DOD","AUTORIDAD_VIGENTE","REALIDAD_TECNICA","EJECUCION","EVIDENCIA","CIERRE"],
-  "construction_rule":"A46 vuelve a ser el ACTO vigente de exposición humana. El Embrión llega PAULI-READY tras A60 (integración y capacidad propia), A61 (Custodia Sincrónica V54) y A62 (Fuente + Experiencia world-class), todos cerrados y certificados. No se agrega nueva construcción por anticipación: ante una fricción material observada por Pauli, preservar lo correcto, ajustar sólo el delta responsable y reemplazar cualquier pieza que induzca semántica vieja o duplicación. Todo cambio debe preservar V46/V51/V52/V53/V54, canonical_integrity v7 / embryo.v53.1, No Regresión + Evolución Limpia y custodia fail-closed. Bridges permanentes, aliases legacy, scores, programas coercitivos, tabla Constelación, capas paralelas y PRELAUNCH RESET anticipado siguen prohibidos; el reset sólo ocurre tras GO humano e inmediatamente antes de primeras vidas reales.",
-  "fail_closed":true,
-  "updated_at":"2026-09-12T15:58:00-03:00"
+  "required_sequence": [
+    "POV_ACTIVOS",
+    "FOCO",
+    "ACTO_DOD",
+    "AUTORIDAD_VIGENTE",
+    "REALIDAD_TECNICA",
+    "EJECUCION",
+    "EVIDENCIA",
+    "CIERRE"
+  ],
+  "construction_rule": "A69 instrumenta únicamente conformidad ejecutable y controles de CI bajo V3/V41/V42/V45/V54/V64/V65; no altera runtime, fuente ni autoridad. A63 sigue EN CURSO y será primer caso de certificación. No merge/promotion antes de los gates aplicables. Preserva lo conforme; ajusta lo defectuoso; reemplaza lo incompatible. Bridges permanentes prohibidos.",
+  "fail_closed": true,
+  "updated_at": "2026-10-15T12:22:13.238186+00:00"
 }

@@ -1,11 +1,21 @@
 name: CI
 
 on:
+  workflow_dispatch:
+    inputs:
+      evidence_artifact_id:
+        description: Post-commit bundle.json artifact for this exact SHA (optional inventory mode)
+        required: false
+        type: string
   pull_request:
-    branches: [main, greenfield-v04-embryo]
+    # All PR destinations are checked; required-check policy governs integration.
   push:
-    branches: [main, greenfield-v04-s0, greenfield-v04-s1, greenfield-v04-embryo]
+    branches: ["**"]
 
+permissions:
+  contents: read
+  id-token: write
+  
 jobs:
   conduction-gate:
     name: Conduction Gate
@@ -13,6 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 2
       - uses: actions/setup-node@v4
         with:
@@ -26,17 +37,108 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
       - name: Verify organism synchrony and custodian contracts
         run: node scripts/check-custody-gate.mjs
 
-  verify:
-    needs: [conduction-gate, custody-gate]
+  conformity-gate:
+    name: Conformity Gate
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    env:
+      CONFORMITY_TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    needs: conduction-gate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Verify checked-out evidence SHA
+        run: test "$(git rev-parse HEAD)" = "$CONFORMITY_TARGET_SHA"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Load requested post-commit evidence bundle
+        if: github.event_name == 'workflow_dispatch' && inputs.evidence_artifact_id != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ inputs.evidence_artifact_id }}
+        run: |
+          [[ "$ARTIFACT_ID" =~ ^[0-9]+$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" > /tmp/a69-evidence.zip
+          unzip -p /tmp/a69-evidence.zip bundle.json > /tmp/a69-bundle.json
+          echo "CONFORMITY_BUNDLE_FILE=/tmp/a69-bundle.json" >> "$GITHUB_ENV"
+      - name: Prepare shared immutable evidence inputs
+        run: node scripts/prepare-conformity-evidence.mjs
+      - run: node scripts/check-conformity.mjs
+        env:
+          CONFORMITY_TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      - run: env -u CONFORMITY_FILE -u PREMIUM_CONTRACT_FILE node --test tests/a69-conformity.test.mjs
+      - name: Validate POV live probe script
+        run: node --check scripts/check-live-pov.mjs
+      - name: Fail closed without POV credentials
+        run: node --test tests/a69-live-pov.test.mjs
+      - name: Independent adversarial auditor
+        run: node scripts/check-independent-audit.mjs
+      - name: Adversarial audit mutation tests
+        run: env -u CONFORMITY_FILE -u PREMIUM_CONTRACT_FILE node --test tests/a69-independent-audit.test.mjs tests/a69-proof.test.mjs tests/a69-evidence-bundle.test.mjs tests/a69-pov-attestation.test.mjs tests/a69-operational-transition.test.mjs
+      - name: Source PREMIUM reusable contract pilot
+        run: node scripts/check-premium-pilot.mjs && env -u CONFORMITY_FILE -u PREMIUM_CONTRACT_FILE node --test tests/a69-premium-pilot.test.mjs
+      - name: Verify A69 cross-domain invariants
+        run: node scripts/check-a69-cross-domain.mjs && env -u CONFORMITY_FILE -u PREMIUM_CONTRACT_FILE node --test tests/a69-cross-domain.test.mjs
+      - name: Google keyless auth for POV check
+        if: github.event_name != 'pull_request'
+        uses: google-github-actions/auth@v2
+        id: pov-auth
+        with:
+          workload_identity_provider: projects/526634587021/locations/global/workloadIdentityPools/va-lumen-github/providers/github-actions
+          service_account: lumen-pov-reader@va-lumen-governance.iam.gserviceaccount.com
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/spreadsheets.readonly
+      - name: Read live POV with federated identity
+        if: github.event_name != 'pull_request'
+        run: node scripts/check-live-pov.mjs
+        env:
+          POV_GOOGLE_ACCESS_TOKEN: ${{ steps.pov-auth.outputs.access_token }}
+      - name: Verify trusted push POV attestation for exact PR head
+        if: github.event_name == 'pull_request'
+        run: node scripts/check-pov-attestation.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          POV_SOURCE_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          POV_TRUSTED_BRANCH: ${{ github.head_ref }}
+      - name: Emit truthful conformity report
+        if: always()
+        run: node scripts/report-conformity.mjs
+      - name: Archive conformity evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a69-conformity-report
+          path: |
+            test-results/a69-conformity-report.*
+            test-results/a69-live-pov.json
+          if-no-files-found: error
+      - name: Block release without complete conformity
+        if: github.event_name == 'pull_request' && github.base_ref == 'main'
+        run: node scripts/check-conformity.mjs
+        env:
+          REQUIRE_CONFORMITY_PASS: 'true'
+          CONFORMITY_TARGET_SHA: ${{ github.event.pull_request.head.sha }}
+
+  verify:
+    needs: [conduction-gate, custody-gate, conformity-gate]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -47,5 +149,14 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Architecture + unit + custody + lint + build + embryo regression
         run: npm run verify
+      - name: Preserve clean-room visual QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cleanroom-visual-qa
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
       - name: Certify live greenfield backend
         run: npm run test:live
