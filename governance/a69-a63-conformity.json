@@ -1,0 +1,589 @@
+{
+  "schema_version": 1,
+  "act_id": "A69",
+  "application_act": "A63",
+  "certification": "IN_PROGRESS",
+  "requirements": [
+    {
+      "id": "LV-01",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "LV-01 · CICLO VITAL Y DISCERNIMIENTO. Una persona puede observar cómo vive y se siente en Áreas que elige considerar relevantes, expresar qué anhela, le duele o desea transformar, explorar su importancia, razones y disposición auténtica, y distinguir: (a) dirección/Faro elegido y revisable, (b) Potenciales propios que desea cultivar —hipótesis editables, nunca juicio de identidad—, (c) Condiciones del entorno favorables/adversas, modificables/no modificables, (d) recursos y apoyos disponibles, (e) realizabilidad situada y próximos gestos voluntarios. LUMI ofrece preguntas reflexivas breves y no un cuestionario prescriptivo, diagnóstico, evaluación de suficiencia ni promesa de resultado. Ningún Faro ni acuerdo de Potenciales es obligatorio para un Momento o Explorar libre.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.14"
+    },
+    {
+      "id": "LV-02",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "LV-02 · MI VIDA / TERRITORIO. Primera capa: mapa vivo de Áreas, Faros y recorrido significativo, sin tablero cuantificador. Profundidad voluntaria: Territorio / Faros / Recorrido como perspectivas, no puertas; crear/editar/pausar/soltar/reformular Faro; enlazar Área y Potenciales validados, Condiciones, reflexiones y composición contextual; consultar cambios/versiones y hechos vividos por intervalo temporal; corregir/retirar asociaciones. Área/Faro/Potencial/intervalo son criterios combinables en búsqueda contextual, no filtros omnipresentes ni taxonomía obligatoria. “Registro del avance” significa observar experiencias, revisiones y cambios significativos, jamás porcentaje, ranking, deuda, progreso inferido ni cumplimiento de objetivos.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.14"
+    },
+    {
+      "id": "LV-03",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "LV-03 · SANTUARIO ABIERTO Y SOBERANO. Además de piezas guardadas, experiencias vividas, reflexiones, composiciones conservadas y propio, permitir crear/editar/retirar notas libres y recursos o contactos provenientes de Fuente, Tejido o exterior, cuando la procedencia y el acceso sean legítimos. Texto abierto puede incluir dolores, valores, talentos, agradecimientos, aprendizajes, luces/sombras u otros significados personales, sin categorías ni revelación forzosa. Poder vincular/desvincular voluntariamente notas/recursos/contactos con Área, Faro, Potencial, constelación o experiencia; recuperar/filtrar por tales relaciones y retomar sin perder historia. Guardar ≠ vivir ≠ retorno ≠ reconocer propio ≠ compartir. Pertenencia, propiedad, consentimiento, corrección, borrado/exportación, visibilidad y límites de privacidad son explícitos. No es un repositorio de identidad total ni un catálogo de favoritos.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.14"
+    },
+    {
+      "id": "LV-04",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "LV-04 · COMPARTIR DESDE LO PROPIO. Compartir un recurso, reflexión o contacto de Santuario hacia Tejido o un destino externo es acto individual, expreso y revocable hasta donde permita el destino, con vista previa del contenido, alcance, destinatario, procedencia, derechos y advertencia de irreversibilidad externa cuando corresponda. Nunca compartir automáticamente notas íntimas, datos de terceros ni contenidos sujetos a derechos no comprobados. Si el medio, permiso o canal no existe, indicar límite real y ofrecer únicamente salida factible; no simular publicación, interacción ni revocación fuera de LUMEN.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.14"
+    },
+    {
+      "id": "LV-05",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "LV-05 · EXPLORAR / FUENTE. Una única Fuente, puerta Explorar; acceso libre aun sin Faro. Criterios posibles de segundo nivel: Área, Faro, Potencial abierto, formato, duración, ubicación autorizada y rango de fecha, combinables sólo si el dato y el backend los sustentan. La búsqueda por Potencial no puede fingir matching semántico si el contrato disponible sólo realiza búsqueda léxica; declarar esa limitación y NO_MATCH. Ubicación/fecha/disponibilidad no se infieren ni se simulan. Mantener procedencia, derechos, condiciones, riesgos y family renderer pertinentes. Incorporar voluntariamente a Constelación o Santuario sin equivalencia automática entre actos.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.14"
+    },
+    {
+      "id": "LV-06",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "LV-06 · TEJIDO VIDA→VIDA. Permitir descubrir, solicitar/ofrecer o compartir encuentros presenciales, espacios online, círculos, pares, profesionales, servicios y saberes aportados (reflexiones/experiencias/recursos), con acuerdos, límites, permisos y condiciones de acceso. Área/Potencial/ubicación autorizada/rango de fecha funcionan como criterios opcionales cuando existen datos reales. La conexión es intencional y reversible donde corresponda; no hay feed, seguidores, rankings, agenda o eventos ficticios ni exposición de información íntima sin consentimiento.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.14"
+    },
+    {
+      "id": "LV-07",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "LV-07 · LUMI CONTEXTUAL Y PROFUNDIDAD. Dos encargos visibles: (1) explicar brevemente para qué sirve cada espacio y cómo puede aportar valor a esa Vida, sólo por invitación o necesidad contextual; (2) facilitar las funciones profundas de editar, relacionar, buscar, compartir, programar, revisar y corregir sin llenar el Nivel 1 de controles. P0 presencia reconocible/silenciosa; P1 orientación contextual mínima; P2 conversación opt-in. Texto siempre; audio o video explicativos sólo con medio real, accesible, autorizado y útil, sin reproductores fingidos/autoplay. Se retira durante Vivir. LUMI no sustituye la navegación de cinco puertas ni monopoliza funciones imprescindibles.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.14"
+    },
+    {
+      "id": "LV-08",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "LV-08 · INICIO Y ACCESOS CRUZADOS. Función primaria inalterada: “¿Qué está pasando ahora?”, expresión libre y un gesto principal. En regreso, mostrar como máximo UNA continuidad priorizada y fundamentada (Faro, práctica, recurso acordado o encuentro) en Nivel 1. La intención actualizada de tres shortcuts personalizados se satisface como HASTA tres accesos contextuales opcionales a otros órganos, visibles sólo bajo demanda/segundo nivel mediante LUMI o revelación discreta y sólo cuando hay objetos/acciones reales pertinentes; no tres tarjetas permanentes, no obligación de poblarlos, ni dashboard. Ante conflicto entre tres atajos visibles y §22.13 RV-02/RV-09, prevalece §22.13 sin sacrificar la circulación de valor entre órganos.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.14"
+    },
+    {
+      "id": "LV-09",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "LV-09 · CONSTELACIÓN / CAMINO. Camino sólo equivale a Constelación cuando designa composición contextual; recorrido de la Vida es historia, no una segunda Constelación. Sobre Faro/Área/Potenciales validados (o Momento puntual sin ellos), LUMEN propone composición abierta, nutrida, editable y ampliable desde Fuente+Tejido+propio/Santuario cuando corresponda. No hay cuota mínima/máxima ni obligación de una familia por clase. Debe poder abordar el Momento actual y abrir reflexión, aprendizaje, práctica, acción real, encuentro y/o ayuda experta/material; ofrecer editar/quitar/sustituir/agregar y conservar composición completa sin obligación de vivir piezas. Sólo se afirma cobertura revisada/admitida; en ausencia, NO_MATCH.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.14"
+    },
+    {
+      "id": "LV-10",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "LV-10 · VIVIR, RETORNO, CONTINUIDAD. Las familias mantienen experiencia propia e inmersión pertinente. Tras Vivir, acciones separadas, voluntarias y no encadenadas obligatoriamente: reflexionar, dar feedback, guardar pieza, preservar composición, incorporar nota/contacto, hacer propio por reconocimiento explícito, repetir/variar/aplicar o acordar recurrencia. Rutina/recordatorio es continuidad opt-in relacionada con recurso/práctica/Faro, con frecuencia/canal/condiciones y cancelación/pausa; no hábitos, streaks, penalizaciones ni vigilancia. Aprendizaje distingue utilidad puntual, continuidad, apropiación y efectos contextuales sin atribución causal automática.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.14"
+    },
+    {
+      "id": "LV-11",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "LV-11 · CONTRATO DE COBERTURA Y DISEÑO. Para cada LV-01..LV-10 contrastar intención actualizada → V58 §§4–8, 22.10, 22.12 → §22.13 RV-01..RV-10 → V55/V62/V63 → acción visible → evento/contrato → DB → E2E/captura desktop1440×900 y mobile390×844. Estados: PASS/GAP/CONTRADICCIÓN/NO VERIFICADO. Funciones de segundo nivel no invaden portada; cinco puertas exactas, Santuario propio e independiente, Constelación escena, LUMI transversal, cinco momentos sin sexto paso, una primaria, diseño editorial PREMIUM. Las funcionalidades cuya persistencia, derechos, disponibilidad, canales externos o medios reales no estén acreditados permanecen GAP, no se declaran implementadas. Esta precisión es documental: A63 sigue EN CURSO, sin FUNCTIONAL/EXPERIENCE/HUMAN PASS por texto ni imagen.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.14"
+    },
+    {
+      "id": "RV-01",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "RV-01 Navegación: cinco puertas Inicio / Mi Vida / Explorar / Tejido / Santuario. Constelación es escena contextual accesible desde Inicio, Faro, Mi Vida y Santuario, nunca quinta puerta. LUMI es presencia transversal P0–P2, no sexta puerta; funciones secundarias contextuales y retirada durante Vivir. Barra de cinco accesos consistente en todos los órganos.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.13"
+    },
+    {
+      "id": "RV-02",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "RV-02 Inicio: una pregunta principal «¿Qué está pasando ahora?», expresión libre texto/voz y, en regreso, una sola continuidad pertinente (Faro activo, práctica acordada o retorno opcional); secundarios discretos retomar práctica/lectura, Explorar y LUMI. No obligar a clasificar ni crear Faro; email/OTP antes del primer Momento según DH-04.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.13"
+    },
+    {
+      "id": "RV-03",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "RV-03 Mi Vida: mapa navegable del territorio/Áreas, Faros, recorrido e historia; cuatro lentes en segundo nivel cuando sean útiles. Acceso claro a Santuario sin reemplazarlo ni confundir guardado, vivido y propio. Sin dashboard cuantificador.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.13"
+    },
+    {
+      "id": "RV-04",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "RV-04 Explorar: entradas por Potencial, Área, Momento y libre; profundidad de Fuente con procedencia y NO_MATCH, sin taxonomía cerrada ni cifras de cobertura ficticias. Incorporación voluntaria de piezas a Constelación.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.13"
+    },
+    {
+      "id": "RV-05",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "RV-05 Tejido: círculos, conversaciones, eventos, personas/mentores/profesionales y experiencias compartidas pertinentes; no feed social; mostrar condiciones reales cuando corresponda.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.13"
+    },
+    {
+      "id": "RV-06",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "RV-06 Santuario: puerta independiente y espacio de pertenencia; distingue piezas guardadas, experiencias vividas, reflexiones, composiciones integrales conservadas de Faro+Área+Potenciales+Constelación y aquello reconocido explícitamente como propio. Permite retomar, editar y enriquecer composición versionada sin perder historia. Guardar pieza, guardar composición, retornar y hacer propio son actos diferentes.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.13"
+    },
+    {
+      "id": "RV-07",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "RV-07 Secuencia visible inferior, CINCO momentos: (1) Expresás libremente; (2) LUMI comprende y propone Área y N Potenciales revisables sólo si se elige cultivar Faro; (3) Ajustás Faro/Área/Potenciales, regenerás y validás; (4) LUMEN compone Constelación nutrida, pertinente, diversa, editable y ampliable desde Fuente+Tejido+Santuario, con NO_MATCH honesto; (5) Elegís y vivís una posibilidad con renderer propio. Después de Vivir, de manera separada y voluntaria, podés reflexionar/dar retorno, guardar una pieza, conservar la composición completa, enriquecerla o acordar recurrencia. NO paso 6 de evolución, NO guardado ni feedback obligatorios, NO secuencia rígida para Momento puntual/Explorar.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.13"
+    },
+    {
+      "id": "RV-08",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "RV-08 Segundo nivel: desde Faro/Constelación/Santuario editar, quitar, reordenar, profundizar y enriquecer sin sobrescribir historia; configurar/pausar/revocar recordatorios; volver a Inicio con continuidad pertinente; corrección, exportación y olvido. LUMI ofrece ayudas secundarias según órgano sin competir con CTA primario. No porcentajes de evolución, streaks, rankings ni scores ficticios.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.13"
+    },
+    {
+      "id": "RV-09",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "RV-09 Invariantes: una acción primaria por pantalla; textos mínimos, profundidad progresiva, estética y familias PREMIUM V55 sin renderer universal, accesibilidad, responsive 390×844/1440×900, estados vacíos/error/NO_MATCH/safety, no autoplay, presencia proporcional de LUMI. La lámina es guía de diseño, no prueba de funcionamiento ni datos reales.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.13"
+    },
+    {
+      "id": "RV-10",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "RV-10 QA/DoD: contrastar cada pantalla y escena con CF-01..10, §22.10–22.12, V62 AC-01..27: pantalla→acción→estado→evento→RPC→DB→E2E→captura. Verificar específicamente Santuario quinta puerta, Constelación escena, LUMI transversal y paso 5 voluntario. A63 EN CURSO; ninguna imagen equivale a FUNCTIONAL/EXPERIENCE/HUMAN PASS.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.13"
+    },
+    {
+      "id": "CF-01",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "CF-01 Llegada y expresión. Inicio recibe con expresión libre oral/escrita («¿Qué está pasando ahora?» o equivalente humano). En regreso muestra sólo continuidad pertinente y consentida: Faro activo, práctica acordada, recurso propio o retorno pendiente, sin desplazar el presente ni transformarse en dashboard. El Momento original queda diferenciado de toda interpretación. Un Momento no se convierte automáticamente en Faro: la persona elige si desea cultivar una dirección longitudinal.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.12"
+    },
+    {
+      "id": "CF-02",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "CF-02 Acuerdo Faro–Área–Potenciales. Para el Faro elegido, LUMI devuelve de forma clara y simultánea la expresión del Faro, el Área/Territorio propuesto cuando aporta orientación y N Potenciales pertinentes en etiquetas humanas con definición/significado contextual. Todos son hipótesis revisables, no diagnósticos ni inventario personal. La persona puede editar o reexpresar Faro, corregir Área, quitar/agregar/sustituir/redefinir Potenciales y solicitar regeneración. Preservar texto original, versiones, procedencia y aceptación explícita del conjunto Faro↔Potenciales N:M antes de componer una Constelación longitudinal. El Área tiende a ser estable pero puede cambiar con decisión de la persona; no bloquear ni imponer clasificación obligatoria. No exigir cuatro lentes ni un número fijo de Potenciales. Un Faro puede vincular varios Potenciales y viceversa.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.12"
+    },
+    {
+      "id": "CF-03",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "CF-03 Constelación inicial nutrida y progresiva. Tras el acuerdo, componer desde Fuente + Tejido + recursos propios pertinentes de Santuario, conforme a cobertura, consentimiento, safety, contexto, realizabilidad y relaciones fundamentadas N:M pieza↔Potenciales. Ofrecer primero una selección orientadora, pequeña y editable —tres sólo como orientación inicial, nunca mínimo ni máximo— con ayuda de baja fricción para ahora cuando sea pertinente, y acceso claro a un reservorio suficientemente diverso y profundo para ampliar: medicina/práctica inmediata no clínica, meditaciones, perspectivas, reflexiones, lecturas profundas, audio, video, acciones reales, personas/profesionales, círculos, eventos, servicios, quietud y elementos propios según corresponda. La amplitud disponible no obliga a exhibir todo a la vez, ni a cubrir artificialmente cada familia. Cada pieza conserva fuente, procedencia, condiciones, límites, derechos, identidad y renderer V55. Sin cobertura suficiente, NO_MATCH honesto; en riesgos, safety y derivación prevalecen.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.12"
+    },
+    {
+      "id": "CF-04",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "CF-04 Conservación integral opt-in. La persona puede conservar voluntariamente en Santuario (a) una pieza individual o (b) la composición completa de un Faro como unidad recuperable: expresión original y vigente, Área acordada, Potenciales/versiones, Constelación elegida con orden/vínculos y referencias a las piezas originales de Fuente/Tejido/Santuario, y continuidad legítima de experiencias, retornos y prácticas. No copiar indiscriminadamente obras ni intimidad a otra capa; preservar referencias, ownership, permisos y trazabilidad. La composición conservada no convierte automáticamente todos sus recursos en «propios» ni obliga a guardar cada propuesta. Santuario expresa pertenencia; Faro orienta; recorrido describe lo vivido, sin órgano nuevo.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.12"
+    },
+    {
+      "id": "CF-05",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "CF-05 Edición y enriquecimiento. Desde Faro/Santuario, la persona puede reformular Faro, revisar Área/Potenciales, editar/reordenar/quitar/sustituir piezas y pedir a LUMI más recursos relacionados, profundidad, perspectivas, modalidades o ayuda humana. LUMEN considera versión vigente, composición conservada, retornos, propios y condiciones actuales, evita duplicación y propone adiciones justificadas que la persona acepta/rechaza. Enriquecer no regenera ni sobrescribe lo conservado. Cambios del acuerdo pueden recomponer propuestas futuras, preservando historia, versiones, elecciones, apropiación y la capacidad de revertir; los vínculos de piezas retiradas no se reexponen como vigentes. Explorar puede agregar una pieza al contexto sin perder el hilo.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.12"
+    },
+    {
+      "id": "CF-06",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "CF-06 Vivir y retorno. Cada pieza elegida conserva renderer diferenciado e invita a vivir dentro o fuera de pantalla. Registrar exposición, elección, experiencia y retorno como eventos distintos; no inferir utilidad de apertura, finalización o silencio. Retorno opcional y ligero: ayudó/no ayudó/no sé, efecto/contexto, reflexión, deseo de repetir/variar/aplicar/integrar, STOPPED_HELPING y eventual reconocimiento explícito de algo propio. Feedback y guardado son decisiones independientes, reversibles y custodiadas.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.12"
+    },
+    {
+      "id": "CF-07",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "CF-07 Cultivo recurrente voluntario. Después de una experiencia, cuando sea oportuno, LUMEN puede ofrecer convertir una pieza/práctica elegida en continuidad recurrente vinculada al Faro y composición. Sólo por aceptación explícita la persona define periodicidad, canal/forma y condiciones del recordatorio; puede posponer, cambiar, pausar, detener o revocar sin deuda ni streaks. En Inicio posterior se recuperan Faro activo, prácticas acordadas y retornos pertinentes con baja densidad y acciones reales. Repetición no equivale a apropiación; apropiación explícita no obliga a recordatorios. Autonomía creciente reduce mediación y permite NO_REMINDER/STOPPED_HELPING.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.12"
+    },
+    {
+      "id": "CF-08",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "CF-08 Aprendizaje de doble circuito. Con permisos válidos, cada experiencia y retorno contextual alimenta (i) conocimiento situado de esa Vida —qué ayudó/no ayudó, en qué momento, para qué Faro/Potenciales, qué se repitió/transfirió/integró y qué cambió— que debe modificar prudentemente una propuesta posterior verificable; y (ii) evidencia colectiva admisible, separada de intimidad individual, con procedencia, incertidumbre, suficiencia, versión, refutación y rollback antes de afirmar patrones transferibles. No convertir correlación, apertura, frecuencia o un retorno aislado en causalidad universal. Aprender implica cambio auditable de decisión, no mero almacenamiento de feedback.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.12"
+    },
+    {
+      "id": "CF-09",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "CF-09 Invariantes de experiencia y custodia. Una única Fuente; cinco puertas Inicio/Mi Vida/Explorar/Tejido/Santuario; LUMI proporcional P0–P2 y retirada durante Vivir; continuidad sin programa ni score; corrección, consentimiento granular, exportación/olvido, reversibilidad, safety, NO_MATCH y propia Vida como unidad primaria. Una Constelación puede ser singular y ampliable, no paquete obligatorio. No crear dashboard, módulo de hábitos, Repertorio separado, catálogo paralelo ni nuevas entidades físicas sin G98 y necesidad demostrada.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.12"
+    },
+    {
+      "id": "CF-10",
+      "authority": "V58",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "CF-10 DoD/QA transversal A63. Probar sobre mismo SHA y backend real: (1) primera llegada OTP→Momento libre; (2) bifurcación puntual sin Faro y longitudinal con Faro elegido; (3) devolución conjunta Área+N Potenciales, edición de los tres elementos y regeneración sin perder original; (4) acuerdo versionado N:M previo a Constelación longitudinal; (5) composición diversa con ayuda inmediata y profundidad progresiva, NO_MATCH y safety; (6) conservar/recuperar composición integral sin copiar indebidamente contenido ni convertir guardado en propio; (7) enriquecer, quitar, reordenar y recomponer sin borrar historia; (8) vivir y retornar con distinción exposición/elección/experiencia/feedback; (9) práctica recurrente opt-in con periodicidad, pausa/revocación y regreso a Inicio; (10) feedback individual que cambia selección futura y evidencia colectiva separada, falsable y reversible; (11) escenas V58 §22.11, 11 familias V55/V62, accesibilidad, mobile/desktop, Santuario, Tejido y LUMI; (12) C0+C1+C2+C3+C7+C8 sin BLOCK y FUNCTIONAL/ARCHITECTURE/DATA/CUSTODY/EXPERIENCE/HUMAN PASS. No confundir precisión documental con implementación ni CI PASS con HUMAN PASS. A63 continúa EN CURSO hasta evidencia.",
+      "source_url": "https://docs.google.com/document/d/1IdkqgyxQoUu3UoeIpSNdFbMjE5Bg9-K4gsRqHMw7Jyg/edit",
+      "source_section": "V58 §22.12"
+    },
+    {
+      "id": "AC-01",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-01 Una persona nueva llega a una Constelación o NO_MATCH honesto en 3 gestos o menos, sin registro obligatorio (OD-01) SC-01, 03, 04",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-02",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-02 Nunca hay más de un botón primario visible CP-R1",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-03",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-03 Ninguna pantalla muestra puntaje, porcentaje, racha o ranking ST-02",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-04",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-04 Guardar, decir \"me ayudó\" y marcar como propio son acciones independientes con eventos distintos ST-01, §8",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-05",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-05 Un NO_MATCH no se rellena con fuentes de baja adecuación SC-04",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-06",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-06 Los tres consentimientos nacen apagados, son independientes y revocables desde Ajustes §7.2",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-07",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-07 Sin consentimiento de memoria la app funciona completa en modo sin memoria ST-04",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-08",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-08 Ningún recordatorio se programa sin consentimiento ni solo por inactividad CN-02",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-09",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-09 Una señal de safety se muestra antes que cualquier constelación ES-01",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-10",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-10 Los 11 renderers existen y los representativos (2 audios, 1 video) funcionan de punta a punta §6.1",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-11",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-11 Toda pantalla resuelve cargando, error y offline §6.2",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-12",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-12 Ninguna pantalla contiene lógica de negocio; cambiar el criterio de selección no requiere tocar React RG-15",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-13",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-13 Cumple AX-01 a AX-07, con herramienta y con prueba manual §9",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-14",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-14 Ningún identificador de ontología se muestra a la persona ST-03, RG-08",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-15",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-15 LUMI puede retirarse y no reaparece en ese contexto LM-02",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-16",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-16 Revocar un consentimiento tiene efecto inmediato y verificable CN-03",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-17",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-17 ▶ Mi Vida muestra el recorrido significativo (lo vivido, lo que sirvió, lo que ya es propio) sin porcentaje, score ni programa, y la persona puede corregir cualquier lectura SC-07, SC-08",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-18",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-18 ▶ Un Faro puede revisarse y reformularse sin perder su historia SC-08 Page 40 of 53",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §10.2"
+    },
+    {
+      "id": "AC-19",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-19 Con memoria consentida, un Momento parecido a uno que ayudó muestra primero lo propio y dice por qué.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
+    },
+    {
+      "id": "AC-20",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-20 Sin consentimiento no aparece ninguna referencia a lo vivido ni mensaje de culpa.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
+    },
+    {
+      "id": "AC-21",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-21 \"Ya es mía\" sólo se registra por acción de la persona y se revierte en un toque desde Santuario.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
+    },
+    {
+      "id": "AC-22",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-22 Tras RECOGNIZED_AS_OWN, el siguiente Momento comparable reduce la presencia de LUMI (menos opciones, sin explicación didáctica) y lo dice.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
+    },
+    {
+      "id": "AC-23",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-23 MiVidaCambio sólo aparece si hay evidencia en el ledger (umbral en OD-15) y cada frase se traza a un evento.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
+    },
+    {
+      "id": "AC-24",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-24 STOPPED_HELPING devuelve propuestas sin reproche y sin repetir la misma fuente sin variación.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
+    },
+    {
+      "id": "AC-25",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-25 Ninguna pantalla muestra racha, contador de uso, porcentaje o puntaje de autonomía (prueba de contenido).",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
+    },
+    {
+      "id": "AC-26",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-26 InicioNadaQueHacer no dispara notificaciones ni insiste; respeta el ritmo acordado.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
+    },
+    {
+      "id": "AC-27",
+      "authority": "V62",
+      "status": "NO_VERIFICADO",
+      "tests": [],
+      "evidence": [],
+      "requirement_text": "AC-27 Existe un experimento brazo vivo contra control que muestra si el segundo acompañamiento mejora.",
+      "source_url": "https://drive.google.com/file/d/1Btmw6z0QCywmdCA5wizuMl2TgTV9odcF/view",
+      "source_section": "V62 §13 (criterios longitudinales)"
+    }
+  ],
+  "created_under_act": "A69"
+}

@@ -33,3 +33,5 @@ dist-ssr
 # Local QA evidence and Supabase CLI metadata
 /cf-runtime-evidence/
 /supabase/.temp/
+# A69 evidence is produced after the target commit; never version SHA-self-referential receipts.
+.conformity/

@@ -1,4 +1,4 @@
-# Conduction and custody controls are human-custodied. Branch protection/ruleset must require Code Owner review for these paths.
+# Human custody identifies the owner; single-owner policy (POV 2026-10-15) does not require a second human review per PR.
 /.github/CODEOWNERS @vamaspyp
 /.github/workflows/ @vamaspyp
 /.github/copilot-instructions.md @vamaspyp
@@ -9,3 +9,23 @@
 /tests/a61-custody-synchrony.test.mjs @vamaspyp
 /AGENTS.md @vamaspyp
 /CLAUDE.md @vamaspyp
+
+# A69 conformity contract, verifier and mutation suite require independent human custody.
+/scripts/check-conformity.mjs @vamaspyp
+/tests/a69-conformity.test.mjs @vamaspyp
+/scripts/check-independent-audit.mjs @vamaspyp
+/scripts/check-live-pov.mjs @vamaspyp
+/scripts/check-premium-pilot.mjs @vamaspyp
+/tests/a69-premium-pilot.test.mjs @vamaspyp
+/tests/a69-live-pov.test.mjs @vamaspyp
+
+# Every A69 verifier, proof validator, report and mutation test has human custody.
+/scripts/conformity-proof.mjs @vamaspyp
+/scripts/report-conformity.mjs @vamaspyp
+/scripts/check-a69-cross-domain.mjs @vamaspyp
+/tests/a69-*.test.mjs @vamaspyp
+
+/scripts/prepare-conformity-evidence.mjs @vamaspyp
+/scripts/check-pov-attestation.mjs @vamaspyp
+
+/tests/a69-operational-transition.test.mjs @vamaspyp

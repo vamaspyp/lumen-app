@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "current_review": {
-    "act_id": "A63",
+    "act_id": "A69",
     "review_set": [
       "C0",
       "C1",
@@ -10,7 +10,8 @@
       "C7",
       "C8"
     ],
-    "status": "IN_PROGRESS"
+    "status": "IN_PROGRESS",
+    "scope": "Selective conformity pipeline integration; historical A63 findings retained without certifying product."
   },
   "findings": [
     {
@@ -60,6 +61,20 @@
       "severity": "WARN",
       "status": "OPEN",
       "evidence": "A63 2026-10-03: 89 unit tests, verify with 60 E2E, 2 additional privacy E2E, build/lint, live backend and SQL transaction checks pass. Typed application RPCs and security-definer functions reuse existing anatomy; no second dispatcher/runtime/catalogue. Human custody and target-branch mechanical protection remain an open governance boundary; no A63 closure or production promotion."
+    }
+  ],
+  "previous_reviews": [
+    {
+      "act_id": "A63",
+      "review_set": [
+        "C0",
+        "C1",
+        "C2",
+        "C3",
+        "C7",
+        "C8"
+      ],
+      "status": "IN_PROGRESS"
     }
   ]
 }
