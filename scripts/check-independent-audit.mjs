@@ -2,7 +2,7 @@ import { validateInventory } from './conformity-proof.mjs';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 const fail = (why) => { console.error('INDEPENDENT_AUDIT_BLOCK: '+why); process.exitCode=1; };
-const contract=JSON.parse(fs.readFileSync('governance/a69-a63-conformity.json','utf8'));
+const contract=JSON.parse(fs.readFileSync(process.env.CONFORMITY_FILE||'governance/a69-a63-conformity.json','utf8'));
 const context=JSON.parse(fs.readFileSync('governance/conduction-context.json','utf8'));
 const snapshot=JSON.parse(fs.readFileSync('governance/pov-snapshot.json','utf8'));
 if(contract.act_id!=='A69'||context.act.id!=='A69'||snapshot.act.id!=='A69') fail('governance conflict');

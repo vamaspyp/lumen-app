@@ -1,0 +1,25 @@
+# A69 · Protocolo ejecutable de evidencia posterior al commit
+
+Autoridad: V3/ACTO A69 y DoD vigente. Este archivo describe operación; no crea gobierno ni certifica A63/Fuente.
+
+## Entrada única, sin autorreferencia del SHA
+
+1. Fijar el commit objetivo y probarlo. Los recibos/revisiones se generan después de conocer ese SHA; no se versionan dentro del propio commit.
+2. Preparar `bundle.json`: `schema_version:1`, `target_sha`, `contracts:{a63:{requirements:[...]},premium:{requirements:[...]}}`, `files:{"receipt.json":{...},"review.json":{...}}`. Los parches identifican requisitos existentes por `id` y sólo pueden aportar estado, criterios, diseño, implementación, tests/casos, evidencia y revisión. No pueden modificar texto, fuente, autoridad, identidad ni eliminar requisitos. `certification` y autorización humana se admiten a nivel de contrato y se verifican por los gates.
+3. Cada recibo declara requirement_id, target_sha, status PASS, criterios cubiertos, hashes SHA256 de diseño/implementación/tests y resultados de ejecución sobre ese SHA. Cada revisión declara requisito/SHA, constructor y revisor distintos, tipo, decisión y referencia de ejecución/aprobación. Las referencias locales estructuran trazabilidad; no autentican por sí solas una identidad humana: custodia de cambios y revisión real siguen siendo necesarias.
+4. Ejecutar `CONFORMITY_TARGET_SHA=<sha> CONFORMITY_BUNDLE_FILE=<bundle.json> node scripts/prepare-conformity-evidence.mjs`. Escribe sólo `.conformity/<sha>/`, excluido de Git. Imprime las dos rutas efectivas. En GitHub Actions también las exporta a GITHUB_ENV.
+5. Ejecutar conformidad, auditor adversarial, PREMIUM y cross-domain con esas mismas rutas (`CONFORMITY_FILE` y `PREMIUM_CONTRACT_FILE`). Los tests declarados se reejecutan; archivo vacío, skip/todo, fallos o evidencia ajena bloquean.
+
+El workflow incorpora entrada manual `evidence_artifact_id`: artifact del mismo repositorio cuyo ZIP contiene `bundle.json`. Descarga y prepara antes de los cuatro validadores. Sin bundle conserva los inventarios canónicos NO_VERIFICADO. El dispatch sólo estará disponible donde esta versión del workflow esté instalada; no se afirma instalación/merge a partir del draft.
+
+`tests/a69-evidence-bundle.test.mjs` demuestra el camino positivo completo y las negativas en copia temporal, con autoridades/inventarios conservados. Sus aprobaciones y resultados son fixtures de protocolo: nunca pruebas humanas o conformidad real de LV/RV/CF/AC/FP.
+
+## POV privada y PR sin ampliar la federación
+
+Push autorizado: OIDC read-only → Sheets ACTOS/FOCOS/ACTIVOS → recibo live por SHA → artifact. PR: mismo SHA/repo/rama de confianza/workflow, Conformity Gate del push terminado SUCCESS, artifact no expirado, recibo PASS con antigüedad máxima una hora. La falta de evidencia o un fallo bloquean el PR. Nunca se usa un push de otro SHA, fork, workflow o una corrida vieja en lugar de la última aplicable.
+
+Esta es reutilización trazable de una lectura autenticada, no una nueva consulta directa desde el evento PR. La identidad Google conserva sus restricciones. La rama emisora actual es `acto/A69-conformidad-ejecutable`; mover la operación a otra rama exige configurar y verificar esa identidad, bajo ACTO. No se presenta como federación universal ya desplegada.
+
+## Fronteras
+
+El reporte no autoemite certificados; un contrato CERTIFIED requiere todas sus pruebas y revisiones y conserva la decisión humana de exposición cuando aplica. El piloto PREMIUM de cuatro controles no equivale a cobertura integral V56. A69 no cierra A63/Fuente, no autoriza merge ni exposición y no reemplaza HUMAN/EXPERIENCE PASS.

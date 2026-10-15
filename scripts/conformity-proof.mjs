@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
+const executions=new Map();
 const digest = p => crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
 const reject = m => { throw Error('PROOF_BLOCK: '+m); };
 const file = p => {
@@ -40,7 +41,9 @@ export function validatePass(r, target) {
  if(r.test_cases.some(x=>typeof x!=='string'||!x.trim()) || new Set(r.test_cases).size!==r.test_cases.length) reject('invalid named test cases '+r.id);
  // Re-run the declared tests rather than accepting a hand-authored success flag.
  const env={...process.env};delete env.NODE_TEST_CONTEXT;
- const result=spawnSync(process.execPath,['--test','--test-reporter=tap',...r.tests],{env,encoding:'utf8',timeout:120000,maxBuffer:1024*1024});
+ const executionKey=JSON.stringify([target,r.tests.map(p=>[p,digest(p)]),r.test_cases]);
+ let result=executions.get(executionKey);
+ if(!result){result=spawnSync(process.execPath,['--test','--test-reporter=tap',...r.tests],{env,encoding:'utf8',timeout:120000,maxBuffer:1024*1024});executions.set(executionKey,result);}
  if(result.status!==0) reject('declared tests fail '+r.id);
  for(const name of r.test_cases) if(!result.stdout.split('\n').some(line=>line.trim()==='# Subtest: '+name)) reject('declared test case not executed '+name);
  const count=name=>{const match=result.stdout.match(new RegExp('^# '+name+' ([0-9]+)$','m'));return match?Number(match[1]):null};

@@ -1,6 +1,6 @@
 import fs from 'node:fs';
-const c=JSON.parse(fs.readFileSync('governance/a69-a63-conformity.json','utf8'));
-const premium=JSON.parse(fs.readFileSync('governance/a69-source-premium-pilot.json','utf8'));
+const c=JSON.parse(fs.readFileSync(process.env.CONFORMITY_FILE||'governance/a69-a63-conformity.json','utf8'));
+const premium=JSON.parse(fs.readFileSync(process.env.PREMIUM_CONTRACT_FILE||'governance/a69-source-premium-pilot.json','utf8'));
 const premiumStates=Object.fromEntries(['PASS','GAP','CONTRADICCION','NO_VERIFICADO'].map(k=>[k,premium.requirements.filter(x=>x.status===k).length]));
 const states=['PASS','GAP','CONTRADICCION','NO_VERIFICADO'];
 const counts=Object.fromEntries(states.map(k=>[k,c.requirements.filter(x=>x.status===k).length]));

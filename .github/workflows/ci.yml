@@ -1,6 +1,12 @@
 name: CI
 
 on:
+  workflow_dispatch:
+    inputs:
+      evidence_artifact_id:
+        description: Post-commit bundle.json artifact for this exact SHA (optional inventory mode)
+        required: false
+        type: string
   pull_request:
     branches: [main, greenfield-v04-embryo, greenfield-a63-v19-hifi-es, a63-lumen-premium-v21-final]
   push:
@@ -17,6 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 2
       - uses: actions/setup-node@v4
         with:
@@ -30,6 +37,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -38,6 +47,10 @@ jobs:
 
   conformity-gate:
     name: Conformity Gate
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
     env:
       CONFORMITY_TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     needs: conduction-gate
@@ -51,10 +64,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      - name: Load requested post-commit evidence bundle
+        if: github.event_name == 'workflow_dispatch' && inputs.evidence_artifact_id != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ inputs.evidence_artifact_id }}
+        run: |
+          [[ "$ARTIFACT_ID" =~ ^[0-9]+$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" > /tmp/a69-evidence.zip
+          unzip -p /tmp/a69-evidence.zip bundle.json > /tmp/a69-bundle.json
+          echo "CONFORMITY_BUNDLE_FILE=/tmp/a69-bundle.json" >> "$GITHUB_ENV"
+      - name: Prepare shared immutable evidence inputs
+        run: node scripts/prepare-conformity-evidence.mjs
       - run: node scripts/check-conformity.mjs
         env:
           CONFORMITY_TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-      - run: node --test tests/a69-conformity.test.mjs
+      - run: env -u CONFORMITY_FILE -u PREMIUM_CONTRACT_FILE node --test tests/a69-conformity.test.mjs
       - name: Validate POV live probe script
         run: node --check scripts/check-live-pov.mjs
       - name: Fail closed without POV credentials
@@ -62,13 +87,13 @@ jobs:
       - name: Independent adversarial auditor
         run: node scripts/check-independent-audit.mjs
       - name: Adversarial audit mutation tests
-        run: node --test tests/a69-independent-audit.test.mjs tests/a69-proof.test.mjs
+        run: env -u CONFORMITY_FILE -u PREMIUM_CONTRACT_FILE node --test tests/a69-independent-audit.test.mjs tests/a69-proof.test.mjs tests/a69-evidence-bundle.test.mjs tests/a69-pov-attestation.test.mjs
       - name: Source PREMIUM reusable contract pilot
-        run: node scripts/check-premium-pilot.mjs && node --test tests/a69-premium-pilot.test.mjs
+        run: node scripts/check-premium-pilot.mjs && env -u CONFORMITY_FILE -u PREMIUM_CONTRACT_FILE node --test tests/a69-premium-pilot.test.mjs
       - name: Verify A69 cross-domain invariants
-        run: node scripts/check-a69-cross-domain.mjs && node --test tests/a69-cross-domain.test.mjs
+        run: node scripts/check-a69-cross-domain.mjs && env -u CONFORMITY_FILE -u PREMIUM_CONTRACT_FILE node --test tests/a69-cross-domain.test.mjs
       - name: Google keyless auth for POV check
-        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+        if: github.event_name != 'pull_request'
         uses: google-github-actions/auth@v2
         id: pov-auth
         with:
@@ -77,9 +102,17 @@ jobs:
           token_format: access_token
           access_token_scopes: https://www.googleapis.com/auth/spreadsheets.readonly
       - name: Read live POV with federated identity
+        if: github.event_name != 'pull_request'
         run: node scripts/check-live-pov.mjs
         env:
           POV_GOOGLE_ACCESS_TOKEN: ${{ steps.pov-auth.outputs.access_token }}
+      - name: Verify trusted push POV attestation for exact PR head
+        if: github.event_name == 'pull_request'
+        run: node scripts/check-pov-attestation.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          POV_SOURCE_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          POV_TRUSTED_BRANCH: acto/A69-conformidad-ejecutable
       - name: Emit truthful conformity report
         if: always()
         run: node scripts/report-conformity.mjs
@@ -104,6 +137,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
