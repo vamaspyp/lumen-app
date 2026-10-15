@@ -8,9 +8,9 @@ on:
         required: false
         type: string
   pull_request:
-    branches: [main, greenfield-v04-embryo, greenfield-a63-v19-hifi-es, a63-lumen-premium-v21-final]
+    # All PR destinations are checked; required-check policy governs integration.
   push:
-    branches: [main, greenfield-v04-s0, greenfield-v04-s1, greenfield-v04-embryo, greenfield-a63-embryo-complete, greenfield-a63-premium-cleanroom, a63-lumen-premium-v21-final, acto/A69-conformidad-ejecutable]
+    branches: ["**"]
 
 permissions:
   contents: read
@@ -87,7 +87,7 @@ jobs:
       - name: Independent adversarial auditor
         run: node scripts/check-independent-audit.mjs
       - name: Adversarial audit mutation tests
-        run: env -u CONFORMITY_FILE -u PREMIUM_CONTRACT_FILE node --test tests/a69-independent-audit.test.mjs tests/a69-proof.test.mjs tests/a69-evidence-bundle.test.mjs tests/a69-pov-attestation.test.mjs
+        run: env -u CONFORMITY_FILE -u PREMIUM_CONTRACT_FILE node --test tests/a69-independent-audit.test.mjs tests/a69-proof.test.mjs tests/a69-evidence-bundle.test.mjs tests/a69-pov-attestation.test.mjs tests/a69-operational-transition.test.mjs
       - name: Source PREMIUM reusable contract pilot
         run: node scripts/check-premium-pilot.mjs && env -u CONFORMITY_FILE -u PREMIUM_CONTRACT_FILE node --test tests/a69-premium-pilot.test.mjs
       - name: Verify A69 cross-domain invariants
@@ -112,7 +112,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           POV_SOURCE_REPO: ${{ github.event.pull_request.head.repo.full_name }}
-          POV_TRUSTED_BRANCH: acto/A69-conformidad-ejecutable
+          POV_TRUSTED_BRANCH: ${{ github.head_ref }}
       - name: Emit truthful conformity report
         if: always()
         run: node scripts/report-conformity.mjs
@@ -155,8 +155,8 @@ jobs:
         with:
           name: cleanroom-visual-qa
           path: |
-            test-results/cleanroom-home.png
-            test-results/cleanroom-home-mobile.png
+            test-results/
+            playwright-report/
           if-no-files-found: ignore
       - name: Certify live greenfield backend
         run: npm run test:live

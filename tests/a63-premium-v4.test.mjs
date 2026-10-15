@@ -4,11 +4,11 @@ import test from 'node:test'
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), 'utf8')
 
-test('A63 mounts the approved premium field and continuous LUMI presence', async () => {
+test('A63 mounts one PREMIUM entry on the root route', async () => {
   const main = await read('src/main.tsx')
-  assert.match(main, /premium-v4\.css/)
-  assert.match(main, /LumiPresence/)
-  assert.match(main, /<LumiPresence\s*\/>/)
+  assert.match(main, /premium-vnext|PremiumVNext/)
+  assert.match(main, /<PremiumVNext\s*\/>/)
+  assert.doesNotMatch(main, /vnext\s*=|<App\s*\/>/)
 })
 
 test('A63 premium field keeps Inicio deliberately quiet and resource cards homogeneous', async () => {

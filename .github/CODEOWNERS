@@ -27,3 +27,5 @@
 
 /scripts/prepare-conformity-evidence.mjs @vamaspyp
 /scripts/check-pov-attestation.mjs @vamaspyp
+
+/tests/a69-operational-transition.test.mjs @vamaspyp

@@ -58,12 +58,14 @@ import {
 } from '../greenfield/application/s1'
 import { Experience } from './Experience'
 import { composeHomeCues, relatedSanctuaryToActiveLife, relatedSourceToActiveLife } from './contextual-orchestration'
+import { constellationKey, premiumConstellations, premiumFamily, premiumFamilyLabel } from './premium-source'
 
 type Space = 'home' | 'life' | 'explore' | 'sanctuary' | 'tissue' | 'search' | 'notifications' | 'settings'
 type MomentStage = 'idle' | 'auth' | 'scene' | 'experience' | 'outcome' | 'closed'
 type TissueKind = 'circles' | 'professionals' | 'institutions' | 'actions'
 type ExperienceHelp = HelpPossibility | SourceItem
 type DurationFilter = 'all' | 'quick' | 'medium' | 'long' | 'unspecified'
+type ViewerProfile = Readonly<{ name:string; email:string|null; avatarUrl:string|null; initials:string }>
 
 type SourceFiltersState = Readonly<{
   duration: DurationFilter
@@ -80,7 +82,7 @@ const EMPTY_SOURCE_FILTERS: SourceFiltersState = {
 }
 
 const IMG = {
-  hero: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=2200&q=90',
+  hero: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=92',
   calm: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd4297?auto=format&fit=crop&w=1000&q=88',
   practice: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1000&q=88',
   journal: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1000&q=88',
@@ -92,6 +94,32 @@ const IMG = {
 }
 
 const RESOURCE_IMAGES = [IMG.calm, IMG.practice, IMG.journal, IMG.meeting, IMG.walk, IMG.sleep]
+
+function resourceImage(item: ExperienceHelp,index:number) {
+  if (isSourceItem(item)) {
+    const family=premiumFamily(item)
+    const byFamily:Record<string,string> = {
+      illustrated_guide: IMG.sunrise,
+      audio_practice: IMG.calm,
+      contemplative_reading_audio: IMG.practice,
+      classic_reading: IMG.journal,
+      video_or_audio_visual_sequence: IMG.walk,
+      health_reference: IMG.calm,
+    }
+    if(family&&byFamily[family])return byFamily[family]
+  }
+  return RESOURCE_IMAGES[index % RESOURCE_IMAGES.length]
+}
+
+function viewerProfile(user: { email?:string|null; user_metadata?:Record<string,unknown> } | null): ViewerProfile {
+  const email=user?.email||null
+  const meta=user?.user_metadata||{}
+  const name=[meta.full_name,meta.name,meta.display_name].find((value)=>typeof value==='string'&&value.trim()) as string|undefined
+  const avatar=[meta.avatar_url,meta.picture].find((value)=>typeof value==='string'&&/^https?:\/\//.test(value)) as string|undefined
+  const label=name?.trim()||email?.split('@')[0]||'Tu espacio'
+  const initials=label.split(/[\s._-]+/).filter(Boolean).slice(0,2).map((part)=>part[0]?.toUpperCase()).join('')||'L'
+  return {name:label,email,avatarUrl:avatar||null,initials}
+}
 
 const ROLE_LABEL: Record<string, string> = {
   UNDERSTAND: 'Comprender',
@@ -133,7 +161,7 @@ function Logo() {
 
 function Sidebar({ active, go, authenticated, onSignOut }: { active: Space; go: (space: Space) => void; authenticated: boolean; onSignOut: () => void }) {
   const links: Array<[Space, string, Parameters<typeof Icon>[0]['name']]> = [
-    ['home','Inicio','home'],['explore','Explorar','explore'],['life','Mi proceso','life'],['tissue','Comunidad','people'],['sanctuary','Santuario','heart'],
+    ['home','Inicio','home'],['explore','Explorar','explore'],['life','Mi proceso','life'],['tissue','Tejido','people'],['sanctuary','Santuario','heart'],
   ]
   const utilities: Array<[Space, string, Parameters<typeof Icon>[0]['name']]> = [
     ['search','Buscar','search'],['notifications','Notificaciones','bell'],['settings','Ajustes','settings'],
@@ -152,18 +180,19 @@ function Sidebar({ active, go, authenticated, onSignOut }: { active: Space; go: 
   </aside>
 }
 
-function Profile({ authenticated }: { authenticated: boolean }) {
-  return <div className="profile"><img src={IMG.portrait} alt=""/><span><b>{authenticated ? 'Tu espacio' : 'LUMEN'}</b><small>{authenticated ? 'Una vida en proceso' : 'Entrá cuando quieras'}</small></span><span>⌄</span></div>
+function Profile({ authenticated,profile }: { authenticated: boolean; profile:ViewerProfile|null }) {
+  return <div className="profile">{authenticated?(profile?.avatarUrl?<img src={profile.avatarUrl} alt="Tu perfil"/>:<span className="profile-initials" aria-label="Tu perfil">{profile?.initials||'T'}</span>):<span className="profile-initials lumen">L</span>}<span><b>{authenticated ? profile?.name||'Tu espacio' : 'LUMEN'}</b><small>{authenticated ? profile?.email||'Una vida en proceso' : 'Entrá cuando quieras'}</small></span><span>⌄</span></div>
 }
 
-function HomeHero({ expression, setExpression, submit, busy, authenticated }: { expression: string; setExpression: (value: string) => void; submit: () => void; busy: boolean; authenticated: boolean }) {
+function HomeHero({ expression, setExpression, submit, busy, authenticated,profile }: { expression: string; setExpression: (value: string) => void; submit: () => void; busy: boolean; authenticated: boolean; profile:ViewerProfile|null }) {
   const chips = ['Necesito calma','Quiero claridad','Me siento abrumada','Quiero explorar','Solo quiero estar']
-  return <section className="hero" style={{ backgroundImage: `url(${IMG.hero})` }}><div className="premium-wordmark">LUMEN</div>
-    <Profile authenticated={authenticated}/>
+  return <section className="hero" style={{ backgroundImage: `linear-gradient(90deg,rgba(255,252,247,.18),rgba(255,252,247,.02)),url(${IMG.hero})` }}>
+    <div className="hero-brand">LUMEN</div>
+    <Profile authenticated={authenticated} profile={profile}/>
     <div className="hero-copy">
-      <p>Hola.</p>
+      <p>TU MOMENTO · AHORA</p>
       <h1>¿Cómo estás hoy?</h1>
-      <h2>Un lugar para pausar, comprender<br/>y encontrar lo que puede ayudarte ahora.</h2>
+      <h2>Un lugar para pausar, comprender y encontrar lo que puede ayudarte ahora.</h2>
       <form className="moment-bar" onSubmit={(event) => { event.preventDefault(); submit() }}>
         <span className="moment-leaf"><Icon name="leaf"/></span>
         <input aria-label="Lo que te está pasando" value={expression} onChange={(event) => setExpression(event.target.value)} placeholder="Contame qué está presente en tu vida..."/>
@@ -171,7 +200,7 @@ function HomeHero({ expression, setExpression, submit, busy, authenticated }: { 
       </form>
       <div className="moment-chips">{chips.map((chip) => <button type="button" key={chip} onClick={() => setExpression(chip)}>{chip}</button>)}</div>
     </div>
-    <aside className="hero-note"><em>“No estás sola.<br/>Estás en camino.”</em><span>LUMEN</span></aside>
+    <aside className="hero-note"><em>Un momento más calmo también es una forma de avanzar.</em><span>—</span></aside>
   </section>
 }
 
@@ -198,16 +227,16 @@ function StartWays({ go,setExpression,authenticated,snapshot,source,entries,circ
     {image:IMG.calm,title:'5. Integro en mi vida',quote:'“Esto me sirvió y quiero conservarlo.”',action:()=>go('life')},
     {image:IMG.sunrise,title:'6. Vuelvo al camino',quote:'“Quiero retomar una dirección que elegí.”',action:()=>go('life')},
   ]
-  const items = contextualItems.length ? contextualItems : genericItems
+  const items = [...contextualItems,...genericItems].slice(0,6)
   return <section className="start-ways">
-    <div className="start-copy"><b>ALGUNAS FORMAS<br/>DE COMENZAR</b><p>{contextualItems.length?'Lo que puede importarte ahora.':'Diferentes entradas,\n un mismo lugar.'}</p></div>
+    <div className="start-copy"><b>ALGUNAS FORMAS<br/>DE COMENZAR</b><p>{contextualItems.length?'Algo de tu vida + otras puertas que siguen disponibles.':'Diferentes entradas,\n un mismo lugar.'}</p></div>
     {items.map((item)=><button className="start-card" key={item.title} type="button" onClick={item.action} style={{backgroundImage:`linear-gradient(0deg,rgba(16,20,17,.72),rgba(16,20,17,.03)),url(${item.image})`}}><b>{item.title}</b><small>{item.quote}</small></button>)}
     <div className="start-end"><em>Diferentes caminos.<br/>Una misma intención.<br/>Vidas más plenas.</em><span>—</span><b>LUMEN</b></div>
   </section>
 }
 
 function PrivateGate({ name,email,setEmail,goHome,goExplore }: { name:string; email:string; setEmail:(value:string)=>void; goHome:()=>void; goExplore:()=>void }) {
-  return <section className="private-gate"><span className="orb"/><p className="eyebrow">{name}</p><h1>Este espacio se vuelve tuyo cuando elegís continuidad.</h1><p>Podés explorar Fuente sin identificarte. Para memoria, Santuario, Mi proceso y Comunidad necesitamos una cuenta mínima.</p><input value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="tu@email.com"/><div className="button-row"><button className="primary" type="button" onClick={goHome}>Entrar con email</button><button className="ghost" type="button" onClick={goExplore}>Seguir explorando</button></div></section>
+  return <section className="private-gate"><span className="orb"/><p className="eyebrow">{name}</p><h1>Este espacio se vuelve tuyo cuando elegís continuidad.</h1><p>Podés explorar Fuente sin identificarte. Para memoria, Santuario, Mi Vida y Tejido necesitamos una cuenta mínima.</p><input value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="tu@email.com"/><div className="button-row"><button className="primary" type="button" onClick={goHome}>Entrar con email</button><button className="ghost" type="button" onClick={goExplore}>Seguir explorando</button></div></section>
 }
 
 function AuthFlow({ email,setEmail,otp,setOtp,otpSent,busy,error,onSend,onVerify,onCancel }: { email:string; setEmail:(value:string)=>void; otp:string; setOtp:(value:string)=>void; otpSent:boolean; busy:boolean; error:string; onSend:()=>void; onVerify:()=>void; onCancel:()=>void }) {
@@ -226,32 +255,40 @@ function resourceRoles(item: ExperienceHelp): string[] {
   return isSourceItem(item) ? (item.cultivation_roles || []) : []
 }
 
-function resourceProvider(item: ExperienceHelp): string | null {
-  return isSourceItem(item) ? item.provider?.name || null : null
+function resourceCapabilityLabels(item: ExperienceHelp, taxonomy: SourceTaxonomy | null): string[] {
+  if (!isSourceItem(item)) return []
+  const keys = Array.from(new Set([...(item.capacities || []), ...(item.capacity_key ? [item.capacity_key] : [])].filter(Boolean)))
+  return keys.map((key)=>taxonomy?.capacities?.find((term)=>term.key===key)?.label || key.replaceAll('_',' '))
 }
 
-function ResourceCard({ item,index,authenticated,onOpen,onSave,contextLabel,extraAction,openLabel='Vivir esta posibilidad' }: { item:ExperienceHelp; index:number; authenticated:boolean; onOpen:(item:ExperienceHelp)=>void; onSave?:(item:SourceItem)=>Promise<void>; contextLabel?:string; extraAction?:ReactNode; openLabel?:string }) {
+function ResourceCard({ item,index,authenticated,onOpen,onSave,taxonomy,contextLabel,extraAction,openLabel='Vivir esta posibilidad' }: { item:ExperienceHelp; index:number; authenticated:boolean; onOpen:(item:ExperienceHelp)=>void; onSave?:(item:SourceItem)=>Promise<void>; taxonomy?:SourceTaxonomy|null; contextLabel?:string; extraAction?:ReactNode; openLabel?:string }) {
   const roles = resourceRoles(item)
-  const provider = resourceProvider(item)
-  return <article className="source-card">
-    <img src={RESOURCE_IMAGES[index % RESOURCE_IMAGES.length]} alt=""/>
-    <div>
-      <p className="eyebrow">{contextLabel || item.help_type.replaceAll('_',' ')}</p>
+  const familyLabel = isSourceItem(item)&&premiumFamily(item) ? premiumFamilyLabel(item) : item.help_type.replaceAll('_',' ')
+  const eyebrow = [familyLabel, item.duration_minutes ? `${item.duration_minutes} MIN` : null].filter(Boolean).join(' · ')
+  const capabilities = resourceCapabilityLabels(item,taxonomy||null)
+  const secondary = Array.from(new Set([...roles.map((role)=>ROLE_LABEL[role]||role), ...(item.energy?[item.energy.replaceAll('_',' ')]:[])])).slice(0,2)
+  return <article className={`source-card premium-card${isSourceItem(item)&&premiumFamily(item)?' premium-source-card':''}`}>
+    <img src={resourceImage(item,index)} alt=""/>
+    <div className="source-card-copy">
+      <p className="eyebrow">{eyebrow}</p>
       <h3>{item.title}</h3>
-      <p>{item.summary}</p>
-      <div className="source-meta">{provider&&<span>{provider}</span>}{item.duration_minutes&&<span>{item.duration_minutes} min</span>}{item.energy&&<span>{item.energy}</span>}</div>
-      {roles.length?<div className="tiny-chips">{roles.map((role)=><span key={role}>{ROLE_LABEL[role]||role}</span>)}</div>:null}
-      <div className="card-actions">
-        <button className="primary small resource-open" type="button" aria-label={openLabel} onClick={()=>onOpen(item)}><span aria-hidden>›</span></button>
-        {authenticated&&onSave&&isSourceItem(item)&&<button className="ghost small" type="button" onClick={()=>void onSave(item)}>Conservar para mí</button>}
-        {extraAction}
+      <p className="source-summary">{item.summary}</p>
+      <div className="premium-tags">
+        {capabilities.slice(0,3).map((tag)=><span className="capacity-tag" key={tag}>{tag}</span>)}
+        {secondary.map((tag)=><span key={tag}>{tag}</span>)}
       </div>
+      {contextLabel&&<small className="card-context">{contextLabel}</small>}
+      {extraAction&&<div className="card-extra">{extraAction}</div>}
+    </div>
+    <div className="card-edge-actions">
+      <button className="card-open" type="button" onClick={()=>onOpen(item)} aria-label={openLabel}><Icon name="arrow"/></button>
+      {authenticated&&onSave&&isSourceItem(item)&&<button className="card-save" type="button" onClick={()=>void onSave(item)} aria-label="Conservar para mí"><Icon name="heart"/></button>}
     </div>
   </article>
 }
 
-function SourceCard({ item,index,authenticated,onOpen,onSave }: { item:SourceItem; index:number; authenticated:boolean; onOpen:(item:SourceItem)=>void; onSave:(item:SourceItem)=>Promise<void> }) {
-  return <ResourceCard item={item} index={index} authenticated={authenticated} onOpen={(resource)=>onOpen(resource as SourceItem)} onSave={onSave}/>
+function SourceCard({ item,index,authenticated,onOpen,onSave,taxonomy }: { item:SourceItem; index:number; authenticated:boolean; onOpen:(item:SourceItem)=>void; onSave:(item:SourceItem)=>Promise<void>; taxonomy?:SourceTaxonomy|null }) {
+  return <ResourceCard item={item} index={index} authenticated={authenticated} onOpen={(resource)=>onOpen(resource as SourceItem)} onSave={onSave} taxonomy={taxonomy}/>
 }
 
 function matchesSourceFilters(item: SourceItem, filters: SourceFiltersState) {
@@ -282,9 +319,10 @@ function SourceFilters({ items,open,setOpen,filters,setFilters }: { items:Source
   </div>
 }
 
-function MomentFlow({ stage,scene,help,constellation,capacityKeys,taxonomy,expression,busy,selectedPathIds,createdTrajectoryId,onSelect,onExperienceExit,onOutcome,onIntegrate,onClose,onClarify,onCapacityChange,onTogglePath,onCreateFaro,onSavePath,integrated }: { stage:MomentStage; scene:S1Scene|null; help:ExperienceHelp|null; constellation:SourceItem[]; capacityKeys:string[]; taxonomy:SourceTaxonomy|null; expression:string; busy:boolean; selectedPathIds:string[]; createdTrajectoryId:string|null; onSelect:(item:ExperienceHelp)=>void; onExperienceExit:()=>void; onOutcome:(effect:'helped'|'not_helped'|'unsure')=>void; onIntegrate:()=>void; onClose:()=>void; onClarify:()=>void; onCapacityChange:(keys:string[])=>void; onTogglePath:(helpId:string)=>void; onCreateFaro:(text:string)=>void; onSavePath:()=>void; integrated:boolean }) {
+function MomentFlow({ stage,scene,help,constellation,capacityKeys,taxonomy,expression,busy,selectedPathIds,createdTrajectoryId,onSelect,onExperienceExit,onOutcome,onIntegrate,onClose,onClarify,onReexpress,onCapacityChange,onTogglePath,onCreateFaro,onSavePath,onOpenPath,integrated }: { stage:MomentStage; scene:S1Scene|null; help:ExperienceHelp|null; constellation:SourceItem[]; capacityKeys:string[]; taxonomy:SourceTaxonomy|null; expression:string; busy:boolean; selectedPathIds:string[]; createdTrajectoryId:string|null; onSelect:(item:ExperienceHelp)=>void; onExperienceExit:()=>void; onOutcome:(effect:'helped'|'not_helped'|'unsure')=>void; onIntegrate:()=>void; onClose:()=>void; onClarify:()=>void; onReexpress:(text:string)=>void; onCapacityChange:(keys:string[])=>void; onTogglePath:(helpId:string)=>void; onCreateFaro:(text:string)=>void; onSavePath:()=>void; onOpenPath:()=>void; integrated:boolean }) {
   const [faroText,setFaroText]=useState(expression.slice(0,280))
-  useEffect(()=>setFaroText(expression.slice(0,280)),[expression])
+  const [reExpression,setReExpression]=useState(expression)
+  useEffect(()=>{setFaroText(expression.slice(0,280));setReExpression(expression)},[expression])
   const noMatch=scene?.scene_id==='moment.no_match'||scene?.scene_id==='moment.safety_referral'||(!help&&!constellation.length)
   const primary=(constellation.find((item)=>item.primary_now)||constellation[0]||help) as ExperienceHelp|null
   const rest=constellation.filter((item)=>item.help_id!==primary?.help_id)
@@ -293,16 +331,22 @@ function MomentFlow({ stage,scene,help,constellation,capacityKeys,taxonomy,expre
     <div className="lumi-presence"><span className="orb small"/><div><small>LUMI · {scene?.presence_mode||'P2'}</small><p>{stage==='scene'?'Estoy acá. No hace falta reducir lo que te pasa a una sola respuesta.':stage==='outcome'?'Volvamos apenas a lo vivido. Vos decidís qué quedó.':'Si algo vale la pena conservar, puede quedar disponible sin convertirse en obligación.'}</p></div></div>
     <button className="dialogue-close" type="button" onClick={onClose}><Icon name="close"/></button>
     {stage==='scene'&&<>{noMatch?<><p className="eyebrow">PRESENCIA ANTES QUE RESPUESTA</p><h1>No quiero inventarte una respuesta.</h1><p>No encontré una posibilidad suficientemente confiable para esto ahora. Podemos aclarar un poco más o dejarlo acá.</p><div className="button-row"><button className="primary" type="button" onClick={onClarify}>Aclarar un poco más</button><button className="ghost" type="button" onClick={onClose}>Dejarlo acá</button></div></>:<>
-      <p className="eyebrow">UNA CONSTELACIÓN PARA ESTE MOMENTO</p>
-      <h1>Algunas formas de acompañar lo que está vivo.</h1>
-      <p className="moment-support-copy">Estas capacidades son una propuesta editable. Elegí sólo lo que tenga sentido para vos.</p>
-      <CapabilityPicker taxonomy={taxonomy} selected={capacityKeys} onChange={onCapacityChange} disabled={busy}/>
-      {primary&&<><div className="section-heading moment-section-heading"><h2>Para ahora</h2><p>Una primera ayuda posible, de baja fricción y pertinente a este momento.</p></div><div className="source-grid moment-source-grid"><ResourceCard item={primary} index={0} authenticated={false} onOpen={onSelect} contextLabel="PARA AHORA · UNA PRIMERA AYUDA POSIBLE" extraAction={<button className={selectedPathIds.includes(primary.help_id)?'ghost small active':'ghost small'} type="button" onClick={()=>onTogglePath(primary.help_id)}>{selectedPathIds.includes(primary.help_id)?'✓ En mi posible Camino':'+ Sumar al Camino'}</button>}/></div></>}
-      {rest.length>0&&<div className="moment-constellation"><div className="section-heading"><h2>Otras maneras de acercarte</h2><p>Comprender, practicar, aplicar, conversar, integrar. Sin un orden obligatorio.</p></div><div className="source-grid moment-source-grid">{rest.map((item,index)=><ResourceCard key={item.help_id} item={item} index={index+1} authenticated={false} onOpen={onSelect} extraAction={<button className={selectedPathIds.includes(item.help_id)?'ghost small active':'ghost small'} type="button" onClick={()=>onTogglePath(item.help_id)}>{selectedPathIds.includes(item.help_id)?'✓ En mi posible Camino':'+ Sumar al Camino'}</button>}/>)}</div></div>}
-      <section className="faro-proposal"><p className="eyebrow">¿HAY ACÁ UNA DIRECCIÓN QUE QUIERAS SEGUIR CUIDANDO?</p><p>Puede ser sólo algo de hoy. O puede haber algo que quieras conservar como Faro. Vos decidís.</p><input value={faroText} onChange={(e)=>setFaroText(e.target.value.slice(0,280))} placeholder="Una dirección que quiero cuidar..."/><CapabilityPicker taxonomy={taxonomy} selected={capacityKeys} onChange={onCapacityChange} disabled={busy}/>{!createdTrajectoryId?<button className="ghost" type="button" disabled={busy||!faroText.trim()} onClick={()=>onCreateFaro(faroText.trim())}>Conservar como Faro</button>:<div className="faro-saved"><b>Faro conservado.</b><p>Ahora podés convertir las piezas que elegiste en un Camino editable.</p><button className="primary" type="button" disabled={busy||!selectedPathIds.length} onClick={onSavePath}>Conservar selección como mi Camino</button></div>}</section>
+      <section className="moment-interpretation">
+        <p className="eyebrow">LO QUE ESCUCHÉ</p>
+        <blockquote>“{expression}”</blockquote>
+        <div className="interpretation-capabilities">
+          <small>Lo estoy leyendo, provisoriamente, desde estas capacidades:</small>
+          <CapabilityPicker taxonomy={taxonomy} selected={capacityKeys} onChange={onCapacityChange} disabled={busy||Boolean(createdTrajectoryId)}/>
+        </div>
+        {!createdTrajectoryId&&<details><summary>Reexpresar o ajustar mi lectura</summary><div className="reexpression-editor"><textarea value={reExpression} onChange={(e)=>setReExpression(e.target.value.slice(0,1200))}/><p>Podés cambiar tus palabras y también elegir o quitar capacidades. La lectura de LUMEN es una propuesta; tu criterio manda.</p><button className="ghost" type="button" disabled={busy||!reExpression.trim()||reExpression.trim()===expression.trim()} onClick={()=>onReexpress(reExpression.trim())}>Volver a interpretar desde mis palabras</button></div></details>}
+      </section>
+      <div className="constellation-hero" style={{backgroundImage:`linear-gradient(90deg,rgba(18,24,18,.72),rgba(18,24,18,.18)),url(${IMG.calm})`}}><div><p className="eyebrow">TU CONSTELACIÓN · ABIERTA Y EDITABLE</p><h1>Algunas formas de acompañar lo que está vivo.</h1><p>Está compuesta desde las capacidades que ves arriba. Podés quitar o sumar piezas antes de hacerla parte de un Camino.</p></div></div>
+      {primary&&<><div className="section-heading moment-section-heading"><h2>Para ahora</h2><p>Una primera ayuda posible, de baja fricción y pertinente a este momento.</p></div><div className="source-grid moment-source-grid"><ResourceCard item={primary} index={0} authenticated={false} onOpen={onSelect} taxonomy={taxonomy} contextLabel="PARA AHORA · UNA PRIMERA AYUDA POSIBLE" extraAction={<button className={selectedPathIds.includes(primary.help_id)?'ghost small active':'ghost small'} type="button" onClick={()=>onTogglePath(primary.help_id)}>{selectedPathIds.includes(primary.help_id)?'✓ En mi posible Camino':'+ Sumar al Camino'}</button>}/></div></>}
+      {rest.length>0&&<div className="moment-constellation"><div className="section-heading"><h2>Otras maneras de acercarte</h2><p>Comprender, practicar, aplicar, conversar, integrar. Sin un orden obligatorio.</p></div><div className="source-grid moment-source-grid">{rest.map((item,index)=><ResourceCard key={item.help_id} item={item} index={index+1} authenticated={false} onOpen={onSelect} taxonomy={taxonomy} extraAction={<button className={selectedPathIds.includes(item.help_id)?'ghost small active':'ghost small'} type="button" onClick={()=>onTogglePath(item.help_id)}>{selectedPathIds.includes(item.help_id)?'✓ En mi posible Camino':'+ Sumar al Camino'}</button>}/>)}</div></div>}
+      <section className="faro-proposal"><p className="eyebrow">SI ESTO MERECE CONTINUIDAD</p><h2>Convertirlo en un Faro propio.</h2><p>Podés reexpresar la dirección, confirmar las capacidades y elegir qué piezas de esta constelación querés llevar a tu Camino. Nada queda fijado para siempre.</p><input value={faroText} onChange={(e)=>setFaroText(e.target.value.slice(0,280))} placeholder="Una dirección que quiero cuidar..."/><CapabilityPicker taxonomy={taxonomy} selected={capacityKeys} onChange={onCapacityChange} disabled={busy||Boolean(createdTrajectoryId)}/><div className="faro-selection-summary"><span>{selectedPathIds.length} {selectedPathIds.length===1?'pieza elegida':'piezas elegidas'} para el Camino</span><small>Podés sumar o quitar piezas desde las tarjetas de la constelación.</small></div>{!createdTrajectoryId?<button className="primary" type="button" disabled={busy||!faroText.trim()||!capacityKeys.length} onClick={()=>onCreateFaro(faroText.trim())}>Crear Faro con estas capacidades y esta constelación</button>:<div className="faro-saved"><b>Faro y Camino creados.</b><p>Quedaron vinculados a estas capacidades y a las piezas que elegiste. Desde Mi proceso podés sumar, quitar y ordenar elementos de Fuente, Santuario, Tejido, Repertorio o algo propio.</p><div className="button-row"><button className="primary" type="button" onClick={onOpenPath}>Abrir mi Camino y ajustarlo</button><button className="ghost" type="button" disabled={busy||!selectedPathIds.length} onClick={onSavePath}>Actualizar con mi selección actual</button></div></div>}</section>
     </>}</>}
     {stage==='outcome'&&<><p className="eyebrow">RETORNO</p><h1>¿Cómo fue para vos?</h1><p>No hace falta explicar demasiado. Sólo nos ayuda a saber si tuvo sentido en tu vida real.</p><div className="outcome-row"><button type="button" onClick={()=>onOutcome('helped')}>Me ayudó</button><button type="button" onClick={()=>onOutcome('unsure')}>No estoy segura</button><button type="button" onClick={()=>onOutcome('not_helped')}>No me ayudó</button></div></>}
-    {stage==='closed'&&<><p className="eyebrow">COSECHA</p><h1>Gracias. Con esto alcanza por ahora.</h1><p>{integrated?'Quedó en tu repertorio porque vos lo elegiste.':'Si querés, podés conservar esta posibilidad como algo a lo que volver.'}</p><div className="button-row">{!integrated&&help&&<button className="primary" type="button" onClick={onIntegrate} disabled={busy}>Guardar “{help.title}” en mi repertorio</button>}<button className="ghost" type="button" onClick={onClose}>Volver a mi vida</button></div></>}
+    {stage==='closed'&&<><p className="eyebrow">COSECHA</p><h1>Gracias. Con esto alcanza por ahora.</h1><p>{integrated?'Quedó en tu repertorio porque vos lo elegiste.':'Si querés, podés conservar esta posibilidad como algo a lo que volver.'}</p><div className="button-row">{!integrated&&help&&<button className="primary" type="button" onClick={onIntegrate} disabled={busy}>Guardar “{help.title}” en mi repertorio</button>}<button className="ghost" type="button" onClick={onClose}>Volver a mi proceso</button></div></>}
   </div></section>
 }
 
@@ -343,7 +387,7 @@ function signalForReturn(move: Exclude<CultivationMove,'CONTINUE_PATH'>, effect:
   return 'REUSED'
 }
 
-function LifeView({ snapshot,proactivity,taxonomy,source,entries,circles,refresh }: { snapshot:ContinuitySnapshot|null; proactivity:ProactivitySnapshot|null; taxonomy:SourceTaxonomy|null; source:SourceItem[]; entries:SanctuaryEntry[]; circles:Circle[]; refresh:()=>Promise<void> }) {
+function LifeView({ snapshot,proactivity,taxonomy,source,entries,circles,refresh,onOpenSource,go }: { snapshot:ContinuitySnapshot|null; proactivity:ProactivitySnapshot|null; taxonomy:SourceTaxonomy|null; source:SourceItem[]; entries:SanctuaryEntry[]; circles:Circle[]; refresh:()=>Promise<void>; onOpenSource:(item:SourceItem)=>void; go:(space:Space)=>void }) {
   const [newFaro,setNewFaro]=useState('')
   const [busy,setBusy]=useState(false)
   const [cultivation,setCultivation]=useState<{help:HelpPossibility;episodeId:string;move:Exclude<CultivationMove,'CONTINUE_PATH'>}|null>(null)
@@ -357,32 +401,46 @@ function LifeView({ snapshot,proactivity,taxonomy,source,entries,circles,refresh
   const scheduleReminder=async(e:FormEvent)=>{e.preventDefault();if(!reminderRepertoireId||!reminderAt)return;const item=snapshot?.repertoire?.find((x)=>x.repertoire_id===reminderRepertoireId);if(!item)return;setBusy(true);setStatus('');try{if(!(proactivity?.proactive_allowed??false)){setStatus('Activá primero la proactividad si querés que LUMEN vuelva por iniciativa acordada.');return}const due=new Date(reminderAt);if(Number.isNaN(due.getTime())||due.getTime()<=Date.now()){setStatus('Elegí un momento futuro para volver.');return}await scheduleCultivationFollowup('self_chosen',due.toISOString(),'REPEAT',{repertoireId:item.repertoire_id,helpId:item.help_id,capacityKey:item.capability_keys?.[0]??null});setReminderRepertoireId('');setReminderAt('');setStatus('Retorno acordado. Podés cancelarlo cuando quieras desde Notificaciones.');await refresh()}catch{setStatus('No pude acordar ese retorno. Revisá la fecha o la proactividad.')}finally{setBusy(false)}}
   if(cultivation)return <Experience help={cultivation.help} onExit={()=>setCultivation(null)} onFeedback={(effect)=>longitudinalFeedback(effect)}/>
   const memory=snapshot?.memory_allowed??false
-  return <section className="space-page life-view"><SpaceHero kicker="MI PROCESO" title="Un camino hacia una vida más tuya." text="Lo que está vivo, lo que elegiste cuidar y aquello que ya hiciste propio." image={IMG.practice}/><div className="space-content"><div className="life-columns"><section><p className="section-label">LO QUE ESTÁ VIVO HOY</p><h2>{snapshot?.trajectories?.[0]?.faro_text||'Un lugar para reconocer dónde estás.'}</h2><p>El presente tiene prioridad. Tus caminos siguen disponibles sin convertirse en presión.</p></section><aside className="soft-control"><span>Memoria elegida por vos</span><button aria-label="Memoria" type="button" className={memory?'switch on':'switch'} onClick={async()=>{await setMemory(!memory);await refresh()}}><i/></button></aside></div><div className="section-heading"><h2>Mis Faros y Caminos</h2><p>Direcciones vivas. Capacidades editables. Caminos que podés armar y desarmar.</p></div><div className="path-grid path-grid-wide">{snapshot?.trajectories?.length?snapshot.trajectories.map((trajectory)=><TrajectoryCard key={trajectory.trajectory_id} trajectory={trajectory} taxonomy={taxonomy} source={source} repertoire={snapshot.repertoire||[]} entries={entries} circles={circles} refresh={refresh}/>):<article><span className="path-dot"/><div><b>Tu primer Faro puede nacer acá.</b><small>Elegido por vos</small><p>Una dirección que quieras cuidar sin convertirla en meta ni score.</p></div></article>}</div><form className="inline-create" onSubmit={create}><input value={newFaro} onChange={(e)=>setNewFaro(e.target.value)} placeholder="Algo que quiero cuidar en mi vida..."/><button disabled={busy||!newFaro.trim()}>Abrir un Faro</button></form><div className="section-heading"><h2>Mi repertorio</h2><p>Lo que ya reconociste como útil para volver a usar.</p></div><div className="repertoire-grid">{snapshot?.repertoire?.length?snapshot.repertoire.map((item)=><article key={item.repertoire_id}><img src={IMG.practice} alt=""/><span><b>{item.title}</b><small>{item.times_reused?`${item.times_reused} retornos`:'Disponible para vos'}</small><p>{item.summary}</p><div className="card-actions"><button className="ghost small" type="button" disabled={busy} onClick={()=>void cultivate(item.repertoire_id,'REPEAT')}>Repetir</button><button className="ghost small" type="button" disabled={busy} onClick={()=>void cultivate(item.repertoire_id,'VARY')}>Variar</button><button className="ghost small" type="button" disabled={busy} onClick={()=>void cultivate(item.repertoire_id,'APPLY_IN_CONTEXT')}>Aplicar</button></div><details><summary>Qué cambió con esto</summary><div className="card-actions"><button className="ghost small" type="button" disabled={busy} onClick={()=>void explicitSignal(item,'RECOGNIZED_AS_OWN')}>Ya lo siento propio</button><button className="ghost small" type="button" disabled={busy} onClick={()=>void explicitSignal(item,'NO_REMINDER_NEEDED')}>Ya no necesito recordatorios</button><button className="ghost small" type="button" disabled={busy} onClick={()=>void explicitSignal(item,'STOPPED_HELPING')}>Dejó de servirme</button></div></details></span></article>):<div className="empty-state">Todavía no hay nada en tu repertorio. LUMEN no lo llena por vos.</div>}</div>{status&&<p className="status-message">{status}</p>}<div className="section-heading"><h2>Continuidad elegida</h2><p>LUMEN sólo vuelve si vos lo permitís.</p></div><aside className="soft-control"><span>Proactividad {proactivity?.proactive_allowed?'activada':'desactivada'}</span><button aria-label="Proactividad" type="button" className={proactivity?.proactive_allowed?'switch on':'switch'} onClick={async()=>{await setProactivity(!(proactivity?.proactive_allowed??false));await refresh()}}><i/></button></aside>{snapshot?.repertoire?.length?<form className="inline-create" onSubmit={scheduleReminder}><select aria-label="Recurso para recordar" value={reminderRepertoireId} onChange={(e)=>setReminderRepertoireId(e.target.value)}><option value="">Elegir algo a lo que volver…</option>{snapshot.repertoire.map((item)=><option key={item.repertoire_id} value={item.repertoire_id}>{item.title}</option>)}</select><input aria-label="Cuándo volver" type="datetime-local" value={reminderAt} onChange={(e)=>setReminderAt(e.target.value)}/><button disabled={busy||!reminderRepertoireId||!reminderAt}>Acordar retorno</button></form>:null}</div></section>
+  return <section className="space-page life-view"><SpaceHero kicker="MI PROCESO" title="Un camino hacia una vida más mía." text="Pequeños pasos, decisiones más conscientes y un espacio cada vez más habitable." image={IMG.calm}/><div className="space-content"><div className="life-columns"><section><p className="section-label">LO QUE ESTÁ VIVO HOY</p><h2>{snapshot?.trajectories?.[0]?.faro_text||'Un lugar para reconocer dónde estás.'}</h2><p>El presente tiene prioridad. Tus caminos siguen disponibles sin convertirse en presión.</p></section><aside className="soft-control"><span>Memoria elegida por vos</span><button aria-label="Memoria" type="button" className={memory?'switch on':'switch'} onClick={async()=>{await setMemory(!memory);await refresh()}}><i/></button></aside></div><div className="section-heading"><h2>Mis Faros y Caminos</h2><p>Direcciones vivas. Capacidades editables. Caminos que podés armar y desarmar.</p></div><div className="path-grid path-grid-wide">{snapshot?.trajectories?.length?snapshot.trajectories.map((trajectory)=><TrajectoryCard key={trajectory.trajectory_id} trajectory={trajectory} taxonomy={taxonomy} source={source} repertoire={snapshot.repertoire||[]} entries={entries} circles={circles} refresh={refresh}/>):<article><span className="path-dot"/><div><b>Tu primer Faro puede nacer acá.</b><small>Elegido por vos</small><p>Una dirección que quieras cuidar sin convertirla en meta ni score.</p></div></article>}</div><form className="inline-create" onSubmit={create}><input value={newFaro} onChange={(e)=>setNewFaro(e.target.value)} placeholder="Algo que quiero cuidar en mi vida..."/><button disabled={busy||!newFaro.trim()}>Abrir un Faro</button></form>{(()=>{const relatedSource=relatedSourceToActiveLife(source,snapshot,3);const relatedSanctuary=relatedSanctuaryToActiveLife(entries,source,snapshot,2);const human=relatedSource.filter((item)=>['professional_support','institutional_service','human_action','conversation'].includes(item.help_type));return (relatedSource.length||relatedSanctuary.length||human.length)?<section className="organism-bridges"><div className="section-heading"><h2>Conexiones alrededor de lo que estás cuidando</h2><p>Fuente, Santuario y Tejido pueden aportar sin convertir tu Faro en un programa.</p></div><div className="bridge-grid">{relatedSource.filter((item)=>!['professional_support','institutional_service','human_action','conversation'].includes(item.help_type)).slice(0,2).map((item)=><button className="bridge-card" type="button" key={item.help_id} onClick={()=>onOpenSource(item)}><small>FUENTE</small><b>{item.title}</b><p>{item.summary}</p></button>)}{relatedSanctuary.slice(0,1).map((entry)=><button className="bridge-card" type="button" key={entry.entry_id} onClick={()=>go('sanctuary')}><small>SANTUARIO</small><b>{entry.title||'Algo que guardaste'}</b><p>{entry.content.slice(0,120)}</p></button>)}{human.slice(0,1).map((item)=><button className="bridge-card" type="button" key={item.help_id} onClick={()=>onOpenSource(item)}><small>TEJIDO</small><b>{item.title}</b><p>{item.summary}</p></button>)}</div></section>:null})()}<div className="section-heading"><h2>Mi repertorio</h2><p>Lo que ya reconociste como útil para volver a usar.</p></div><div className="repertoire-grid">{snapshot?.repertoire?.length?snapshot.repertoire.map((item)=><article key={item.repertoire_id}><img src={IMG.practice} alt=""/><span><b>{item.title}</b><small>{item.times_reused?`${item.times_reused} retornos`:'Disponible para vos'}</small><p>{item.summary}</p><div className="card-actions"><button className="ghost small" type="button" disabled={busy} onClick={()=>void cultivate(item.repertoire_id,'REPEAT')}>Repetir</button><button className="ghost small" type="button" disabled={busy} onClick={()=>void cultivate(item.repertoire_id,'VARY')}>Variar</button><button className="ghost small" type="button" disabled={busy} onClick={()=>void cultivate(item.repertoire_id,'APPLY_IN_CONTEXT')}>Aplicar</button></div><details><summary>Qué cambió con esto</summary><div className="card-actions"><button className="ghost small" type="button" disabled={busy} onClick={()=>void explicitSignal(item,'RECOGNIZED_AS_OWN')}>Ya lo siento propio</button><button className="ghost small" type="button" disabled={busy} onClick={()=>void explicitSignal(item,'NO_REMINDER_NEEDED')}>Ya no necesito recordatorios</button><button className="ghost small" type="button" disabled={busy} onClick={()=>void explicitSignal(item,'STOPPED_HELPING')}>Dejó de servirme</button></div></details></span></article>):<div className="empty-state">Todavía no hay nada en tu repertorio. LUMEN no lo llena por vos.</div>}</div>{status&&<p className="status-message">{status}</p>}<div className="section-heading"><h2>Continuidad elegida</h2><p>LUMEN sólo vuelve si vos lo permitís.</p></div><aside className="soft-control"><span>Proactividad {proactivity?.proactive_allowed?'activada':'desactivada'}</span><button aria-label="Proactividad" type="button" className={proactivity?.proactive_allowed?'switch on':'switch'} onClick={async()=>{await setProactivity(!(proactivity?.proactive_allowed??false));await refresh()}}><i/></button></aside>{snapshot?.repertoire?.length?<form className="inline-create" onSubmit={scheduleReminder}><select aria-label="Recurso para recordar" value={reminderRepertoireId} onChange={(e)=>setReminderRepertoireId(e.target.value)}><option value="">Elegir algo a lo que volver…</option>{snapshot.repertoire.map((item)=><option key={item.repertoire_id} value={item.repertoire_id}>{item.title}</option>)}</select><input aria-label="Cuándo volver" type="datetime-local" value={reminderAt} onChange={(e)=>setReminderAt(e.target.value)}/><button disabled={busy||!reminderRepertoireId||!reminderAt}>Acordar retorno</button></form>:null}</div></section>
 }
 
 function SpaceHero({ kicker,title,text,image }: { kicker:string; title:string; text:string; image:string }) {
-  return <header className="space-hero" style={{backgroundImage:`url(${image})`}}><div className="premium-wordmark">LUMEN</div><div><p>{kicker}</p><h1>{title}</h1><span>{text}</span></div></header>
+  const identity = kicker==='EXPLORAR'||kicker==='BUSCAR' ? 'FUENTE' : kicker
+  const editorial = identity==='FUENTE'
+  const notes:Record<string,string> = {
+    'FUENTE':'Explorar también es una forma de cuidarte.',
+    'MI PROCESO':'También aquí, en lo cotidiano, hay un lugar para volver a ti.',
+    'SANTUARIO':'Conservar lo que importa también es una forma de cuidarte.',
+    'TEJIDO':'Compartir también es una forma de cuidar.',
+    'NOTIFICACIONES':'Volver sólo cuando lo elegís.',
+    'AJUSTES':'Una vida más tuya también se construye con límites claros.',
+  }
+  return <header className={editorial?'space-hero space-hero-editorial':'space-hero'} style={{backgroundImage:`url(${image})`}}>
+    <div className="space-brand">LUMEN · {identity}</div>
+    <aside className="space-hero-note"><em>{notes[identity]||notes[kicker]||'Una vida más tuya.'}</em><span>—</span></aside>
+    <div className="space-hero-copy"><p>{kicker}</p><h1>{title}</h1><span>{text}</span></div>
+  </header>
 }
 
-function ExploreHeader() {
-  return <header className="explore-hero"><div className="premium-wordmark page">LUMEN</div><p className="eyebrow">EXPLORAR</p><h1>Explorar</h1><span>Descubrí contenido para una vida más tuya.</span></header>
-}
-
-function ExploreView({ source,taxonomy,snapshot,authenticated,onOpen,onSave }: { source:SourceItem[]; taxonomy:SourceTaxonomy|null; snapshot:ContinuitySnapshot|null; authenticated:boolean; onOpen:(item:SourceItem)=>void; onSave:(item:SourceItem)=>Promise<void> }) {
+function ExploreView({ source,taxonomy,snapshot,authenticated,onOpen,onSave,returnConstellationKey,onReturnConstellationChange }: { source:SourceItem[]; taxonomy:SourceTaxonomy|null; snapshot:ContinuitySnapshot|null; authenticated:boolean; onOpen:(item:SourceItem)=>void; onSave:(item:SourceItem)=>Promise<void>; returnConstellationKey:string|null; onReturnConstellationChange:(key:string|null)=>void }) {
   const [query,setQuery]=useState('')
   const [selectedCapacity,setSelectedCapacity]=useState<string|null>(null)
   const [constellation,setConstellation]=useState<SourceItem[]>([])
+  const [selectedConstellationKey,setSelectedConstellationKey]=useState<string|null>(null)
   const [loading,setLoading]=useState(false)
   const [message,setMessage]=useState('')
   const [filtersOpen,setFiltersOpen]=useState(false)
   const [filters,setFilters]=useState<SourceFiltersState>(EMPTY_SOURCE_FILTERS)
   const filtered=useMemo(()=>source.filter((item)=>`${item.title} ${item.summary} ${(item.capacities||[]).join(' ')}`.toLowerCase().includes(query.toLowerCase())).filter((item)=>matchesSourceFilters(item,filters)).slice(0,24),[source,query,filters])
   const faroRelated=useMemo(()=>relatedSourceToActiveLife(source,snapshot,4),[source,snapshot])
+  const premiumGroups=useMemo(()=>premiumConstellations(source,taxonomy),[source,taxonomy])
   const selectedLabel=taxonomy?.capacities?.find((term)=>term.key===selectedCapacity)?.label||selectedCapacity
   const filteredConstellation=useMemo(()=>constellation.filter((item)=>matchesSourceFilters(item,filters)),[constellation,filters])
   const groups=useMemo(()=>{const grouped=new Map<string,SourceItem[]>();filteredConstellation.forEach((item)=>{const role=item.cultivation_roles?.[0]||'OTHER';grouped.set(role,[...(grouped.get(role)||[]),item])});return[...grouped.entries()]},[filteredConstellation])
-  const openCapacity=async(key:string)=>{setSelectedCapacity(key);setLoading(true);setMessage('');try{const items=await discoverConstellation(key,null,navigator.language||'es-AR',16);setConstellation(items);if(!items.length)setMessage('No encontré una constelación suficientemente diversa para esta capacidad ahora.')}catch{setConstellation([]);setMessage('No pude componer esta constelación ahora.')}finally{setLoading(false)}}
-  return <section className="space-page explore-view"><ExploreHeader/><div className="space-content"><div className="explore-toolbar"><div className="search-large"><Icon name="search"/><input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="Buscar por tema, capacidad o palabra..."/></div><SourceFilters items={selectedCapacity?constellation:source} open={filtersOpen} setOpen={setFiltersOpen} filters={filters} setFilters={setFilters}/></div>{faroRelated.length>0&&<section id="related-to-faro"><div className="section-heading"><h2>Relacionado con tu Faro</h2><p>Posibilidades de Fuente conectadas con las Capacidades que elegiste cuidar. La relación orienta; no prescribe.</p></div><div className="source-grid">{faroRelated.map((item,index)=><ResourceCard key={item.help_id} item={item} index={index} authenticated={authenticated} onOpen={(resource)=>onOpen(resource as SourceItem)} onSave={onSave} contextLabel="RELACIONADO CON TU FARO"/>)}</div></section>}<div className="section-heading"><h2>Capacidades</h2><p>Son lentes para orientar posibilidades, no niveles ni scores sobre tu vida.</p></div><div className="faro-large-grid">{(taxonomy?.capacities||[]).map((term,index)=><button key={term.key} className={selectedCapacity===term.key?'active':''} type="button" onClick={()=>void openCapacity(term.key)}><span>{['◎','◌','♡','◍','◇','◉','◈','○','◐','✦'][index%10]}</span><b>{term.label}</b><small>Componer constelación</small></button>)}</div>{selectedCapacity?<><div className="section-heading"><h2>Constelación para {selectedLabel}</h2><p>Una composición dinámica de formas complementarias. No es un programa.</p></div>{loading&&<div className="empty-state">Componiendo desde Fuente…</div>}{message&&<div className="empty-state">{message}</div>}{!loading&&!message&&filteredConstellation.length===0&&<div className="empty-state">Ninguna posibilidad de esta constelación coincide con los filtros actuales.</div>}{groups.map(([role,items])=><section key={role}><div className="section-heading"><h2>{ROLE_LABEL[role]||'Otras maneras de acercarte'}</h2><p>{items.length} {items.length===1?'posibilidad':'posibilidades'}.</p></div><div className="source-grid">{items.map((item,index)=><SourceCard key={item.help_id} item={item} index={index} authenticated={authenticated} onOpen={onOpen} onSave={onSave}/>)}</div></section>)}<button className="ghost" type="button" onClick={()=>{setSelectedCapacity(null);setConstellation([]);setMessage('')}}>Volver a todas las posibilidades</button></>:<><div className="section-heading"><h2>Posibilidades</h2><p>Exploración deliberada de Fuente. Cada pieza conserva naturaleza y origen.</p></div><div className="source-grid">{filtered.map((item,index)=><SourceCard key={item.help_id} item={item} index={index} authenticated={authenticated} onOpen={onOpen} onSave={onSave}/>)}</div>{!filtered.length&&<div className="empty-state">No hay posibilidades que coincidan con esta búsqueda y estos filtros.</div>}</>}</div></section>
+  useEffect(()=>{if(!returnConstellationKey||selectedConstellationKey)return;const group=premiumGroups.find((item)=>item.key===returnConstellationKey);if(!group)return;setSelectedConstellationKey(group.key);setSelectedCapacity(group.capacityKey);setConstellation(group.items);setMessage('');setLoading(false)},[returnConstellationKey,premiumGroups,selectedConstellationKey])
+  const openCapacity=async(key:string)=>{onReturnConstellationChange(null);setSelectedConstellationKey(null);setSelectedCapacity(key);setLoading(true);setMessage('');try{const items=await discoverConstellation(key,null,navigator.language||'es-AR',16);setConstellation(items);if(!items.length)setMessage('No encontré una constelación suficientemente diversa para esta capacidad ahora.')}catch{setConstellation([]);setMessage('No pude componer esta constelación ahora.')}finally{setLoading(false)}}
+  const openPremium=(key:string)=>{const group=premiumGroups.find((item)=>item.key===key);if(!group)return;onReturnConstellationChange(key);setSelectedConstellationKey(key);setSelectedCapacity(group.capacityKey);setConstellation(group.items);setMessage('');setLoading(false)}
+  return <section className={selectedCapacity?'space-page explore-view constellation-open':'space-page explore-view'}><SpaceHero kicker="EXPLORAR" title="Explorar" text="Descubrí saberes, prácticas, experiencias y otras vidas para una vida más tuya." image={IMG.sunrise}/><div className="space-content"><div className="explore-toolbar"><div className="search-large"><Icon name="search"/><input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="Buscar por tema, capacidad o palabra..."/></div><SourceFilters items={selectedCapacity?constellation:source} open={filtersOpen} setOpen={setFiltersOpen} filters={filters} setFilters={setFilters}/></div>{premiumGroups.length>0&&<section className="premium-constellation-showcase"><div className="section-heading"><h2>Constelaciones destacadas</h2><p>Composiciones cuidadas de saberes y prácticas que conservan procedencia y naturaleza propia.</p></div><div className="premium-constellation-grid">{premiumGroups.map((group)=><button type="button" key={group.key} onClick={()=>openPremium(group.key)} style={{backgroundImage:`linear-gradient(90deg,rgba(18,24,18,.76),rgba(18,24,18,.16)),url(${IMG.calm})`}}><small>CONSTELACIÓN PREMIUM</small><b>{group.capacityLabel}</b><span>{group.items.length} posibilidades · abrir constelación</span></button>)}</div></section>}{faroRelated.length>0&&<section id="related-to-faro"><div className="section-heading"><h2>Relacionado con tu Faro</h2><p>Posibilidades de Fuente conectadas con las Capacidades que elegiste cuidar. La relación orienta; no prescribe.</p></div><div className="source-grid">{faroRelated.map((item,index)=><ResourceCard key={item.help_id} item={item} index={index} authenticated={authenticated} onOpen={(resource)=>onOpen(resource as SourceItem)} onSave={onSave} taxonomy={taxonomy} contextLabel="RELACIONADO CON TU FARO"/>)}</div></section>}<div className="section-heading capability-heading"><h2>Capacidades</h2><p>Son lentes para orientar posibilidades, no niveles ni scores sobre tu vida.</p></div><div className="faro-large-grid">{(taxonomy?.capacities||[]).map((term,index)=><button key={term.key} className={selectedCapacity===term.key?'active':''} type="button" onClick={()=>void openCapacity(term.key)}><span>{['◎','◌','♡','◍','◇','◉','◈','○','◐','✦'][index%10]}</span><b>{term.label}</b><small>Componer constelación</small></button>)}</div>{selectedCapacity?<><div className={selectedConstellationKey?'constellation-hero premium':'constellation-hero'} style={{backgroundImage:`linear-gradient(90deg,rgba(18,24,18,.76),rgba(18,24,18,.18)),url(${IMG.calm})`}}><div><p className="eyebrow">{selectedConstellationKey?'CONSTELACIÓN PREMIUM · FUENTE':'CONSTELACIÓN · FUENTE'}</p><h1>{selectedLabel}</h1><p>{selectedConstellationKey?'Siete puertas complementarias para comprender, practicar, contemplar y pedir ayuda sin convertir la regulación en un programa.':'Una composición dinámica de formas complementarias. No es un programa.'}</p>{selectedConstellationKey&&<small>{selectedConstellationKey}</small>}</div></div>{loading&&<div className="empty-state">Componiendo desde Fuente…</div>}{message&&<div className="empty-state">{message}</div>}{!loading&&!message&&filteredConstellation.length===0&&<div className="empty-state">Ninguna posibilidad de esta constelación coincide con los filtros actuales.</div>}{selectedConstellationKey?<section className="premium-constellation-resources"><div className="section-heading"><h2>Recursos para tu bienestar</h2><p>Distintas miradas y formas de ayuda, reunidas alrededor de una misma capacidad.</p></div><div className="source-grid">{filteredConstellation.map((item,index)=><SourceCard key={item.help_id} item={item} index={index} authenticated={authenticated} onOpen={onOpen} onSave={onSave} taxonomy={taxonomy}/>)}</div></section>:groups.map(([role,items])=><section key={role}><div className="section-heading"><h2>{ROLE_LABEL[role]||'Otras maneras de acercarte'}</h2><p>{items.length} {items.length===1?'posibilidad':'posibilidades'}.</p></div><div className="source-grid">{items.map((item,index)=><SourceCard key={item.help_id} item={item} index={index} authenticated={authenticated} onOpen={onOpen} onSave={onSave} taxonomy={taxonomy}/>)}</div></section>)}<button className="ghost" type="button" onClick={()=>{onReturnConstellationChange(null);setSelectedCapacity(null);setSelectedConstellationKey(null);setConstellation([]);setMessage('')}}>Volver a todas las posibilidades</button></>:<><div className="section-heading"><h2>Posibilidades</h2><p>Exploración deliberada de Fuente. Cada pieza conserva naturaleza y origen.</p></div><div className="source-grid">{filtered.map((item,index)=><SourceCard key={item.help_id} item={item} index={index} authenticated={authenticated} onOpen={onOpen} onSave={onSave} taxonomy={taxonomy}/>)}</div>{!filtered.length&&<div className="empty-state">No hay posibilidades que coincidan con esta búsqueda y estos filtros.</div>}</>}</div></section>
 }
 
 function SanctuaryView({ entries,source,snapshot,refresh,go }: { entries:SanctuaryEntry[]; source:SourceItem[]; snapshot:ContinuitySnapshot|null; refresh:()=>Promise<void>; go:(space:Space)=>void }) {
@@ -403,11 +461,11 @@ function SanctuaryView({ entries,source,snapshot,refresh,go }: { entries:Sanctua
   return <section className="space-page sanctuary-view"><SpaceHero kicker="SANTUARIO" title="Aquí vive lo que importa." text="Un espacio íntimo para conservar significado, no una carpeta de favoritos." image={IMG.journal}/><div className="space-content">{related.length>0&&<section><div className="section-heading"><h2>Conexiones con tu Faro</h2><p>Algo que vos guardaste y que conserva una relación trazable con lo que elegiste cuidar.</p></div><div className="filter-chips">{related.map((entry)=><button key={entry.entry_id} type="button" onClick={()=>document.getElementById(`sanctuary-${entry.entry_id}`)?.scrollIntoView({behavior:'smooth',block:'center'})}>{entry.title||'Volver a algo que guardaste'}</button>)}<button type="button" onClick={()=>go('life')}>Ver mi Faro</button></div></section>}<div className="sanctuary-toolbar"><div className="filter-chips">{filters.map(([key,label])=><button key={key} className={filter===key?'active':''} type="button" onClick={()=>setFilter(key)}>{label}</button>)}</div><button className="text-action" onClick={()=>void download()} type="button"><Icon name="download"/>Exportar lo mío</button></div><div className="sanctuary-grid-large">{visible.length?visible.map((entry,index)=><article id={`sanctuary-${entry.entry_id}`} key={entry.entry_id} className={index===0?'feature':''}><div className="entry-visual" style={{backgroundImage:`linear-gradient(0deg,rgba(28,31,24,.50),rgba(28,31,24,.06)),url(${[IMG.calm,IMG.journal,IMG.meeting,IMG.walk][index%4]})`}}/><div className="entry-copy"><small>{entry.entry_kind}</small>{editingId===entry.entry_id?<><input value={editTitle} onChange={(e)=>setEditTitle(e.target.value)} placeholder="Título (opcional)"/><textarea value={editContent} onChange={(e)=>setEditContent(e.target.value)}/><div className="card-actions"><button className="primary small" type="button" disabled={busy||!editContent.trim()} onClick={()=>void saveEdit()}>Guardar cambios</button><button className="ghost small" type="button" disabled={busy} onClick={()=>setEditingId(null)}>Cancelar</button></div></>:<><h3>{entry.title||'Algo que elegiste conservar'}</h3><p>{entry.content}</p><div className="card-actions"><button className="ghost small" type="button" onClick={()=>startEdit(entry)}>Editar</button><button className="icon-action" type="button" onClick={async()=>{await deleteSanctuary(entry.entry_id);await refresh()}} aria-label="Eliminar"><Icon name="trash"/></button></div></>}</div></article>):<article className="empty-sanctuary"><span className="orb small"/><h3>{entries.length?'No hay elementos de este tipo.':'Tu Santuario empieza cuando algo importa para vos.'}</h3><p>Nada entra sin tu decisión.</p></article>}</div><form className="sanctuary-compose" onSubmit={save}><p className="section-label">UNA NOTA PARA VOS</p><input value={title} onChange={(e)=>setTitle(e.target.value)} placeholder="Título (opcional)"/><textarea value={content} onChange={(e)=>setContent(e.target.value)} placeholder="Algo que quieras conservar..."/><button className="primary" disabled={busy||!content.trim()}>Conservar en mi Santuario</button></form></div></section>
 }
 
-function TissueSource({ items,onOpen }: { items:SourceItem[]; onOpen:(item:SourceItem)=>void }) {
-  return <div className="source-grid">{items.length?items.map((item,index)=><SourceCard key={item.help_id} item={item} index={index} authenticated={false} onOpen={onOpen} onSave={async()=>undefined}/>):<div className="empty-state">No hay posibilidades activas de este tipo en Fuente ahora. LUMEN no inventa personas ni servicios.</div>}</div>
+function TissueSource({ items,onOpen,taxonomy }: { items:SourceItem[]; onOpen:(item:SourceItem)=>void; taxonomy?:SourceTaxonomy|null }) {
+  return <div className="source-grid">{items.length?items.map((item,index)=><SourceCard key={item.help_id} item={item} index={index} authenticated={false} onOpen={onOpen} onSave={async()=>undefined} taxonomy={taxonomy}/>):<div className="empty-state">No hay posibilidades activas de este tipo en Fuente ahora. LUMEN no inventa personas ni servicios.</div>}</div>
 }
 
-function TissueView({ circles,source,snapshot,refresh,onOpen }: { circles:Circle[]; source:SourceItem[]; snapshot:ContinuitySnapshot|null; refresh:()=>Promise<void>; onOpen:(item:SourceItem)=>void }) {
+function TissueView({ circles,source,snapshot,refresh,onOpen,taxonomy }: { circles:Circle[]; source:SourceItem[]; snapshot:ContinuitySnapshot|null; refresh:()=>Promise<void>; onOpen:(item:SourceItem)=>void; taxonomy?:SourceTaxonomy|null }) {
   const [name,setName]=useState('')
   const [purpose,setPurpose]=useState('')
   const [kind,setKind]=useState<TissueKind>('circles')
@@ -427,15 +485,15 @@ function TissueView({ circles,source,snapshot,refresh,onOpen }: { circles:Circle
   const institutions=source.filter((item)=>item.help_type==='institutional_service')
   const actions=source.filter((item)=>['human_action','conversation'].includes(item.help_type))
   const tabs:Array<[TissueKind,string]>=[['circles','Círculos'],['professionals','Apoyo profesional'],['institutions','Instituciones'],['actions','Acciones humanas']]
-  return <section className="space-page tissue-view"><SpaceHero kicker="COMUNIDAD" title="Juntos también se avanza." text="Personas, pares, profesionales, círculos e instituciones cuando la presencia humana tiene sentido." image={IMG.meeting}/><div className="space-content">{relatedHuman.length>0&&<section><div className="section-heading"><h2>Relacionado con tu Faro</h2><p>Presencias y ayudas humanas vinculadas con las Capacidades que elegiste cuidar.</p></div><TissueSource items={relatedHuman} onOpen={onOpen}/></section>}<div className="filter-chips tissue-filters">{tabs.map(([key,label])=><button key={key} className={kind===key?'active':''} type="button" onClick={()=>setKind(key)}>{label}</button>)}</div>{kind==='circles'&&<><div className="section-heading"><h2>Mis círculos y encuentros</h2><p>Espacios reales con propósito. Sin feed, likes ni ranking.</p></div><form className="inline-create" onSubmit={join}><input value={joinToken} onChange={(e)=>setJoinToken(e.target.value)} placeholder="Código de invitación para entrar a un círculo"/><button disabled={busy||!joinToken.trim()}>Entrar</button></form><div className="circle-large">{circles.map((circle,index)=><article key={circle.space_id}><img src={[IMG.meeting,IMG.journal,IMG.walk][index%3]} alt=""/><div><h3>{circle.name}</h3><p>{circle.purpose}</p><small>{circle.member_count} vidas · {circle.role}</small>{inviteTokens[circle.space_id]&&<p><b>Invitación:</b> {inviteTokens[circle.space_id]}</p>}<div className="card-actions">{circle.role==='host'&&<button className="ghost small" type="button" disabled={busy} onClick={()=>void invite(circle)}>Crear invitación</button>}<button className="ghost small" type="button" disabled={busy} onClick={()=>void leave(circle)}>Salir</button><button className="ghost small" type="button" disabled={busy} onClick={()=>void report(circle)}>Reportar</button></div><div className="inline-create"><select aria-label={`Posibilidad para compartir en ${circle.name}`} value={shareSelection[circle.space_id]||''} onChange={(e)=>setShareSelection((current)=>({...current,[circle.space_id]:e.target.value}))}><option value="">Compartir una posibilidad…</option>{source.slice(0,60).map((item)=><option key={item.help_id} value={item.help_id}>{item.title}</option>)}</select><button type="button" disabled={busy||!shareSelection[circle.space_id]} onClick={()=>void share(circle)}>Compartir</button></div></div></article>)}{!circles.length&&<div className="empty-state">Todavía no participás de ningún círculo.</div>}</div>{message&&<p className="status-message">{message}</p>}<form className="circle-create" onSubmit={create}><div><p className="section-label">ABRIR UN CÍRCULO</p><h2>Crear un espacio con propósito.</h2><p>LUMEN sostiene los bordes; las personas ocupan el centro.</p></div><input value={name} onChange={(e)=>setName(e.target.value)} placeholder="Nombre del círculo"/><input value={purpose} onChange={(e)=>setPurpose(e.target.value)} placeholder="Para qué existe"/><button className="primary" disabled={busy||!name.trim()||!purpose.trim()}>Crear círculo</button></form></>}{kind==='professionals'&&<><div className="section-heading"><h2>Apoyo profesional</h2><p>Opciones activas y trazables desde Fuente.</p></div><TissueSource items={professional} onOpen={onOpen}/></>}{kind==='institutions'&&<><div className="section-heading"><h2>Instituciones y servicios</h2><p>Acceso, ayuda pública o institucional cuando corresponde.</p></div><TissueSource items={institutions} onOpen={onOpen}/></>}{kind==='actions'&&<><div className="section-heading"><h2>Acciones y conversaciones</h2><p>Formas de llevar la vida hacia otras vidas fuera de la pantalla.</p></div><TissueSource items={actions} onOpen={onOpen}/></>}</div></section>
+  return <section className="space-page tissue-view"><SpaceHero kicker="TEJIDO" title="Juntos también se avanza." text="Personas, saberes y experiencias para una vida más humana, más consciente y más conectada." image={IMG.meeting}/><div className="space-content">{relatedHuman.length>0&&<section><div className="section-heading"><h2>Relacionado con tu Faro</h2><p>Presencias y ayudas humanas vinculadas con las Capacidades que elegiste cuidar.</p></div><TissueSource items={relatedHuman} onOpen={onOpen} taxonomy={taxonomy}/></section>}<div className="filter-chips tissue-filters">{tabs.map(([key,label])=><button key={key} className={kind===key?'active':''} type="button" onClick={()=>setKind(key)}>{label}</button>)}</div>{kind==='circles'&&<><div className="section-heading"><h2>Mis círculos y encuentros</h2><p>Espacios reales con propósito. Sin feed, likes ni ranking.</p></div><form className="inline-create" onSubmit={join}><input value={joinToken} onChange={(e)=>setJoinToken(e.target.value)} placeholder="Código de invitación para entrar a un círculo"/><button disabled={busy||!joinToken.trim()}>Entrar</button></form><div className="circle-large">{circles.map((circle,index)=><article key={circle.space_id}><img src={[IMG.meeting,IMG.journal,IMG.walk][index%3]} alt=""/><div><h3>{circle.name}</h3><p>{circle.purpose}</p><small>{circle.member_count} vidas · {circle.role}</small>{inviteTokens[circle.space_id]&&<p><b>Invitación:</b> {inviteTokens[circle.space_id]}</p>}<div className="card-actions">{circle.role==='host'&&<button className="ghost small" type="button" disabled={busy} onClick={()=>void invite(circle)}>Crear invitación</button>}<button className="ghost small" type="button" disabled={busy} onClick={()=>void leave(circle)}>Salir</button><button className="ghost small" type="button" disabled={busy} onClick={()=>void report(circle)}>Reportar</button></div><div className="inline-create"><select aria-label={`Posibilidad para compartir en ${circle.name}`} value={shareSelection[circle.space_id]||''} onChange={(e)=>setShareSelection((current)=>({...current,[circle.space_id]:e.target.value}))}><option value="">Compartir una posibilidad…</option>{source.slice(0,60).map((item)=><option key={item.help_id} value={item.help_id}>{item.title}</option>)}</select><button type="button" disabled={busy||!shareSelection[circle.space_id]} onClick={()=>void share(circle)}>Compartir</button></div></div></article>)}{!circles.length&&<div className="empty-state">Todavía no participás de ningún círculo.</div>}</div>{message&&<p className="status-message">{message}</p>}<form className="circle-create" onSubmit={create}><div><p className="section-label">ABRIR UN CÍRCULO</p><h2>Crear un espacio con propósito.</h2><p>LUMEN sostiene los bordes; las personas ocupan el centro.</p></div><input value={name} onChange={(e)=>setName(e.target.value)} placeholder="Nombre del círculo"/><input value={purpose} onChange={(e)=>setPurpose(e.target.value)} placeholder="Para qué existe"/><button className="primary" disabled={busy||!name.trim()||!purpose.trim()}>Crear círculo</button></form></>}{kind==='professionals'&&<><div className="section-heading"><h2>Apoyo profesional</h2><p>Opciones activas y trazables desde Fuente.</p></div><TissueSource items={professional} onOpen={onOpen} taxonomy={taxonomy}/></>}{kind==='institutions'&&<><div className="section-heading"><h2>Instituciones y servicios</h2><p>Acceso, ayuda pública o institucional cuando corresponde.</p></div><TissueSource items={institutions} onOpen={onOpen} taxonomy={taxonomy}/></>}{kind==='actions'&&<><div className="section-heading"><h2>Acciones y conversaciones</h2><p>Formas de llevar la vida hacia otras vidas fuera de la pantalla.</p></div><TissueSource items={actions} onOpen={onOpen} taxonomy={taxonomy}/></>}</div></section>
 }
 
-function SearchView({ source,onOpen }: { source:SourceItem[]; onOpen:(item:SourceItem)=>void }) {
+function SearchView({ source,onOpen,taxonomy }: { source:SourceItem[]; onOpen:(item:SourceItem)=>void; taxonomy?:SourceTaxonomy|null }) {
   const [query,setQuery]=useState('')
   const [filtersOpen,setFiltersOpen]=useState(false)
   const [filters,setFilters]=useState<SourceFiltersState>(EMPTY_SOURCE_FILTERS)
   const results=useMemo(()=>{const q=query.trim().toLowerCase();if(!q)return[];return source.filter((item)=>`${item.title} ${item.summary} ${(item.areas||[]).join(' ')} ${(item.capacities||[]).join(' ')} ${item.provider?.name||''}`.toLowerCase().includes(q)).filter((item)=>matchesSourceFilters(item,filters))},[query,source,filters])
-  return <section className="space-page explore-view"><SpaceHero kicker="BUSCAR" title="Encontrar sin perderte en un catálogo." text="Buscá en la Fuente activa por tema, capacidad, procedencia o palabra." image={IMG.sunrise}/><div className="space-content"><div className="explore-toolbar"><div className="search-large"><Icon name="search"/><input autoFocus value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="¿Qué estás buscando?"/></div><SourceFilters items={source} open={filtersOpen} setOpen={setFiltersOpen} filters={filters} setFilters={setFilters}/></div>{query.trim()?<><div className="section-heading"><h2>{results.length} resultados</h2><p>La búsqueda no modifica tu vida ni tu memoria.</p></div><TissueSource items={results} onOpen={onOpen}/></>:<div className="empty-state">Escribí algo para buscar en Fuente.</div>}</div></section>
+  return <section className="space-page explore-view"><SpaceHero kicker="BUSCAR" title="Buscar" text="Encontrá recursos, prácticas, experiencias y saberes sin perderte en un catálogo." image={IMG.sunrise}/><div className="space-content"><div className="explore-toolbar"><div className="search-large"><Icon name="search"/><input autoFocus value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="¿Qué estás buscando?"/></div><SourceFilters items={source} open={filtersOpen} setOpen={setFiltersOpen} filters={filters} setFilters={setFilters}/></div>{query.trim()?<><div className="section-heading"><h2>{results.length} resultados</h2><p>La búsqueda no modifica tu vida ni tu memoria.</p></div><TissueSource items={results} onOpen={onOpen} taxonomy={taxonomy}/></>:<div className="empty-state">Escribí algo para buscar en Fuente.</div>}</div></section>
 }
 
 function NotificationsView({ proactivity,refresh }: { proactivity:ProactivitySnapshot|null; refresh:()=>Promise<void> }) {
@@ -451,6 +509,7 @@ export default function App() {
   const [space,setSpace]=useState<Space>('home')
   const [authChecked,setAuthChecked]=useState(false)
   const [authenticated,setAuthenticated]=useState(false)
+  const [profile,setProfile]=useState<ViewerProfile|null>(null)
   const [email,setEmail]=useState('')
   const [otp,setOtp]=useState('')
   const [otpSent,setOtpSent]=useState(false)
@@ -471,9 +530,10 @@ export default function App() {
   const [proactivity,setProactivityState]=useState<ProactivitySnapshot|null>(null)
   const [busy,setBusy]=useState(false)
   const [integrated,setIntegrated]=useState(false)
+  const [sourceReturnConstellationKey,setSourceReturnConstellationKey]=useState<string|null>(null)
 
   const loadPublic=useCallback(async()=>{
-    const [tax,items]=await Promise.all([getSourceTaxonomy(),discoverSource(null,null,null,navigator.language||'es-AR',80)])
+    const [tax,items]=await Promise.all([getSourceTaxonomy(),discoverSource(null,null,null,navigator.language||'es-AR',100)])
     setTaxonomy(tax)
     setSource(items)
   },[])
@@ -486,8 +546,9 @@ export default function App() {
     setProactivityState(nextProactivity)
   },[])
 
-  useEffect(()=>{void (async()=>{try{const auth=await getAuthSnapshot();setAuthenticated(Boolean(auth.session));if(auth.session){await bootstrapPerson();await loadPrivate()}await loadPublic()}finally{setAuthChecked(true)}})()},[loadPrivate,loadPublic])
+  useEffect(()=>{void (async()=>{try{const auth=await getAuthSnapshot();setAuthenticated(Boolean(auth.session));setProfile(auth.user?viewerProfile(auth.user):null);if(auth.session){await bootstrapPerson();await loadPrivate()}await loadPublic()}finally{setAuthChecked(true)}})()},[loadPrivate,loadPublic])
   useEffect(()=>{window.dispatchEvent(new CustomEvent('lumen:space',{detail:{space}}))},[space])
+  useEffect(()=>{window.dispatchEvent(new CustomEvent('lumen:presence',{detail:{mode:stage==='experience'?'retired':'ambient'}}))},[stage])
 
   const go=(next:Space)=>{setSpace(next);if(next!=='home'&&stage!=='idle')setStage('idle')}
   const resetMoment=()=>{setStage('idle');setScene(null);setHelp(null);setMomentConstellation([]);setCapacityKeys([]);setSelectedPathIds([]);setCreatedTrajectoryId(null);setIntegrated(false)}
@@ -517,34 +578,81 @@ export default function App() {
   }
 
   const sendOtp=async()=>{setBusy(true);setAuthError('');try{await requestEmailOtp(email);setOtpSent(true)}catch{setAuthError('No pude enviar el código. Revisá el email e intentá de nuevo.')}finally{setBusy(false)}}
-  const verifyOtp=async()=>{setBusy(true);setAuthError('');try{const auth=await verifyEmailOtp(email,otp);if(!auth.session)throw new Error('No session');await bootstrapPerson();setAuthenticated(true);setOtp('');setOtpSent(false);await loadPrivate();if(stage==='auth')await runMomentAfterAuth()}catch{setAuthError('Ese código no pudo verificarse. Podés pedir uno nuevo.')}finally{setBusy(false)}}
+  const verifyOtp=async()=>{setBusy(true);setAuthError('');try{const auth=await verifyEmailOtp(email,otp);if(!auth.session)throw new Error('No session');await bootstrapPerson();setAuthenticated(true);setProfile(auth.user?viewerProfile(auth.user):null);setOtp('');setOtpSent(false);await loadPrivate();if(stage==='auth')await runMomentAfterAuth()}catch{setAuthError('Ese código no pudo verificarse. Podés pedir uno nuevo.')}finally{setBusy(false)}}
   const runMomentAfterAuth=async()=>{const nextScene=await accompanyMoment(expression.trim(),navigator.language||'es-AR','es');setScene(nextScene);const primary=primaryHelpFromScene(nextScene);setHelp(primary);setCapacityKeys(nextScene.interpretation?.capacity_keys||[]);if(nextScene.episode_id){try{const projection=await composeMomentConstellation(nextScene.episode_id,navigator.language||'es-AR',12);setMomentConstellation(projection.items);setCapacityKeys(projection.capacity_keys?.length?projection.capacity_keys:(nextScene.interpretation?.capacity_keys||[]));const primaryItem=projection.items.find((item)=>item.primary_now)||projection.items[0];if(primaryItem)setHelp(primaryItem);setSelectedPathIds(projection.items.filter((item)=>item.primary_now).map((item)=>item.help_id))}catch{setMomentConstellation([])}}setStage('scene')}
 
   const chooseMomentHelp=async(item:ExperienceHelp)=>{if(!scene?.episode_id)return;setBusy(true);try{const selection=await selectHelp(scene.episode_id,item.help_id,'selected');setHelp(isSourceItem(item)?item:selection.help);setStage('experience')}finally{setBusy(false)}}
   const momentOutcome=async(effect:OutcomeEffect)=>{if(!scene?.episode_id)return;setBusy(true);try{await recordOutcome(scene.episode_id,effect);setStage('closed');if(authenticated)await loadPrivate()}finally{setBusy(false)}}
   const integrateMoment=async()=>{if(!help)return;setBusy(true);try{await integrateHelp(help.help_id);setIntegrated(true);await loadPrivate()}finally{setBusy(false)}}
-  const changeMomentCapabilities=async(keys:string[])=>{setCapacityKeys(keys);if(createdTrajectoryId)await setTrajectoryCapabilities(createdTrajectoryId,keys);if(!scene?.episode_id)return;if(keys.length===1){try{const recomposed=await discoverConstellation(keys[0],scene.interpretation?.area_keys?.[0]||null,navigator.language||'es-AR',12);setMomentConstellation(recomposed)}catch{setMomentConstellation([])}}}
-  const createMomentFaro=async(text:string)=>{setBusy(true);try{const result=await createTrajectoryFromMoment(text,capacityKeys,scene?.moment_id||null);setCreatedTrajectoryId(result.trajectory_id);await loadPrivate()}finally{setBusy(false)}}
+  const recomposeMomentForCapabilities=async(keys:string[])=>{
+    if(!scene?.episode_id)return
+    try{
+      if(!keys.length){
+        const projection=await composeMomentConstellation(scene.episode_id,navigator.language||'es-AR',12)
+        setMomentConstellation(projection.items)
+        setSelectedPathIds((current)=>current.filter((id)=>projection.items.some((item)=>item.help_id===id)))
+        return
+      }
+      const areaKey=scene.interpretation?.area_keys?.[0]||null
+      const groups=await Promise.all(keys.slice(0,4).map((key)=>discoverConstellation(key,areaKey,navigator.language||'es-AR',8)))
+      const merged:Array<SourceItem>=[]
+      const seen=new Set<string>()
+      for(const group of groups)for(const item of group){if(!seen.has(item.help_id)){seen.add(item.help_id);merged.push(item)}}
+      const next=merged.slice(0,12)
+      setMomentConstellation(next)
+      setSelectedPathIds((current)=>{
+        const kept=current.filter((id)=>next.some((item)=>item.help_id===id))
+        return kept.length?kept:(next[0]?[next[0].help_id]:[])
+      })
+    }catch{setMomentConstellation([])}
+  }
+  const changeMomentCapabilities=async(keys:string[])=>{setCapacityKeys(keys);if(createdTrajectoryId)await setTrajectoryCapabilities(createdTrajectoryId,keys);await recomposeMomentForCapabilities(keys)}
+  const reexpressMoment=async(text:string)=>{
+    if(!text.trim())return
+    setBusy(true)
+    try{
+      setExpression(text.trim())
+      const nextScene=await accompanyMoment(text.trim(),navigator.language||'es-AR','es')
+      setScene(nextScene)
+      setHelp(primaryHelpFromScene(nextScene))
+      const initialKeys=nextScene.interpretation?.capacity_keys||[]
+      setCapacityKeys(initialKeys)
+      setCreatedTrajectoryId(null)
+      setSelectedPathIds([])
+      if(nextScene.episode_id){
+        try{
+          const projection=await composeMomentConstellation(nextScene.episode_id,navigator.language||'es-AR',12)
+          setMomentConstellation(projection.items)
+          const nextKeys=projection.capacity_keys?.length?projection.capacity_keys:initialKeys
+          setCapacityKeys(nextKeys)
+          const primaryItem=projection.items.find((item)=>item.primary_now)||projection.items[0]
+          if(primaryItem)setHelp(primaryItem)
+          setSelectedPathIds(primaryItem?[primaryItem.help_id]:[])
+        }catch{setMomentConstellation([])}
+      }
+    }finally{setBusy(false)}
+  }
+  const createMomentFaro=async(text:string)=>{setBusy(true);try{const result=await createTrajectoryFromMoment(text,capacityKeys,scene?.moment_id||null);setCreatedTrajectoryId(result.trajectory_id);if(selectedPathIds.length)await saveConstellationToPath(result.trajectory_id,selectedPathIds);await loadPrivate()}finally{setBusy(false)}}
   const saveMomentPath=async()=>{if(!createdTrajectoryId||!selectedPathIds.length)return;setBusy(true);try{await saveConstellationToPath(createdTrajectoryId,selectedPathIds);await loadPrivate()}finally{setBusy(false)}}
 
-  const openSource=async(item:SourceItem)=>{setHelp(item);setScene(null);setStage('experience')}
+  const openSource=async(item:SourceItem)=>{setSourceReturnConstellationKey(constellationKey(item));setHelp(item);setScene(null);setStage('experience')}
   const saveSource=async(item:SourceItem)=>{if(!authenticated){setEmail('');setSpace('sanctuary');return}await saveSanctuary('treasure',item.title,item.summary,item.help_id);await loadPrivate()}
   const closeExperience=()=>{if(scene?.episode_id)setStage('outcome');else setStage('idle')}
 
   const content=useMemo(()=>{
     if(stage==='auth')return <AuthFlow email={email} setEmail={setEmail} otp={otp} setOtp={setOtp} otpSent={otpSent} busy={busy} error={authError} onSend={()=>void sendOtp()} onVerify={()=>void verifyOtp()} onCancel={()=>resetMoment()}/>
-    if(stage!=='idle')return <MomentFlow stage={stage} scene={scene} help={help} constellation={momentConstellation} capacityKeys={capacityKeys} taxonomy={taxonomy} expression={expression} busy={busy} selectedPathIds={selectedPathIds} createdTrajectoryId={createdTrajectoryId} onSelect={(item)=>void chooseMomentHelp(item)} onExperienceExit={closeExperience} onOutcome={(effect)=>void momentOutcome(effect)} onIntegrate={()=>void integrateMoment()} onClose={()=>{resetMoment();setSpace('home')}} onClarify={()=>{setStage('idle');setSpace('home')}} onCapacityChange={(keys)=>void changeMomentCapabilities(keys)} onTogglePath={(helpId)=>setSelectedPathIds((current)=>current.includes(helpId)?current.filter((id)=>id!==helpId):[...current,helpId])} onCreateFaro={(text)=>void createMomentFaro(text)} onSavePath={()=>void saveMomentPath()} integrated={integrated}/>
-    if(space==='home')return <><HomeHero expression={expression} setExpression={setExpression} submit={()=>void runMoment()} busy={busy} authenticated={authenticated}/><StartWays go={go} setExpression={setExpression} authenticated={authenticated} snapshot={snapshot} source={source} entries={entries} circles={circles} proactivity={proactivity} onOpenSource={(item)=>void openSource(item)}/></>
-    if(space==='explore')return <ExploreView source={source} taxonomy={taxonomy} snapshot={snapshot} authenticated={authenticated} onOpen={(item)=>void openSource(item)} onSave={saveSource}/>
-    if(!authenticated&&!['search'].includes(space))return <PrivateGate name={space==='life'?'MI VIDA':space==='sanctuary'?'SANTUARIO':space==='tissue'?'TEJIDO':'TU ESPACIO'} email={email} setEmail={setEmail} goHome={()=>setStage('auth')} goExplore={()=>go('explore')}/>
-    if(space==='life')return <LifeView snapshot={snapshot} proactivity={proactivity} taxonomy={taxonomy} source={source} entries={entries} circles={circles} refresh={loadPrivate}/>
+    if(stage!=='idle')return <MomentFlow stage={stage} scene={scene} help={help} constellation={momentConstellation} capacityKeys={capacityKeys} taxonomy={taxonomy} expression={expression} busy={busy} selectedPathIds={selectedPathIds} createdTrajectoryId={createdTrajectoryId} onSelect={(item)=>void chooseMomentHelp(item)} onExperienceExit={closeExperience} onOutcome={(effect)=>void momentOutcome(effect)} onIntegrate={()=>void integrateMoment()} onClose={()=>{resetMoment();setSpace('home')}} onClarify={()=>{setStage('idle');setSpace('home')}} onReexpress={(text)=>void reexpressMoment(text)} onCapacityChange={(keys)=>void changeMomentCapabilities(keys)} onTogglePath={(helpId)=>setSelectedPathIds((current)=>current.includes(helpId)?current.filter((id)=>id!==helpId):[...current,helpId])} onCreateFaro={(text)=>void createMomentFaro(text)} onSavePath={()=>void saveMomentPath()} onOpenPath={()=>{resetMoment();setSpace('life')}} integrated={integrated}/>
+    if(space==='home')return <><HomeHero expression={expression} setExpression={setExpression} submit={()=>void runMoment()} busy={busy} authenticated={authenticated} profile={profile}/><StartWays go={go} setExpression={setExpression} authenticated={authenticated} snapshot={snapshot} source={source} entries={entries} circles={circles} proactivity={proactivity} onOpenSource={(item)=>void openSource(item)}/></>
+    if(space==='explore')return <ExploreView source={source} taxonomy={taxonomy} snapshot={snapshot} authenticated={authenticated} onOpen={(item)=>void openSource(item)} onSave={saveSource} returnConstellationKey={sourceReturnConstellationKey} onReturnConstellationChange={setSourceReturnConstellationKey}/>
+    if(!authenticated&&!['search'].includes(space))return <PrivateGate name={space==='life'?'MI PROCESO':space==='sanctuary'?'SANTUARIO':space==='tissue'?'TEJIDO':'TU ESPACIO'} email={email} setEmail={setEmail} goHome={()=>setStage('auth')} goExplore={()=>go('explore')}/>
+    if(space==='life')return <LifeView snapshot={snapshot} proactivity={proactivity} taxonomy={taxonomy} source={source} entries={entries} circles={circles} refresh={loadPrivate} onOpenSource={(item)=>void openSource(item)} go={go}/>
     if(space==='sanctuary')return <SanctuaryView entries={entries} source={source} snapshot={snapshot} refresh={loadPrivate} go={go}/>
-    if(space==='tissue')return <TissueView circles={circles} source={source} snapshot={snapshot} refresh={loadPrivate} onOpen={(item)=>void openSource(item)}/>
-    if(space==='search')return <SearchView source={source} onOpen={(item)=>void openSource(item)}/>
+    if(space==='tissue')return <TissueView circles={circles} source={source} snapshot={snapshot} refresh={loadPrivate} onOpen={(item)=>void openSource(item)} taxonomy={taxonomy}/>
+    if(space==='search')return <SearchView source={source} onOpen={(item)=>void openSource(item)} taxonomy={taxonomy}/>
     if(space==='notifications')return <NotificationsView proactivity={proactivity} refresh={loadPrivate}/>
     return <SettingsView snapshot={snapshot} proactivity={proactivity} refresh={loadPrivate}/>
-  },[stage,space,email,otp,otpSent,busy,authError,scene,help,momentConstellation,capacityKeys,taxonomy,expression,selectedPathIds,createdTrajectoryId,integrated,authenticated,source,snapshot,entries,circles,proactivity,loadPrivate])
+  },[stage,space,email,otp,otpSent,busy,authError,scene,help,momentConstellation,capacityKeys,taxonomy,expression,selectedPathIds,createdTrajectoryId,integrated,authenticated,profile,sourceReturnConstellationKey,source,snapshot,entries,circles,proactivity,loadPrivate])
 
   if(!authChecked)return <div className="boot-screen"><span className="orb"/><p>LUMEN</p></div>
-  return <div className="app-shell"><Sidebar active={space} go={go} authenticated={authenticated} onSignOut={()=>void (async()=>{await signOut();setAuthenticated(false);setSnapshot(null);setEntries([]);setCircles([]);setProactivityState(null);resetMoment();setSpace('home')})()}/><main className="main-field">{content}</main></div>
+  return <div className="app-shell">{stage!=='experience'&&<Sidebar active={space} go={go} authenticated={authenticated} onSignOut={()=>void (async()=>{await signOut();setAuthenticated(false);setProfile(null);setSourceReturnConstellationKey(null);setSnapshot(null);setEntries([]);setCircles([]);setProactivityState(null);resetMoment();setSpace('home')})()}/>}<main className="main-field">{content}</main></div>
 }

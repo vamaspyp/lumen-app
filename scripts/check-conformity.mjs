@@ -3,7 +3,7 @@ import fs from 'node:fs';
 const contractPath = process.env.CONFORMITY_FILE || 'governance/a69-a63-conformity.json';
 const c = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
 const reject = m => { throw new Error('CONFORMITY_BLOCK: ' + m); };
-if (c.act_id !== 'A69' || c.application_act !== 'A63') reject('ACTO mismatch');
+if (!/^A[0-9]+$/.test(c.act_id || '') || c.application_act !== 'A63') reject('ACTO mismatch');
 if (!Array.isArray(c.requirements)) reject('requirements absent');
 const context = JSON.parse(fs.readFileSync('governance/conduction-context.json','utf8'));
 const pov = JSON.parse(fs.readFileSync('governance/pov-snapshot.json','utf8'));

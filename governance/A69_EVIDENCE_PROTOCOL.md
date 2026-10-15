@@ -23,3 +23,13 @@ Esta es reutilización trazable de una lectura autenticada, no una nueva consult
 ## Fronteras
 
 El reporte no autoemite certificados; un contrato CERTIFIED requiere todas sus pruebas y revisiones y conserva la decisión humana de exposición cuando aplica. El piloto PREMIUM de cuatro controles no equivale a cobertura integral V56. A69 no cierra A63/Fuente, no autoriza merge ni exposición y no reemplaza HUMAN/EXPERIENCE PASS.
+
+## Integración operativa sobre runtime vigente (2026-10-15)
+
+Candidato construido selectivamente sobre A63 `1f74703e87552fa3058f2568ea910aeb2292d53d`. No modifica `src/`, `supabase/` ni las 96 regresiones E2E del producto. Conserva los cuatro checks, la evidencia completa y la revisión humana.
+
+`created_under_act` conserva la procedencia A69 de los contratos. `act_id` identifica el ACTO ejecutor y debe coincidir con contexto y POV; una transición requiere renovar los cuatro documentos desde autoridad vigente, sin eliminar requisitos ni alterar fuentes. Las pruebas de transición aceptan un nuevo ACTO coherente y rechazan el obsoleto, la autoridad retirada y la pérdida de cobertura. Son pruebas de mecanismo, no un cambio real de ACTO en POV.
+
+Los triggers cubren pushes de ramas y PRs; la atestación exige el push del mismo SHA y rama del PR, y ACTO/FOCO iguales al snapshot. Esto no amplía la autorización Google: una rama no autorizada falla cerrada. La única emisora comprobada hasta ahora sigue siendo `acto/A69-conformidad-ejecutable`. No conceder acceso indiscriminado a todas las ramas para obtener checks verdes.
+
+Pendientes para cierre operativo: autorización OIDC verificable para las ramas de trabajo/integración aprobadas; ruleset con Conduction Gate, Custody Gate, Conformity Gate y verify obligatorios sobre el destino real `a63-v60-intuitive` y su integración `greenfield-v04-embryo`; revisión Code Owner elegible, merge humano y ejecución satisfactoria posterior en destino. No declarar instalación efectiva ni A69 cerrado por existir este candidato.

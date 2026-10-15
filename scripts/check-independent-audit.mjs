@@ -5,7 +5,7 @@ const fail = (why) => { console.error('INDEPENDENT_AUDIT_BLOCK: '+why); process.
 const contract=JSON.parse(fs.readFileSync(process.env.CONFORMITY_FILE||'governance/a69-a63-conformity.json','utf8'));
 const context=JSON.parse(fs.readFileSync('governance/conduction-context.json','utf8'));
 const snapshot=JSON.parse(fs.readFileSync('governance/pov-snapshot.json','utf8'));
-if(contract.act_id!=='A69'||context.act.id!=='A69'||snapshot.act.id!=='A69') fail('governance conflict');
+if(!/^A[0-9]+$/.test(contract.act_id||'')||contract.act_id!==context.act.id||context.act.id!==snapshot.act.id) fail('governance conflict');
 const req=contract.requirements||[];
 const expected=[['LV',11],['RV',10],['CF',10],['AC',27]].flatMap(([p,n])=>Array.from({length:n},(_,i)=>p+'-'+String(i+1).padStart(2,'0')));
 validateInventory(contract,expected,new Set((snapshot.active_authorities||[]).filter(x=>x.state==='VIGENTE').map(x=>x.id)),process.env.CONFORMITY_TARGET_SHA);

@@ -62,17 +62,28 @@ const CONTEXT: Record<Space, { label:string; title:string; body:string; tip:stri
   },
 }
 
-export function LumiPresence() {
+export function LumiPresence({ onNavigate }: { onNavigate?: (target: string) => void } = {}) {
   const [open, setOpen] = useState(false)
   const [space, setSpace] = useState<Space>('home')
+  const [retired, setRetired] = useState(false)
 
   useEffect(() => {
     const onSpace = (event: Event) => {
       const next = (event as CustomEvent<{space?:Space}>).detail?.space
       if (next && next in CONTEXT) setSpace(next)
     }
+    const onPresence = (event: Event) => {
+      const mode = (event as CustomEvent<{mode?:'ambient'|'retired'}>).detail?.mode
+      const nextRetired = mode === 'retired'
+      setRetired(nextRetired)
+      if (nextRetired) setOpen(false)
+    }
     window.addEventListener('lumen:space', onSpace)
-    return () => window.removeEventListener('lumen:space', onSpace)
+    window.addEventListener('lumen:presence', onPresence)
+    return () => {
+      window.removeEventListener('lumen:space', onSpace)
+      window.removeEventListener('lumen:presence', onPresence)
+    }
   }, [])
 
   const context = CONTEXT[space]
@@ -110,6 +121,11 @@ export function LumiPresence() {
   }, [space])
 
   const returnToMoment = () => {
+    if (onNavigate) {
+      onNavigate('moment')
+      setOpen(false)
+      return
+    }
     clickNav('Inicio')
     window.setTimeout(() => {
       const input = document.querySelector<HTMLInputElement>('[aria-label="Lo que te está pasando"]')
@@ -121,12 +137,13 @@ export function LumiPresence() {
 
   const act = (target:string) => {
     if(target === 'moment'){returnToMoment();return}
+    if(onNavigate){onNavigate(target);setOpen(false);return}
     if(target === 'related'){clickNav('Explorar');scrollTo('related-to-faro');setOpen(false);return}
     clickNav(target)
     setOpen(false)
   }
 
-  return <div className={open ? 'lumi-global open' : 'lumi-global'}>
+  return <div className={retired ? 'lumi-global retired' : open ? 'lumi-global open' : 'lumi-global'} aria-hidden={retired}>
     {open && <aside className="lumi-panel" aria-label="LUMI">
       <small>LUMI · {context.label}</small>
       <h2>{context.title}</h2>
@@ -137,7 +154,7 @@ export function LumiPresence() {
       </div>
       <em>Vos marcás el ritmo.</em>
     </aside>}
-    <button className="lumi-orb" type="button" aria-label={open ? 'Cerrar LUMI' : 'Abrir LUMI'} aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+    <button className="lumi-orb" type="button" disabled={retired} aria-label={open ? 'Cerrar LUMI' : 'Abrir LUMI'} aria-expanded={open} onClick={() => setOpen((value) => !value)}>
       <span className="lumi-glow"/>
       <span className="lumi-spark">✦</span>
     </button>

@@ -1,7 +1,7 @@
-// A69 PRs consume a successful same-SHA trusted push probe; no wider Google federation.
+// Governed PRs consume a successful same-SHA trusted push probe; no wider Google federation.
 import fs from 'node:fs';import {spawnSync} from 'node:child_process';import {pathToFileURL} from 'node:url';
 const fail=m=>{throw Error('POV_ATTESTATION_BLOCK: '+m)};
-export async function verifyPushAttestation({repo,sourceRepo,sha,branch,token,fetcher=fetch,pause=ms=>new Promise(r=>setTimeout(r,ms)),attempts=24}) {
+export async function verifyPushAttestation({repo,sourceRepo,sha,branch,token,fetcher=fetch,pause=ms=>new Promise(r=>setTimeout(r,ms)),attempts=24,expectedAct,expectedFocus}) {
  if(!/^[\w.-]+\/[\w.-]+$/.test(repo||'')||sourceRepo!==repo||!/^[a-f0-9]{40}$/.test(sha||'')||!branch||!token)fail('untrusted source or missing identity');
  const api=async suffix=>{const r=await fetcher('https://api.github.com/repos/'+repo+suffix,{headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(15000)});if(!r.ok)fail('GitHub API HTTP '+r.status);return r};
  for(let attempt=0;attempt<attempts;attempt++){
@@ -21,7 +21,7 @@ export async function verifyPushAttestation({repo,sourceRepo,sha,branch,token,fe
     const extracted=spawnSync('python3',['-c',"import io,sys,zipfile; z=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())); b=z.read('a69-live-pov.json'); assert len(b)<65536; sys.stdout.buffer.write(b)"],{input:zip,maxBuffer:65536});
     if(extracted.status!==0)fail('invalid probe artifact');
     const proof=JSON.parse(extracted.stdout.toString());
-    if(proof.status!=='PASS'||proof.target_sha!==sha||proof.act_id!=='A69'||proof.focus_id!=='F6'||!Number.isFinite(Date.parse(proof.verified_at))||Math.abs(Date.now()-Date.parse(proof.verified_at))>3600000)fail('probe unsuccessful, stale or foreign');
+    if(proof.status!=='PASS'||proof.target_sha!==sha||proof.act_id!==(expectedAct||JSON.parse(fs.readFileSync('governance/pov-snapshot.json','utf8')).act.id)||proof.focus_id!==(expectedFocus||JSON.parse(fs.readFileSync('governance/pov-snapshot.json','utf8')).focus.id)||!Number.isFinite(Date.parse(proof.verified_at))||Math.abs(Date.now()-Date.parse(proof.verified_at))>3600000)fail('probe unsuccessful, stale or foreign');
     return {...proof,attestation_source:'trusted_push_artifact',source_run_id:run.id,source_artifact_id:artifact.id};
    }
   }

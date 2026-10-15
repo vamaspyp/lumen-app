@@ -21,6 +21,7 @@ export type PathItem = Readonly<{
 export type Trajectory = Readonly<{
   trajectory_id: string
   faro_text: string
+  history?: Array<{text:string;until:string}>
   status: 'active' | 'paused' | 'closed'
   capability_keys?: string[]
   origin_moment_id?: string | null
@@ -47,6 +48,7 @@ export type ContinuitySnapshot = Readonly<{
 
 export type SanctuaryEntry = Readonly<{
   entry_id: string
+  composition?: import('./cultivation').ConservedComposition | null
   entry_kind: 'treasure' | 'reflection' | 'note'
   title: string | null
   content: string
@@ -64,6 +66,8 @@ export type SanctuaryExport = Readonly<{
 }>
 
 export type SourceItem = Readonly<{
+  context_origin?: 'fuente'|'propio'|'santuario'|'tejido'
+  context_reason?: string
   help_id: string
   help_version_id?: string
   canonical_code: string
@@ -101,6 +105,10 @@ export type MomentConstellation = Readonly<{
   episode_id: string
   moment_id: string
   decision_run_id: string
+  decision_kind?:string
+  lumi_withdrawn?:boolean
+  continuity_message?:string|null
+  evidence_event_id?:string
   items: SourceItem[]
   capacity_keys: string[]
   area_keys: string[]
@@ -296,6 +304,10 @@ export function setTrajectoryCapabilities(trajectoryId: string, capacityKeys: st
 
 export function integrateHelp(helpId: string) {
   return rpc('lumen_s2_add_repertoire', { p_help_id: helpId, p_trace_id: newTraceId() })
+}
+
+export function releaseOwnResource(repertoireId: string): Promise<{repertoire_id:string;released:boolean}> {
+  return rpc('lumen_s2_release_repertoire', { p_repertoire_id: repertoireId, p_trace_id: newTraceId() })
 }
 
 export function reuseRepertoire(repertoireId: string, move: Exclude<CultivationMove, 'CONTINUE_PATH'>): Promise<CultivationScene> {
